@@ -991,6 +991,102 @@ importers:
         specifier: ^3.0.9
         version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
 
+  stone-js-lab/apps/rest-api-imperative:
+    dependencies:
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../../../stone-js-core
+      '@stone-js/env':
+        specifier: workspace:*
+        version: link:../../../stone-js-env
+      '@stone-js/http-core':
+        specifier: workspace:*
+        version: link:../../../stone-js-http-core
+      '@stone-js/node-cli-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-cli-adapter
+      '@stone-js/node-http-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-http-adapter
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../../../stone-js-router
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.25.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-env':
+        specifier: ^7.26.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-typescript':
+        specifier: ^7.27.0
+        version: 7.29.7(@babel/core@7.29.7)
+      '@stone-js/cli':
+        specifier: workspace:*
+        version: link:../../../stone-js-cli
+      '@types/node':
+        specifier: ^24.0.7
+        version: 24.13.3
+
+  stone-js-lab/apps/rest-api-imperative-vanilla:
+    dependencies:
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../../../stone-js-core
+      '@stone-js/env':
+        specifier: workspace:*
+        version: link:../../../stone-js-env
+      '@stone-js/http-core':
+        specifier: workspace:*
+        version: link:../../../stone-js-http-core
+      '@stone-js/node-cli-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-cli-adapter
+      '@stone-js/node-http-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-http-adapter
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../../../stone-js-router
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.25.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-env':
+        specifier: ^7.26.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@stone-js/cli':
+        specifier: workspace:*
+        version: link:../../../stone-js-cli
+
+  stone-js-lab/apps/rest-api-vanilla:
+    dependencies:
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../../../stone-js-core
+      '@stone-js/http-core':
+        specifier: workspace:*
+        version: link:../../../stone-js-http-core
+      '@stone-js/node-cli-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-cli-adapter
+      '@stone-js/node-http-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-http-adapter
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../../../stone-js-router
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.25.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-env':
+        specifier: ^7.26.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@stone-js/cli':
+        specifier: workspace:*
+        version: link:../../../stone-js-cli
+
   stone-js-node-cli-adapter:
     dependencies:
       '@stone-js/core':
