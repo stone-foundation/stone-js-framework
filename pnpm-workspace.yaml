@@ -3,3 +3,4 @@ packages:
   - 'stone-js-*'
   - '!stone-js-docs'
   - '!stone-js-starters'
+  - '!stone-js-lab'
