@@ -23,6 +23,7 @@
       "@stone-js/aws-lambda-http-adapter",
       "@stone-js/use-view",
       "@stone-js/use-react",
+      "@stone-js/telemetry",
       "@stone-js/cli"
     ]
   ],
