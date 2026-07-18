@@ -1,0 +1,97 @@
+{
+  "name": "@stone-js/lab",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Living, runnable proof that every Stone.js feature works (API, SPA, SSR, SSG, telemetry dashboard). Also a starter provider.",
+  "author": "Mr. Stone <evensstone@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "Stone.js",
+    "examples",
+    "validation",
+    "showcase",
+    "lab"
+  ],
+  "stone": {
+    "starters": [
+      {
+        "value": "rest-api",
+        "title": "REST API — declarative, TypeScript (lab)",
+        "description": "Real REST API: routing, regex params, JSON responses, 404s. Decorators + TS.",
+        "tags": ["api", "service", "declarative", "typescript", "lab"],
+        "path": "apps/rest-api"
+      },
+      {
+        "value": "rest-api-vanilla",
+        "title": "REST API — declarative, JavaScript (lab)",
+        "description": "The same REST API in vanilla JS (decorators preserved, types stripped).",
+        "tags": ["api", "service", "declarative", "javascript", "lab"],
+        "path": "apps/rest-api-vanilla"
+      },
+      {
+        "value": "rest-api-imperative",
+        "title": "REST API — imperative, TypeScript (lab)",
+        "description": "The same REST API with the define* meta-module API instead of decorators.",
+        "tags": ["api", "service", "imperative", "typescript", "lab"],
+        "path": "apps/rest-api-imperative"
+      },
+      {
+        "value": "rest-api-imperative-vanilla",
+        "title": "REST API — imperative, JavaScript (lab)",
+        "description": "The imperative REST API in vanilla JS — the 4th corner of the matrix.",
+        "tags": ["api", "service", "imperative", "javascript", "lab"],
+        "path": "apps/rest-api-imperative-vanilla"
+      },
+      {
+        "value": "spa",
+        "title": "React SPA — client-side rendering (lab)",
+        "description": "React SPA: multi-page routing, StoneLink navigation, CSR. Same pages as ssr/ssg.",
+        "tags": ["react", "frontend", "spa", "csr", "lab"],
+        "path": "apps/spa"
+      },
+      {
+        "value": "ssr",
+        "title": "React SSR — server-side rendering (lab)",
+        "description": "React SSR with client hydration (isomorphic). Same pages as spa/ssg.",
+        "tags": ["react", "frontend", "ssr", "lab"],
+        "path": "apps/ssr"
+      },
+      {
+        "value": "ssg",
+        "title": "React SSG — static site generation (lab)",
+        "description": "React SSG: routes pre-rendered to static HTML + client hydration. Same pages as spa/ssr.",
+        "tags": ["react", "frontend", "ssg", "static", "lab"],
+        "path": "apps/ssg"
+      },
+      {
+        "value": "spa-imperative",
+        "title": "React SPA — CSR, imperative (lab)",
+        "description": "The SPA built with the imperative define* API instead of decorators. 1:1 with apps/spa.",
+        "tags": ["react", "frontend", "spa", "csr", "imperative", "lab"],
+        "path": "apps/spa-imperative"
+      },
+      {
+        "value": "ssr-imperative",
+        "title": "React SSR — imperative (lab)",
+        "description": "The SSR app built with the imperative define* API. 1:1 with apps/ssr.",
+        "tags": ["react", "frontend", "ssr", "imperative", "lab"],
+        "path": "apps/ssr-imperative"
+      },
+      {
+        "value": "ssg-imperative",
+        "title": "React SSG — imperative (lab)",
+        "description": "The SSG app built with the imperative define* API. 1:1 with apps/ssg.",
+        "tags": ["react", "frontend", "ssg", "static", "imperative", "lab"],
+        "path": "apps/ssg-imperative"
+      },
+      {
+        "value": "security-dashboard",
+        "title": "Security & runtime metrics dashboard (lab)",
+        "description": "Consumes @stone-js/telemetry: spans every request, aggregates in a shared exporter, renders a live HTML dashboard + JSON metrics API.",
+        "tags": ["telemetry", "observability", "security", "dashboard", "service", "lab"],
+        "path": "apps/security-dashboard"
+      }
+    ]
+  }
+}

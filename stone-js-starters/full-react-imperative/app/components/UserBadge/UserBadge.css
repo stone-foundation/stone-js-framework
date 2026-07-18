@@ -1,0 +1,33 @@
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-badge button {
+  text-align: left;
+}
+
+.user-badge.vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.user-badge-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+}
+
+.user-badge-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.95rem;
+}
+
+.user-badge-details {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}

@@ -1,0 +1,49 @@
+{
+  "name": "@stone-js/docs",
+  "version": "0.1.3",
+  "description": "StoneJS official documentation",
+  "license": "MIT",
+  "type": "module",
+  "authors": {
+    "name": "Mr. Stone",
+    "email": "pierre.evens16@gmail.com"
+  },
+  "repository": "https://github.com/stone-foundation/stone-js-docs.git",
+  "homepage": "https://stonejs.dev",
+  "scripts": {
+    "generate-docs": "node ./scripts/auto-generate-docs.mjs",
+    "docs:build": "vuepress-vite build src",
+    "docs:clean-dev": "vuepress-vite dev src --clean-cache",
+    "docs:dev": "vuepress-vite dev src",
+    "docs:update-package": "pnpm dlx vp-update",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "bulma": "^1.0.4",
+    "lucide-vue-next": "^0.523.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@vuepress/bundler-vite": "2.0.0-rc.23",
+    "@vuepress/plugin-docsearch": "2.0.0-rc.108",
+    "@vuepress/plugin-prismjs": "2.0.0-rc.108",
+    "husky": "^9.1.7",
+    "mermaid": "^11.7.0",
+    "prismjs": "^1.30.0",
+    "sass-embedded": "^1.89.2",
+    "vue": "^3.5.17",
+    "vuepress": "2.0.0-rc.23",
+    "vuepress-theme-hope": "2.0.0-rc.92"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ],
+    "overrides": {
+      "vuepress": "2.0.0-rc.23",
+      "@vuepress/bundler-vite": "2.0.0-rc.23",
+      "@vuepress/plugin-prismjs": "2.0.0-rc.108"
+    }
+  }
+}

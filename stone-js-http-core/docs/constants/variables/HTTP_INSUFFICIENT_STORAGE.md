@@ -1,0 +1,5 @@
+# Variable: HTTP\_INSUFFICIENT\_STORAGE
+
+```ts
+const HTTP_INSUFFICIENT_STORAGE: 507 = 507;
+```

@@ -1,0 +1,25 @@
+{
+  "name": "continuum-showcase",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Showcase app exercising the new head/OG API and static-asset aliases (2026-07 continuum pass).",
+  "scripts": {
+    "dev": "stone dev",
+    "build": "stone build",
+    "preview": "stone preview"
+  },
+  "dependencies": {
+    "@stone-js/browser-adapter": "workspace:*",
+    "@stone-js/core": "workspace:*",
+    "@stone-js/node-http-adapter": "workspace:*",
+    "@stone-js/router": "workspace:*",
+    "@stone-js/use-react": "workspace:*",
+    "@stone-js/use-view": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@stone-js/cli": "workspace:*"
+  }
+}

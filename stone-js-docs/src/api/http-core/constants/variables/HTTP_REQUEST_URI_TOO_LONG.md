@@ -1,0 +1,5 @@
+# Variable: HTTP\_REQUEST\_URI\_TOO\_LONG
+
+```ts
+const HTTP_REQUEST_URI_TOO_LONG: 414 = 414;
+```

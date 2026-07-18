@@ -1,0 +1,32 @@
+.right-aside-panel {
+  position: sticky;
+  top: 72px;
+  align-self: start;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.aside-section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem 1rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.aside-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.2rem;
+}
+
+.aside-section ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 0;
+  margin: 0;
+}

@@ -1,0 +1,5 @@
+# Variable: HTTP\_MULTIPLE\_CHOICES
+
+```ts
+const HTTP_MULTIPLE_CHOICES: 300 = 300;
+```

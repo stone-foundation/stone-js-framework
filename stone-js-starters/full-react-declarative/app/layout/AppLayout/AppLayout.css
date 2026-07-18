@@ -1,0 +1,20 @@
+.app-layout .logo {
+  margin: 0;
+  border: none;
+  display: flex;
+  width: 300px;
+  align-items: center;
+  background: none;
+  text-align: center;
+}
+.app-layout .logo:hover {
+  cursor: pointer;
+}
+.app-layout .logo img {
+  width: 24px;
+}
+.app-layout .logo span {
+  font-size: 1.5em;
+  margin-left: 8px;
+  font-weight: bold;
+}

@@ -1,0 +1,5 @@
+# Variable: HTTP\_EXPECTATION\_FAILED
+
+```ts
+const HTTP_EXPECTATION_FAILED: 417 = 417;
+```

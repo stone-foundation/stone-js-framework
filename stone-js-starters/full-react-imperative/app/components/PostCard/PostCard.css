@@ -1,0 +1,129 @@
+.post-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  padding: 1rem;
+  margin-top: 1.5rem;
+  transition: box-shadow 0.2s ease;
+  max-width: 100%;
+}
+
+.post-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.post-content p {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+  color: #1c1e21;
+}
+
+.post-image {
+  margin-top: 0.75rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.post-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .post-card {
+    padding: 0.75rem;
+  }
+
+  .post-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .post-author strong {
+    font-size: 0.875rem;
+  }
+
+  .post-author span {
+    font-size: 0.7rem;
+  }
+}
+
+.post-actions {
+  margin-left: auto;
+  position: relative;
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.post-dropdown {
+  position: absolute;
+  top: 1.5rem;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  list-style: none;
+  padding: 0.25rem 0;
+  width: 140px;
+  z-index: 20;
+}
+
+.post-dropdown li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #333;
+}
+
+.post-dropdown li:hover {
+  background: #f0f2f5;
+}
+
+/* Post Footer Buttons */
+.post-footer {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.post-comments {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.post-action {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.post-action:hover {
+  background-color: #f0f2f5;
+  color: #111;
+}

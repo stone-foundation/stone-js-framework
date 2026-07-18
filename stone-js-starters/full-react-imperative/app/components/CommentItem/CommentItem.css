@@ -1,0 +1,74 @@
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f0f0f0;
+}
+
+.comment-bubble {
+  background: #f0f2f5;
+  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  position: relative;
+  flex: 1;
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.comment-text {
+  font-size: 0.9rem;
+  color: #1c1e21;
+  line-height: 1.4;
+}
+
+.comment-delete {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  color: #999;
+  cursor: pointer;
+}
+
+.comment-delete:hover {
+  color: #e11d48;
+}
+
+.comment-reactions {
+  margin-top: 0.25rem;
+}
+
+.like-button {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.like-button:hover {
+  background: #e5e7eb;
+}
+
+.like-button.liked {
+  color: #2563eb;
+  font-weight: 600;
+}

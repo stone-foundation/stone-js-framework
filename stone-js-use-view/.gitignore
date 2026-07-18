@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+docs/
+.turbo/
+*.log
+.DS_Store
+
+# Internal audit/strategy docs live in the monorepo root docs/ (gitignored there)
+RAPPORT-AUDIT.md
+FEUILLE-DE-ROUTE.md
+PASSE-CONTINUUM-*.md

@@ -1,0 +1,111 @@
+import { sidebar } from "vuepress-theme-hope";
+
+export const enSidebar = sidebar({
+  "/docs/": [
+    {
+      text: "Getting Started",
+      collapsible: false,
+      prefix: "getting-started/",
+      children: [
+        { text: 'Installation', link: 'README.md' },
+        'structure',
+        'deployment',
+      ],
+    },
+    {
+      text: "Core Concepts",
+      collapsible: false,
+      prefix: 'architecture/',
+      children: [
+        { text: 'Introduction', link: 'README.md' },
+        { text: 'Continuum', link: 'continuum.md' },
+        { text: 'Paradigms', link: 'paradigms.md' },
+        'build',
+        'lifecycle',
+        'middleware',
+        'blueprint',
+        'adapter',
+        'container',
+        'providers',
+      ],
+    },
+    {
+      text: "Essentials",
+      collapsible: false,
+      prefix: "essentials/",
+      children: [
+        'event-handler',
+        'incoming-event',
+        'outgoing-response',
+        'cookies',
+        'events',
+        { text: 'Configuration', link: 'configuration.md' },
+        'error-handler',
+        'logging',
+      ],
+    },
+    {
+      text: "Router",
+      collapsible: false,
+      prefix: "router/",
+      children: [
+        { text: 'Introduction', link: 'README.md' },
+        'definitions',
+        'parameters',
+        'binding',
+        { text: 'Misc', link: 'misc.md' },
+      ],
+    },
+    {
+      text: "React",
+      collapsible: false,
+      prefix: "react/",
+      children: [
+        { text: 'Introduction', link: 'README.md' },
+        'pages',
+        'components',
+        'routing',
+        'fetching',
+        'layout',
+        'error-pages',
+        'assets',
+        { text: 'Misc', link: 'misc.md' },
+      ],
+    },
+    {
+      text: "Deep dive",
+      collapsible: false,
+      prefix: "deeper/",
+      children: [
+        'testing',
+        'commands',
+        'development',
+      ],
+    },
+  ],
+  '/packages/': [
+    { text: "Browser Adapter", link: 'browser-adapter/README.md' },
+    { text: "Node HTTP Adapter", link: 'node-http-adapter/README.md' },
+    { text: "AWS Lambda HTTP Adapter", link: 'aws-lambda-http-adapter/README.md' },
+    { text: "AWS Lambda Adapter", link: 'aws-lambda-adapter/README.md' },
+    { text: "Node CLI Adapter", link: 'node-cli-adapter/README.md' }
+  ],
+  '/api/': [
+    { text: "Core", link: 'core/README.md' },
+    { text: "Pipeline", link: 'pipeline/README.md' },
+    { text: "Service Container", link: 'service-container/README.md' },
+    { text: "Config", link: 'config/README.md' },
+    { text: "Env", link: 'env/README.md' },
+    { text: "Filesystem", link: 'filesystem/README.md' },
+    { text: "HTTP Core", link: 'http-core/README.md' },
+    { text: "Browser Core", link: 'browser-core/README.md' },
+    { text: "Node HTTP Adapter", link: 'node-http-adapter/README.md' },
+    { text: "AWS Lambda HTTP Adapter", link: 'aws-lambda-http-adapter/README.md' },
+    { text: "AWS Lambda Adapter", link: 'aws-lambda-adapter/README.md' },
+    { text: "Browser Adapter", link: 'browser-adapter/README.md' },
+    { text: "Node CLI Adapter", link: 'node-cli-adapter/README.md' },
+    { text: "Router", link: 'router/README.md' },
+    { text: "React Integration", link: 'use-react/README.md' },
+    { text: "CLI", link: 'cli/README.md' }
+  ],
+});

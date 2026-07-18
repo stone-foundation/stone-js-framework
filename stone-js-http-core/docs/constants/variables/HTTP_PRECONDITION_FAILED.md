@@ -1,0 +1,5 @@
+# Variable: HTTP\_PRECONDITION\_FAILED
+
+```ts
+const HTTP_PRECONDITION_FAILED: 412 = 412;
+```

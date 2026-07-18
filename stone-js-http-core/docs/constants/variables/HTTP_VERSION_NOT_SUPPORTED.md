@@ -1,0 +1,5 @@
+# Variable: HTTP\_VERSION\_NOT\_SUPPORTED
+
+```ts
+const HTTP_VERSION_NOT_SUPPORTED: 505 = 505;
+```

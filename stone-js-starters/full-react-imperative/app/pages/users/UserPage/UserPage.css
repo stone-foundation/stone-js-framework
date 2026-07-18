@@ -1,0 +1,31 @@
+.users-page .users-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.users-search {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 9999px;
+  border: 1px solid #d1d5db;
+  background-color: #f9fafb;
+  margin-bottom: 2rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.users-search:focus {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+}
+
+.users-page .user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}

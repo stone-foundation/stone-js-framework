@@ -1,0 +1,65 @@
+/* Base skeleton style */
+.skeleton {
+  pointer-events: none;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #f0f0f0;
+  }
+  50% {
+    background-color: #e4e4e7;
+  }
+  100% {
+    background-color: #f0f0f0;
+  }
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+}
+
+.skeleton-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-left: 0.75rem;
+}
+
+.skeleton-line {
+  height: 12px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.skeleton-line.short {
+  width: 40%;
+}
+
+.skeleton-line.tiny {
+  width: 25%;
+}
+
+.skeleton-line.half {
+  width: 70%;
+}
+
+.skeleton-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.skeleton-image {
+  height: 200px;
+  background-color: #e5e7eb;
+  border-radius: 8px;
+  margin-top: 1rem;
+}

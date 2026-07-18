@@ -1,0 +1,64 @@
+.user-profile-page {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
+}
+
+/* Cover Banner */
+.profile-cover {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(to right, #3b82f6, #6366f1);
+}
+
+/* Header with avatar */
+.profile-header {
+  background: white;
+  margin-top: -48px;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-avatar {
+  margin-top: -24px;
+}
+
+.profile-info h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.profile-info .email {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.profile-info .bio {
+  font-size: 1rem;
+  color: #374151;
+  margin-top: 0.5rem;
+}
+
+.profile-info .status {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.profile-info .online {
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* Timeline Section */
+.profile-timeline {
+  margin-top: 2rem;
+}

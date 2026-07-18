@@ -1,0 +1,24 @@
+{
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts", "src/bundler/rollup.config.mjs",
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "allowJs": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "declaration": false,
+    "skipLibCheck": true,
+    "declarationMap": false,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "types": ["node", "vitest/globals"],
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

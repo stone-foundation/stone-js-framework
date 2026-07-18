@@ -1,0 +1,41 @@
+.dropdown-menu li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dropdown-menu li.unread {
+  font-weight: 600;
+  background: #eef2ff;
+}
+
+.dropdown-menu li.read {
+  font-weight: 400;
+  background: white;
+}
+
+.notification-time {
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.notification-button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 5px;
+  border-radius: 9999px;
+  font-weight: bold;
+}

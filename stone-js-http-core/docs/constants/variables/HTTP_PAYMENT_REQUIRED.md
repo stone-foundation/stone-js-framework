@@ -1,0 +1,5 @@
+# Variable: HTTP\_PAYMENT\_REQUIRED
+
+```ts
+const HTTP_PAYMENT_REQUIRED: 402 = 402;
+```

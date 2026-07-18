@@ -1,0 +1,5 @@
+# Variable: HTTP\_NOT\_IMPLEMENTED
+
+```ts
+const HTTP_NOT_IMPLEMENTED: 501 = 501;
+```

@@ -1,0 +1,31 @@
+# Node modules
+node_modules/
+
+# VuePress build output
+dist/
+
+# Local dev server cache
+.temp/
+.cache/
+
+# Optional: pnpm store (if you want to exclude it)
+.pnpm-store/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# macOS files
+.DS_Store
+
+# VSCode settings (optional, personal choice)
+.vscode/
+
+# System files
+Thumbs.db
+
+# Environment variables (if used)
+.env
+.env.local

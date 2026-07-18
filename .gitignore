@@ -16,5 +16,5 @@ coverage/
 
 # Modules are still independent git repos until consolidation; ignore them at the
 # root for now to avoid nested gitlinks.
-stone-js/
-stone-js-*/
+# stone-js/ (consolidated into monorepo)
+# stone-js-*/ (consolidated into monorepo)

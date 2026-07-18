@@ -1,0 +1,62 @@
+.app-header .app-navbar {
+  display: flex;
+  margin: 0 auto;
+  max-width: 1280px;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  justify-content: space-between;
+}
+
+.header-left .logo {
+  margin: 0;
+  gap: 0.5rem;
+  border: none;
+  display: flex;
+  color: #1c1e21;
+  background: none;
+  font-weight: bold;
+  font-size: 1.25rem;
+  align-items: center;
+  text-decoration: none;
+}
+
+.header-left .logo:hover {
+  cursor: pointer;
+}
+
+.header-left img {
+  height: 36px;
+  width: 36px;
+}
+
+.header-left .logo span {
+  font-size: 1.1em;
+  margin-left: 8px;
+  font-weight: bold;
+}
+
+.header-right {
+  gap: 3rem;
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+  color: #555;
+}

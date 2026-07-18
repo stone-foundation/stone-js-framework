@@ -1,0 +1,5 @@
+# Variable: HTTP\_UNPROCESSABLE\_ENTITY
+
+```ts
+const HTTP_UNPROCESSABLE_ENTITY: 422 = 422;
+```

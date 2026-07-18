@@ -1,0 +1,5 @@
+# Variable: HTTP\_SERVICE\_UNAVAILABLE
+
+```ts
+const HTTP_SERVICE_UNAVAILABLE: 503 = 503;
+```

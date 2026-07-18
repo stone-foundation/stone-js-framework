@@ -1,0 +1,18 @@
+.user-avatar-img {
+  border-radius: 9999px;
+  object-fit: cover;
+  background-color: #e5e7eb;
+  display: inline-block;
+}
+
+.user-avatar-fallback {
+  border-radius: 9999px;
+  background-color: #6366f1; /* Indigo */
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  user-select: none;
+}

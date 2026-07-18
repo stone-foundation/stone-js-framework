@@ -1,0 +1,9 @@
+# constants
+
+## Variables
+
+- [COMMAND\_NOT\_FOUND\_CODE](variables/COMMAND_NOT_FOUND_CODE.md)
+- [EXIT\_COMMAND\_NOT\_FOUND](variables/EXIT_COMMAND_NOT_FOUND.md)
+- [EXIT\_FAILURE](variables/EXIT_FAILURE.md)
+- [EXIT\_SUCCESS](variables/EXIT_SUCCESS.md)
+- [NODE\_CONSOLE\_PLATFORM](variables/NODE_CONSOLE_PLATFORM.md)
