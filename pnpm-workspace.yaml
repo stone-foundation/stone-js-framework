@@ -4,3 +4,4 @@ packages:
   - '!stone-js-docs'
   - '!stone-js-starters'
   - '!stone-js-lab'
+  - 'stone-js-lab/apps/*'

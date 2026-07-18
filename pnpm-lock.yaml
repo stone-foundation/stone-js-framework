@@ -951,6 +951,46 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
 
+  stone-js-lab/apps/rest-api:
+    dependencies:
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../../../stone-js-core
+      '@stone-js/http-core':
+        specifier: workspace:*
+        version: link:../../../stone-js-http-core
+      '@stone-js/node-cli-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-cli-adapter
+      '@stone-js/node-http-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-http-adapter
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../../../stone-js-router
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.25.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-env':
+        specifier: ^7.26.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-typescript':
+        specifier: ^7.27.0
+        version: 7.29.7(@babel/core@7.29.7)
+      '@stone-js/cli':
+        specifier: workspace:*
+        version: link:../../../stone-js-cli
+      '@types/node':
+        specifier: ^24.0.7
+        version: 24.13.3
+      '@vitest/coverage-v8':
+        specifier: ^3.0.9
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+
   stone-js-node-cli-adapter:
     dependencies:
       '@stone-js/core':
@@ -1247,11 +1287,8 @@ importers:
   stone-js-router:
     dependencies:
       '@stone-js/core':
-        specifier: ^0.2.1
-        version: 0.2.1
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.18.1
+        specifier: workspace:*
+        version: link:../stone-js-core
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
@@ -1271,9 +1308,6 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^12.3.0
         version: 12.3.0(rollup@4.62.2)(tslib@2.8.1)(typescript@5.9.3)
-      '@types/lodash-es':
-        specifier: ^4.17.12
-        version: 4.17.12
       '@types/node':
         specifier: ^24.0.7
         version: 24.13.3
@@ -1380,26 +1414,92 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
 
+  stone-js-telemetry:
+    devDependencies:
+      '@commitlint/cli':
+        specifier: ^19.8.1
+        version: 19.8.1(@types/node@24.13.3)(typescript@5.9.3)
+      '@commitlint/config-conventional':
+        specifier: ^19.8.1
+        version: 19.8.1
+      '@rollup/plugin-commonjs':
+        specifier: ^28.0.6
+        version: 28.0.9(rollup@4.62.2)
+      '@rollup/plugin-multi-entry':
+        specifier: ^6.0.1
+        version: 6.0.1(rollup@4.62.2)
+      '@rollup/plugin-node-resolve':
+        specifier: ^16.0.1
+        version: 16.0.3(rollup@4.62.2)
+      '@rollup/plugin-typescript':
+        specifier: ^12.1.4
+        version: 12.3.0(rollup@4.62.2)(tslib@2.8.1)(typescript@5.9.3)
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../stone-js-core
+      '@types/node':
+        specifier: ^24.0.7
+        version: 24.13.3
+      '@vitest/coverage-v8':
+        specifier: ^3.2.4
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      rollup:
+        specifier: ^4.44.1
+        version: 4.62.2
+      rollup-plugin-delete:
+        specifier: ^3.0.1
+        version: 3.0.2(rollup@4.62.2)
+      rollup-plugin-dts:
+        specifier: ^6.2.1
+        version: 6.4.1(rollup@4.62.2)(typescript@5.9.3)
+      rollup-plugin-node-externals:
+        specifier: ^8.0.1
+        version: 8.1.2(rollup@4.62.2)
+      ts-standard:
+        specifier: ^12.0.2
+        version: 12.0.2(typescript@5.9.3)
+      tslib:
+        specifier: ^2.8.1
+        version: 2.8.1
+      typedoc:
+        specifier: ^0.28.6
+        version: 0.28.20(typescript@5.9.3)
+      typedoc-plugin-markdown:
+        specifier: ^4.7.0
+        version: 4.12.0(typedoc@0.28.20(typescript@5.9.3))
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+
   stone-js-use-react:
     dependencies:
       '@stone-js/browser-adapter':
-        specifier: ^0.1.1
-        version: 0.1.1(@stone-js/browser-core@0.1.2(@stone-js/core@0.2.1))(@stone-js/core@0.2.1)
+        specifier: workspace:*
+        version: link:../stone-js-browser-adapter
       '@stone-js/browser-core':
-        specifier: ^0.1.2
-        version: 0.1.2(@stone-js/core@0.2.1)
+        specifier: workspace:*
+        version: link:../stone-js-browser-core
       '@stone-js/config':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: workspace:*
+        version: link:../stone-js-config
       '@stone-js/core':
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: workspace:*
+        version: link:../stone-js-core
       '@stone-js/http-core':
-        specifier: ^0.1.4
-        version: 0.1.4(@stone-js/core@0.2.1)(@stone-js/filesystem@stone-js-filesystem)
+        specifier: workspace:*
+        version: link:../stone-js-http-core
       '@stone-js/router':
-        specifier: ^0.2.2
-        version: 0.2.2(@stone-js/core@0.2.1)
+        specifier: workspace:*
+        version: link:../stone-js-router
       '@stone-js/use-view':
         specifier: workspace:*
         version: link:../stone-js-use-view
@@ -1486,11 +1586,11 @@ importers:
   stone-js-use-view:
     dependencies:
       '@stone-js/core':
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: workspace:*
+        version: link:../stone-js-core
       '@stone-js/router':
-        specifier: ^0.2.2
-        version: 0.2.2(@stone-js/core@0.2.1)
+        specifier: workspace:*
+        version: link:../stone-js-router
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
@@ -2762,48 +2862,6 @@ packages:
   '@sindresorhus/merge-streams@2.3.0':
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
-
-  '@stone-js/browser-adapter@0.1.1':
-    resolution: {integrity: sha512-xEl7oRvEKn0vwNN9x2AITh7As3ypVDnMtiUcXVUGHInoTlAz2AlsZX0aiiYiw/hwWfXTJffgU9HxboLUittXXQ==}
-    engines: {node: '>=18.17.0'}
-    peerDependencies:
-      '@stone-js/browser-core': ^0.1.2
-      '@stone-js/core': ^0.2.1
-
-  '@stone-js/browser-core@0.1.2':
-    resolution: {integrity: sha512-q6mWr9g+3+cdworEmIURb7bmeFeowiD3LEqVIjnYqqw8S/S7nB8qakRL87RZcXiUaAQR7c7HB4w0Vrt3ooyotg==}
-    engines: {node: '>=18.17.0'}
-    peerDependencies:
-      '@stone-js/core': ^0.2.1
-
-  '@stone-js/config@0.2.0':
-    resolution: {integrity: sha512-MVDY8qwe/4JTJ1KCaxjIPuJmCxiFQGSwMZg6EP1dwGS1Hn34fnbXsQftkpSHYHMEo+pkHaONZbGO3HiTTc2NcQ==}
-    engines: {node: '>=18.17.0'}
-
-  '@stone-js/core@0.2.1':
-    resolution: {integrity: sha512-eHsMsv0I7T9CY+yYBxg2fxLiEZ7G5+du5BHMRXvjTsnhcQ2o81pJxGfisLRF9pbGceNfrxc1NzvcuPfnX7oq2A==}
-    engines: {node: '>=18.17.0'}
-
-  '@stone-js/http-core@0.1.4':
-    resolution: {integrity: sha512-PiJHrGJEAaa1osmIOsH71NjIQDX4s6KFMNc7Bh6JbLBUKe3KclKZX3BdSCohMW63tFYNzP+b75OU+1G6IB2/Ug==}
-    engines: {node: '>=18.17.0'}
-    peerDependencies:
-      '@stone-js/core': ^0.2.1
-      '@stone-js/filesystem': ^0.1.2
-
-  '@stone-js/pipeline@0.1.3':
-    resolution: {integrity: sha512-hi8v0L8coS8AYlol/hZQ2ImOrnS8xDn5lGmrP2ieigfM+S329plr8Joycj0lE4gEFaYyxZbsPLsVxojOi6AVCQ==}
-    engines: {node: '>=18.17.0'}
-
-  '@stone-js/router@0.2.2':
-    resolution: {integrity: sha512-tAg/qaXEEQEPwywkIAmqWZ6M+85P+8leoIkYAHRXqZj1E2fkf8w7hLCXHK/j0Cp18//wlyl6dLOxjMU9oSj/ig==}
-    engines: {node: '>=18.17.0'}
-    peerDependencies:
-      '@stone-js/core': ^0.2.1
-
-  '@stone-js/service-container@0.1.3':
-    resolution: {integrity: sha512-CDgKV6s+2EEA/cZd+3UtNwrbL5ohGDe44hr7fSAfuvP4TkjN6nYXlueABKzAA5012kdrGvDhAEGOYWF/1FOBPQ==}
-    engines: {node: '>=18.17.0'}
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -4445,9 +4503,6 @@ packages:
   locate-path@7.2.0:
     resolution: {integrity: sha512-gvVijfZvn7R+2qyPX8mAuKcFGDf6Nc61GdvGafQsHL0sBIxfKzA+usWn4GFC/bk+QdwPUD4kWFJLhElipq+0VA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
-  lodash-es@4.18.1:
-    resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
 
   lodash.camelcase@4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
@@ -7041,65 +7096,6 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@stone-js/browser-adapter@0.1.1(@stone-js/browser-core@0.1.2(@stone-js/core@0.2.1))(@stone-js/core@0.2.1)':
-    dependencies:
-      '@stone-js/browser-core': 0.1.2(@stone-js/core@0.2.1)
-      '@stone-js/core': 0.2.1
-      cookie: 1.1.1
-
-  '@stone-js/browser-core@0.1.2(@stone-js/core@0.2.1)':
-    dependencies:
-      '@stone-js/core': 0.2.1
-      cookie: 1.1.1
-
-  '@stone-js/config@0.2.0':
-    dependencies:
-      deepmerge: 4.3.1
-      lodash-es: 4.18.1
-
-  '@stone-js/core@0.2.1':
-    dependencies:
-      '@stone-js/config': 0.2.0
-      '@stone-js/pipeline': 0.1.3
-      '@stone-js/service-container': 0.1.3
-      deepmerge: 4.3.1
-      lodash-es: 4.18.1
-
-  '@stone-js/http-core@0.1.4(@stone-js/core@0.2.1)(@stone-js/filesystem@stone-js-filesystem)':
-    dependencies:
-      '@stone-js/core': 0.2.1
-      '@stone-js/filesystem': link:stone-js-filesystem
-      accepts: 1.3.8
-      busboy: 1.6.0
-      bytes: 3.1.2
-      content-disposition: 0.5.4
-      content-type: 1.0.5
-      cookie: 1.1.1
-      cookie-signature: 1.2.2
-      etag: 1.8.1
-      filesize: 10.1.6
-      fresh: 0.5.2
-      ip-range-check: 0.2.0
-      lodash-es: 4.18.1
-      mime: 4.1.0
-      range-parser: 1.3.0
-      safe-buffer: 5.2.1
-      send: 1.2.1
-      statuses: 2.0.2
-      type-is: 2.1.0
-      vary: 1.1.2
-    transitivePeerDependencies:
-      - supports-color
-
-  '@stone-js/pipeline@0.1.3': {}
-
-  '@stone-js/router@0.2.2(@stone-js/core@0.2.1)':
-    dependencies:
-      '@stone-js/core': 0.2.1
-      lodash-es: 4.18.1
-
-  '@stone-js/service-container@0.1.3': {}
-
   '@testing-library/dom@10.4.1':
     dependencies:
       '@babel/code-frame': 7.29.7
@@ -8993,8 +8989,6 @@ snapshots:
   locate-path@7.2.0:
     dependencies:
       p-locate: 6.0.0
-
-  lodash-es@4.18.1: {}
 
   lodash.camelcase@4.3.0: {}
 
