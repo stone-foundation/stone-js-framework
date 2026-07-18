@@ -1133,6 +1133,52 @@ importers:
         specifier: ^19.0.3
         version: 19.2.3(@types/react@19.2.17)
 
+  stone-js-lab/apps/spa-imperative:
+    dependencies:
+      '@stone-js/browser-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-browser-adapter
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../../../stone-js-core
+      '@stone-js/node-cli-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-cli-adapter
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../../../stone-js-router
+      '@stone-js/use-react':
+        specifier: workspace:*
+        version: link:../../../stone-js-use-react
+      react:
+        specifier: ^19.0.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.7(react@19.2.7)
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.25.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-env':
+        specifier: ^7.26.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-typescript':
+        specifier: ^7.27.0
+        version: 7.29.7(@babel/core@7.29.7)
+      '@stone-js/cli':
+        specifier: workspace:*
+        version: link:../../../stone-js-cli
+      '@types/node':
+        specifier: ^24.0.7
+        version: 24.13.3
+      '@types/react':
+        specifier: ^19.0.7
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.0.3
+        version: 19.2.3(@types/react@19.2.17)
+
   stone-js-lab/apps/ssg:
     dependencies:
       '@stone-js/browser-adapter':
@@ -1182,7 +1228,105 @@ importers:
         specifier: ^19.0.3
         version: 19.2.3(@types/react@19.2.17)
 
+  stone-js-lab/apps/ssg-imperative:
+    dependencies:
+      '@stone-js/browser-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-browser-adapter
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../../../stone-js-core
+      '@stone-js/node-cli-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-cli-adapter
+      '@stone-js/node-http-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-http-adapter
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../../../stone-js-router
+      '@stone-js/use-react':
+        specifier: workspace:*
+        version: link:../../../stone-js-use-react
+      react:
+        specifier: ^19.0.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.7(react@19.2.7)
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.25.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-env':
+        specifier: ^7.26.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-typescript':
+        specifier: ^7.27.0
+        version: 7.29.7(@babel/core@7.29.7)
+      '@stone-js/cli':
+        specifier: workspace:*
+        version: link:../../../stone-js-cli
+      '@types/node':
+        specifier: ^24.0.7
+        version: 24.13.3
+      '@types/react':
+        specifier: ^19.0.7
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.0.3
+        version: 19.2.3(@types/react@19.2.17)
+
   stone-js-lab/apps/ssr:
+    dependencies:
+      '@stone-js/browser-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-browser-adapter
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../../../stone-js-core
+      '@stone-js/node-cli-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-cli-adapter
+      '@stone-js/node-http-adapter':
+        specifier: workspace:*
+        version: link:../../../stone-js-node-http-adapter
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../../../stone-js-router
+      '@stone-js/use-react':
+        specifier: workspace:*
+        version: link:../../../stone-js-use-react
+      react:
+        specifier: ^19.0.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.7(react@19.2.7)
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.25.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-env':
+        specifier: ^7.26.9
+        version: 7.29.7(@babel/core@7.29.7)
+      '@babel/preset-typescript':
+        specifier: ^7.27.0
+        version: 7.29.7(@babel/core@7.29.7)
+      '@stone-js/cli':
+        specifier: workspace:*
+        version: link:../../../stone-js-cli
+      '@types/node':
+        specifier: ^24.0.7
+        version: 24.13.3
+      '@types/react':
+        specifier: ^19.0.7
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.0.3
+        version: 19.2.3(@types/react@19.2.17)
+
+  stone-js-lab/apps/ssr-imperative:
     dependencies:
       '@stone-js/browser-adapter':
         specifier: workspace:*
