@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+coverage/
+.turbo/
+
+# Logs
+*.log
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Modules are still independent git repos until consolidation; ignore them at the
+# root for now to avoid nested gitlinks.
+stone-js/
+stone-js-*/

@@ -1,0 +1,30 @@
+{
+  "name": "@stone-js/monorepo",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Stone.js — micro-kernel universel (Continuum Architecture). Monorepo de contrôle (Phase 1 workspace-first).",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "packageManager": "pnpm@10.12.3",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "turbo run build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.9",
+    "turbo": "^2.1.0"
+  },
+  "keywords": [
+    "stone.js",
+    "continuum",
+    "micro-kernel",
+    "monorepo"
+  ],
+  "license": "MIT"
+}
