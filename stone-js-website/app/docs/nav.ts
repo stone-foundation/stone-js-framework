@@ -78,11 +78,27 @@ export const DOC_NAV: DocSection[] = [
     blurb: 'Recipes for real applications.',
     items: [
       { title: 'Config & environment', path: '/docs/build/config' },
-      { title: 'Routing', path: '/docs/build/routing' },
       { title: 'Validation', path: '/docs/build/validation' },
       { title: 'Auth & authorization', path: '/docs/build/auth' },
       { title: 'Resources & OpenAPI', path: '/docs/build/resources' },
       { title: 'Testing', path: '/docs/build/testing' }
+    ]
+  },
+  {
+    title: 'Routing',
+    blurb: 'One universal router, in full.',
+    items: [
+      { title: 'Overview', path: '/docs/routing' },
+      { title: 'Route definitions', path: '/docs/routing/definitions' },
+      { title: 'Parameters & constraints', path: '/docs/routing/parameters' },
+      { title: 'Query & body', path: '/docs/routing/query-body' },
+      { title: 'Model binding', path: '/docs/routing/binding' },
+      { title: 'Groups & prefixes', path: '/docs/routing/groups' },
+      { title: 'Named routes & URL generation', path: '/docs/routing/names' },
+      { title: 'Route middleware', path: '/docs/routing/middleware' },
+      { title: 'Redirects & responses', path: '/docs/routing/redirects' },
+      { title: 'Matching & precedence', path: '/docs/routing/matching' },
+      { title: 'Misc', path: '/docs/routing/misc' }
     ]
   },
   {

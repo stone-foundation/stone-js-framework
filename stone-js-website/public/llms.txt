@@ -34,9 +34,21 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [Agents](/docs/contexts/agents): expose the domain as MCP tools.
 - [Mobile](/docs/contexts/mobile): a forthcoming context (React Native / Expo) as one more adapter.
 
+## Routing (dedicated section)
+- [Overview](/docs/routing): the universal router, the mental model, section map.
+- [Route definitions](/docs/routing/definitions): verb decorators, controllers, defineRoutes, options.
+- [Parameters and constraints](/docs/routing/parameters): path params, optional, catch-all, rules.
+- [Query and body](/docs/routing/query-body): reading input via event.get, one accessor.
+- [Model binding](/docs/routing/binding): resolve a param into a model at the boundary.
+- [Groups and prefixes](/docs/routing/groups): shared base path and middleware via controllers/children.
+- [Named routes and URL generation](/docs/routing/names): name routes, router.generate.
+- [Route middleware](/docs/routing/middleware): attach middleware per route/group, order, excludeMiddleware.
+- [Redirects and responses](/docs/routing/redirects): returning data, status, redirects.
+- [Matching and precedence](/docs/routing/matching): how a route is chosen; domain/protocol/strict.
+- [Misc](/docs/routing/misc): fallback, current route, useRouter, routing in the browser.
+
 ## Build (recipes)
 - [Config and environment](/docs/build/config): the Blueprint manifest; typed environment access.
-- [Routing](/docs/build/routing): one universal router for server and browser.
 - [Validation](/docs/build/validation): one schema, enforced on the API and the form.
 - [Auth and authorization](/docs/build/auth): stateless JWT/OAuth; isomorphic RBAC and ABAC.
 - [Resources and OpenAPI](/docs/build/resources): shape the output; derive the public contract.

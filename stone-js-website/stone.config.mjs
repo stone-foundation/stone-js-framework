@@ -39,11 +39,22 @@ export default defineConfig({
       '/docs/contexts/mobile',
       // Docs: Build
       '/docs/build/config',
-      '/docs/build/routing',
       '/docs/build/validation',
       '/docs/build/auth',
       '/docs/build/resources',
       '/docs/build/testing',
+      // Docs: Routing (dedicated section)
+      '/docs/routing',
+      '/docs/routing/definitions',
+      '/docs/routing/parameters',
+      '/docs/routing/query-body',
+      '/docs/routing/binding',
+      '/docs/routing/groups',
+      '/docs/routing/names',
+      '/docs/routing/middleware',
+      '/docs/routing/redirects',
+      '/docs/routing/matching',
+      '/docs/routing/misc',
       // Docs: Frontier
       '/docs/frontier/adapter',
       '/docs/frontier/universal',

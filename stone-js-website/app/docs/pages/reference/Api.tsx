@@ -72,7 +72,7 @@ export class Api implements IPage<ReactIncomingEvent> {
         <H2>Where the details live</H2>
         <p>
           Each capability is also taught, with runnable examples, on its own page:
-          {' '}<StoneLink to='/docs/build/routing'>Routing</StoneLink>,{' '}
+          {' '}<StoneLink to='/docs/routing'>Routing</StoneLink>,{' '}
           <StoneLink to='/docs/build/validation'>Validation</StoneLink>,{' '}
           <StoneLink to='/docs/build/auth'>Auth</StoneLink>,{' '}
           <StoneLink to='/docs/build/resources'>Resources & OpenAPI</StoneLink>,{' '}
