@@ -52,6 +52,15 @@ export class IncomingEvent implements IPage<ReactIncomingEvent> {
   return this.tasks.add(title, { notify })
 }`}</Code>
 
+        <H3>Nested keys</H3>
+        <p>
+          <code>get</code> reads dotted paths, so you reach into a nested body without unpacking it
+          first. A default guards a missing branch, so deep access never throws on absence.
+        </p>
+        <Code file='app/Tasks.ts'>{`event.get('user.name', 'Guest')          // nested body value, with a fallback
+event.get<boolean>('permissions.admin', false)
+event.get('payload.items.0.id')          // arrays index by number`}</Code>
+
         <H2>HTTP details</H2>
         <p>
           When you are on an HTTP context, the event exposes typed getters for the request's details.
@@ -66,16 +75,36 @@ export class IncomingEvent implements IPage<ReactIncomingEvent> {
           { name: 'event.cookies', type: 'cookies', desc: 'Parsed cookies (see Cookies).' },
           { name: 'event.uri / path / pathname', type: 'string', desc: 'The request URL and its parts.' },
           { name: 'event.method', type: 'HttpMethod', desc: 'The HTTP verb.' },
+          { name: 'event.getHeader(name, def?)', type: '(name) => string', desc: 'A single request header.' },
+          { name: 'event.getCookie(name, def?)', type: '(name) => value', desc: 'A single cookie.' },
           { name: 'event.isSecure / isXhr / isAjax', type: 'boolean', desc: 'Common request predicates.' },
-          { name: 'event.getFile(name)', type: '(name) => File', desc: 'An uploaded file, when the body is multipart.' }
+          { name: 'event.getFile(name)', type: '(name) => UploadedFile', desc: 'An uploaded file, when the body is multipart.' },
+          { name: 'event.clone()', type: '() => IncomingHttpEvent', desc: 'A copy, for safe experimentation.' }
         ]} />
+
+        <H3>Content negotiation</H3>
+        <p>
+          When a response should adapt to what the client accepts, ask the event. Each predicate reads
+          the relevant <code>Accept</code> header for you.
+        </p>
+        <Code file='app/Reports.ts'>{`if (event.acceptsTypes('json', 'html') === 'json') return data
+return renderHtml(data)
+
+const lang = event.acceptsLanguages('en', 'fr') ?? 'en'`}</Code>
 
         <H3>Files and uploads</H3>
         <Code file='app/Uploads.ts'>{`@Post('/import')
 import (event: IncomingHttpEvent) {
-  const file = event.getFile('csv')     // a multipart upload
+  const file = event.getFile('csv')         // one UploadedFile
+  const images = event.filterFiles(['photos'])  // several, by field
   return this.importer.run(file)
 }`}</Code>
+
+        <H3>Fingerprinting</H3>
+        <p>
+          <code>event.fingerprint()</code> returns a stable hash of the request's identifying traits,
+          handy as a cache key or a rate-limit bucket without inventing your own scheme.
+        </p>
 
         <Callout kind='important' title='Never trust raw input'>
           Values on the event are user input until proven otherwise. Put a <code>validate(...)</code>
