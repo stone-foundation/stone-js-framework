@@ -29,7 +29,8 @@
       "@stone-js/fetch-adapter",
       "@stone-js/auth",
       "@stone-js/authz",
-      "@stone-js/resources"
+      "@stone-js/resources",
+      "@stone-js/openapi"
     ]
   ],
   "linked": [],
