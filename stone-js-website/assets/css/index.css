@@ -365,19 +365,34 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .docs-main { min-width: 0; padding: 44px 0 20px; }
 .docs-toc { position: sticky; top: var(--dh); align-self: start; max-height: calc(100vh - var(--dh)); overflow-y: auto; padding: 46px 0 40px; }
 
-/* ---- 14.4 Sidebar ---- */
-.side-section { margin-bottom: 26px; }
-.side-title { font-family: var(--display); font-size: 15px; font-weight: 600; margin: 0 0 2px; }
-.side-blurb { font-size: 12px; color: var(--gres); margin: 0 0 12px; line-height: 1.45; }
+/* ---- 14.4 Sidebar (collapsible sections + groups) ---- */
+.side-section { margin-bottom: 4px; }
+.side-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 6px; background: none; border: 0; cursor: pointer; color: var(--encre); text-align: left; }
+.side-head:hover { color: var(--braise-txt); }
+.side-head:focus-visible { outline: 2px solid var(--braise); outline-offset: 2px; border-radius: 6px; }
+.side-title { font-family: var(--display); font-size: 15px; font-weight: 600; }
+.side-chevron { flex: 0 0 auto; color: var(--gres); transition: transform 200ms var(--ease); }
+.side-section.open .side-chevron { transform: rotate(180deg); }
+.side-body { padding: 2px 0 10px; }
+.side-blurb { font-size: 12px; color: var(--gres); margin: 0 0 10px 6px; line-height: 1.45; }
 .doc-sidebar ul { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--trait); }
 .side-link { display: flex; align-items: center; gap: 8px; padding: 6px 0 6px 16px; margin-left: -1px; border-left: 2px solid transparent; font-size: 14px; color: var(--gres); transition: color 160ms var(--ease), border-color 160ms var(--ease); }
 .side-link:hover { color: var(--encre); }
 .side-link.active { color: var(--braise-txt); border-left-color: var(--braise); font-weight: 600; }
 .side-link.soon { color: color-mix(in srgb, var(--gres) 55%, transparent); cursor: default; }
 .soon-tag { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--trait); border-radius: 5px; padding: 1px 5px; }
+.side-group { margin-top: 12px; }
+.side-group-title { font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--cuivre); margin: 0 0 6px 6px; }
 
 /* ---- 14.5 Article typography ---- */
 .doc-article { max-width: 760px; }
+/* Breadcrumbs: the trail above each page. */
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12px; color: var(--gres); margin-bottom: 20px; }
+.crumbs a { color: var(--gres); transition: color 160ms var(--ease); }
+.crumbs a:hover { color: var(--braise-txt); }
+.crumb-sep { color: var(--trait); margin: 0 2px; }
+.crumb-here { color: var(--encre); }
+
 .doc-top { margin-bottom: 30px; }
 .doc-eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--braise-txt); margin: 0 0 12px; }
 .doc-h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.06; letter-spacing: -.015em; }
@@ -543,6 +558,14 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .mc-name { font-family: var(--mono); font-size: 13px; color: var(--braise-txt); margin: 0 0 6px; word-break: break-word; }
 .mc-desc { font-size: 13.5px; color: var(--gres); margin: 0; line-height: 1.5; }
 @media (max-width: 620px) { .market-grid { grid-template-columns: 1fr; } }
+
+/* ---- 14.116 See also + required marker ---- */
+.see-also { margin: 40px 0 0; padding: 18px 20px; border: 1px solid var(--trait); border-radius: 12px; background: var(--surface); }
+.see-also-title { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--gres); margin: 0 0 10px; }
+.see-also ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.see-also a { color: var(--braise-txt); font-size: 14px; }
+.see-also a::before { content: "→ "; color: var(--cuivre); }
+.doc-article td .req { color: var(--braise-txt); font-weight: 700; margin-left: 2px; }
 
 /* ---- 14.12 Docs footer spacing ---- */
 .docs-main .site-footer { margin-top: 40px; }

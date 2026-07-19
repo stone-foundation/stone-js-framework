@@ -97,6 +97,54 @@ export function Aphorism ({ children, cite }: { children: ReactNode, cite?: stri
   )
 }
 
+/**
+ * An options / API reference table. Keeps every reference page's tables uniform:
+ * a name, a type, an optional default, and a description.
+ */
+export interface PropRow { name: string, type: string, default?: string, required?: boolean, desc: ReactNode }
+
+export function PropsTable ({ rows, nameHeader = 'Option' }: { rows: PropRow[], nameHeader?: string }): JSX.Element {
+  const showDefault = rows.some((r) => r.default !== undefined)
+  return (
+    <div className='table-wrap'>
+      <table>
+        <thead>
+          <tr>
+            <th>{nameHeader}</th>
+            <th>Type</th>
+            {showDefault && <th>Default</th>}
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.name}>
+              <td>{r.name}{r.required === true && <span className='req' title='Required'>*</span>}</td>
+              <td><code>{r.type}</code></td>
+              {showDefault && <td>{r.default !== undefined ? <code>{r.default}</code> : <span className='muted'>·</span>}</td>}
+              <td>{r.desc}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+/** A short list of related pages, shown before the pager. */
+export function SeeAlso ({ links }: { links: Array<{ title: string, path: string }> }): JSX.Element {
+  return (
+    <aside className='see-also'>
+      <p className='see-also-title'>See also</p>
+      <ul>
+        {links.map((l) => (
+          <li key={l.path}><StoneLink to={l.path}>{l.title}</StoneLink></li>
+        ))}
+      </ul>
+    </aside>
+  )
+}
+
 /** The prev/next pager, driven by the doc spine. */
 export function Pager ({ prev, next }: { prev?: DocLink, next?: DocLink }): JSX.Element {
   return (

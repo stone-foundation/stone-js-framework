@@ -1,5 +1,6 @@
 import { Toc } from './components/Toc'
 import { Search } from './components/Search'
+import { Breadcrumbs } from './components/Breadcrumbs'
 import { Footer } from '../components/Header'
 import { Analytics, trackPageView } from '../components/Analytics'
 import { Portal } from '../components/brand/Portal'
@@ -79,6 +80,7 @@ function DocShell ({ children }: { children: ReactNode }): JSX.Element {
         </aside>
         <main className='docs-main'>
           <article className='doc-article'>
+            <Breadcrumbs path={currentPath} />
             <StoneOutlet>{children}</StoneOutlet>
           </article>
           <Footer />

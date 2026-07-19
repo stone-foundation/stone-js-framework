@@ -14,11 +14,20 @@ export interface DocLink {
   soon?: boolean
 }
 
+/** A named cluster of pages inside a section (a sub-section). */
+export interface DocGroup {
+  title: string
+  items: DocLink[]
+}
+
 export interface DocSection {
   title: string
   /** One-line intent, shown under the section title in the sidebar. */
   blurb: string
-  items: DocLink[]
+  /** Flat pages directly under the section. */
+  items?: DocLink[]
+  /** Sub-sections; rendered as labelled groups under the section. */
+  groups?: DocGroup[]
 }
 
 export const DOC_NAV: DocSection[] = [
@@ -104,9 +113,17 @@ export const DOC_NAV: DocSection[] = [
   }
 ]
 
+/** Every page of a section, flat, in order (its own items then each group's). */
+export function sectionLinks (section: DocSection): DocLink[] {
+  return [
+    ...(section.items ?? []),
+    ...(section.groups ?? []).flatMap((group) => group.items)
+  ]
+}
+
 /** Every real (built) page, in reading order: the spine of the prev/next pager. */
 export const DOC_SPINE: DocLink[] = DOC_NAV
-  .flatMap((section) => section.items)
+  .flatMap(sectionLinks)
   .filter((item) => item.soon !== true)
 
 /** All routable doc paths (built pages only), for the SSG route list. */
@@ -117,4 +134,26 @@ export function siblings (path: string): { prev?: DocLink, next?: DocLink } {
   const index = DOC_SPINE.findIndex((item) => item.path === path)
   if (index === -1) return {}
   return { prev: DOC_SPINE[index - 1], next: DOC_SPINE[index + 1] }
+}
+
+/** Where a path sits in the tree: its section, its group (if any), and the link. */
+export interface Located { section: DocSection, group?: DocGroup, link: DocLink }
+
+export function locate (path: string): Located | undefined {
+  for (const section of DOC_NAV) {
+    for (const link of section.items ?? []) {
+      if (link.path === path) return { section, link }
+    }
+    for (const group of section.groups ?? []) {
+      for (const link of group.items) {
+        if (link.path === path) return { section, group, link }
+      }
+    }
+  }
+  return undefined
+}
+
+/** True when a section contains the given path (in its items or any group). */
+export function sectionHasPath (section: DocSection, path: string): boolean {
+  return sectionLinks(section).some((link) => link.path === path)
 }
