@@ -77,6 +77,17 @@ Pagefind runtime from `/pagefind/` at runtime and degrades gracefully when the i
 (e.g. the SSR dev server). To try search locally, serve the built output statically
 (`npx serve dist`), not the SSR preview.
 
+## API reference (TypeDoc)
+
+`scripts/build-api.mjs` generates one consolidated TypeDoc site for every @stone-js library
+package (28 of them) into `dist/api`, so it ships with the SSG output and is never committed.
+It is part of `npm run build` (after Pagefind) and served at `/api/`, linked from the
+`Reference / API` page. The look comes from `assets/typedoc-theme.css` (the « Obsidienne &
+Braise » palette mapped onto TypeDoc's variables, light and dark). Type-checking is skipped
+during generation (`skipErrorChecking`) so cross-package resolution noise never blocks the docs;
+declarations are still fully documented. Add or remove a package and the script picks it up
+automatically (it discovers `stone-js-*` dirs with `src/` and a `typedoc.json`, minus a denylist).
+
 ## i18n
 
 English first. `app/i18n.ts` is the seam a second language plugs into: it declares the locales

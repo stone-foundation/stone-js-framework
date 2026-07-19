@@ -2841,6 +2841,9 @@ importers:
       pagefind:
         specifier: ^1.5.2
         version: 1.5.2
+      typedoc:
+        specifier: ^0.28.20
+        version: 0.28.20(typescript@5.9.3)
 
 packages:
 

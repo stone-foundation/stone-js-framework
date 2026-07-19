@@ -1,0 +1,60 @@
+/* ============================================================================
+   TypeDoc theme « Obsidienne & Braise » — maps the default theme's variables to
+   the Stone.js palette, light and dark. Appended after TypeDoc's own styles.
+   ========================================================================== */
+:root {
+  --light-color-background: #F4EFE6;
+  --light-color-background-secondary: #EAE3D6;
+  --light-color-background-active: #FBF7EF;
+  --light-color-text: #1B1613;
+  --light-color-text-aside: #6E6459;
+  --light-color-link: #A83A08;
+  --light-color-accent: #DDD4C5;
+  --light-color-active-menu-item: #EAE3D6;
+  --light-color-ts-keyword: #A83A08;
+  --light-color-ts-function: #9A5B2B;
+  --light-color-ts-class: #9A5B2B;
+  --light-color-ts-interface: #9A5B2B;
+  --light-color-ts-property: #6E5A3E;
+  --light-color-ts-module: #6E5A3E;
+
+  --dark-color-background: #14110F;
+  --dark-color-background-secondary: #1D1815;
+  --dark-color-background-active: #26201B;
+  --dark-color-text: #EFE8DC;
+  --dark-color-text-aside: #A69A8C;
+  --dark-color-link: #FF8A4D;
+  --dark-color-accent: #2F2822;
+  --dark-color-active-menu-item: #26201B;
+  --dark-color-ts-keyword: #FF8A4D;
+  --dark-color-ts-function: #E0B080;
+  --dark-color-ts-class: #E0B080;
+  --dark-color-ts-interface: #E0B080;
+  --dark-color-ts-property: #D9C7B3;
+  --dark-color-ts-module: #D9C7B3;
+
+  --font-family-text: "Archivo", "Avenir Next", system-ui, sans-serif;
+  --font-family-code: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+body { font-family: var(--font-family-text); }
+h1, h2, h3, h4, .tsd-page-title h1 { font-family: "Clash Display", "Futura", "Avenir Next", sans-serif; letter-spacing: -.01em; }
+code, pre, .tsd-signature { font-family: var(--font-family-code); }
+
+/* Header: a thin braise underline, matching the site chrome. */
+.tsd-page-toolbar { border-bottom: 1px solid var(--color-accent); backdrop-filter: blur(12px); }
+.tsd-page-toolbar .title { font-family: "Clash Display", sans-serif; font-weight: 600; }
+
+/* Accent: links and the active nav item pick up braise. */
+a { text-underline-offset: 2px; }
+.tsd-navigation a.current, .tsd-navigation .tsd-nav-link.current { color: var(--color-link); }
+.tsd-index-panel a:hover, .tsd-navigation a:hover { color: var(--color-link); }
+
+/* Panels and code blocks: rounded, on-brand surfaces. */
+.tsd-panel, .tsd-signature, pre { border-radius: 12px; }
+pre { border: 1px solid var(--color-accent); }
+.tsd-kind-icon ~ span, .tsd-signature-symbol { opacity: .85; }
+
+/* Search box + members: subtle rounding for the premium feel. */
+#tsd-search .field input, .tsd-filter-input { border-radius: 10px; }
+.tsd-member { border-radius: 12px; }

@@ -59,9 +59,19 @@ export class Api implements IPage<ReactIncomingEvent> {
           </table>
         </div>
 
+        <H2>The full generated reference</H2>
+        <p>
+          Every exported symbol of all 28 packages, with its types, is in the consolidated TypeDoc
+          reference: one cross-linked site, generated from the source at build time and exhaustive
+          by construction.
+        </p>
+        <p>
+          <a className='btn btn-primary' href='/api/' style={{ marginTop: 4 }}>Open the API reference →</a>
+        </p>
+
         <H2>Where the details live</H2>
         <p>
-          Each capability is taught, with runnable examples, on its own page:
+          Each capability is also taught, with runnable examples, on its own page:
           {' '}<StoneLink to='/docs/build/routing'>Routing</StoneLink>,{' '}
           <StoneLink to='/docs/build/validation'>Validation</StoneLink>,{' '}
           <StoneLink to='/docs/build/auth'>Auth</StoneLink>,{' '}
@@ -70,10 +80,9 @@ export class Api implements IPage<ReactIncomingEvent> {
           <StoneLink to='/docs/reference/glossary'>Glossary</StoneLink>.
         </p>
 
-        <Callout kind='note' title='Generated reference'>
-          A consolidated, generated type reference (from TypeDoc) is produced per package and
-          published alongside these docs. It is exhaustive by construction; this page stays curated,
-          so you always have a human entry point before the generated depth.
+        <Callout kind='note' title='Curated first, generated underneath'>
+          This page stays curated, so you always have a human entry point; the generated TypeDoc
+          reference underneath is the exhaustive depth when you need a specific signature.
         </Callout>
 
         <Pager {...siblings(PATH)} />
