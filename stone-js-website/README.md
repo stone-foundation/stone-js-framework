@@ -63,6 +63,10 @@ Two conventions carry the pedagogy (see the strategy plan §0):
 To add a page: create it under `app/docs/pages/`, flip its `soon` off in `nav.ts`, add its
 path to `stone.config.mjs`. Nothing else to wire (pages are auto-discovered by decorator).
 
+`public/` is copied verbatim to the build root. `public/llms.txt` is the machine-readable
+docs map served at `/llms.txt` (for coding agents); keep it in sync with `nav.ts` when pages
+ship. (Automating that generation is a later task.)
+
 ## Storytelling
 
 The Continuum, told through quantum mechanics: the domain lives in superposition across

@@ -449,6 +449,16 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .toc li a:hover { color: var(--encre); }
 .toc li.active a { color: var(--braise-txt); border-left-color: var(--braise); }
 
+/* ---- 14.115 Marketplace (docs ecosystem page) ---- */
+.market-group { margin: 0 0 10px; }
+.market-blurb { color: var(--gres); font-size: 15px; margin: -6px 0 16px; }
+.market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 8px; }
+.market-card { border: 1px solid var(--trait); border-radius: 12px; padding: 15px 16px; background: var(--surface); transition: border-color 200ms var(--ease), transform 200ms var(--ease); }
+.market-card:hover { border-color: color-mix(in srgb, var(--braise) 45%, var(--trait)); transform: translateY(-2px); }
+.mc-name { font-family: var(--mono); font-size: 13px; color: var(--braise-txt); margin: 0 0 6px; word-break: break-word; }
+.mc-desc { font-size: 13.5px; color: var(--gres); margin: 0; line-height: 1.5; }
+@media (max-width: 620px) { .market-grid { grid-template-columns: 1fr; } }
+
 /* ---- 14.12 Docs footer spacing ---- */
 .docs-main .site-footer { margin-top: 40px; }
 

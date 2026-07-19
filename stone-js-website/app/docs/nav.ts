@@ -68,21 +68,28 @@ export const DOC_NAV: DocSection[] = [
     title: 'Build',
     blurb: 'Recipes for real applications.',
     items: [
-      { title: 'Config & environment', path: '/docs/build/config', soon: true },
-      { title: 'Routing', path: '/docs/build/routing', soon: true },
-      { title: 'Validation', path: '/docs/build/validation', soon: true },
-      { title: 'Auth & authorization', path: '/docs/build/auth', soon: true },
-      { title: 'Resources & OpenAPI', path: '/docs/build/resources', soon: true },
-      { title: 'Testing', path: '/docs/build/testing', soon: true }
+      { title: 'Config & environment', path: '/docs/build/config' },
+      { title: 'Routing', path: '/docs/build/routing' },
+      { title: 'Validation', path: '/docs/build/validation' },
+      { title: 'Auth & authorization', path: '/docs/build/auth' },
+      { title: 'Resources & OpenAPI', path: '/docs/build/resources' },
+      { title: 'Testing', path: '/docs/build/testing' }
     ]
   },
   {
     title: 'Frontier',
     blurb: 'Bring the future to your stack.',
     items: [
-      { title: 'Write your own adapter', path: '/docs/frontier/adapter', soon: true },
-      { title: 'Universal apps', path: '/docs/frontier/universal', soon: true },
-      { title: 'Agent-native patterns', path: '/docs/frontier/agent-native', soon: true }
+      { title: 'Write your own adapter', path: '/docs/frontier/adapter' },
+      { title: 'Universal apps', path: '/docs/frontier/universal' },
+      { title: 'Agent-native patterns', path: '/docs/frontier/agent-native' }
+    ]
+  },
+  {
+    title: 'Ecosystem',
+    blurb: 'A keystone kernel. Everything else plugs in.',
+    items: [
+      { title: 'Marketplace', path: '/docs/ecosystem' }
     ]
   }
 ]

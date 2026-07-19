@@ -21,7 +21,20 @@ export default defineConfig({
       '/docs/contexts/backend',
       '/docs/contexts/frontend',
       '/docs/contexts/edge',
-      '/docs/contexts/agents'
+      '/docs/contexts/agents',
+      // Docs: Build
+      '/docs/build/config',
+      '/docs/build/routing',
+      '/docs/build/validation',
+      '/docs/build/auth',
+      '/docs/build/resources',
+      '/docs/build/testing',
+      // Docs: Frontier
+      '/docs/frontier/adapter',
+      '/docs/frontier/universal',
+      '/docs/frontier/agent-native',
+      // Docs: Ecosystem
+      '/docs/ecosystem'
     ]
   }
 })
