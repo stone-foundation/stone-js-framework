@@ -111,10 +111,25 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [MCP server and llms.txt](/docs/extensions/mcp): the framework’s agent tooling and docs-map generation.
 - [Telemetry](/docs/extensions/telemetry): spans and metrics with pluggable exporters.
 
+## Extending Stone.js
+- [Overview](/docs/extending): author the framework’s own building blocks.
+- [Write your own adapter](/docs/extending/adapter): open a new context in three verbs.
+- [Create a package or plugin](/docs/extending/package): a blueprint, providers, decorators/define*.
+- [Create a decorator](/docs/extending/decorator): TC39 stage-3 + Symbol.metadata; addMetadata/addBlueprint.
+- [Create CLI commands](/docs/extending/commands): @Command/defineCommand; args, flags, input/output.
+
+## Primitives
+- [Overview](/docs/primitives): the three libraries the kernel is built on.
+- [Pipeline](/docs/primitives/pipeline): the chain of responsibility (send/through/then).
+- [Service container](/docs/primitives/service-container): DI as a standalone library.
+- [Config](/docs/primitives/config): a deep dotted-key store; the Blueprint underneath.
+
 ## Frontier (advanced)
-- [Write your own adapter](/docs/frontier/adapter): open a new context in three verbs.
 - [Universal apps](/docs/frontier/universal): SSR as a superposition of browser and server.
 - [Agent-native patterns](/docs/frontier/agent-native): design a domain machines can use well.
+- [Performance and cold starts](/docs/frontier/performance): fast by construction; cold-start choices.
+- [Security posture](/docs/frontier/security): trust the boundary; secure defaults; a small trusted base.
+- [Internals](/docs/frontier/internals): setup once, per-event path; how the primitives show through.
 
 ## Ecosystem
 - [Marketplace](/docs/ecosystem): the full catalog, grouped by role in the architecture.

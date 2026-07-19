@@ -183,12 +183,35 @@ export const DOC_NAV: DocSection[] = [
     ]
   },
   {
+    title: 'Extending Stone.js',
+    blurb: 'Author the framework’s own building blocks.',
+    items: [
+      { title: 'Overview', path: '/docs/extending' },
+      { title: 'Write your own adapter', path: '/docs/extending/adapter' },
+      { title: 'Create a package or plugin', path: '/docs/extending/package' },
+      { title: 'Create a decorator', path: '/docs/extending/decorator' },
+      { title: 'Create CLI commands', path: '/docs/extending/commands' }
+    ]
+  },
+  {
+    title: 'Primitives',
+    blurb: 'The three libraries the kernel is built on.',
+    items: [
+      { title: 'Overview', path: '/docs/primitives' },
+      { title: 'Pipeline', path: '/docs/primitives/pipeline' },
+      { title: 'Service container', path: '/docs/primitives/service-container' },
+      { title: 'Config', path: '/docs/primitives/config' }
+    ]
+  },
+  {
     title: 'Frontier',
     blurb: 'Bring the future to your stack.',
     items: [
-      { title: 'Write your own adapter', path: '/docs/frontier/adapter' },
       { title: 'Universal apps', path: '/docs/frontier/universal' },
-      { title: 'Agent-native patterns', path: '/docs/frontier/agent-native' }
+      { title: 'Agent-native patterns', path: '/docs/frontier/agent-native' },
+      { title: 'Performance & cold starts', path: '/docs/frontier/performance' },
+      { title: 'Security posture', path: '/docs/frontier/security' },
+      { title: 'Internals', path: '/docs/frontier/internals' }
     ]
   },
   {

@@ -70,7 +70,7 @@ export class UseView implements IPage<ReactIncomingEvent> {
         <SeeAlso links={[
           { title: 'Frontend overview', path: '/docs/frontend' },
           { title: 'Adapters', path: '/docs/foundations/adapters' },
-          { title: 'Write your own adapter', path: '/docs/frontier/adapter' }
+          { title: 'Write your own adapter', path: '/docs/extending/adapter' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>

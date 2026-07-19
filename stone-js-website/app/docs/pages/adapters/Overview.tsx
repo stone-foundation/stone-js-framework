@@ -62,7 +62,7 @@ export class Overview implements IPage<ReactIncomingEvent> {
 
         <SeeAlso links={[
           { title: 'Adapters (concept)', path: '/docs/foundations/adapters' },
-          { title: 'Write your own adapter', path: '/docs/frontier/adapter' },
+          { title: 'Write your own adapter', path: '/docs/extending/adapter' },
           { title: 'Superposition & collapse', path: '/docs/foundations/superposition' }
         ]} />
         <Pager {...siblings(PATH)} />

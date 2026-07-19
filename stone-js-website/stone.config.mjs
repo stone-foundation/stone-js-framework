@@ -106,10 +106,23 @@ export default defineConfig({
       '/docs/routing/redirects',
       '/docs/routing/matching',
       '/docs/routing/misc',
+      // Docs: Extending Stone.js
+      '/docs/extending',
+      '/docs/extending/adapter',
+      '/docs/extending/package',
+      '/docs/extending/decorator',
+      '/docs/extending/commands',
+      // Docs: Primitives
+      '/docs/primitives',
+      '/docs/primitives/pipeline',
+      '/docs/primitives/service-container',
+      '/docs/primitives/config',
       // Docs: Frontier
-      '/docs/frontier/adapter',
       '/docs/frontier/universal',
       '/docs/frontier/agent-native',
+      '/docs/frontier/performance',
+      '/docs/frontier/security',
+      '/docs/frontier/internals',
       // Docs: Ecosystem
       '/docs/ecosystem',
       // Docs: Reference

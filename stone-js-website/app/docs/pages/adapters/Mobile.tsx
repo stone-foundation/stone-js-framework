@@ -57,7 +57,7 @@ export class Mobile implements IPage<ReactIncomingEvent> {
         <SeeAlso links={[
           { title: 'Mobile context', path: '/docs/contexts/mobile' },
           { title: 'use-view', path: '/docs/frontend/use-view' },
-          { title: 'Write your own adapter', path: '/docs/frontier/adapter' }
+          { title: 'Write your own adapter', path: '/docs/extending/adapter' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>
