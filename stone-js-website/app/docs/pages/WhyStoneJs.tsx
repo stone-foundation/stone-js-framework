@@ -1,15 +1,13 @@
 import { JSX } from 'react'
-import { CodeTabs } from '../components/Code'
+import { CodeGroup } from '../components/Code'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, Callout, Aphorism, Define, Pager } from '../components/content'
 import { siblings } from '../nav'
 
 const PATH = '/docs'
 
-const DECL = `
+const SERVICE_DECL = `
 import { Service } from '@stone-js/core'
-import { IncomingHttpEvent } from '@stone-js/http-core'
-import { Get, Post, EventHandler } from '@stone-js/router'
 
 interface Task { id: string, title: string, done: boolean }
 
@@ -29,6 +27,30 @@ export class TaskService {
     return task
   }
 }
+`
+
+const SERVICE_IMP = `
+import { defineService } from '@stone-js/core'
+
+// A factory service, bound to the alias 'tasks'.
+const TaskService = () => {
+  const items = new Map()
+  return {
+    list: (done) => [...items.values()].filter((t) => done === undefined || t.done === done),
+    add: (title) => {
+      const task = { id: crypto.randomUUID(), title, done: false }
+      items.set(task.id, task)
+      return task
+    }
+  }
+}
+
+export const services = [defineService(TaskService, { alias: 'tasks' }, true)]
+`
+
+const CONTROLLER_DECL = `
+import { IncomingHttpEvent } from '@stone-js/http-core'
+import { Get, Post, EventHandler } from '@stone-js/router'
 
 @EventHandler('/tasks')
 export class TaskController {
@@ -47,30 +69,14 @@ export class TaskController {
 }
 `
 
-const IMP = `
-import { defineService } from '@stone-js/core'
+const CONTROLLER_IMP = `
 import { defineEventHandler, defineRoutes } from '@stone-js/router'
-
-// A factory service, bound to the alias 'tasks'.
-const TaskService = () => {
-  const items = new Map()
-  return {
-    list: (done) => [...items.values()].filter((t) => done === undefined || t.done === done),
-    add: (title) => {
-      const task = { id: crypto.randomUUID(), title, done: false }
-      items.set(task.id, task)
-      return task
-    }
-  }
-}
 
 // A factory handler: the container hands it the resolved 'tasks' service.
 const TaskController = ({ tasks }) => ({
   list: (event) => tasks.list(event.get('done')),
   create: (event) => tasks.add(event.get('title', 'Untitled'))
 })
-
-export const services = [defineService(TaskService, { alias: 'tasks' }, true)]
 
 export const routes = defineRoutes([
   [defineEventHandler(TaskController, 'list'),   { path: '/tasks', method: 'GET' }],
@@ -140,11 +146,10 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
           Node; the exact same class ships to a Lambda, to a Cloudflare Worker, or becomes a tool
           an AI agent can call. Nothing below the domain leaks into it.
         </p>
-        <CodeTabs
-          file='app/Tasks.ts'
-          decl={DECL}
-          imp={IMP}
-        />
+        <CodeGroup files={[
+          { name: 'TaskService.ts', decl: SERVICE_DECL, imp: SERVICE_IMP },
+          { name: 'TaskController.ts', decl: CONTROLLER_DECL, imp: CONTROLLER_IMP }
+        ]} />
         <p>
           Two ways to write it, declarative and imperative, at strict parity. Pick one with the
           switch in the header; every example on the site follows your choice.

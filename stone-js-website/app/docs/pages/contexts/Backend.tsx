@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { Code, CodeTabs } from '../../components/Code'
+import { Code, CodeTabs, CodeGroup } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, Callout, Aphorism, Pager } from '../../components/content'
@@ -58,9 +58,10 @@ export class Backend implements IPage<ReactIncomingEvent> {
           Here is the Tasks handler again, unchanged. It names no server, no request object, no
           port. It reads intentions from an event and returns values.
         </p>
-        <Code file='app/Tasks.ts'>{`import { Service, RuntimeError } from '@stone-js/core'
-import { IncomingHttpEvent } from '@stone-js/http-core'
-import { Get, Post, Delete, EventHandler } from '@stone-js/router'
+        <CodeGroup files={[
+          {
+            name: 'TaskService.ts',
+            code: `import { Service } from '@stone-js/core'
 
 @Service({ alias: 'tasks' })
 export class TaskService {
@@ -78,7 +79,13 @@ export class TaskService {
     this.items.set(task.id, task)
     return task
   }
-}
+}`
+          },
+          {
+            name: 'TaskController.ts',
+            code: `import { RuntimeError } from '@stone-js/core'
+import { IncomingHttpEvent } from '@stone-js/http-core'
+import { Get, Post, EventHandler } from '@stone-js/router'
 
 @EventHandler('/tasks')
 export class TaskController {
@@ -101,7 +108,9 @@ export class TaskController {
   create (event: IncomingHttpEvent): Task {
     return this.tasks.add(event.get<string>('title'))
   }
-}`}</Code>
+}`
+          }
+        ]} />
 
         <H2>Collapse it onto Node</H2>
         <p>

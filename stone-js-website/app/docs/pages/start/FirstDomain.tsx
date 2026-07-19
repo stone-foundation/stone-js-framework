@@ -1,15 +1,13 @@
 import { JSX } from 'react'
-import { Code, CodeTabs } from '../../components/Code'
+import { Code, CodeGroup } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, Callout, Aphorism, Pager } from '../../components/content'
 
 const PATH = '/docs/start/first-domain'
 
-const DECL = `
+const SERVICE_DECL = `
 import { Service } from '@stone-js/core'
-import { IncomingHttpEvent } from '@stone-js/http-core'
-import { Get, Post, EventHandler } from '@stone-js/router'
 
 interface Task { id: string, title: string, done: boolean }
 
@@ -25,6 +23,29 @@ export class TaskService {
     return task
   }
 }
+`
+
+const SERVICE_IMP = `
+import { defineService } from '@stone-js/core'
+
+const TaskService = () => {
+  const items = new Map()
+  return {
+    list: () => [...items.values()],
+    add: (title) => {
+      const task = { id: crypto.randomUUID(), title, done: false }
+      items.set(task.id, task)
+      return task
+    }
+  }
+}
+
+export const services = [defineService(TaskService, { alias: 'tasks' }, true)]
+`
+
+const CONTROLLER_DECL = `
+import { IncomingHttpEvent } from '@stone-js/http-core'
+import { Get, Post, EventHandler } from '@stone-js/router'
 
 @EventHandler('/tasks')
 export class TaskController {
@@ -41,28 +62,14 @@ export class TaskController {
 }
 `
 
-const IMP = `
-import { defineService } from '@stone-js/core'
+const CONTROLLER_IMP = `
 import { defineEventHandler, defineRoutes } from '@stone-js/router'
-
-const TaskService = () => {
-  const items = new Map()
-  return {
-    list: () => [...items.values()],
-    add: (title) => {
-      const task = { id: crypto.randomUUID(), title, done: false }
-      items.set(task.id, task)
-      return task
-    }
-  }
-}
 
 const TaskController = ({ tasks }) => ({
   list: () => tasks.list(),
   create: (event) => tasks.add(event.get('title', 'Untitled'))
 })
 
-export const services = [defineService(TaskService, { alias: 'tasks' }, true)]
 export const routes = defineRoutes([
   [defineEventHandler(TaskController, 'list'),   { path: '/tasks', method: 'GET' }],
   [defineEventHandler(TaskController, 'create'), { path: '/tasks', method: 'POST' }]
@@ -97,7 +104,10 @@ export class FirstDomain implements IPage<ReactIncomingEvent> {
           <strong> handler</strong> exposes intentions and delegates to the service. The handler
           reads values off an event and returns plain data, nothing platform-shaped.
         </p>
-        <CodeTabs file='app/Tasks.ts' decl={DECL} imp={IMP} />
+        <CodeGroup files={[
+          { name: 'TaskService.ts', decl: SERVICE_DECL, imp: SERVICE_IMP },
+          { name: 'TaskController.ts', decl: CONTROLLER_DECL, imp: CONTROLLER_IMP }
+        ]} />
 
         <H2>What is deliberately missing</H2>
         <p>

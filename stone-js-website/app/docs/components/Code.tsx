@@ -95,3 +95,74 @@ export function CodeTabs ({ decl, imp, file, lang = 'ts' }: { decl: string, imp:
     </div>
   )
 }
+
+/** One file inside a CodeGroup: a single `code`, or paradigm `decl`/`imp` variants. */
+export interface CodeFile {
+  name: string
+  lang?: string
+  code?: string
+  decl?: string
+  imp?: string
+}
+
+/** The visible code of a file, honouring the current paradigm. */
+function fileText (f: CodeFile): string {
+  if (f.code !== undefined) return clean(f.code)
+  const imperative = typeof document !== 'undefined' && document.documentElement.getAttribute('data-paradigm') === 'imperative'
+  return clean((imperative ? f.imp : f.decl) ?? f.decl ?? f.imp ?? '')
+}
+
+/** Renders a file's body: its paradigm variants (CSS-toggled) or a single block. */
+function FileBody ({ f }: { f: CodeFile }): JSX.Element {
+  const lang = f.lang ?? 'ts'
+  if (f.code !== undefined) return <Block code={clean(f.code)} lang={lang} />
+  return (
+    <>
+      <div className='p-decl'><Block code={clean(f.decl ?? f.imp ?? '')} lang={lang} /></div>
+      {f.imp !== undefined && <div className='p-imp'><Block code={clean(f.imp)} lang={lang} /></div>}
+    </>
+  )
+}
+
+/**
+ * A multi-file code snippet with a tab per file (the file name is the tab title).
+ * Split an example across the files it really spans, e.g. the service in one tab
+ * and the handler in another. Each file can still carry declarative/imperative
+ * variants, toggled by the global paradigm switch. Line-numbered, with copy.
+ */
+export function CodeGroup ({ files }: { files: CodeFile[] }): JSX.Element {
+  const [active, setActive] = useState(0)
+  const current = files[active] ?? files[0]
+
+  return (
+    <div className='doc-code codegroup'>
+      <div className='code-tabs' role='tablist'>
+        {files.map((f, i) => (
+          <button
+            key={f.name}
+            role='tab'
+            aria-selected={i === active}
+            className={`code-tab ${i === active ? 'active' : ''}`}
+            onClick={() => setActive(i)}
+          >
+            {f.name}
+          </button>
+        ))}
+        {files.some((f) => f.decl !== undefined && f.imp !== undefined) && (
+          <span className='code-para'>
+            <span className='cp cp-decl'>declarative</span>
+            <span className='cp cp-imp'>imperative</span>
+          </span>
+        )}
+      </div>
+      <div className='code-body'>
+        <CopyButton getText={() => fileText(current)} />
+        {files.map((f, i) => (
+          <div key={f.name} style={{ display: i === active ? undefined : 'none' }}>
+            <FileBody f={f} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

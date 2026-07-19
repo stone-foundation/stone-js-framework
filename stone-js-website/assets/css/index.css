@@ -435,6 +435,13 @@ html[data-paradigm="imperative"] .p-imp { display: block; }
 html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .code-para .cp { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--braise-txt); }
 
+/* Multi-file tabs: one tab per file, the file name is the tab title. */
+.code-tabs { display: flex; align-items: center; gap: 2px; padding: 6px 8px 0; border-bottom: 1px solid var(--trait); background: var(--surface-2); overflow-x: auto; }
+.code-tab { font-family: var(--mono); font-size: 12px; color: var(--gres); background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; cursor: pointer; white-space: nowrap; transition: color 160ms var(--ease), border-color 160ms var(--ease); }
+.code-tab:hover { color: var(--encre); }
+.code-tab.active { color: var(--braise-txt); border-bottom-color: var(--braise); }
+.code-tabs .code-para { margin-left: auto; padding-right: 8px; }
+
 /* Prism theme « Obsidienne & Braise »: warm, near-monochrome with a sage accent
    for strings. Token colors come from --hl-* tokens, so they follow the theme. */
 .doc-code .token.comment, .doc-code .token.prolog, .doc-code .token.doctype, .doc-code .token.cdata { color: var(--hl-comment); font-style: italic; }
