@@ -2,22 +2,37 @@
 
 > The Continuum framework. Write your domain once; it lives in superposition across every execution context (server, edge, browser, agents) and collapses into one at runtime. Stone.js is the reference implementation of the Continuum Architecture: an application is an act, Domain times Context resolves into a Resolution. You write the domain; adapters supply the context at runtime, so the same code runs on Node, AWS Lambda, Cloudflare, Deno, Bun, the browser, and AI agents.
 
-Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorators with Symbol.metadata) and imperative (define* meta-modules). Three forms everywhere: class, factory, function.
+Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorators with Symbol.metadata) and imperative (define* meta-modules). Three forms everywhere: class, factory, function (the function form never receives the container; providers forbid it).
 
 ## Start here
 - [Why Stone.js](/docs): an application is an act, not an object; the thesis in three minutes.
 - [Install and create](/docs/start/install): scaffold with npm create @stone-js, then run locally.
+- [Your first domain](/docs/start/first-domain): write the what (a service and a handler) with no reference to where it runs.
+- [Collapse it](/docs/start/collapse): choose the runtime by adding an adapter to the manifest, not by editing the domain.
+- [Project anatomy](/docs/start/anatomy): what the scaffold creates and why.
 
-## Foundations (the architecture)
+## Foundations (the architecture; principle then In Stone.js)
 - [The Continuum](/docs/foundations/continuum): the app as an act; the four dimensions (Setup, Integration, Initialization, Functional).
 - [Domain times Context resolves into Resolution](/docs/foundations/domain-context): keep the domain pure, let the context arrive.
 - [The uncertainty principle](/docs/foundations/uncertainty): defer the where, own the what.
+- [Superposition and collapse](/docs/foundations/superposition): stack adapters; the collapse happens at runtime.
+- [The ephemeral context](/docs/foundations/ephemeral-context): a fresh container per event; only the adapter is long-lived.
+- [Blueprint: config as a manifest](/docs/foundations/blueprint): one immutable manifest, addressed by dotted stone.* keys.
+- [Blueprint as a pipeline](/docs/foundations/build-phase): the manifest is composed by a pipeline of steps.
+- [Lifecycle and the kernel](/docs/foundations/lifecycle): the kernel applies the domain per event; @Hook lifecycle points.
+- [Middleware and the pipeline](/docs/foundations/middleware): the chain of responsibility, applied to events.
+- [Service container and DI](/docs/foundations/container): resolve and inject services by alias.
+- [Service providers](/docs/foundations/providers): register then boot; the seam every module plugs into.
+- [Adapters](/docs/foundations/adapters): the integration dimension; capture, normalise, emit.
+- [The two paradigms](/docs/foundations/paradigms): decorators and define* at parity, one Blueprint.
+- [The three forms](/docs/foundations/forms): class, factory, function.
 
 ## Contexts (the dimensions; the same domain, collapsed differently)
 - [Backend](/docs/contexts/backend): Node HTTP and CLI adapters on one domain.
 - [Frontend](/docs/contexts/frontend): React pages and layouts; CSR, SSR, SSG.
 - [Edge and Serverless](/docs/contexts/edge): one Web-standard adapter for Cloudflare, Deno, Bun, Vercel, Netlify; plus AWS Lambda.
 - [Agents](/docs/contexts/agents): expose the domain as MCP tools.
+- [Mobile](/docs/contexts/mobile): a forthcoming context (React Native / Expo) as one more adapter.
 
 ## Build (recipes)
 - [Config and environment](/docs/build/config): the Blueprint manifest; typed environment access.
@@ -34,6 +49,12 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 
 ## Ecosystem
 - [Marketplace](/docs/ecosystem): the full catalog, grouped by role in the architecture.
+
+## Reference
+- [API](/docs/reference/api): primary entry points per package, and the generated TypeDoc reference at /api.
+- [CLI](/docs/reference/cli): the stone command line.
+- [Configuration](/docs/reference/config): the stone.* keys.
+- [Glossary](/docs/reference/glossary): the Continuum vocabulary.
 
 ## Optional
 - [The Continuum manifesto](https://evens-stone.github.io/continuum-manifesto/manifesto): the philosophy behind the framework.

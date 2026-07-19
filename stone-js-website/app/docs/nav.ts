@@ -28,9 +28,9 @@ export const DOC_NAV: DocSection[] = [
     items: [
       { title: 'Why Stone.js', path: '/docs' },
       { title: 'Install & create', path: '/docs/start/install' },
-      { title: 'Your first domain', path: '/docs/start/first-domain', soon: true },
-      { title: 'Collapse it', path: '/docs/start/collapse', soon: true },
-      { title: 'Project anatomy', path: '/docs/start/anatomy', soon: true }
+      { title: 'Your first domain', path: '/docs/start/first-domain' },
+      { title: 'Collapse it', path: '/docs/start/collapse' },
+      { title: 'Project anatomy', path: '/docs/start/anatomy' }
     ]
   },
   {
@@ -40,17 +40,17 @@ export const DOC_NAV: DocSection[] = [
       { title: 'The Continuum', path: '/docs/foundations/continuum' },
       { title: 'Domain × Context → Resolution', path: '/docs/foundations/domain-context' },
       { title: 'The uncertainty principle', path: '/docs/foundations/uncertainty' },
-      { title: 'Superposition & collapse', path: '/docs/foundations/superposition', soon: true },
-      { title: 'The ephemeral context', path: '/docs/foundations/ephemeral-context', soon: true },
-      { title: 'Blueprint: config as a manifest', path: '/docs/foundations/blueprint', soon: true },
-      { title: 'Blueprint as a pipeline', path: '/docs/foundations/build-phase', soon: true },
-      { title: 'Lifecycle & the kernel', path: '/docs/foundations/lifecycle', soon: true },
-      { title: 'Middleware & the pipeline', path: '/docs/foundations/middleware', soon: true },
-      { title: 'Service container & DI', path: '/docs/foundations/container', soon: true },
-      { title: 'Service providers', path: '/docs/foundations/providers', soon: true },
-      { title: 'Adapters', path: '/docs/foundations/adapters', soon: true },
-      { title: 'The two paradigms', path: '/docs/foundations/paradigms', soon: true },
-      { title: 'The three forms', path: '/docs/foundations/forms', soon: true }
+      { title: 'Superposition & collapse', path: '/docs/foundations/superposition' },
+      { title: 'The ephemeral context', path: '/docs/foundations/ephemeral-context' },
+      { title: 'Blueprint: config as a manifest', path: '/docs/foundations/blueprint' },
+      { title: 'Blueprint as a pipeline', path: '/docs/foundations/build-phase' },
+      { title: 'Lifecycle & the kernel', path: '/docs/foundations/lifecycle' },
+      { title: 'Middleware & the pipeline', path: '/docs/foundations/middleware' },
+      { title: 'Service container & DI', path: '/docs/foundations/container' },
+      { title: 'Service providers', path: '/docs/foundations/providers' },
+      { title: 'Adapters', path: '/docs/foundations/adapters' },
+      { title: 'The two paradigms', path: '/docs/foundations/paradigms' },
+      { title: 'The three forms', path: '/docs/foundations/forms' }
     ]
   },
   {
@@ -61,7 +61,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Frontend', path: '/docs/contexts/frontend' },
       { title: 'Edge & Serverless', path: '/docs/contexts/edge' },
       { title: 'Agents', path: '/docs/contexts/agents' },
-      { title: 'Mobile', path: '/docs/contexts/mobile', soon: true }
+      { title: 'Mobile', path: '/docs/contexts/mobile' }
     ]
   },
   {
