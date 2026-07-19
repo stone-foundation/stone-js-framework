@@ -130,7 +130,7 @@ export function HeroAtom (): JSX.Element {
         </h1>
         <p className='lede'>
           Write the domain once. It lives in superposition across every context: server, edge,
-          browser, agents. Deployment is the observation that collapses it into one.
+          browser, agents. Running it is the observation that collapses it into one.
           Stone.js orchestrates the collapse.
         </p>
         <div className='equation'>

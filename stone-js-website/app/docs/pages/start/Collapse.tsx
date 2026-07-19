@@ -84,10 +84,11 @@ curl localhost:8080/tasks           # [{ "id": "...", "title": "Ship it", "done"
           <li><strong>Static hosts / CDNs</strong> for frontend (CSR/SSG) builds.</li>
         </ul>
 
-        <Callout kind='note' title='Deployment is the measurement'>
-          Until an adapter runs, the domain is in superposition across every context. Choosing an
-          adapter and deploying is the observation that collapses it into one concrete runtime. That
-          is the whole thesis, and you just performed it.
+        <Callout kind='note' title='Running is the measurement'>
+          Adding an adapter does not collapse anything; it adds a possible context. The collapse
+          happens when the app <em>runs</em>: at run time Stone.js resolves which adapter answers the
+          cause. Deployment only decides where the artifact lives; running it, locally or in
+          production, is the observation, and you just performed it with <code>npm run dev</code>.
         </Callout>
 
         <Callout kind='future' title='You can stack them'>

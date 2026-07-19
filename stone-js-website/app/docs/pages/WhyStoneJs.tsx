@@ -92,7 +92,7 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
   head (): HeadContext {
     return {
       title: 'Why Stone.js',
-      description: 'A framework that is the context. Write your domain once; it runs on server, edge, browser and agents, and collapses into one at deploy.'
+      description: 'A framework that is the context. Write your domain once; it runs on server, edge, browser and agents, and collapses into one at run time.'
     }
   }
 
@@ -111,7 +111,7 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
           An application is not an object you build for one place. It is an act:
           a domain, meeting a context, resolving into a response. Stone.js is the context.
           You keep the part that is yours, the <em>what</em>, and defer the part that is the
-          platform's, the <em>where</em>, until the last responsible moment: deployment.
+          platform's, the <em>where</em>, until the last responsible moment: run time.
         </p>
         <Aphorism cite='The Continuum Architecture'>
           Application = Domain × Context → Resolution
