@@ -70,9 +70,35 @@ create (event: IncomingHttpEvent) {
           { name: 'jsonHttpResponse(data, status?)', type: '(data, status) => Response', desc: 'A JSON body with an optional status.' },
           { name: 'htmlHttpResponse(html, status?)', type: '(html, status) => Response', desc: 'An HTML body.' },
           { name: 'noContentHttpResponse()', type: '() => Response', desc: 'A 204 with no body.' },
+          { name: 'jsonpHttpResponse(data, cb)', type: '(data, callback) => Response', desc: 'A JSONP body for a named callback.' },
           { name: 'redirectHttpResponse(url, status?)', type: '(url, status) => Response', desc: 'A redirect (default 302).' },
-          { name: 'fileHttpResponse(file)', type: '(file) => Response', desc: 'Stream a file back.' },
-          { name: 'response.setHeader / setCookie', type: 'methods', desc: 'Set headers and cookies on any response.' }
+          { name: 'fileHttpResponse(file)', type: '(file) => Response', desc: 'Stream or download a file.' },
+          { name: 'emptyHttpResponse()', type: '() => Response', desc: 'An empty body (defaults to 200).' }
+        ]} />
+        <p>
+          For the common failures there are status shortcuts, so you can be explicit when throwing a
+          domain error is not the right fit: <code>badRequestHttpResponse</code>,
+          <code> unauthorizedHttpResponse</code>, <code>forbiddenHttpResponse</code>,
+          <code> notFoundHttpResponse</code>, <code>serverErrorHttpResponse</code>.
+        </p>
+
+        <H2>Shaping a response</H2>
+        <p>
+          Any response is fluent: set the status, headers, cookies and caching hints before returning
+          it. The caching setters (<code>setEtag</code>, <code>setLastModified</code>) let a handler
+          participate in conditional requests without touching the platform.
+        </p>
+        <Code file='app/Reports.ts'>{`return jsonHttpResponse(report)
+  .setStatus(200)
+  .setHeader('Cache-Control', 'public, max-age=60')
+  .setEtag(report.hash)            // enables 304 on re-request
+  .setLastModified(report.updatedAt)`}</Code>
+        <PropsTable nameHeader='Setter' rows={[
+          { name: 'setStatus(code)', type: '(number) => this', desc: 'The HTTP status.' },
+          { name: 'setHeader(name, value)', type: '(name, value) => this', desc: 'A response header.' },
+          { name: 'setCookie(name, value, opts?)', type: '(name, value, opts) => this', desc: 'A cookie (see Cookies).' },
+          { name: 'setContent(data)', type: '(data) => this', desc: 'Replace the body.' },
+          { name: 'setEtag(tag) / setLastModified(date)', type: 'caching', desc: 'Conditional-request hints for 304 handling.' }
         ]} />
 
         <Callout kind='note' title='Errors are responses too'>

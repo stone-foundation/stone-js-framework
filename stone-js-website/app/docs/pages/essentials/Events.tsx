@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { CodeTabs } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, H3, Callout, Aphorism, SeeAlso, Pager } from '../../components/content'
@@ -86,8 +86,29 @@ create (event: IncomingHttpEvent) {
         <p>
           When one unit handles several related events, a subscriber groups them: mark it with
           <code> @Subscriber</code> (or <code>defineEventSubscriber</code>) and map each event to a
-          method. Wildcards let one listener catch a family of events.
+          method, with its dependencies injected once for the whole group.
         </p>
+        <Code file='app/TaskSubscriber.ts'>{`import { Subscriber } from '@stone-js/core'
+
+@Subscriber()
+export class TaskSubscriber {
+  constructor ({ metrics }: { metrics: Metrics }) { this.metrics = metrics }
+
+  subscribe (emitter) {
+    emitter.on('task.created', (e) => this.metrics.inc('tasks.created'))
+    emitter.on('task.deleted', (e) => this.metrics.inc('tasks.deleted'))
+  }
+}`}</Code>
+
+        <H3>Wildcards</H3>
+        <p>
+          A wildcard name catches a whole family of events with one listener, useful for audit logs
+          or metrics that should not enumerate every event by hand.
+        </p>
+        <Code file='app/Audit.ts'>{`@Listener({ event: 'task.*' })       // task.created, task.updated, task.deleted, ...
+export class AuditTaskEvents {
+  handle (event, name) { this.audit.record(name, event) }
+}`}</Code>
 
         <Callout kind='note' title='Keep listeners idempotent'>
           Listeners run as reactions, sometimes retried, sometimes out of order relative to other
