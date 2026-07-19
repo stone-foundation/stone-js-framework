@@ -398,8 +398,21 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .code-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--trait); background: var(--surface-2); }
 .code-file { font-family: var(--mono); font-size: 12px; color: var(--gres); }
 .code-lang { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--cuivre); }
-.doc-code pre { margin: 0; padding: 18px 18px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px; line-height: 1.65; color: var(--encre); }
+.doc-code pre { margin: 0; padding: 18px 18px; overflow-x: auto; flex: 1 1 auto; min-width: 0; font-family: var(--mono); font-size: 13.5px; line-height: 1.65; color: var(--encre); }
 .doc-code code { font-family: var(--mono); }
+/* Line-number gutter: a fixed column beside the (independently scrolling) code.
+   Same font-size, line-height and top padding as the pre, so numbers align. */
+.code-scroll { display: flex; align-items: stretch; }
+.code-gutter {
+  flex: 0 0 auto; display: flex; flex-direction: column; text-align: right;
+  padding: 18px 12px 18px 16px; user-select: none; -webkit-user-select: none;
+  font-family: var(--mono); font-size: 13.5px; line-height: 1.65;
+  color: color-mix(in srgb, var(--gres) 60%, transparent);
+  border-right: 1px solid var(--trait);
+  background: color-mix(in srgb, var(--surface-2) 45%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+.code-gutter span { display: block; }
 /* paradigm toggling: declarative is the default; imperative shows only when chosen */
 .p-imp, .code-para .cp-imp { display: none; }
 html[data-paradigm="imperative"] .p-decl, html[data-paradigm="imperative"] .code-para .cp-decl { display: none; }

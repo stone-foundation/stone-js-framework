@@ -16,7 +16,6 @@ function CopyButton ({ getText }: { getText: () => string }): JSX.Element {
     if (navigator.clipboard?.writeText !== undefined) {
       void navigator.clipboard.writeText(text).then(done, () => {})
     } else {
-      // Fallback for non-secure contexts.
       const ta = document.createElement('textarea')
       ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'
       document.body.appendChild(ta); ta.select()
@@ -34,9 +33,22 @@ function CopyButton ({ getText }: { getText: () => string }): JSX.Element {
   )
 }
 
+/** A highlighted block with an aligned line-number gutter. */
+function Block ({ code, lang }: { code: string, lang: string }): JSX.Element {
+  const count = code.split('\n').length
+  return (
+    <div className='code-scroll'>
+      <span className='code-gutter' aria-hidden='true'>
+        {Array.from({ length: count }, (_, i) => <span key={i}>{i + 1}</span>)}
+      </span>
+      <pre className={`language-${lang}`}><code dangerouslySetInnerHTML={{ __html: highlight(code, lang) }} /></pre>
+    </div>
+  )
+}
+
 /**
- * A single, static code block, syntax-highlighted with Prism (isomorphic, so the
- * SSG output already ships coloured, and hydration matches). Includes a copy button.
+ * A single, static code block: Prism-highlighted (isomorphic), with line numbers
+ * and a copy button.
  */
 export function Code ({ children, file, lang = 'ts' }: { children: string, file?: string, lang?: string }): JSX.Element {
   const code = clean(children)
@@ -47,16 +59,15 @@ export function Code ({ children, file, lang = 'ts' }: { children: string, file?
         : null}
       <div className='code-body'>
         <CopyButton getText={() => code} />
-        <pre className={`language-${lang}`}><code dangerouslySetInnerHTML={{ __html: highlight(code, lang) }} /></pre>
+        <Block code={code} lang={lang} />
       </div>
     </div>
   )
 }
 
 /**
- * Paradigm-aware code. Both variants are rendered and highlighted; the global
- * paradigm switch (an attribute on <html>) reveals exactly one via CSS. The copy
- * button copies whichever variant is currently shown.
+ * Paradigm-aware code. Both variants are rendered (line-numbered); the global
+ * paradigm switch reveals exactly one via CSS. The copy button copies the shown one.
  */
 export function CodeTabs ({ decl, imp, file, lang = 'ts' }: { decl: string, imp: string, file?: string, lang?: string }): JSX.Element {
   const d = clean(decl)
@@ -78,8 +89,8 @@ export function CodeTabs ({ decl, imp, file, lang = 'ts' }: { decl: string, imp:
         : null}
       <div className='code-body'>
         <CopyButton getText={active} />
-        <div className='p-decl'><pre className={`language-${lang}`}><code dangerouslySetInnerHTML={{ __html: highlight(d, lang) }} /></pre></div>
-        <div className='p-imp'><pre className={`language-${lang}`}><code dangerouslySetInnerHTML={{ __html: highlight(i, lang) }} /></pre></div>
+        <div className='p-decl'><Block code={d} lang={lang} /></div>
+        <div className='p-imp'><Block code={i} lang={lang} /></div>
       </div>
     </div>
   )
