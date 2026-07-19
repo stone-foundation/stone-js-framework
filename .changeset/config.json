@@ -28,7 +28,8 @@
       "@stone-js/validation",
       "@stone-js/fetch-adapter",
       "@stone-js/auth",
-      "@stone-js/authz"
+      "@stone-js/authz",
+      "@stone-js/resources"
     ]
   ],
   "linked": [],
