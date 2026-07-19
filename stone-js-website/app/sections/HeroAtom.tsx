@@ -75,6 +75,7 @@ export function HeroAtom (): JSX.Element {
     <div className='hero'>
       <div className='halo' />
       <div className='wrap'>
+        <div className='atom-stage'>
         <div
           className={`atom ${chosen !== null ? 'collapsed' : ''}`}
           onMouseEnter={onAtomEnter}
@@ -114,6 +115,7 @@ export function HeroAtom (): JSX.Element {
             </div>
           ))}
           <Portal size={122} id='bz-nucleus' className='nucleus' keyClassName='key' />
+        </div>
         </div>
 
         <p className='atom-caption'>

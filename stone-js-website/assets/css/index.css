@@ -119,11 +119,18 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .foot .right { text-align: right; }
 
 /* ---------- 5. Hero: the atom ---------- */
-.hero { position: relative; min-height: 96vh; display: grid; place-items: center; text-align: center; padding: 64px 0 40px; overflow: hidden; }
+.hero { position: relative; min-height: 96vh; display: grid; place-items: center; text-align: center; padding: clamp(24px, 6vw, 64px) 0 40px; overflow: hidden; }
 .hero .halo { position: absolute; inset: 0; z-index: -1; background: radial-gradient(46% 40% at 50% 32%, rgba(255, 107, 43, .13), transparent 72%); }
 
-.atom { position: relative; width: 460px; height: 460px; margin: 0 auto 30px; }
-@media (max-width: 560px) { .atom { transform: scale(.72); margin: -56px auto -34px; } }
+/* The atom is a fixed 460px box; its chips overhang to a ~540px footprint.
+   Scale the whole stage fluidly so that footprint always fits the viewport,
+   and reserve the scaled height so the layout stays honest. */
+.atom-stage {
+  --atom-scale: clamp(.5, calc((100vw - 40px) / 540), 1);
+  height: calc(460px * var(--atom-scale));
+  display: grid; place-items: center; margin: 0 auto 30px;
+}
+.atom { position: relative; width: 460px; height: 460px; transform: scale(var(--atom-scale)); }
 .nucleus { position: absolute; width: 122px; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 6; }
 .nucleus .key { filter: drop-shadow(0 0 16px rgba(255, 107, 43, .55)); transition: filter 500ms var(--ease); animation: pulse 4.5s var(--ease) infinite; }
 @keyframes pulse {
@@ -183,10 +190,10 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
   animation: sweep 7s var(--ease) infinite;
 }
 @keyframes sweep { 0%, 55% { background-position: 120% 0; } 85%, 100% { background-position: -60% 0; } }
-.hero .lede { font-size: 19.5px; color: var(--gres); max-width: 56ch; margin: 24px auto 0; }
+.hero .lede { font-size: clamp(16px, 4.4vw, 19.5px); color: var(--gres); max-width: 56ch; margin: 24px auto 0; padding: 0 4px; }
 .equation {
-  font-family: var(--mono); font-size: 14.5px; margin-top: 26px; display: inline-block;
-  padding: 15px 22px; border: 1px solid var(--trait); border-radius: 12px;
+  font-family: var(--mono); font-size: clamp(11.5px, 3.3vw, 14.5px); margin-top: 26px; display: inline-block;
+  max-width: 100%; padding: 15px clamp(14px, 4vw, 22px); border: 1px solid var(--trait); border-radius: 12px;
   background: color-mix(in srgb, var(--surface) 82%, transparent);
 }
 .equation b { color: var(--braise-txt); font-weight: 600; }
