@@ -100,7 +100,7 @@ show (event: IncomingHttpEvent) {
         <SeeAlso links={[
           { title: 'Outgoing response', path: '/docs/essentials/outgoing-response' },
           { title: 'Logging', path: '/docs/essentials/logging' },
-          { title: 'Testing', path: '/docs/build/testing' }
+          { title: 'Testing', path: '/docs/extensions/testing' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>

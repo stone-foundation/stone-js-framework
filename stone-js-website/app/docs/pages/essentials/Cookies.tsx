@@ -71,7 +71,7 @@ return response`}</Code>
         <SeeAlso links={[
           { title: 'Incoming event', path: '/docs/essentials/incoming-event' },
           { title: 'Outgoing response', path: '/docs/essentials/outgoing-response' },
-          { title: 'Auth & authorization', path: '/docs/build/auth' }
+          { title: 'Auth & authorization', path: '/docs/extensions/auth' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>

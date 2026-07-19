@@ -91,8 +91,8 @@ export class TaskController {
 
         <SeeAlso links={[
           { title: 'Middleware & the pipeline', path: '/docs/foundations/middleware' },
-          { title: 'Auth & authorization', path: '/docs/build/auth' },
-          { title: 'Validation', path: '/docs/build/validation' }
+          { title: 'Auth & authorization', path: '/docs/extensions/auth' },
+          { title: 'Validation', path: '/docs/extensions/validation' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>

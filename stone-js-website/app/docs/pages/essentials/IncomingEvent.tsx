@@ -86,7 +86,7 @@ import (event: IncomingHttpEvent) {
         <SeeAlso links={[
           { title: 'Outgoing response', path: '/docs/essentials/outgoing-response' },
           { title: 'Query & body', path: '/docs/routing/query-body' },
-          { title: 'Validation', path: '/docs/build/validation' }
+          { title: 'Validation', path: '/docs/extensions/validation' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>

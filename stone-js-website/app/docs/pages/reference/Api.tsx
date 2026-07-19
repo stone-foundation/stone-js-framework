@@ -73,10 +73,10 @@ export class Api implements IPage<ReactIncomingEvent> {
         <p>
           Each capability is also taught, with runnable examples, on its own page:
           {' '}<StoneLink to='/docs/routing'>Routing</StoneLink>,{' '}
-          <StoneLink to='/docs/build/validation'>Validation</StoneLink>,{' '}
-          <StoneLink to='/docs/build/auth'>Auth</StoneLink>,{' '}
-          <StoneLink to='/docs/build/resources'>Resources & OpenAPI</StoneLink>,{' '}
-          <StoneLink to='/docs/build/testing'>Testing</StoneLink>. The vocabulary is fixed in the{' '}
+          <StoneLink to='/docs/extensions/validation'>Validation</StoneLink>,{' '}
+          <StoneLink to='/docs/extensions/auth'>Auth</StoneLink>,{' '}
+          <StoneLink to='/docs/extensions/resources'>Resources & OpenAPI</StoneLink>,{' '}
+          <StoneLink to='/docs/extensions/testing'>Testing</StoneLink>. The vocabulary is fixed in the{' '}
           <StoneLink to='/docs/reference/glossary'>Glossary</StoneLink>.
         </p>
 

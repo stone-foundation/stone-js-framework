@@ -100,11 +100,16 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [MCP](/docs/adapters/mcp): @Mcp; expose the domain as agent tools.
 - [Mobile](/docs/adapters/mobile): forthcoming (React Native / Expo).
 
-## Build (recipes)
-- [Validation](/docs/build/validation): one schema, enforced on the API and the form.
-- [Auth and authorization](/docs/build/auth): stateless JWT/OAuth; isomorphic RBAC and ABAC.
-- [Resources and OpenAPI](/docs/build/resources): shape the output; derive the public contract.
-- [Testing](/docs/build/testing): boot the real app in memory; dispatch real events.
+## Extensions (opt-in capabilities)
+- [Overview](/docs/extensions): the catalog; how extensions attach via blueprints.
+- [Validation](/docs/extensions/validation): one schema, enforced on the API and the form.
+- [Auth](/docs/extensions/auth): stateless JWT/OAuth; requireAuth / requireScopes.
+- [Authorization](/docs/extensions/authorization): isomorphic RBAC + ABAC; defineAbility / authorize.
+- [Resources](/docs/extensions/resources): shape the output; defineResource, fields, envelopes.
+- [OpenAPI](/docs/extensions/openapi): derive the public contract from your schemas.
+- [Testing](/docs/extensions/testing): createTestApp + send(makeIncomingHttpEvent); behavioural tests.
+- [MCP server and llms.txt](/docs/extensions/mcp): the framework’s agent tooling and docs-map generation.
+- [Telemetry](/docs/extensions/telemetry): spans and metrics with pluggable exporters.
 
 ## Frontier (advanced)
 - [Write your own adapter](/docs/frontier/adapter): open a new context in three verbs.

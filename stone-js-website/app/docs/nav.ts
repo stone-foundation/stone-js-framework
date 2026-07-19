@@ -151,13 +151,18 @@ export const DOC_NAV: DocSection[] = [
     ]
   },
   {
-    title: 'Build',
-    blurb: 'Recipes for real applications.',
+    title: 'Extensions',
+    blurb: 'Opt-in capabilities that graft onto the kernel.',
     items: [
-      { title: 'Validation', path: '/docs/build/validation' },
-      { title: 'Auth & authorization', path: '/docs/build/auth' },
-      { title: 'Resources & OpenAPI', path: '/docs/build/resources' },
-      { title: 'Testing', path: '/docs/build/testing' }
+      { title: 'Overview', path: '/docs/extensions' },
+      { title: 'Validation', path: '/docs/extensions/validation' },
+      { title: 'Auth', path: '/docs/extensions/auth' },
+      { title: 'Authorization', path: '/docs/extensions/authorization' },
+      { title: 'Resources', path: '/docs/extensions/resources' },
+      { title: 'OpenAPI', path: '/docs/extensions/openapi' },
+      { title: 'Testing', path: '/docs/extensions/testing' },
+      { title: 'MCP server & llms.txt', path: '/docs/extensions/mcp' },
+      { title: 'Telemetry', path: '/docs/extensions/telemetry' }
     ]
   },
   {

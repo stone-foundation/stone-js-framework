@@ -70,7 +70,7 @@ create (event: IncomingHttpEvent) {
 
         <SeeAlso links={[
           { title: 'Parameters & constraints', path: '/docs/routing/parameters' },
-          { title: 'Validation', path: '/docs/build/validation' }
+          { title: 'Validation', path: '/docs/extensions/validation' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>

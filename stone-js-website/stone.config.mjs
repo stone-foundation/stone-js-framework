@@ -49,11 +49,16 @@ export default defineConfig({
       '/docs/essentials/errors',
       '/docs/essentials/logging',
       '/docs/essentials/hooks',
-      // Docs: Build
-      '/docs/build/validation',
-      '/docs/build/auth',
-      '/docs/build/resources',
-      '/docs/build/testing',
+      // Docs: Extensions
+      '/docs/extensions',
+      '/docs/extensions/validation',
+      '/docs/extensions/auth',
+      '/docs/extensions/authorization',
+      '/docs/extensions/resources',
+      '/docs/extensions/openapi',
+      '/docs/extensions/testing',
+      '/docs/extensions/mcp',
+      '/docs/extensions/telemetry',
       // Docs: Dependency injection
       '/docs/di',
       '/docs/di/services',
