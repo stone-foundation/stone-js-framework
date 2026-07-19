@@ -64,6 +64,19 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [Registering middleware](/docs/middleware/registering): global/group/route; priority, alias, excludeMiddleware.
 - [Terminating middleware](/docs/middleware/terminating): shape the response and run cleanup on the way out.
 
+## Frontend (use-react)
+- [Overview](/docs/frontend): the view dimension; enable React; section map.
+- [Pages](/docs/frontend/pages): @Page with handle (loader), render, head.
+- [Layouts](/docs/frontend/layouts): @PageLayout + StoneOutlet; named layouts.
+- [Components and links](/docs/frontend/components): StoneLink/StoneOutlet/StonePage; the hooks.
+- [Navigation](/docs/frontend/navigation): StoneLink and programmatic navigation via the router.
+- [Data fetching](/docs/frontend/data): the page loader; useData; server loaders.
+- [Head and metadata](/docs/frontend/head): head() and useHead; SEO; JSON-LD.
+- [Error pages](/docs/frontend/error-pages): @ErrorPage and @AdapterErrorPage.
+- [Assets](/docs/frontend/assets): entry CSS, import aliases, the public directory.
+- [Rendering: CSR, SSR, SSG](/docs/frontend/rendering): three ways to resolve the same pages; hydration.
+- [use-view](/docs/frontend/use-view): the framework-agnostic view engine beneath use-react.
+
 ## Routing (dedicated section)
 - [Overview](/docs/routing): the universal router, the mental model, section map.
 - [Route definitions](/docs/routing/definitions): verb decorators, controllers, defineRoutes, options.

@@ -109,6 +109,23 @@ export const DOC_NAV: DocSection[] = [
     ]
   },
   {
+    title: 'Frontend',
+    blurb: 'React on the universal kernel: pages, views, rendering.',
+    items: [
+      { title: 'Overview', path: '/docs/frontend' },
+      { title: 'Pages', path: '/docs/frontend/pages' },
+      { title: 'Layouts', path: '/docs/frontend/layouts' },
+      { title: 'Components & links', path: '/docs/frontend/components' },
+      { title: 'Navigation', path: '/docs/frontend/navigation' },
+      { title: 'Data fetching', path: '/docs/frontend/data' },
+      { title: 'Head & metadata', path: '/docs/frontend/head' },
+      { title: 'Error pages', path: '/docs/frontend/error-pages' },
+      { title: 'Assets', path: '/docs/frontend/assets' },
+      { title: 'Rendering: CSR, SSR, SSG', path: '/docs/frontend/rendering' },
+      { title: 'use-view', path: '/docs/frontend/use-view' }
+    ]
+  },
+  {
     title: 'Contexts',
     blurb: 'The dimensions. The same domain, collapsed differently.',
     items: [

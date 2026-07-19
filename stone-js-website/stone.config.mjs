@@ -68,6 +68,18 @@ export default defineConfig({
       '/docs/middleware/defining',
       '/docs/middleware/registering',
       '/docs/middleware/terminating',
+      // Docs: Frontend (use-react)
+      '/docs/frontend',
+      '/docs/frontend/pages',
+      '/docs/frontend/layouts',
+      '/docs/frontend/components',
+      '/docs/frontend/navigation',
+      '/docs/frontend/data',
+      '/docs/frontend/head',
+      '/docs/frontend/error-pages',
+      '/docs/frontend/assets',
+      '/docs/frontend/rendering',
+      '/docs/frontend/use-view',
       // Docs: Routing (dedicated section)
       '/docs/routing',
       '/docs/routing/definitions',
