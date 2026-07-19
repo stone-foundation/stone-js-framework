@@ -34,6 +34,19 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [Agents](/docs/contexts/agents): expose the domain as MCP tools.
 - [Mobile](/docs/contexts/mobile): a forthcoming context (React Native / Expo) as one more adapter.
 
+## Essentials (the runtime building blocks, in detail)
+- [Application and bootstrap](/docs/essentials/application): the manifest, adapters, app options.
+- [Event handlers](/docs/essentials/event-handlers): the handler contract; the three forms.
+- [Incoming event](/docs/essentials/incoming-event): reading input via event.get; HTTP getters; files.
+- [Outgoing response](/docs/essentials/outgoing-response): return data or build a response; helpers.
+- [Cookies](/docs/essentials/cookies): read and set cookies with secure options.
+- [Configuration](/docs/essentials/configuration): set and read stone.* keys on the Blueprint.
+- [Environment](/docs/essentials/environment): typed, validated env getters.
+- [Events and listeners](/docs/essentials/events): emit domain events; listeners and subscribers.
+- [Error handling](/docs/essentials/errors): throw meaningful errors; map them to responses.
+- [Logging](/docs/essentials/logging): the logger, levels, custom backend.
+- [Hooks and lifecycle](/docs/essentials/hooks): run code at startup, shutdown and around each event.
+
 ## Routing (dedicated section)
 - [Overview](/docs/routing): the universal router, the mental model, section map.
 - [Route definitions](/docs/routing/definitions): verb decorators, controllers, defineRoutes, options.
@@ -48,7 +61,6 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [Misc](/docs/routing/misc): fallback, current route, useRouter, routing in the browser.
 
 ## Build (recipes)
-- [Config and environment](/docs/build/config): the Blueprint manifest; typed environment access.
 - [Validation](/docs/build/validation): one schema, enforced on the API and the form.
 - [Auth and authorization](/docs/build/auth): stateless JWT/OAuth; isomorphic RBAC and ABAC.
 - [Resources and OpenAPI](/docs/build/resources): shape the output; derive the public contract.

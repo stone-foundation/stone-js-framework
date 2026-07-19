@@ -63,6 +63,23 @@ export const DOC_NAV: DocSection[] = [
     ]
   },
   {
+    title: 'Essentials',
+    blurb: 'The runtime building blocks, in detail.',
+    items: [
+      { title: 'Application & bootstrap', path: '/docs/essentials/application' },
+      { title: 'Event handlers', path: '/docs/essentials/event-handlers' },
+      { title: 'Incoming event', path: '/docs/essentials/incoming-event' },
+      { title: 'Outgoing response', path: '/docs/essentials/outgoing-response' },
+      { title: 'Cookies', path: '/docs/essentials/cookies' },
+      { title: 'Configuration', path: '/docs/essentials/configuration' },
+      { title: 'Environment', path: '/docs/essentials/environment' },
+      { title: 'Events & listeners', path: '/docs/essentials/events' },
+      { title: 'Error handling', path: '/docs/essentials/errors' },
+      { title: 'Logging', path: '/docs/essentials/logging' },
+      { title: 'Hooks & lifecycle', path: '/docs/essentials/hooks' }
+    ]
+  },
+  {
     title: 'Contexts',
     blurb: 'The dimensions. The same domain, collapsed differently.',
     items: [
@@ -77,7 +94,6 @@ export const DOC_NAV: DocSection[] = [
     title: 'Build',
     blurb: 'Recipes for real applications.',
     items: [
-      { title: 'Config & environment', path: '/docs/build/config' },
       { title: 'Validation', path: '/docs/build/validation' },
       { title: 'Auth & authorization', path: '/docs/build/auth' },
       { title: 'Resources & OpenAPI', path: '/docs/build/resources' },
