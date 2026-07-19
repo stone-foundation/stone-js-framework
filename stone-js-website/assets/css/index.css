@@ -113,14 +113,25 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .site-header .links a { font-size: 15px; color: var(--gres); transition: color 200ms var(--ease); }
 .site-header .links a:hover { color: var(--encre); }
 .site-header .spacer { flex: 1; }
-.ver { font-family: var(--mono); font-size: 12px; color: var(--gres); border: 1px solid var(--trait); border-radius: 999px; padding: 3px 10px; }
-@media (max-width: 820px) { .site-header .links { display: none; } }
+.ver { font-family: var(--mono); font-size: 12px; color: var(--gres); border: 1px solid var(--trait); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+.site-header nav > .icon-btn { flex: 0 0 auto; }
+@media (max-width: 820px) { .site-header .links { display: none; } .site-header nav { gap: 14px; } }
+@media (max-width: 480px) {
+  .site-header nav { gap: 10px; height: 58px; }
+  .brand { font-size: 18px; gap: 8px; }
+  .ver { display: none; }
+}
 
 .site-footer { padding: 56px 0 46px; }
 .foot { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: center; padding-top: 40px; }
 .slogan { font-family: var(--display); font-size: 20px; }
 .slogan .dot { color: var(--braise); }
 .foot .right { text-align: right; }
+@media (max-width: 640px) {
+  .site-footer { padding: 44px 0 38px; }
+  .foot { flex-direction: column; align-items: flex-start; gap: 20px; padding-top: 30px; }
+  .foot .right { text-align: left; }
+}
 
 /* ---------- 5. Hero: the atom ---------- */
 .hero { position: relative; min-height: 96vh; display: grid; place-items: center; text-align: center; padding: clamp(24px, 6vw, 64px) 0 40px; overflow: hidden; }
@@ -409,6 +420,22 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .doc-code .token.deleted { color: #E06C75; }
 .doc-code .token.namespace { opacity: .7; }
 
+/* Copy button: sits top-right of the code body, reveals on hover/focus. */
+.code-body { position: relative; }
+.copy-btn {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 11.5px; line-height: 1;
+  padding: 6px 9px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--trait); background: var(--surface-2); color: var(--gres);
+  opacity: 0; transition: opacity 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease);
+}
+.doc-code:hover .copy-btn, .copy-btn:focus-visible { opacity: 1; }
+.copy-btn:hover { border-color: var(--braise); color: var(--encre); }
+.copy-btn.copied { opacity: 1; border-color: var(--braise); color: var(--braise-txt); }
+.copy-btn svg { display: block; }
+@media (hover: none) { .copy-btn { opacity: 1; } }
+
 /* ---- 14.7 Callouts ---- */
 .callout { margin: 0 0 22px; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--trait); background: var(--surface); border-left: 3px solid var(--gres); }
 .callout-label { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 8px; color: var(--gres); }
@@ -450,23 +477,37 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .toc li a:hover { color: var(--encre); }
 .toc li.active a { color: var(--braise-txt); border-left-color: var(--braise); }
 
-/* ---- 14.113 Search (trigger + ⌘K modal) ---- */
-.search-trigger { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px; border-radius: 9px; border: 1px solid var(--trait); background: var(--surface); color: var(--gres); cursor: pointer; font-family: var(--body); font-size: 13px; transition: border-color 200ms var(--ease); }
-.search-trigger:hover { border-color: var(--braise); color: var(--encre); }
-.search-trigger .st-label { min-width: 52px; text-align: left; }
-.st-kbd { font-family: var(--mono); font-size: 10.5px; border: 1px solid var(--trait); border-radius: 5px; padding: 1px 5px; color: var(--gres); background: var(--bg); }
-.search-overlay { position: fixed; inset: 0; z-index: 80; background: color-mix(in srgb, #000 45%, transparent); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 12vh 20px 20px; }
-.search-panel { width: 100%; max-width: 600px; background: var(--surface); border: 1px solid var(--trait); border-radius: 16px; overflow: hidden; box-shadow: 0 40px 100px -30px rgba(0, 0, 0, .6); }
-.search-field { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--trait); color: var(--gres); }
-.search-field input { flex: 1; border: 0; background: transparent; outline: none; color: var(--encre); font-family: var(--body); font-size: 17px; }
-.search-results { max-height: 56vh; overflow-y: auto; padding: 8px; }
-.search-note { color: var(--gres); font-size: 14px; padding: 18px; margin: 0; }
-.search-hit { display: block; padding: 12px 14px; border-radius: 10px; transition: background 160ms var(--ease); }
-.search-hit:hover { background: var(--surface-2); }
-.sh-title { display: block; font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--encre); }
-.sh-excerpt { display: block; font-size: 13px; color: var(--gres); margin-top: 3px; }
-.sh-excerpt mark { background: color-mix(in srgb, var(--braise) 26%, transparent); color: var(--encre); border-radius: 3px; padding: 0 2px; }
-@media (max-width: 680px) { .search-trigger .st-label, .search-trigger .st-kbd { display: none; } }
+/* ---- 14.113 Search (Algolia DocSearch, themed to « Obsidienne & Braise ») ---- */
+.docsearch-host { display: inline-flex; }
+:root {
+  --docsearch-primary-color: var(--braise);
+  --docsearch-text-color: var(--encre);
+  --docsearch-muted-color: var(--gres);
+  --docsearch-searchbox-background: var(--surface);
+  --docsearch-searchbox-focus-background: var(--surface);
+  --docsearch-searchbox-shadow: inset 0 0 0 1px var(--braise);
+  --docsearch-modal-background: var(--surface);
+  --docsearch-modal-shadow: 0 40px 100px -30px rgba(0, 0, 0, .6);
+  --docsearch-footer-background: var(--surface-2);
+  --docsearch-footer-shadow: 0 -1px 0 0 var(--trait);
+  --docsearch-hit-background: var(--bg);
+  --docsearch-hit-color: var(--encre);
+  --docsearch-hit-shadow: none;
+  --docsearch-hit-active-color: #1B1010;
+  --docsearch-key-gradient: linear-gradient(-26deg, var(--surface-2), var(--surface));
+  --docsearch-key-shadow: none;
+  --docsearch-highlight-color: var(--braise);
+}
+/* The trigger, restyled to match the docs header chrome. */
+.DocSearch-Button { margin: 0; height: 34px; border-radius: 9px; border: 1px solid var(--trait); background: var(--surface); padding: 0 10px; transition: border-color 200ms var(--ease); }
+.DocSearch-Button:hover { border-color: var(--braise); box-shadow: none; }
+.DocSearch-Button .DocSearch-Search-Icon { color: var(--gres); width: 16px; height: 16px; }
+.DocSearch-Button-Placeholder { font-family: var(--body); font-size: 13px; color: var(--gres); }
+.DocSearch-Button-Keys { min-width: auto; }
+.DocSearch-Button-Key { background: var(--bg); border: 1px solid var(--trait); box-shadow: none; color: var(--gres); font-family: var(--mono); }
+.DocSearch-Hit-source { color: var(--braise-txt); }
+.DocSearch-Hit a { border-radius: 10px; }
+@media (max-width: 680px) { .DocSearch-Button-Placeholder, .DocSearch-Button-Keys { display: none; } .DocSearch-Button { padding: 0 9px; } }
 
 /* ---- 14.114 Reference tables & definition lists ---- */
 .doc-article .table-wrap { overflow-x: auto; margin: 0 0 22px; border: 1px solid var(--trait); border-radius: 12px; }
@@ -514,10 +555,17 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
   .principle { grid-template-columns: 1fr; }
   .dh-crumb { display: none; }
   .ps-label { display: none; }
+  .dh-inner { gap: 10px; }
 }
 @media (max-width: 560px) {
   .pager { grid-template-columns: 1fr; }
-  .paradigm-switch { order: 3; }
+  .dh-inner { gap: 8px; padding: 0 14px; }
+  .dh-inner .brand { font-size: 17px; }
+  .dh-inner .brand .portal-mark, .dh-inner .brand svg { flex: 0 0 auto; }
+  /* GitHub lives in the landing header and footer; drop it here to save room. */
+  .dh-inner > a.icon-btn { display: none; }
+  .ps-btn { padding: 6px 8px; font-size: 11px; }
+  .icon-btn { width: 34px; height: 34px; }
 }
 
 /* ---------- 15. Reduced motion ---------- */

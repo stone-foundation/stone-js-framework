@@ -12,15 +12,18 @@ import { requireAuth, requireScopes } from '@stone-js/auth'
 import { authorize } from '@stone-js/authz'
 
 @EventHandler('/tasks')
-export class Tasks {
+export class TaskController {
+  private readonly tasks: TaskService
+  constructor ({ tasks }: { tasks: TaskService }) { this.tasks = tasks }
+
   @Get('/', { middleware: [requireAuth()] })
-  list () { return this.store.all() }
+  list () { return this.tasks.list() }
 
   @Post('/', { middleware: [requireScopes('tasks:write')] })
-  create (event) { return this.store.add(event.get('body')) }
+  create (event) { return this.tasks.add(event.get('title')) }
 
   @Delete('/:id', { middleware: [authorize('delete', 'Task')] })
-  remove (event) { return this.store.remove(event.get('id')) }
+  remove (event) { return this.tasks.remove(event.get('id')) }
 }
 `
 
@@ -30,11 +33,11 @@ import { requireAuth, requireScopes } from '@stone-js/auth'
 import { authorize } from '@stone-js/authz'
 
 export const routes = defineRoutes([
-  [defineEventHandler(Tasks, 'list'),
+  [defineEventHandler(TaskController, 'list'),
     { path: '/tasks', method: 'GET', middleware: [requireAuth()] }],
-  [defineEventHandler(Tasks, 'create'),
+  [defineEventHandler(TaskController, 'create'),
     { path: '/tasks', method: 'POST', middleware: [requireScopes('tasks:write')] }],
-  [defineEventHandler(Tasks, 'remove'),
+  [defineEventHandler(TaskController, 'remove'),
     { path: '/tasks/:id', method: 'DELETE', middleware: [authorize('delete', 'Task')] }]
 ])
 `

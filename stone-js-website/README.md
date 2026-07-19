@@ -69,13 +69,26 @@ and `.nojekyll` (so GitHub Pages serves `/pagefind/*` and any underscore paths).
 
 ## Search
 
-Full-text search is [Pagefind](https://pagefind.app): self-hosted, no external service, CSP-
-friendly. The build indexes the SSG HTML (`npm run build` = `stone build && pagefind --site dist`).
-Only docs pages are indexed (`.doc-article` carries `data-pagefind-body`; the landing carries
-`data-pagefind-ignore`). `app/docs/components/Search.tsx` is a Cmd/Ctrl+K modal that loads the
-Pagefind runtime from `/pagefind/` at runtime and degrades gracefully when the index is absent
-(e.g. the SSR dev server). To try search locally, serve the built output statically
-(`npx serve dist`), not the SSR preview.
+Search is [Algolia DocSearch](https://docsearch.algolia.com). Keys live in `app/site.ts`
+(the API key is the public search-only key). `app/docs/components/Search.tsx` loads the
+DocSearch runtime on the client (dynamic import) and injects its button + Cmd/Ctrl+K modal;
+navigation is routed through the SPA. The stylesheet is vendored to `public/vendor/docsearch.css`
+and linked at runtime (the SSR build has no CSS loader, so it must not be imported from JS).
+The index is populated by Algolia's crawler against the deployed site; update the crawler config
+if the URL structure changes.
+
+## Analytics
+
+Google Analytics (gtag) via `app/components/Analytics.tsx`, loaded once on the client and
+rendered in both shells (landing + docs). Single-page navigations fire `page_view` from the docs
+layout. The measurement id is in `app/site.ts`.
+
+## Code blocks
+
+`Code` / `CodeTabs` (see `app/docs/components/Code.tsx`) are Prism-highlighted and carry a
+copy-to-clipboard button that confirms briefly on copy. `CodeTabs` copies whichever paradigm
+variant is currently shown. In-page heading anchors and the TOC scroll smoothly via a shared
+`scrollToId` helper (bypassing router interception of hash links).
 
 ## API reference (TypeDoc)
 

@@ -1,6 +1,7 @@
 import { Toc } from './components/Toc'
 import { Search } from './components/Search'
 import { Footer } from '../components/Header'
+import { Analytics, trackPageView } from '../components/Analytics'
 import { Portal } from '../components/brand/Portal'
 import { ParadigmSwitch } from './components/ParadigmSwitch'
 import { Sidebar, useCurrentPath } from './components/Sidebar'
@@ -38,12 +39,16 @@ function DocShell ({ children }: { children: ReactNode }): JSX.Element {
     } catch {}
   }, [])
 
-  // Close the mobile drawer whenever the route changes.
-  useEffect(() => { setDrawer(false) }, [currentPath])
+  // Close the mobile drawer and record a page view whenever the route changes.
+  useEffect(() => {
+    setDrawer(false)
+    if (currentPath !== '') trackPageView(currentPath)
+  }, [currentPath])
 
   return (
     <div className={`docs-root ${drawer ? 'drawer-open' : ''}`}>
       <script dangerouslySetInnerHTML={{ __html: NO_FLASH }} />
+      <Analytics />
       <header className='docs-header'>
         <div className='dh-inner'>
           <button className='icon-btn menu-btn' aria-label='Toggle menu' aria-expanded={drawer} onClick={() => setDrawer((v) => !v)}>
@@ -73,13 +78,13 @@ function DocShell ({ children }: { children: ReactNode }): JSX.Element {
           <Sidebar currentPath={currentPath} onNavigate={() => setDrawer(false)} />
         </aside>
         <main className='docs-main'>
-          <article className='doc-article' data-pagefind-body>
+          <article className='doc-article'>
             <StoneOutlet>{children}</StoneOutlet>
           </article>
           <Footer />
         </main>
         <aside className='docs-toc'>
-          <Toc />
+          <Toc pathKey={currentPath} />
         </aside>
       </div>
     </div>

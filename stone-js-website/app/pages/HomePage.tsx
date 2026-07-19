@@ -7,6 +7,7 @@ import { Paradigms } from '../sections/Paradigms'
 import { Ecosystem } from '../sections/Ecosystem'
 import { CollapseLab } from '../sections/CollapseLab'
 import { Header, Footer } from '../components/Header'
+import { Analytics } from '../components/Analytics'
 import { Manifesto, FinalCta } from '../sections/Closing'
 import { IPage, Page, ReactIncomingEvent, HeadContext } from '@stone-js/use-react'
 
@@ -28,10 +29,10 @@ export class HomePage implements IPage<ReactIncomingEvent> {
   }
 
   render (): JSX.Element {
-    // data-pagefind-ignore: keep the marketing landing out of the docs search index.
     return (
-      <div data-pagefind-ignore>
+      <div>
         <Header />
+        <Analytics />
         <main>
           <HeroAtom />
           <Physics />

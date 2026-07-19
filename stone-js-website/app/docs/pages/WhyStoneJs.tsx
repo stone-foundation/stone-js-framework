@@ -7,24 +7,74 @@ import { siblings } from '../nav'
 const PATH = '/docs'
 
 const DECL = `
-import { Get, EventHandler } from '@stone-js/router'
+import { Service } from '@stone-js/core'
+import { IncomingHttpEvent } from '@stone-js/http-core'
+import { Get, Post, EventHandler } from '@stone-js/router'
+
+interface Task { id: string, title: string, done: boolean }
+
+// A service, injected by its alias. Pure domain: no HTTP, no platform.
+@Service({ alias: 'tasks' })
+export class TaskService {
+  private readonly items = new Map<string, Task>()
+
+  list (done?: boolean): Task[] {
+    const all = [...this.items.values()]
+    return done === undefined ? all : all.filter((t) => t.done === done)
+  }
+
+  add (title: string): Task {
+    const task: Task = { id: crypto.randomUUID(), title, done: false }
+    this.items.set(task.id, task)
+    return task
+  }
+}
 
 @EventHandler('/tasks')
-export class Tasks {
-  constructor ({ store }) { this.store = store }
+export class TaskController {
+  private readonly tasks: TaskService
+  constructor ({ tasks }: { tasks: TaskService }) { this.tasks = tasks }
 
   @Get('/')
-  list () { return this.store.all() }
+  list (event: IncomingHttpEvent): Task[] {
+    return this.tasks.list(event.get<boolean>('done'))
+  }
+
+  @Post('/')
+  create (event: IncomingHttpEvent): Task {
+    return this.tasks.add(event.get<string>('title', 'Untitled'))
+  }
 }
 `
 
 const IMP = `
+import { defineService } from '@stone-js/core'
 import { defineEventHandler, defineRoutes } from '@stone-js/router'
 
-const Tasks = ({ store }) => ({ list: () => store.all() })
+// A factory service, bound to the alias 'tasks'.
+const TaskService = () => {
+  const items = new Map()
+  return {
+    list: (done) => [...items.values()].filter((t) => done === undefined || t.done === done),
+    add: (title) => {
+      const task = { id: crypto.randomUUID(), title, done: false }
+      items.set(task.id, task)
+      return task
+    }
+  }
+}
+
+// A factory handler: the container hands it the resolved 'tasks' service.
+const TaskController = ({ tasks }) => ({
+  list: (event) => tasks.list(event.get('done')),
+  create: (event) => tasks.add(event.get('title', 'Untitled'))
+})
+
+export const services = [defineService(TaskService, { alias: 'tasks' }, true)]
 
 export const routes = defineRoutes([
-  [defineEventHandler(Tasks, 'list'), { path: '/tasks', method: 'GET' }]
+  [defineEventHandler(TaskController, 'list'),   { path: '/tasks', method: 'GET' }],
+  [defineEventHandler(TaskController, 'create'), { path: '/tasks', method: 'POST' }]
 ])
 `
 

@@ -126,7 +126,7 @@ export function HeroAtom (): JSX.Element {
         <p className='eyebrow'><span className='psi'>ψ</span>The Continuum Framework</p>
         <h1 className='mono-title'>
           Your app exists in <span className='shimmer'>every runtime</span>.<br />
-          Until you deploy it.
+          Until you run it.
         </h1>
         <p className='lede'>
           Write the domain once. It lives in superposition across every context: server, edge,

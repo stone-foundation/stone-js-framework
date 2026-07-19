@@ -7,33 +7,68 @@ import { ArticleTop, Lead, H2, Callout, Principle, Pager } from '../components/c
 const PATH = '/docs/foundations/domain-context'
 
 const DECL = `
-import { Get, EventHandler } from '@stone-js/router'
+import { RuntimeError } from '@stone-js/core'
+import { IncomingHttpEvent } from '@stone-js/http-core'
+import { Get, Post, Delete, EventHandler } from '@stone-js/router'
 
-// Pure domain. No request, no response, no platform.
+// Pure domain. Every value is an intention read off the event; nothing here
+// knows whether it arrived over HTTP, a CLI flag, or an agent tool call.
 @EventHandler('/tasks')
-export class Tasks {
-  constructor ({ store }) { this.store = store }
+export class TaskController {
+  private readonly tasks: TaskService
+  constructor ({ tasks }: { tasks: TaskService }) { this.tasks = tasks }
 
   @Get('/')
-  list () { return this.store.all() }
+  list (event: IncomingHttpEvent): Task[] {
+    return this.tasks.list({
+      done: event.get<boolean>('done'),
+      limit: event.get<number>('limit', 50)
+    })
+  }
 
   @Get('/:id')
-  show (event) { return this.store.find(event.get('id')) }
+  show (event: IncomingHttpEvent): Task {
+    const task = this.tasks.find(event.get<string>('id'))
+    if (task === undefined) throw new RuntimeError('Task not found')
+    return task
+  }
+
+  @Post('/')
+  create (event: IncomingHttpEvent): Task {
+    return this.tasks.add(event.get<string>('title'))
+  }
+
+  @Delete('/:id')
+  remove (event: IncomingHttpEvent): void {
+    this.tasks.remove(event.get<string>('id'))
+  }
 }
 `
 
 const IMP = `
+import { RuntimeError } from '@stone-js/core'
 import { defineEventHandler, defineRoutes } from '@stone-js/router'
 
-// Pure domain, as functions.
-const Tasks = ({ store }) => ({
-  list: () => store.all(),
-  show: (event) => store.find(event.get('id'))
+// Pure domain, as functions. Same intentions, same ignorance of the platform.
+const TaskController = ({ tasks }) => ({
+  list: (event) => tasks.list({
+    done: event.get('done'),
+    limit: event.get('limit', 50)
+  }),
+  show: (event) => {
+    const task = tasks.find(event.get('id'))
+    if (task === undefined) throw new RuntimeError('Task not found')
+    return task
+  },
+  create: (event) => tasks.add(event.get('title')),
+  remove: (event) => tasks.remove(event.get('id'))
 })
 
 export const routes = defineRoutes([
-  [defineEventHandler(Tasks, 'list'), { path: '/tasks', method: 'GET' }],
-  [defineEventHandler(Tasks, 'show'), { path: '/tasks/:id', method: 'GET' }]
+  [defineEventHandler(TaskController, 'list'),   { path: '/tasks',     method: 'GET' }],
+  [defineEventHandler(TaskController, 'show'),   { path: '/tasks/:id', method: 'GET' }],
+  [defineEventHandler(TaskController, 'create'), { path: '/tasks',     method: 'POST' }],
+  [defineEventHandler(TaskController, 'remove'), { path: '/tasks/:id', method: 'DELETE' }]
 ])
 `
 

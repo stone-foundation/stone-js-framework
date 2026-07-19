@@ -58,13 +58,49 @@ export class Backend implements IPage<ReactIncomingEvent> {
           Here is the Tasks handler again, unchanged. It names no server, no request object, no
           port. It reads intentions from an event and returns values.
         </p>
-        <Code file='app/Tasks.ts'>{`@EventHandler('/tasks')
-export class Tasks {
-  constructor ({ store }) { this.store = store }
+        <Code file='app/Tasks.ts'>{`import { Service, RuntimeError } from '@stone-js/core'
+import { IncomingHttpEvent } from '@stone-js/http-core'
+import { Get, Post, Delete, EventHandler } from '@stone-js/router'
 
-  @Get('/')     list ()      { return this.store.all() }
-  @Get('/:id')  show (event) { return this.store.find(event.get('id')) }
-  @Post('/')    create (event) { return this.store.add({ title: event.get('title') }) }
+@Service({ alias: 'tasks' })
+export class TaskService {
+  private readonly items = new Map<string, Task>()
+
+  list (done?: boolean): Task[] {
+    const all = [...this.items.values()]
+    return done === undefined ? all : all.filter((t) => t.done === done)
+  }
+
+  find (id: string): Task | undefined { return this.items.get(id) }
+
+  add (title: string): Task {
+    const task: Task = { id: crypto.randomUUID(), title, done: false }
+    this.items.set(task.id, task)
+    return task
+  }
+}
+
+@EventHandler('/tasks')
+export class TaskController {
+  private readonly tasks: TaskService
+  constructor ({ tasks }: { tasks: TaskService }) { this.tasks = tasks }
+
+  @Get('/')
+  list (event: IncomingHttpEvent): Task[] {
+    return this.tasks.list(event.get<boolean>('done'))
+  }
+
+  @Get('/:id')
+  show (event: IncomingHttpEvent): Task {
+    const task = this.tasks.find(event.get<string>('id'))
+    if (task === undefined) throw new RuntimeError('Task not found')
+    return task
+  }
+
+  @Post('/')
+  create (event: IncomingHttpEvent): Task {
+    return this.tasks.add(event.get<string>('title'))
+  }
 }`}</Code>
 
         <H2>Collapse it onto Node</H2>

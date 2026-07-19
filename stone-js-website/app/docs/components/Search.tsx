@@ -1,102 +1,54 @@
-import { JSX, useEffect, useRef, useState } from 'react'
+import { ALGOLIA } from '../../site'
+import { JSX, useEffect, useRef } from 'react'
 
-interface Hit { url: string, title: string, excerpt: string }
-
-/** Loads the Pagefind runtime once, from the deployed /pagefind bundle. */
-let pagefindPromise: Promise<any> | null = null
-async function loadPagefind (): Promise<any> {
-  if (pagefindPromise === null) {
-    const base = (import.meta as any).env?.BASE_URL ?? '/'
-    const url = `${base}pagefind/pagefind.js`.replace(/\/\//g, '/')
-    // @vite-ignore: this file exists only in the built site, never in the bundle.
-    pagefindPromise = import(/* @vite-ignore */ url).then(async (pf) => {
-      await pf.options?.({ excerptLength: 24 })
-      return pf
-    })
-  }
-  return await pagefindPromise
+/** Loads the vendored DocSearch stylesheet once (kept out of the JS bundle so the SSR build never sees a CSS import). */
+function ensureStyles (): void {
+  if (document.getElementById('docsearch-css') !== null) return
+  const link = document.createElement('link')
+  link.id = 'docsearch-css'
+  link.rel = 'stylesheet'
+  link.href = '/vendor/docsearch.css'
+  document.head.appendChild(link)
 }
 
 /**
- * The docs search: a trigger in the header plus a Cmd/Ctrl+K modal. Results come
- * from Pagefind, which indexes the built HTML after the SSG build. Degrades
- * gracefully when the index is absent (e.g. the dev server).
+ * Docs search, powered by Algolia DocSearch. The runtime and its stylesheet load
+ * on the client only (dynamic import), so server-side rendering stays untouched;
+ * DocSearch injects its own button (and the Cmd/Ctrl+K modal) into the host.
+ * Navigation is routed through the client so results open without a full reload.
  */
 export function Search (): JSX.Element {
-  const [open, setOpen] = useState(false)
-  const [query, setQuery] = useState('')
-  const [hits, setHits] = useState<Hit[]>([])
-  const [state, setState] = useState<'idle' | 'searching' | 'unavailable'>('idle')
-  const inputRef = useRef<HTMLInputElement>(null)
+  const host = useRef<HTMLDivElement>(null)
 
-  // Global Cmd/Ctrl+K to open, Esc to close.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setOpen(true) }
-      if (e.key === 'Escape') setOpen(false)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    let active = true
+    ensureStyles()
+    void import('@docsearch/js').then((mod) => {
+      if (!active || host.current === null) return
+      mod.default({
+        container: host.current,
+        appId: ALGOLIA.appId,
+        apiKey: ALGOLIA.apiKey,
+        indexName: ALGOLIA.indexName,
+        placeholder: 'Search the docs',
+        // Keep results inside the SPA: same-origin links navigate without a reload.
+        navigator: {
+          navigate ({ itemUrl }) {
+            try {
+              const url = new URL(itemUrl, window.location.origin)
+              if (url.origin === window.location.origin) {
+                window.history.pushState(null, '', url.pathname + url.hash)
+                window.dispatchEvent(new PopStateEvent('popstate'))
+                return
+              }
+            } catch {}
+            window.location.assign(itemUrl)
+          }
+        }
+      })
+    })
+    return () => { active = false }
   }, [])
 
-  useEffect(() => { if (open) inputRef.current?.focus() }, [open])
-
-  // Debounced query against Pagefind.
-  useEffect(() => {
-    if (!open) return
-    const q = query.trim()
-    if (q === '') { setHits([]); setState('idle'); return }
-    let cancelled = false
-    const timer = setTimeout(() => {
-      setState('searching')
-      loadPagefind()
-        .then(async (pf) => {
-          const search = await pf.search(q)
-          const data = await Promise.all(search.results.slice(0, 8).map(async (r: any) => await r.data()))
-          if (cancelled) return
-          setHits(data.map((d: any) => ({ url: d.url, title: d.meta?.title ?? d.url, excerpt: d.excerpt })))
-          setState('idle')
-        })
-        .catch(() => { if (!cancelled) setState('unavailable') })
-    }, 160)
-    return () => { cancelled = true; clearTimeout(timer) }
-  }, [query, open])
-
-  return (
-    <>
-      <button className='search-trigger' onClick={() => setOpen(true)} aria-label='Search'>
-        <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><circle cx='11' cy='11' r='7' /><path d='m21 21-4.3-4.3' /></svg>
-        <span className='st-label'>Search</span>
-        <kbd className='st-kbd'>⌘K</kbd>
-      </button>
-
-      {open && (
-        <div className='search-overlay' onClick={() => setOpen(false)} role='dialog' aria-modal='true' aria-label='Search'>
-          <div className='search-panel' onClick={(e) => e.stopPropagation()}>
-            <div className='search-field'>
-              <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><circle cx='11' cy='11' r='7' /><path d='m21 21-4.3-4.3' /></svg>
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder='Search the docs'
-                aria-label='Search the docs'
-              />
-              <kbd className='st-kbd'>Esc</kbd>
-            </div>
-            <div className='search-results'>
-              {state === 'unavailable' && <p className='search-note'>Search is available on the deployed site. Run a static preview of the build to try it locally.</p>}
-              {state === 'idle' && query.trim() !== '' && hits.length === 0 && <p className='search-note'>No results for "{query}".</p>}
-              {hits.map((h) => (
-                <a key={h.url} className='search-hit' href={h.url}>
-                  <span className='sh-title'>{h.title}</span>
-                  <span className='sh-excerpt' dangerouslySetInnerHTML={{ __html: h.excerpt }} />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  )
+  return <div ref={host} className='docsearch-host' />
 }

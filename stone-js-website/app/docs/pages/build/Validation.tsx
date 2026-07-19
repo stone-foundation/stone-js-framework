@@ -18,7 +18,7 @@ export class Tasks {
   @Post('/', { middleware: [validate({ body: NewTask })] })
   create (event) {
     // reaches here only if the body already matched NewTask
-    return this.store.add(event.get('body'))
+    return this.tasks.add(event.get('body'))
   }
 }
 `
@@ -31,7 +31,7 @@ const NewTask = z.object({ title: z.string().min(1).max(120) })
 
 const create = (event) => {
   validateEvent(event, { body: NewTask })   // throws ValidationError (422) on mismatch
-  return store.add(event.get('body'))
+  return tasks.add(event.get('body'))
 }
 `
 

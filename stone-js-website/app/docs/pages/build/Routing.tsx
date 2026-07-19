@@ -7,32 +7,44 @@ import { ArticleTop, Lead, H2, H3, Callout, Aphorism, Pager } from '../../compon
 const PATH = '/docs/build/routing'
 
 const DECL = `
+import { IncomingHttpEvent } from '@stone-js/http-core'
 import { EventHandler, Get, Post } from '@stone-js/router'
 
 @EventHandler('/tasks')
-export class Tasks {
-  constructor ({ store }) { this.store = store }
+export class TaskController {
+  private readonly tasks: TaskService
+  constructor ({ tasks }: { tasks: TaskService }) { this.tasks = tasks }
 
-  @Get('/')          list ()      { return this.store.all() }
-  @Get('/:id')       show (event) { return this.store.find(event.get('id')) }
+  @Get('/')
+  list (event: IncomingHttpEvent): Task[] {
+    return this.tasks.list(event.get<boolean>('done'))
+  }
+
+  @Get('/:id')
+  show (event: IncomingHttpEvent): Task | undefined {
+    return this.tasks.find(event.get<string>('id'))
+  }
+
   @Post('/', { name: 'tasks.create' })
-  create (event) { return this.store.add({ title: event.get('title') }) }
+  create (event: IncomingHttpEvent): Task {
+    return this.tasks.add(event.get<string>('title'))
+  }
 }
 `
 
 const IMP = `
 import { defineEventHandler, defineRoutes } from '@stone-js/router'
 
-const Tasks = ({ store }) => ({
-  list:   ()      => store.all(),
-  show:   (event) => store.find(event.get('id')),
-  create: (event) => store.add({ title: event.get('title') })
+const TaskController = ({ tasks }) => ({
+  list:   (event) => tasks.list(event.get('done')),
+  show:   (event) => tasks.find(event.get('id')),
+  create: (event) => tasks.add(event.get('title'))
 })
 
 export const routes = defineRoutes([
-  [defineEventHandler(Tasks, 'list'),   { path: '/tasks',     method: 'GET' }],
-  [defineEventHandler(Tasks, 'show'),   { path: '/tasks/:id', method: 'GET' }],
-  [defineEventHandler(Tasks, 'create'), { path: '/tasks', method: 'POST', name: 'tasks.create' }]
+  [defineEventHandler(TaskController, 'list'),   { path: '/tasks',     method: 'GET' }],
+  [defineEventHandler(TaskController, 'show'),   { path: '/tasks/:id', method: 'GET' }],
+  [defineEventHandler(TaskController, 'create'), { path: '/tasks', method: 'POST', name: 'tasks.create' }]
 ])
 `
 
@@ -82,7 +94,7 @@ export class Routing implements IPage<ReactIncomingEvent> {
           file='app/Tasks.ts'
           decl={`@Post('/', { middleware: [requireAuth()] })
 create (event) { /* ... */ }`}
-          imp={`[defineEventHandler(Tasks, 'create'),
+          imp={`[defineEventHandler(TaskController, 'create'),
   { path: '/tasks', method: 'POST', middleware: [requireAuth()] }]`}
         />
 

@@ -9,13 +9,13 @@
   },
   "scripts": {
     "dev": "stone dev",
-    "build": "stone build && pagefind --site dist && node scripts/build-api.mjs",
+    "build": "stone build && node scripts/build-api.mjs",
     "build:app": "stone build",
-    "index": "pagefind --site dist",
     "api": "node scripts/build-api.mjs",
     "preview": "stone preview"
   },
   "dependencies": {
+    "@docsearch/js": "^3.9.0",
     "@stone-js/browser-adapter": "workspace:*",
     "@stone-js/core": "workspace:*",
     "@stone-js/node-cli-adapter": "workspace:*",
@@ -35,7 +35,6 @@
     "@types/prismjs": "^1.26.6",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
-    "pagefind": "^1.5.2",
     "typedoc": "^0.28.20"
   }
 }

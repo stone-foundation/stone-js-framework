@@ -11,6 +11,19 @@ export function slug (text: string): string {
     .replace(/(^-|-$)/g, '')
 }
 
+/**
+ * Smooth-scrolls to an in-page anchor and updates the hash, bypassing any router
+ * interception of hash links. The sticky-header offset is handled by the target's
+ * `scroll-margin-top`.
+ */
+export function scrollToId (event: { preventDefault: () => void }, id: string): void {
+  event.preventDefault()
+  const el = document.getElementById(id)
+  if (el === null) return
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  history.pushState(null, '', `#${id}`)
+}
+
 /** The title block of a doc page: a section eyebrow and the h1. */
 export function ArticleTop ({ eyebrow, title }: { eyebrow: string, title: string }): JSX.Element {
   return (
@@ -29,13 +42,13 @@ export function Lead ({ children }: { children: ReactNode }): JSX.Element {
 /** A section heading that carries an anchor id (consumed by the TOC). */
 export function H2 ({ children }: { children: string }): JSX.Element {
   const id = slug(children)
-  return <h2 id={id} className='doc-h2'><a className='anchor' href={`#${id}`} aria-label={children}>#</a>{children}</h2>
+  return <h2 id={id} className='doc-h2'><a className='anchor' href={`#${id}`} aria-label={children} onClick={(e) => scrollToId(e, id)}>#</a>{children}</h2>
 }
 
 /** A sub-heading that carries an anchor id. */
 export function H3 ({ children }: { children: string }): JSX.Element {
   const id = slug(children)
-  return <h3 id={id} className='doc-h3'><a className='anchor' href={`#${id}`} aria-label={children}>#</a>{children}</h3>
+  return <h3 id={id} className='doc-h3'><a className='anchor' href={`#${id}`} aria-label={children} onClick={(e) => scrollToId(e, id)}>#</a>{children}</h3>
 }
 
 type CalloutKind = 'note' | 'important' | 'future'
