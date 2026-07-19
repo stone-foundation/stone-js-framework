@@ -33,7 +33,8 @@
       "@stone-js/openapi",
       "@stone-js/testing",
       "@stone-js/mcp-adapter",
-      "@stone-js/mcp"
+      "@stone-js/mcp",
+      "@stone-js/edge-adapter"
     ]
   ],
   "linked": [],

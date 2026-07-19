@@ -1,0 +1,94 @@
+{
+  "name": "@stone-js/edge-adapter",
+  "version": "0.8.0",
+  "description": "Deploy a Stone.js app to any WinterCG/edge or JS runtime \u2014 Cloudflare Workers, Vercel Edge, Netlify Edge, Deno and Bun \u2014 with one-line serve helpers on top of @stone-js/fetch-adapter. Build once, deploy anywhere.",
+  "author": "Mr. Stone <evensstone@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/stone-foundation/stone-js-edge-adapter.git"
+  },
+  "homepage": "https://stonejs.dev",
+  "bugs": {
+    "url": "https://github.com/stone-foundation/stone-js-edge-adapter/issues"
+  },
+  "keywords": [
+    "StoneJS",
+    "adapter",
+    "edge",
+    "cloudflare",
+    "vercel",
+    "netlify",
+    "deno",
+    "bun",
+    "wintercg"
+  ],
+  "files": [
+    "/dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "lint": "ts-standard src",
+    "lint:fix": "ts-standard --fix src tests",
+    "predoc": "rimraf docs",
+    "doc": "typedoc",
+    "prebuild": "rimraf dist && npm run doc",
+    "build": "rollup -c",
+    "test": "vitest run",
+    "test:cvg": "npm run test -- --coverage",
+    "test:text": "npm run test:cvg -- --coverage.reporter=text",
+    "test:html": "npm run test:cvg -- --coverage.reporter=html",
+    "test:clover": "npm run test:cvg -- --coverage.reporter=clover",
+    "prepare": "husky"
+  },
+  "peerDependencies": {
+    "@stone-js/core": "workspace:*",
+    "@stone-js/fetch-adapter": "workspace:*"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-multi-entry": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@stone-js/core": "workspace:*",
+    "@stone-js/fetch-adapter": "workspace:*",
+    "@stone-js/http-core": "workspace:*",
+    "@types/node": "^24.0.7",
+    "@vitest/coverage-v8": "^3.2.4",
+    "husky": "^9.1.7",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.44.1",
+    "rollup-plugin-delete": "^3.0.1",
+    "rollup-plugin-dts": "^6.2.1",
+    "rollup-plugin-node-externals": "^8.0.1",
+    "ts-standard": "^12.0.2",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.28.6",
+    "typedoc-plugin-markdown": "^4.7.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  },
+  "ts-standard": {
+    "globals": [
+      "it",
+      "test",
+      "vi",
+      "expect",
+      "describe",
+      "beforeEach"
+    ]
+  }
+}
