@@ -90,6 +90,16 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [Matching and precedence](/docs/routing/matching): how a route is chosen; domain/protocol/strict.
 - [Misc](/docs/routing/misc): fallback, current route, useRouter, routing in the browser.
 
+## Adapters (per platform, A to Z)
+- [Overview](/docs/adapters): the catalog and the shared install/decorate/deploy pattern.
+- [Node HTTP](/docs/adapters/node-http): @NodeHttp; a production HTTP server on Node.
+- [Node CLI](/docs/adapters/node-cli): @NodeConsole + @Command; handlers as CLI commands.
+- [Fetch](/docs/adapters/fetch): @Fetch; one Web-standard adapter for Cloudflare/Deno/Bun/Vercel/Netlify.
+- [AWS Lambda](/docs/adapters/aws-lambda): @AwsLambdaHttp (API Gateway) and @AwsLambda (generic).
+- [Browser](/docs/adapters/browser): @Browser; SPA and hydration.
+- [MCP](/docs/adapters/mcp): @Mcp; expose the domain as agent tools.
+- [Mobile](/docs/adapters/mobile): forthcoming (React Native / Expo).
+
 ## Build (recipes)
 - [Validation](/docs/build/validation): one schema, enforced on the API and the form.
 - [Auth and authorization](/docs/build/auth): stateless JWT/OAuth; isomorphic RBAC and ABAC.

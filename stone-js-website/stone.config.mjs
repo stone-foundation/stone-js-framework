@@ -80,6 +80,15 @@ export default defineConfig({
       '/docs/frontend/assets',
       '/docs/frontend/rendering',
       '/docs/frontend/use-view',
+      // Docs: Adapters (per platform)
+      '/docs/adapters',
+      '/docs/adapters/node-http',
+      '/docs/adapters/node-cli',
+      '/docs/adapters/fetch',
+      '/docs/adapters/aws-lambda',
+      '/docs/adapters/browser',
+      '/docs/adapters/mcp',
+      '/docs/adapters/mobile',
       // Docs: Routing (dedicated section)
       '/docs/routing',
       '/docs/routing/definitions',

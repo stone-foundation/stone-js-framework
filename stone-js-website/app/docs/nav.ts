@@ -137,6 +137,20 @@ export const DOC_NAV: DocSection[] = [
     ]
   },
   {
+    title: 'Adapters',
+    blurb: 'Each platform, A to Z: install, enable, configure, deploy.',
+    items: [
+      { title: 'Overview', path: '/docs/adapters' },
+      { title: 'Node HTTP', path: '/docs/adapters/node-http' },
+      { title: 'Node CLI', path: '/docs/adapters/node-cli' },
+      { title: 'Fetch (edge & serverless)', path: '/docs/adapters/fetch' },
+      { title: 'AWS Lambda', path: '/docs/adapters/aws-lambda' },
+      { title: 'Browser', path: '/docs/adapters/browser' },
+      { title: 'MCP (agents)', path: '/docs/adapters/mcp' },
+      { title: 'Mobile', path: '/docs/adapters/mobile' }
+    ]
+  },
+  {
     title: 'Build',
     blurb: 'Recipes for real applications.',
     items: [
