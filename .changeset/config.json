@@ -25,7 +25,8 @@
       "@stone-js/use-react",
       "@stone-js/telemetry",
       "@stone-js/cli",
-      "@stone-js/validation"
+      "@stone-js/validation",
+      "@stone-js/fetch-adapter"
     ]
   ],
   "linked": [],
