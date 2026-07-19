@@ -16,7 +16,12 @@ export default defineConfig({
       // Docs: Foundations
       '/docs/foundations/continuum',
       '/docs/foundations/domain-context',
-      '/docs/foundations/uncertainty'
+      '/docs/foundations/uncertainty',
+      // Docs: Contexts
+      '/docs/contexts/backend',
+      '/docs/contexts/frontend',
+      '/docs/contexts/edge',
+      '/docs/contexts/agents'
     ]
   }
 })

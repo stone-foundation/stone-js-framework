@@ -57,10 +57,10 @@ export const DOC_NAV: DocSection[] = [
     title: 'Contexts',
     blurb: 'The dimensions. The same domain, collapsed differently.',
     items: [
-      { title: 'Backend', path: '/docs/contexts/backend', soon: true },
-      { title: 'Frontend', path: '/docs/contexts/frontend', soon: true },
-      { title: 'Edge & Serverless', path: '/docs/contexts/edge', soon: true },
-      { title: 'Agents', path: '/docs/contexts/agents', soon: true },
+      { title: 'Backend', path: '/docs/contexts/backend' },
+      { title: 'Frontend', path: '/docs/contexts/frontend' },
+      { title: 'Edge & Serverless', path: '/docs/contexts/edge' },
+      { title: 'Agents', path: '/docs/contexts/agents' },
       { title: 'Mobile', path: '/docs/contexts/mobile', soon: true }
     ]
   },
