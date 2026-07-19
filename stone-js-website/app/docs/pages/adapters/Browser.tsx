@@ -69,6 +69,20 @@ export class Browser implements IPage<ReactIncomingEvent> {
           { name: 'rendering: ssg + Browser', type: 'build + browser', desc: 'Static HTML, then hydrated on load.' }
         ]} />
 
+        <H2>Browser primitives</H2>
+        <p>
+          The adapter builds on <code>@stone-js/browser-core</code>, the browser's runtime-agnostic
+          event and response model, the counterpart of <code>http-core</code> on the server. You rarely
+          touch it directly (pages and the event accessor cover day-to-day work), but it is what makes
+          a browser navigation just another normalised intention.
+        </p>
+        <PropsTable rows={[
+          { name: 'IncomingBrowserEvent', type: 'event', desc: 'A browser cause (navigation, load) as an intention your pages read with event.get().' },
+          { name: 'OutgoingBrowserResponse', type: 'response', desc: 'The browser-side response the view is rendered from.' },
+          { name: 'RedirectBrowserResponse', type: 'response', desc: 'A client-side redirect.' },
+          { name: 'Cookie / CookieCollection', type: 'cookies', desc: 'Cookie access in the browser context.' }
+        ]} nameHeader='browser-core' />
+
         <H2>Deploy</H2>
         <p>
           A CSR or SSG build is static assets: deploy <code>dist/</code> to any static host or CDN. An

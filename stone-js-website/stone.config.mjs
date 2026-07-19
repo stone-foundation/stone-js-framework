@@ -43,6 +43,7 @@ export default defineConfig({
       '/docs/essentials/incoming-event',
       '/docs/essentials/outgoing-response',
       '/docs/essentials/cookies',
+      '/docs/essentials/filesystem',
       '/docs/essentials/configuration',
       '/docs/essentials/environment',
       '/docs/essentials/events',

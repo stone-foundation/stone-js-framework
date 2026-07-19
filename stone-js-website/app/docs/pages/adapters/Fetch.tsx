@@ -64,11 +64,31 @@ export class Fetch implements IPage<ReactIncomingEvent> {
           { name: 'Netlify', type: 'serverless / edge', desc: 'Edge or serverless functions.' }
         ]} />
 
-        <H2>Deploy</H2>
+        <H2>Deploy: platform entrypoints</H2>
         <p>
-          Build once and deploy the output to any target with that platform's tooling. The handlers are
-          byte-for-byte identical across all of them; only the deployment command differs.
+          Each fetch runtime expects a slightly different entry shape (a Worker export, a Deno
+          <code> serve</code>, a Bun server). <code>@stone-js/edge-adapter</code> provides one
+          <code> serve*</code> helper per platform that wraps your fetch handler in exactly that shape,
+          so the only per-platform code is a one-line entry file.
         </p>
+        <Code file='app/entrypoints.ts'>{`import { App } from './Application'
+import {
+  serveCloudflare, serveDeno, serveBun, serveVercel, serveNetlify
+} from '@stone-js/edge-adapter'
+
+// Pick the entry for your target; each wraps the same fetch handler.
+export default serveCloudflare(App)   // Cloudflare Worker default export
+// export default serveVercel(App)    // Vercel edge/serverless
+// Deno.serve(serveDeno(App))         // Deno
+// Bun.serve({ fetch: serveBun(App) })// Bun`}</Code>
+        <PropsTable rows={[
+          { name: 'serveCloudflare(App)', type: '=> Worker export', desc: 'A Cloudflare Workers module export.' },
+          { name: 'serveDeno(App)', type: '=> fetch handler', desc: 'A handler for Deno.serve / Deno Deploy.' },
+          { name: 'serveBun(App)', type: '=> fetch handler', desc: 'A handler for Bun.serve.' },
+          { name: 'serveVercel(App)', type: '=> handler', desc: 'A Vercel edge/serverless function.' },
+          { name: 'serveNetlify(App)', type: '=> handler', desc: 'A Netlify edge/serverless function.' },
+          { name: 'serveFetch(App)', type: '=> (Request) => Response', desc: 'The raw Web-standard handler, for any other host.' }
+        ]} nameHeader='Entry helper' />
         <Code file='terminal' lang='bash'>{`npm run build
 # then, per platform, e.g.:
 wrangler deploy            # Cloudflare

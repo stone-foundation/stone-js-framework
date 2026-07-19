@@ -40,6 +40,7 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [Incoming event](/docs/essentials/incoming-event): reading input via event.get; HTTP getters; files.
 - [Outgoing response](/docs/essentials/outgoing-response): return data or build a response; helpers.
 - [Cookies](/docs/essentials/cookies): read and set cookies with secure options.
+- [Filesystem and storage](/docs/essentials/filesystem): storage disks, uploaded files, project path helpers.
 - [Configuration](/docs/essentials/configuration): set and read stone.* keys on the Blueprint.
 - [Environment](/docs/essentials/environment): typed, validated env getters.
 - [Events and listeners](/docs/essentials/events): emit domain events; listeners and subscribers.

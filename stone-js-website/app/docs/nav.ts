@@ -71,6 +71,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Incoming event', path: '/docs/essentials/incoming-event' },
       { title: 'Outgoing response', path: '/docs/essentials/outgoing-response' },
       { title: 'Cookies', path: '/docs/essentials/cookies' },
+      { title: 'Filesystem & storage', path: '/docs/essentials/filesystem' },
       { title: 'Configuration', path: '/docs/essentials/configuration' },
       { title: 'Environment', path: '/docs/essentials/environment' },
       { title: 'Events & listeners', path: '/docs/essentials/events' },
