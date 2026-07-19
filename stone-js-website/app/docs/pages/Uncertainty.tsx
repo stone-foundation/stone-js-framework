@@ -94,8 +94,7 @@ create (event) {
         </Callout>
 
         <Callout kind='note' title='Defer the where. Own the what.'>
-          If you remember one line from Foundations, make it this one. Every design decision in
-          Stone.js is downstream of it.
+          Every design decision in Stone.js is downstream of this one line.
         </Callout>
 
         <Pager {...siblings(PATH)} />

@@ -46,7 +46,10 @@ The documentation is a dogfooded set of Stone.js pages under a shared layout.
   `ParadigmSwitch`, and content primitives:
   - `content.tsx`: `ArticleTop`, `Lead`, `H2`/`H3` (auto-anchored for the TOC), `Callout`
     (`note` / `important` / `future`), `Principle`, `Aphorism`, `Pager`.
-  - `Code.tsx`: `Code` (single block) and `CodeTabs` (paradigm-aware).
+  - `Code.tsx` + `highlight.ts`: `Code` (single block) and `CodeTabs` (paradigm-aware),
+    syntax-highlighted with Prism. Highlighting is isomorphic and deterministic, so the SSG
+    output already ships coloured and hydration matches. Token colors come from `--hl-*`
+    design tokens (bespoke « Obsidienne & Braise » theme, follows light/dark).
 - `app/docs/pages/`: one file per page. A page returns `ArticleTop` + content + `Pager`.
 
 Two conventions carry the pedagogy (see the strategy plan §0):

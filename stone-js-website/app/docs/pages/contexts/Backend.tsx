@@ -55,8 +55,8 @@ export class Backend implements IPage<ReactIncomingEvent> {
 
         <H2>The same domain</H2>
         <p>
-          This is the Tasks handler from Foundations, unchanged. It names no server, no request
-          object, no port. It reads intentions from an event and returns values.
+          Here is the Tasks handler again, unchanged. It names no server, no request object, no
+          port. It reads intentions from an event and returns values.
         </p>
         <Code file='app/Tasks.ts'>{`@EventHandler('/tasks')
 export class Tasks {

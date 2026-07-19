@@ -23,9 +23,9 @@ export class Continuum implements IPage<ReactIncomingEvent> {
       <>
         <ArticleTop eyebrow='Foundations' title='The Continuum' />
         <Lead>
-          This is the one idea the rest of the framework serves. Get it, and adapters, blueprints,
-          the container and the lifecycle stop being features to memorise and become obvious
-          consequences. It is also an idea you can carry to any stack.
+          This is the one idea the rest of the framework serves. Once it clicks, adapters,
+          blueprints, the container and the lifecycle stop being features to memorise and become
+          obvious consequences, and the idea outlives any single stack.
         </Lead>
 
         <H2>An application is an act</H2>

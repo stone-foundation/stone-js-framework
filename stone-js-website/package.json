@@ -13,14 +13,15 @@
     "preview": "stone preview"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "@stone-js/browser-adapter": "workspace:*",
     "@stone-js/core": "workspace:*",
+    "@stone-js/node-cli-adapter": "workspace:*",
+    "@stone-js/node-http-adapter": "workspace:*",
     "@stone-js/router": "workspace:*",
     "@stone-js/use-react": "workspace:*",
-    "@stone-js/browser-adapter": "workspace:*",
-    "@stone-js/node-http-adapter": "workspace:*",
-    "@stone-js/node-cli-adapter": "workspace:*"
+    "prismjs": "^1.30.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.25.9",
@@ -28,6 +29,7 @@
     "@babel/preset-typescript": "^7.27.0",
     "@stone-js/cli": "workspace:*",
     "@types/node": "^24.0.7",
+    "@types/prismjs": "^1.26.6",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3"
   }

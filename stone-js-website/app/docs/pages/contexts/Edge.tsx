@@ -77,9 +77,9 @@ export class Edge implements IPage<ReactIncomingEvent> {
 
         <H2>Why this is the payoff of the whole model</H2>
         <p>
-          Everything Foundations argued becomes concrete here. The domain never named a platform,
-          so moving from a Worker to a Lambda to a Deno isolate is a deployment decision, taken
-          long after the logic was written, and reversible.
+          This is where it all pays off. The domain never named a platform, so moving from a Worker
+          to a Lambda to a Deno isolate is a deployment decision, taken long after the logic was
+          written, and reversible.
         </p>
 
         <Callout kind='note' title='Cold starts respect the model'>

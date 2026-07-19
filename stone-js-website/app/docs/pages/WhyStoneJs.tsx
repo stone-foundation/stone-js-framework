@@ -63,9 +63,9 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
 
         <H2>The same domain, everywhere</H2>
         <p>
-          This handler is the running example of the whole course. Written once, it serves an
-          HTTP API on Node, the exact same class ships to a Lambda, to a Cloudflare Worker, or
-          becomes a tool an AI agent can call. Nothing below the domain leaks into it.
+          Keep an eye on this handler; it comes back a lot. Written once, it serves an HTTP API on
+          Node; the exact same class ships to a Lambda, to a Cloudflare Worker, or becomes a tool
+          an AI agent can call. Nothing below the domain leaks into it.
         </p>
         <CodeTabs
           file='app/Tasks.ts'
@@ -83,11 +83,11 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
           writing a line of logic will feel like guessing.
         </Callout>
 
-        <H2>What the rest of this course does</H2>
+        <H2>Where this goes next</H2>
         <p>
-          Foundations teaches the architecture, the part you learn once and carry everywhere,
-          even to other stacks. Contexts shows the same domain collapsing into backend, frontend,
-          edge and agents. Build gives you the recipes. Frontier brings you what is coming next.
+          Foundations is the architecture itself, the part that holds no matter where the code runs.
+          Contexts follows the same domain as it collapses into backend, frontend, edge and agents.
+          Build has the recipes for real applications. Frontier is where the model goes from here.
         </p>
 
         <Pager {...siblings(PATH)} />

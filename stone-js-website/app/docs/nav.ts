@@ -1,10 +1,10 @@
 /**
- * The documentation tree: the single source of truth for the whole course.
+ * The documentation tree: the single source of truth for the whole site map.
  *
  * It drives the sidebar, the prev/next pager and (later) breadcrumbs and search.
- * The full architecture course is listed here so the vision is always visible;
- * pages not yet written are marked `soon` and render as disabled, never as dead
- * links. Flip `soon` off the moment a page ships.
+ * The full outline is listed here so the shape is always visible; pages not yet
+ * written are marked `soon` and render as disabled, never as dead links. Flip
+ * `soon` off the moment a page ships.
  */
 
 export interface DocLink {
@@ -35,7 +35,7 @@ export const DOC_NAV: DocSection[] = [
   },
   {
     title: 'Foundations',
-    blurb: 'The architecture course. Learn it once, it holds in every context.',
+    blurb: 'The ideas that hold in every context.',
     items: [
       { title: 'The Continuum', path: '/docs/foundations/continuum' },
       { title: 'Domain × Context → Resolution', path: '/docs/foundations/domain-context' },

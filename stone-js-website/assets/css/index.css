@@ -11,6 +11,7 @@
   --braise: #E04E10; --braise-txt: #A83A08;
   --braise-grad: linear-gradient(135deg, #FFC46B, #FF5A1F);
   --cuivre: #A9653B;
+  --hl-comment: #8A7F70; --hl-punc: #6E6459; --hl-kw: #A83A08; --hl-str: #5F7A3A; --hl-fn: #9A5B2B; --hl-num: #B5480F; --hl-prop: #6E5A3E;
   --display: "Clash Display", "Futura", "Avenir Next", ui-sans-serif, sans-serif;
   --body: "Archivo", "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -21,17 +22,20 @@
     --bg: #14110F; --surface: #1D1815; --surface-2: #26201B;
     --encre: #EFE8DC; --gres: #A69A8C; --trait: #2F2822;
     --braise: #FF6B2B; --braise-txt: #FF8A4D; --cuivre: #D89468;
+    --hl-comment: #7C7060; --hl-punc: #A69A8C; --hl-kw: #FF8A4D; --hl-str: #B7C48A; --hl-fn: #E0B080; --hl-num: #E58C5A; --hl-prop: #D9C7B3;
   }
 }
 :root[data-theme="dark"] {
   --bg: #14110F; --surface: #1D1815; --surface-2: #26201B;
   --encre: #EFE8DC; --gres: #A69A8C; --trait: #2F2822;
   --braise: #FF6B2B; --braise-txt: #FF8A4D; --cuivre: #D89468;
+  --hl-comment: #7C7060; --hl-punc: #A69A8C; --hl-kw: #FF8A4D; --hl-str: #B7C48A; --hl-fn: #E0B080; --hl-num: #E58C5A; --hl-prop: #D9C7B3;
 }
 :root[data-theme="light"] {
   --bg: #F4EFE6; --surface: #FBF7EF; --surface-2: #EAE3D6;
   --encre: #1B1613; --gres: #6E6459; --trait: #DDD4C5;
   --braise: #E04E10; --braise-txt: #A83A08; --cuivre: #A9653B;
+  --hl-comment: #8A7F70; --hl-punc: #6E6459; --hl-kw: #A83A08; --hl-str: #5F7A3A; --hl-fn: #9A5B2B; --hl-num: #B5480F; --hl-prop: #6E5A3E;
 }
 
 /* ---------- 2. Base ---------- */
@@ -390,6 +394,19 @@ html[data-paradigm="imperative"] .p-decl, html[data-paradigm="imperative"] .code
 html[data-paradigm="imperative"] .p-imp { display: block; }
 html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .code-para .cp { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--braise-txt); }
+
+/* Prism theme « Obsidienne & Braise »: warm, near-monochrome with a sage accent
+   for strings. Token colors come from --hl-* tokens, so they follow the theme. */
+.doc-code .token.comment, .doc-code .token.prolog, .doc-code .token.doctype, .doc-code .token.cdata { color: var(--hl-comment); font-style: italic; }
+.doc-code .token.punctuation { color: var(--hl-punc); }
+.doc-code .token.keyword, .doc-code .token.atrule, .doc-code .token.important, .doc-code .token.tag, .doc-code .token.operator { color: var(--hl-kw); }
+.doc-code .token.string, .doc-code .token.char, .doc-code .token.attr-value, .doc-code .token.inserted, .doc-code .token.regex, .doc-code .token.url { color: var(--hl-str); }
+.doc-code .token.function, .doc-code .token.class-name, .doc-code .token.function-variable { color: var(--hl-fn); }
+.doc-code .token.number, .doc-code .token.boolean, .doc-code .token.constant, .doc-code .token.symbol { color: var(--hl-num); }
+.doc-code .token.property, .doc-code .token.attr-name, .doc-code .token.variable, .doc-code .token.parameter { color: var(--hl-prop); }
+.doc-code .token.builtin { color: var(--hl-fn); }
+.doc-code .token.deleted { color: #E06C75; }
+.doc-code .token.namespace { opacity: .7; }
 
 /* ---- 14.7 Callouts ---- */
 .callout { margin: 0 0 22px; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--trait); background: var(--surface); border-left: 3px solid var(--gres); }
