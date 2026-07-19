@@ -32,7 +32,8 @@
       "@stone-js/resources",
       "@stone-js/openapi",
       "@stone-js/testing",
-      "@stone-js/mcp-adapter"
+      "@stone-js/mcp-adapter",
+      "@stone-js/mcp"
     ]
   ],
   "linked": [],
