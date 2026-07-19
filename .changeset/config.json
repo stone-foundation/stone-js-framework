@@ -30,7 +30,8 @@
       "@stone-js/auth",
       "@stone-js/authz",
       "@stone-js/resources",
-      "@stone-js/openapi"
+      "@stone-js/openapi",
+      "@stone-js/testing"
     ]
   ],
   "linked": [],
