@@ -475,6 +475,17 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .callout-future .callout-label { color: var(--cuivre); }
 .callout-future .callout-label::before { content: "ψ "; }
 
+/* ---- 14.75 Term (inline glossary link) + Define (first-use definition) ---- */
+.term { color: inherit; border-bottom: 1px dotted var(--cuivre); text-decoration: none; }
+.term:hover { color: var(--braise-txt); border-bottom-color: var(--braise); }
+.define { margin: 0 0 22px; padding: 18px 20px; border: 1px solid var(--trait); border-radius: 12px; background: color-mix(in srgb, var(--cuivre) 6%, var(--surface)); border-left: 3px solid var(--cuivre); }
+.define-term { font-family: var(--display); font-size: 18px; font-weight: 600; margin: 0 0 8px; display: flex; align-items: baseline; gap: 10px; }
+.define-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--cuivre); font-weight: 400; }
+.define-body { color: color-mix(in srgb, var(--encre) 88%, var(--gres)); }
+.define-body p { margin: 0 0 10px; }
+.define-body :last-child { margin-bottom: 0; }
+.define-more { display: inline-block; margin-top: 12px; font-family: var(--mono); font-size: 12px; color: var(--braise-txt); }
+
 /* ---- 14.8 Principle (taught twice) ---- */
 .principle { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin: 0 0 24px; border: 1px solid var(--trait); border-radius: 14px; overflow: hidden; background: var(--trait); }
 .pr-side { background: var(--surface); padding: 22px 22px; }

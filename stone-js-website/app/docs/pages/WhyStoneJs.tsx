@@ -1,7 +1,7 @@
 import { JSX } from 'react'
 import { CodeTabs } from '../components/Code'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Aphorism, Pager } from '../components/content'
+import { ArticleTop, Lead, H2, Callout, Aphorism, Define, Pager } from '../components/content'
 import { siblings } from '../nav'
 
 const PATH = '/docs'
@@ -110,6 +110,29 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
         <Aphorism cite='The Continuum Architecture'>
           Application = Domain × Context → Resolution
         </Aphorism>
+
+        <p>
+          Two words carry this whole site, so let us pin them down before going further, in the
+          plainest terms, with an everyday example.
+        </p>
+        <Define term='Domain'>
+          <p>What your app <em>means</em>: its data and its rules, independent of where it runs.</p>
+          <p>
+            <strong>Everyday example.</strong> In a to-do app, "a task has a title and can be marked
+            done" is the domain. It is true whether the app runs on a server, on a phone, or nowhere
+            at all yet. It is the part that is <em>yours</em>.
+          </p>
+        </Define>
+        <Define term='Context'>
+          <p>Everything your app does <em>not</em> control: the runtime, the protocol, the shape of
+            the input and output. The part the platform decides.</p>
+          <p>
+            <strong>Everyday example.</strong> The same to-do task might be created by an
+            <code> HTTP POST</code> on a Node server, by a tap in a mobile app, or by an AI agent
+            calling a tool. Different contexts, one domain. Stone.js supplies the context so you do
+            not have to.
+          </p>
+        </Define>
 
         <H2>The same domain, everywhere</H2>
         <p>

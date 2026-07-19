@@ -87,6 +87,29 @@ export function Principle ({ principle, incarnation }: { principle: ReactNode, i
   )
 }
 
+/**
+ * An inline link to a term's glossary entry, underlined discreetly. Use it when a
+ * key term reappears, so a reader can always reach its precise definition.
+ */
+export function Term ({ children, name }: { children: string, name?: string }): JSX.Element {
+  return <StoneLink to={`/docs/reference/glossary#${name ?? slug(children)}`} className='term'>{children}</StoneLink>
+}
+
+/**
+ * A first-use definition: the story keeps its ambition, but every key term is
+ * pinned in plain language with an everyday example the first time it matters, and
+ * points to the glossary for the full entry. Rigor, not dilution.
+ */
+export function Define ({ term, glossary, children }: { term: string, glossary?: string, children: ReactNode }): JSX.Element {
+  return (
+    <aside className='define'>
+      <p className='define-term'>{term}<span className='define-tag'>in plain terms</span></p>
+      <div className='define-body'>{children}</div>
+      <StoneLink className='define-more' to={`/docs/reference/glossary#${glossary ?? slug(term)}`}>Full definition in the glossary →</StoneLink>
+    </aside>
+  )
+}
+
 /** A pull-quote, for a line worth stopping on. */
 export function Aphorism ({ children, cite }: { children: ReactNode, cite?: string }): JSX.Element {
   return (
