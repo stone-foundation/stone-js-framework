@@ -28,8 +28,9 @@ export class HomePage implements IPage<ReactIncomingEvent> {
   }
 
   render (): JSX.Element {
+    // data-pagefind-ignore: keep the marketing landing out of the docs search index.
     return (
-      <>
+      <div data-pagefind-ignore>
         <Header />
         <main>
           <HeroAtom />
@@ -45,7 +46,7 @@ export class HomePage implements IPage<ReactIncomingEvent> {
           <FinalCta />
         </main>
         <Footer />
-      </>
+      </div>
     )
   }
 }

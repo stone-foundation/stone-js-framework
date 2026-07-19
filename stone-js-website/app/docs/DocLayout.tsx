@@ -1,4 +1,5 @@
 import { Toc } from './components/Toc'
+import { Search } from './components/Search'
 import { Footer } from '../components/Header'
 import { Portal } from '../components/brand/Portal'
 import { ParadigmSwitch } from './components/ParadigmSwitch'
@@ -54,6 +55,7 @@ function DocShell ({ children }: { children: ReactNode }): JSX.Element {
           </StoneLink>
           <span className='dh-crumb'>Docs</span>
           <div className='spacer' />
+          <Search />
           <ParadigmSwitch />
           <button className='icon-btn' onClick={toggleTheme} aria-label='Toggle theme' title='Toggle theme'>
             <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><path d='M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z' /></svg>
@@ -71,7 +73,7 @@ function DocShell ({ children }: { children: ReactNode }): JSX.Element {
           <Sidebar currentPath={currentPath} onNavigate={() => setDrawer(false)} />
         </aside>
         <main className='docs-main'>
-          <article className='doc-article'>
+          <article className='doc-article' data-pagefind-body>
             <StoneOutlet>{children}</StoneOutlet>
           </article>
           <Footer />

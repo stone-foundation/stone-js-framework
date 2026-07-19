@@ -34,7 +34,12 @@ export default defineConfig({
       '/docs/frontier/universal',
       '/docs/frontier/agent-native',
       // Docs: Ecosystem
-      '/docs/ecosystem'
+      '/docs/ecosystem',
+      // Docs: Reference
+      '/docs/reference/api',
+      '/docs/reference/cli',
+      '/docs/reference/config',
+      '/docs/reference/glossary'
     ]
   }
 })

@@ -91,6 +91,16 @@ export const DOC_NAV: DocSection[] = [
     items: [
       { title: 'Marketplace', path: '/docs/ecosystem' }
     ]
+  },
+  {
+    title: 'Reference',
+    blurb: 'Look it up.',
+    items: [
+      { title: 'API', path: '/docs/reference/api' },
+      { title: 'CLI', path: '/docs/reference/cli' },
+      { title: 'Configuration', path: '/docs/reference/config' },
+      { title: 'Glossary', path: '/docs/reference/glossary' }
+    ]
   }
 ]
 

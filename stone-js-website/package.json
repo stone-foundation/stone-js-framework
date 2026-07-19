@@ -9,7 +9,9 @@
   },
   "scripts": {
     "dev": "stone dev",
-    "build": "stone build",
+    "build": "stone build && pagefind --site dist",
+    "build:app": "stone build",
+    "index": "pagefind --site dist",
     "preview": "stone preview"
   },
   "dependencies": {
@@ -31,6 +33,7 @@
     "@types/node": "^24.0.7",
     "@types/prismjs": "^1.26.6",
     "@types/react": "^19.0.7",
-    "@types/react-dom": "^19.0.3"
+    "@types/react-dom": "^19.0.3",
+    "pagefind": "^1.5.2"
   }
 }

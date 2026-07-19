@@ -127,14 +127,15 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .hero .halo { position: absolute; inset: 0; z-index: -1; background: radial-gradient(46% 40% at 50% 32%, rgba(255, 107, 43, .13), transparent 72%); }
 
 /* The atom is a fixed 460px box; its chips overhang to a ~540px footprint.
-   Scale the whole stage fluidly so that footprint always fits the viewport,
-   and reserve the scaled height so the layout stays honest. */
-.atom-stage {
-  --atom-scale: clamp(.5, calc((100vw - 40px) / 540), 1);
-  height: calc(460px * var(--atom-scale));
-  display: grid; place-items: center; margin: 0 auto 30px;
+   Shrink it fluidly with `zoom` (not `transform: scale`, which leaves the layout
+   box at 460px and overflows a narrow column). The ratio must be a NUMBER, so we
+   divide a length by a length (`/ 540px`), never by a bare 540. `zoom` scales the
+   visual, the fonts, the hit-testing AND the layout box together. */
+.atom-stage { display: flex; justify-content: center; margin: 0 auto 30px; }
+.atom {
+  position: relative; width: 460px; height: 460px;
+  zoom: clamp(.5, calc((100vw - 40px) / 540px), 1);
 }
-.atom { position: relative; width: 460px; height: 460px; transform: scale(var(--atom-scale)); }
 .nucleus { position: absolute; width: 122px; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 6; }
 .nucleus .key { filter: drop-shadow(0 0 16px rgba(255, 107, 43, .55)); transition: filter 500ms var(--ease); animation: pulse 4.5s var(--ease) infinite; }
 @keyframes pulse {
@@ -448,6 +449,36 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .toc li.toc-l3 a { padding-left: 26px; font-size: 12.5px; }
 .toc li a:hover { color: var(--encre); }
 .toc li.active a { color: var(--braise-txt); border-left-color: var(--braise); }
+
+/* ---- 14.113 Search (trigger + ⌘K modal) ---- */
+.search-trigger { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px; border-radius: 9px; border: 1px solid var(--trait); background: var(--surface); color: var(--gres); cursor: pointer; font-family: var(--body); font-size: 13px; transition: border-color 200ms var(--ease); }
+.search-trigger:hover { border-color: var(--braise); color: var(--encre); }
+.search-trigger .st-label { min-width: 52px; text-align: left; }
+.st-kbd { font-family: var(--mono); font-size: 10.5px; border: 1px solid var(--trait); border-radius: 5px; padding: 1px 5px; color: var(--gres); background: var(--bg); }
+.search-overlay { position: fixed; inset: 0; z-index: 80; background: color-mix(in srgb, #000 45%, transparent); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 12vh 20px 20px; }
+.search-panel { width: 100%; max-width: 600px; background: var(--surface); border: 1px solid var(--trait); border-radius: 16px; overflow: hidden; box-shadow: 0 40px 100px -30px rgba(0, 0, 0, .6); }
+.search-field { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--trait); color: var(--gres); }
+.search-field input { flex: 1; border: 0; background: transparent; outline: none; color: var(--encre); font-family: var(--body); font-size: 17px; }
+.search-results { max-height: 56vh; overflow-y: auto; padding: 8px; }
+.search-note { color: var(--gres); font-size: 14px; padding: 18px; margin: 0; }
+.search-hit { display: block; padding: 12px 14px; border-radius: 10px; transition: background 160ms var(--ease); }
+.search-hit:hover { background: var(--surface-2); }
+.sh-title { display: block; font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--encre); }
+.sh-excerpt { display: block; font-size: 13px; color: var(--gres); margin-top: 3px; }
+.sh-excerpt mark { background: color-mix(in srgb, var(--braise) 26%, transparent); color: var(--encre); border-radius: 3px; padding: 0 2px; }
+@media (max-width: 680px) { .search-trigger .st-label, .search-trigger .st-kbd { display: none; } }
+
+/* ---- 14.114 Reference tables & definition lists ---- */
+.doc-article .table-wrap { overflow-x: auto; margin: 0 0 22px; border: 1px solid var(--trait); border-radius: 12px; }
+.doc-article table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.doc-article thead th { text-align: left; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--gres); padding: 12px 16px; background: var(--surface-2); border-bottom: 1px solid var(--trait); }
+.doc-article tbody td { padding: 11px 16px; border-bottom: 1px solid var(--trait); color: color-mix(in srgb, var(--encre) 86%, var(--gres)); vertical-align: top; }
+.doc-article tbody tr:last-child td { border-bottom: 0; }
+.doc-article tbody td:first-child { font-family: var(--mono); font-size: 13px; color: var(--braise-txt); white-space: nowrap; }
+.deflist { margin: 0 0 22px; }
+.deflist dt { font-family: var(--display); font-weight: 600; font-size: 17px; margin: 18px 0 4px; scroll-margin-top: calc(var(--dh) + 16px); }
+.deflist dt .term-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--cuivre); margin-left: 10px; font-weight: 400; }
+.deflist dd { margin: 0; color: color-mix(in srgb, var(--encre) 86%, var(--gres)); }
 
 /* ---- 14.115 Marketplace (docs ecosystem page) ---- */
 .market-group { margin: 0 0 10px; }

@@ -63,9 +63,32 @@ Two conventions carry the pedagogy (see the strategy plan §0):
 To add a page: create it under `app/docs/pages/`, flip its `soon` off in `nav.ts`, add its
 path to `stone.config.mjs`. Nothing else to wire (pages are auto-discovered by decorator).
 
-`public/` is copied verbatim to the build root. `public/llms.txt` is the machine-readable
-docs map served at `/llms.txt` (for coding agents); keep it in sync with `nav.ts` when pages
-ship. (Automating that generation is a later task.)
+`public/` is copied verbatim to the build root. It holds `llms.txt` (the machine-readable
+docs map served at `/llms.txt`, keep it in sync with `nav.ts`), `CNAME` (the custom domain)
+and `.nojekyll` (so GitHub Pages serves `/pagefind/*` and any underscore paths).
+
+## Search
+
+Full-text search is [Pagefind](https://pagefind.app): self-hosted, no external service, CSP-
+friendly. The build indexes the SSG HTML (`npm run build` = `stone build && pagefind --site dist`).
+Only docs pages are indexed (`.doc-article` carries `data-pagefind-body`; the landing carries
+`data-pagefind-ignore`). `app/docs/components/Search.tsx` is a Cmd/Ctrl+K modal that loads the
+Pagefind runtime from `/pagefind/` at runtime and degrades gracefully when the index is absent
+(e.g. the SSR dev server). To try search locally, serve the built output statically
+(`npx serve dist`), not the SSR preview.
+
+## i18n
+
+English first. `app/i18n.ts` is the seam a second language plugs into: it declares the locales
+and the URL scheme (default locale at the root, others prefixed `/fr/...`) with `localizedPath`
+/ `stripLocale`. Content and locale-prefixed route registration are a dedicated later pass; the
+document already ships `<html lang="en">`.
+
+## Deploy
+
+GitHub Pages via `.github/workflows/deploy-website.yml`: Turbo builds the workspace deps then
+the website (SSG + Pagefind), and the `dist/` is published. Served on a custom domain, so the
+base path is `/` (no URL rewriting). Change the domain in `public/CNAME`.
 
 ## Storytelling
 

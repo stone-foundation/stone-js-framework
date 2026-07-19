@@ -10,8 +10,8 @@
 node_modules
 dist
 dist-ssr
-public
 *.local
+# note: `public/` is our SOURCE static dir (CNAME, .nojekyll, llms.txt), so it is tracked.
 
 # Types
 types/
