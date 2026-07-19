@@ -321,7 +321,148 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .manifesto .src { font-family: var(--mono); font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--gres); margin: 22px 0 30px; }
 .cta-final { text-align: center; }
 
-/* ---------- 13. Reduced motion ---------- */
+/* ============================================================================
+   14. Docs  ·  shell (header/sidebar/toc), article typography, content primitives
+   ========================================================================== */
+:root { --dh: 60px; }
+
+/* ---- 14.1 Docs header ---- */
+.docs-header { position: sticky; top: 0; z-index: 40; height: var(--dh); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--trait); }
+.dh-inner { display: flex; align-items: center; gap: 14px; height: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+.dh-inner .brand { display: flex; align-items: center; gap: 9px; font-family: var(--display); font-weight: 600; font-size: 19px; }
+.dh-inner .brand .dot { color: var(--braise-txt); }
+.dh-crumb { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--gres); padding-left: 12px; border-left: 1px solid var(--trait); }
+.dh-inner .spacer { flex: 1; }
+.menu-btn { display: none; }
+
+/* ---- 14.2 Paradigm switch ---- */
+.paradigm-switch { display: flex; align-items: center; gap: 9px; }
+.ps-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--gres); }
+.ps-track { display: inline-flex; border: 1px solid var(--trait); border-radius: 9px; overflow: hidden; background: var(--surface); }
+.ps-btn { font-family: var(--mono); font-size: 12px; padding: 6px 11px; border: 0; background: transparent; color: var(--gres); cursor: pointer; transition: background 200ms var(--ease), color 200ms var(--ease); }
+.ps-btn[aria-pressed="true"] { background: var(--braise-grad); color: #1B1010; font-weight: 600; }
+.ps-btn:focus-visible { outline: 2px solid var(--braise); outline-offset: -2px; }
+
+/* ---- 14.3 Grid ---- */
+.docs-grid { display: grid; grid-template-columns: 264px minmax(0, 1fr) 216px; gap: 44px; max-width: 1400px; margin: 0 auto; padding: 0 20px; align-items: start; }
+.docs-aside { position: sticky; top: var(--dh); align-self: start; height: calc(100vh - var(--dh)); overflow-y: auto; padding: 30px 8px 60px 0; }
+.docs-main { min-width: 0; padding: 44px 0 20px; }
+.docs-toc { position: sticky; top: var(--dh); align-self: start; max-height: calc(100vh - var(--dh)); overflow-y: auto; padding: 46px 0 40px; }
+
+/* ---- 14.4 Sidebar ---- */
+.side-section { margin-bottom: 26px; }
+.side-title { font-family: var(--display); font-size: 15px; font-weight: 600; margin: 0 0 2px; }
+.side-blurb { font-size: 12px; color: var(--gres); margin: 0 0 12px; line-height: 1.45; }
+.doc-sidebar ul { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--trait); }
+.side-link { display: flex; align-items: center; gap: 8px; padding: 6px 0 6px 16px; margin-left: -1px; border-left: 2px solid transparent; font-size: 14px; color: var(--gres); transition: color 160ms var(--ease), border-color 160ms var(--ease); }
+.side-link:hover { color: var(--encre); }
+.side-link.active { color: var(--braise-txt); border-left-color: var(--braise); font-weight: 600; }
+.side-link.soon { color: color-mix(in srgb, var(--gres) 55%, transparent); cursor: default; }
+.soon-tag { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--trait); border-radius: 5px; padding: 1px 5px; }
+
+/* ---- 14.5 Article typography ---- */
+.doc-article { max-width: 760px; }
+.doc-top { margin-bottom: 30px; }
+.doc-eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--braise-txt); margin: 0 0 12px; }
+.doc-h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.06; letter-spacing: -.015em; }
+.doc-lead { font-size: 20px; line-height: 1.55; color: var(--encre); margin: 0 0 30px; }
+.doc-article p { color: color-mix(in srgb, var(--encre) 86%, var(--gres)); margin: 0 0 18px; }
+.doc-article ul { margin: 0 0 18px; padding-left: 22px; color: color-mix(in srgb, var(--encre) 86%, var(--gres)); }
+.doc-article li { margin: 6px 0; }
+.doc-article a:not(.anchor):not(.pager-link) { color: var(--braise-txt); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: color-mix(in srgb, var(--braise) 40%, transparent); }
+.doc-article :not(pre) > code { font-size: .88em; background: var(--surface-2); border: 1px solid var(--trait); border-radius: 5px; padding: 1px 6px; color: var(--braise-txt); }
+.doc-article em { color: var(--encre); font-style: italic; }
+.doc-h2 { font-size: 27px; margin: 44px 0 16px; scroll-margin-top: calc(var(--dh) + 16px); }
+.doc-h3 { font-size: 20px; margin: 32px 0 12px; scroll-margin-top: calc(var(--dh) + 16px); }
+.anchor { color: var(--trait); font-weight: 400; margin-left: -22px; padding-right: 8px; opacity: 0; transition: opacity 160ms var(--ease); }
+.doc-h2:hover .anchor, .doc-h3:hover .anchor { opacity: 1; }
+
+/* ---- 14.6 Code blocks ---- */
+.doc-code { margin: 0 0 22px; border: 1px solid var(--trait); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.code-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--trait); background: var(--surface-2); }
+.code-file { font-family: var(--mono); font-size: 12px; color: var(--gres); }
+.code-lang { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--cuivre); }
+.doc-code pre { margin: 0; padding: 18px 18px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px; line-height: 1.65; color: var(--encre); }
+.doc-code code { font-family: var(--mono); }
+/* paradigm toggling: declarative is the default; imperative shows only when chosen */
+.p-imp, .code-para .cp-imp { display: none; }
+html[data-paradigm="imperative"] .p-decl, html[data-paradigm="imperative"] .code-para .cp-decl { display: none; }
+html[data-paradigm="imperative"] .p-imp { display: block; }
+html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
+.code-para .cp { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--braise-txt); }
+
+/* ---- 14.7 Callouts ---- */
+.callout { margin: 0 0 22px; padding: 16px 20px; border-radius: 12px; border: 1px solid var(--trait); background: var(--surface); border-left: 3px solid var(--gres); }
+.callout-label { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 8px; color: var(--gres); }
+.callout-body { color: color-mix(in srgb, var(--encre) 88%, var(--gres)); }
+.callout-body :last-child { margin-bottom: 0; }
+.callout-important { border-left-color: var(--braise); }
+.callout-important .callout-label { color: var(--braise-txt); }
+.callout-future { border-left-color: var(--cuivre); background: color-mix(in srgb, var(--cuivre) 8%, var(--surface)); }
+.callout-future .callout-label { color: var(--cuivre); }
+.callout-future .callout-label::before { content: "ψ "; }
+
+/* ---- 14.8 Principle (taught twice) ---- */
+.principle { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin: 0 0 24px; border: 1px solid var(--trait); border-radius: 14px; overflow: hidden; background: var(--trait); }
+.pr-side { background: var(--surface); padding: 22px 22px; }
+.pr-incarnation { background: color-mix(in srgb, var(--braise) 6%, var(--surface)); }
+.pr-tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 12px; color: var(--gres); }
+.pr-incarnation .pr-tag { color: var(--braise-txt); }
+.pr-body :last-child { margin-bottom: 0; }
+.pr-body p, .pr-body ul { font-size: 15px; margin-bottom: 12px; }
+
+/* ---- 14.9 Aphorism ---- */
+.aphorism { margin: 30px 0; padding: 4px 0 4px 24px; border-left: 3px solid var(--braise); }
+.aphorism blockquote { margin: 0; font-family: var(--display); font-size: clamp(20px, 2.6vw, 26px); line-height: 1.3; }
+.aphorism figcaption { font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--gres); margin-top: 12px; }
+
+/* ---- 14.10 Pager ---- */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 50px 0 20px; padding-top: 26px; border-top: 1px solid var(--trait); }
+.pager-link { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border: 1px solid var(--trait); border-radius: 12px; transition: border-color 200ms var(--ease), transform 200ms var(--ease); }
+.pager-link:hover { border-color: var(--braise); transform: translateY(-2px); }
+.pager-link.next { text-align: right; }
+.pager-link .dir { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--gres); }
+.pager-link .ttl { font-family: var(--display); font-weight: 600; font-size: 16px; }
+
+/* ---- 14.11 TOC ---- */
+.toc-title { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--gres); margin: 0 0 12px; }
+.toc ul { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--trait); }
+.toc li a { display: block; padding: 5px 0 5px 14px; margin-left: -1px; border-left: 2px solid transparent; font-size: 13px; color: var(--gres); transition: color 160ms var(--ease), border-color 160ms var(--ease); }
+.toc li.toc-l3 a { padding-left: 26px; font-size: 12.5px; }
+.toc li a:hover { color: var(--encre); }
+.toc li.active a { color: var(--braise-txt); border-left-color: var(--braise); }
+
+/* ---- 14.12 Docs footer spacing ---- */
+.docs-main .site-footer { margin-top: 40px; }
+
+/* ---- 14.13 Drawer (mobile) ---- */
+.drawer-scrim { display: none; }
+@media (max-width: 1120px) {
+  .docs-grid { grid-template-columns: 240px minmax(0, 1fr); }
+  .docs-toc { display: none; }
+}
+@media (max-width: 860px) {
+  .menu-btn { display: inline-flex; }
+  .docs-grid { grid-template-columns: 1fr; }
+  .docs-aside {
+    position: fixed; top: var(--dh); left: 0; z-index: 45;
+    width: 300px; max-width: 82vw; height: calc(100vh - var(--dh));
+    background: var(--bg); border-right: 1px solid var(--trait);
+    padding: 24px 20px; transform: translateX(-102%); transition: transform 260ms var(--ease);
+  }
+  .drawer-open .docs-aside { transform: translateX(0); }
+  .drawer-open .drawer-scrim { display: block; position: fixed; inset: var(--dh) 0 0; z-index: 44; background: rgba(0,0,0,.4); }
+  .docs-main { padding-top: 30px; }
+  .principle { grid-template-columns: 1fr; }
+  .dh-crumb { display: none; }
+  .ps-label { display: none; }
+}
+@media (max-width: 560px) {
+  .pager { grid-template-columns: 1fr; }
+  .paradigm-switch { order: 3; }
+}
+
+/* ---------- 15. Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .orbit, .u, .chip, .nucleus .key, .vein::before, .pseam::before,
   .mono-title .shimmer, .wire .pulse, .caret, .ch { animation: none; }
@@ -329,5 +470,6 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
   .cl { opacity: 1; animation: none; }
   .mono-title .shimmer { background: none; color: var(--encre); }
   .reveal { opacity: 1; transform: none; transition: none; }
+  .docs-aside { transition: none; }
   html { scroll-behavior: auto; }
 }

@@ -24,7 +24,7 @@ const LAWS = [
     glyph: 'Δ',
     sym: 'CONTEXTUAL UNCERTAINTY',
     title: 'Defer the where. Own the what.',
-    text: 'A domain cannot, at the same time, know its execution context exactly and evolve independently of it. Know it too well and you are coupled; ignore it and you fail the intent. The answer: abstraction, mediation, deliberate uncertainty, orchestrated by the system.'
+    text: 'A domain cannot, at the same time, know its execution context exactly and evolve independently of it. Know it too well and you are coupled; ignore it and you fail the intent. Stone.js keeps the where uncertain while you build the what, at full speed.'
   }
 ]
 

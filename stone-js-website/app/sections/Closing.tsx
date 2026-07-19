@@ -33,8 +33,8 @@ export function FinalCta (): JSX.Element {
           <h2>Learn the core once. Command every context.</h2>
           <p style={{ marginInline: 'auto' }}>One base of knowledge. Every dimension open: this era's, and the next.</p>
           <div className='cta-row' style={{ marginTop: 30 }}>
-            <a className='btn btn-primary' href='#physics'>Get started</a>
-            <a className='btn btn-ghost' href='#physics'>Explore the docs →</a>
+            <a className='btn btn-primary' href='/docs/start/install'>Get started</a>
+            <a className='btn btn-ghost' href='/docs'>Explore the docs →</a>
           </div>
         </Reveal>
       </div>

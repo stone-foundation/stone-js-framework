@@ -31,6 +31,35 @@ Rules:
 - Every animation must respect `prefers-reduced-motion` (see section 13 of the CSS).
 - New pages: add the route to `stone.config.mjs` (`ssg.routes`).
 
+## Docs system (light design, built to grow)
+
+The documentation is a dogfooded set of Stone.js pages under a shared layout.
+
+- `app/docs/nav.ts` is the **single source of truth** for the whole course: sections and
+  pages. It drives the sidebar and the prev/next pager. Pages not written yet are marked
+  `soon` (shown greyed, excluded from routing and the pager), so the course shape is always
+  visible without dead links. `DOC_ROUTES` lists the built pages; mirror it in
+  `stone.config.mjs` (`ssg.routes`) when a page ships.
+- `app/docs/DocLayout.tsx` is the `@PageLayout({ name: 'docs' })`: header, sidebar,
+  article outlet, TOC, footer, mobile drawer. Pages opt in with `@Page(path, { layout: 'docs' })`.
+- `app/docs/components/`: `Sidebar`, `Toc` (reads rendered headings, scroll-spy),
+  `ParadigmSwitch`, and content primitives:
+  - `content.tsx`: `ArticleTop`, `Lead`, `H2`/`H3` (auto-anchored for the TOC), `Callout`
+    (`note` / `important` / `future`), `Principle`, `Aphorism`, `Pager`.
+  - `Code.tsx`: `Code` (single block) and `CodeTabs` (paradigm-aware).
+- `app/docs/pages/`: one file per page. A page returns `ArticleTop` + content + `Pager`.
+
+Two conventions carry the pedagogy (see the strategy plan §0):
+- **Taught twice**: every Foundations concept uses `<Principle principle={…} incarnation={…} />`
+  (the agnostic truth, then the Stone.js incarnation).
+- **The global paradigm switch**: `<CodeTabs decl imp />` renders BOTH variants; a
+  `data-paradigm` attribute on `<html>` reveals exactly one via CSS. No hydration mismatch,
+  declarative shows even without JS, and the choice persists (restored before paint by the
+  no-flash script in the layout). Theme works the same way.
+
+To add a page: create it under `app/docs/pages/`, flip its `soon` off in `nav.ts`, add its
+path to `stone.config.mjs`. Nothing else to wire (pages are auto-discovered by decorator).
+
 ## Storytelling
 
 The Continuum, told through quantum mechanics: the domain lives in superposition across

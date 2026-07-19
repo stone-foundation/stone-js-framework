@@ -137,7 +137,7 @@ export function HeroAtom (): JSX.Element {
           Application <span className='g'>=</span> <b>Domain</b> <span className='g'>×</span> <b>Context</b> <span className='g'>→</span> Resolution
         </div>
         <div className='cta-row'>
-          <a className='btn btn-primary' href='#physics'>npm create @stone-js</a>
+          <a className='btn btn-primary' href='/docs/start/install'>npm create @stone-js</a>
           <a className='btn btn-ghost' href={MANIFESTO_URL} target='_blank' rel='noopener noreferrer'>Read the manifesto →</a>
         </div>
       </div>

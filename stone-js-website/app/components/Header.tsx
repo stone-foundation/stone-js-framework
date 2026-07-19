@@ -34,7 +34,7 @@ export function Header (): JSX.Element {
             Stone<span className='dot'>.</span>js
           </a>
           <div className='links'>
-            <a href='#physics'>Docs</a>
+            <a href='/docs'>Docs</a>
             <a href='#ecosystem'>Ecosystem</a>
             <a href='#agents'>Agents</a>
             <a href={MANIFESTO_URL} target='_blank' rel='noopener noreferrer'>Manifesto</a>
