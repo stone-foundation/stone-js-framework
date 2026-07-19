@@ -27,7 +27,8 @@
       "@stone-js/cli",
       "@stone-js/validation",
       "@stone-js/fetch-adapter",
-      "@stone-js/auth"
+      "@stone-js/auth",
+      "@stone-js/authz"
     ]
   ],
   "linked": [],
