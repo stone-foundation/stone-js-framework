@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Principle, Aphorism, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, Pager } from '../../components/content'
 
 const PATH = '/docs/foundations/lifecycle'
 
@@ -71,6 +71,16 @@ export class Application {
           <code> onExecutingEventHandler</code>, <code>onExecutingErrorHandler</code>,
           <code> onStop</code> and <code>onTerminate</code>.
         </p>
+
+        <H3>Two scopes, dimension-bound</H3>
+        <p>
+          Hooks are scoped to the dimension they observe, which sorts them into two lifetimes:
+        </p>
+        <ul>
+          <li><strong>Global hooks</strong> fire once over the app's lifetime, when it starts and stops (<code>onStart</code>, <code>onStop</code>, <code>onTerminate</code>). They live with the long-lived adapter.</li>
+          <li><strong>Per-intent hooks</strong> fire for every event, inside its ephemeral container (<code>onHandlingEvent</code>, <code>onExecutingEventHandler</code>, <code>onExecutingErrorHandler</code>), from the moment the context is created to when the response is sent and it is torn down.</li>
+        </ul>
+        <Aphorism>Hooks exist to observe the lifecycle, not to alter it. To change what happens to an event, use middleware.</Aphorism>
 
         <Callout kind='note' title='Hooks are not middleware'>
           Use a hook for lifecycle moments (startup, shutdown, observation). Use middleware to

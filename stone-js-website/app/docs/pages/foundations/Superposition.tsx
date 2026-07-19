@@ -85,6 +85,20 @@ export class Superposition implements IPage<ReactIncomingEvent> {
         </p>
         <Aphorism>The adapters are the possibilities. The cause that arrives is the measurement. The response is the collapse.</Aphorism>
 
+        <H3>One artifact, two collapses</H3>
+        <p>
+          Take the manifest above, Node and Lambda stacked, and build it once. The same artifact
+          collapses differently depending only on where it runs:
+        </p>
+        <ul>
+          <li><strong>Locally</strong>: run it and Stone.js resolves the Node adapter at run time; requests collapse onto Node.</li>
+          <li><strong>On Lambda</strong>: deploy that exact artifact and, at run time there, Stone.js resolves the Lambda adapter; invocations collapse onto Lambda.</li>
+        </ul>
+        <p>
+          Nothing chose between them at build, and deployment only decided where the artifact lives.
+          The collapse is a runtime act, performed freshly wherever the app happens to run.
+        </p>
+
         <H2>Why decoherence lives at the edge</H2>
         <p>
           The collapse is confined to the integration dimension, the adapter. Everything inward, the

@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code } from '../components/Code'
 import { siblings } from '../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Principle, Aphorism, Pager } from '../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, Pager } from '../components/content'
 
 const PATH = '/docs/foundations/uncertainty'
 
@@ -84,6 +84,21 @@ create (event) {
   // "title" is an intention. Its transport is unknown here, on purpose.
   const title = event.get('title')
   return this.store.add({ title })
+}`}</Code>
+
+        <H3>The two failure modes, in code</H3>
+        <p>
+          The trade-off is easiest to see side by side. Know the context too exactly and the handler
+          is welded to one platform; hold it uncertain and the same handler runs anywhere.
+        </p>
+        <Code file='coupled-vs-deferred.ts'>{`// Coupled: knows the platform exactly. Runs on Node, and only Node.
+create (req, res) {
+  res.status(201).json(store.add({ title: req.body.title }))   // Express-shaped, forever
+}
+
+// Deferred: reads an intention, returns a value. Runs on every context.
+create (event) {
+  return store.add({ title: event.get('title') })              // no platform in sight
 }`}</Code>
 
         <Callout kind='future' title='Uncertainty as a superpower'>

@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code } from '../components/Code'
 import { siblings } from '../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Principle, Aphorism, Pager } from '../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, Pager } from '../components/content'
 
 const PATH = '/docs/foundations/continuum'
 
@@ -90,6 +90,22 @@ export class Continuum implements IPage<ReactIncomingEvent> {
             </ul>
           }
         />
+
+        <H3>One request, all four</H3>
+        <p>
+          The dimensions are not abstract; they are the stages a single request passes through.
+          Follow one <code>POST /tasks</code>:
+        </p>
+        <ul>
+          <li><strong>Setup</strong> (once, before any request): the Blueprint is built from your decorators; the adapter starts listening.</li>
+          <li><strong>Integration</strong>: the HTTP request arrives; the adapter normalises it into an <code>IncomingEvent</code> carrying <code>title</code>.</li>
+          <li><strong>Initialization</strong>: the kernel opens a fresh container, resolves your handler and its services into it.</li>
+          <li><strong>Functional</strong>: your <code>create</code> method runs, returns the task; the response leaves, the container is discarded.</li>
+        </ul>
+        <p>
+          Only the first stage is platform-shaped, and it happens at the edge. From Initialization
+          inward, nothing knows an HTTP server was involved.
+        </p>
 
         <H2>Why this buys you freedom</H2>
         <p>
