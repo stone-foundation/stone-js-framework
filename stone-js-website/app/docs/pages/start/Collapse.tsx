@@ -71,6 +71,19 @@ curl localhost:8080/tasks           # [{ "id": "...", "title": "Ship it", "done"
         </p>
         <Aphorism>The runtime is a value you set in the manifest, not a foundation you pour under the code.</Aphorism>
 
+        <H2>Build once, deploy anywhere</H2>
+        <p>
+          <code>npm run build</code> emits a single self-contained artifact in <code>dist/</code>,
+          with no <code>node_modules</code> to carry. That one artifact drops onto any JavaScript
+          runtime; the adapter you chose decides which shape it takes.
+        </p>
+        <ul>
+          <li><strong>Node servers</strong> and <strong>Docker</strong> containers.</li>
+          <li><strong>Serverless</strong>: AWS Lambda, Azure Functions, and the like.</li>
+          <li><strong>Edge</strong>: Cloudflare Workers, Vercel Edge, Deno Deploy, Bun.</li>
+          <li><strong>Static hosts / CDNs</strong> for frontend (CSR/SSG) builds.</li>
+        </ul>
+
         <Callout kind='note' title='Deployment is the measurement'>
           Until an adapter runs, the domain is in superposition across every context. Choosing an
           adapter and deploying is the observation that collapses it into one concrete runtime. That

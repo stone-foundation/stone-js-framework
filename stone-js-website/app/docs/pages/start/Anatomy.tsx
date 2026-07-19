@@ -36,9 +36,12 @@ export class Anatomy implements IPage<ReactIncomingEvent> {
 assets/
   css/index.css      the entry stylesheet, auto-linked
 public/              copied verbatim to the build root (llms.txt, robots, ...)
+tests/               your test suites (Vitest by default)
 stone.config.mjs     build & rendering config (target, SSG routes)
+tsconfig.json        TypeScript config (stage-3 decorators set up for you)
+.env                 local environment variables (never commit secrets)
 .stone/              generated on build (safe to delete, never edit)
-dist/                the build output`}</Code>
+dist/                the build output (a single, self-contained artifact)`}</Code>
 
         <H2>The two files that matter</H2>
         <p>
