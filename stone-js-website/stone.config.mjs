@@ -54,6 +54,20 @@ export default defineConfig({
       '/docs/build/auth',
       '/docs/build/resources',
       '/docs/build/testing',
+      // Docs: Dependency injection
+      '/docs/di',
+      '/docs/di/services',
+      '/docs/di/providers',
+      // Docs: Blueprint & build
+      '/docs/blueprint',
+      '/docs/blueprint/middleware',
+      '/docs/blueprint/meta-modules',
+      '/docs/blueprint/build',
+      // Docs: Middleware (implementation)
+      '/docs/middleware',
+      '/docs/middleware/defining',
+      '/docs/middleware/registering',
+      '/docs/middleware/terminating',
       // Docs: Routing (dedicated section)
       '/docs/routing',
       '/docs/routing/definitions',

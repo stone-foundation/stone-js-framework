@@ -80,6 +80,35 @@ export const DOC_NAV: DocSection[] = [
     ]
   },
   {
+    title: 'Dependency injection',
+    blurb: 'Declare what you need; the container provides it.',
+    items: [
+      { title: 'The container', path: '/docs/di' },
+      { title: 'Services', path: '/docs/di/services' },
+      { title: 'Service providers', path: '/docs/di/providers' }
+    ]
+  },
+  {
+    title: 'Blueprint & build',
+    blurb: 'How the manifest is composed and built.',
+    items: [
+      { title: 'The Blueprint', path: '/docs/blueprint' },
+      { title: 'Blueprint middleware', path: '/docs/blueprint/middleware' },
+      { title: 'Meta-modules & define*', path: '/docs/blueprint/meta-modules' },
+      { title: 'The build & targets', path: '/docs/blueprint/build' }
+    ]
+  },
+  {
+    title: 'Middleware',
+    blurb: 'The pipeline every event flows through.',
+    items: [
+      { title: 'Overview', path: '/docs/middleware' },
+      { title: 'Defining middleware', path: '/docs/middleware/defining' },
+      { title: 'Registering middleware', path: '/docs/middleware/registering' },
+      { title: 'Terminating middleware', path: '/docs/middleware/terminating' }
+    ]
+  },
+  {
     title: 'Contexts',
     blurb: 'The dimensions. The same domain, collapsed differently.',
     items: [

@@ -47,6 +47,23 @@ Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorato
 - [Logging](/docs/essentials/logging): the logger, levels, custom backend.
 - [Hooks and lifecycle](/docs/essentials/hooks): run code at startup, shutdown and around each event.
 
+## Dependency injection
+- [The container](/docs/di): bindings and resolution; singleton/instance/alias/resolve/make/factory.
+- [Services](/docs/di/services): @Service / defineService; aliases; singletons; injection by alias.
+- [Service providers](/docs/di/providers): register then boot; mustSkip; how modules attach.
+
+## Blueprint & build
+- [The Blueprint](/docs/blueprint): the keyed, immutable manifest; get/set/has/add.
+- [Blueprint middleware](/docs/blueprint/middleware): the build pipeline; insert steps to refine the manifest.
+- [Meta-modules and define*](/docs/blueprint/meta-modules): the imperative model; the define* family.
+- [The build and targets](/docs/blueprint/build): module discovery, .stone codegen, targets, stone.config.
+
+## Middleware
+- [Overview](/docs/middleware): the pipe model (in via next, out on the response).
+- [Defining middleware](/docs/middleware/defining): class/factory/function; configurable middleware.
+- [Registering middleware](/docs/middleware/registering): global/group/route; priority, alias, excludeMiddleware.
+- [Terminating middleware](/docs/middleware/terminating): shape the response and run cleanup on the way out.
+
 ## Routing (dedicated section)
 - [Overview](/docs/routing): the universal router, the mental model, section map.
 - [Route definitions](/docs/routing/definitions): verb decorators, controllers, defineRoutes, options.
