@@ -53,22 +53,22 @@ export class OpenApi implements IPage<ReactIncomingEvent> {
 export const spec = OpenApiGenerator
   .create({ title: 'Tasks API', version: '1.0.0' })
   .addServer('https://api.example.com')
-  .generate()   // a valid OpenAPI document`}</Code>
+  .build()   // a valid OpenAPI document`}</Code>
 
-        <H2>Serving it, with Swagger UI</H2>
+        <H2>Serving it</H2>
         <p>
-          Expose the document from a route for tools and machines, and serve a ready-made Swagger UI
-          for humans, <code>swaggerUiHtml</code> renders the interactive explorer against your spec, no
-          separate docs site to run.
+          Expose the built document from a route. Tools, machines and agents read it directly; point any
+          OpenAPI viewer (Swagger UI, Scalar) at that URL for a human-friendly, interactive explorer, no
+          separate docs site to keep in sync.
         </p>
-        <Code file='app/Docs.ts'>{`import { swaggerUiHtml } from '@stone-js/openapi'
-import { htmlHttpResponse } from '@stone-js/http-core'
+        <Code file='app/OpenApiController.ts'>{`import { EventHandler, Get } from '@stone-js/router'
+import { spec } from './openapi'
 
-@Get('/openapi.json')
-spec () { return spec }                                  // the raw document
-
-@Get('/docs')
-ui () { return htmlHttpResponse(swaggerUiHtml('/openapi.json')) }  // interactive explorer`}</Code>
+@EventHandler('/openapi.json')
+export class OpenApiController {
+  @Get('/')
+  document () { return spec }   // the generated OpenAPI document, as JSON
+}`}</Code>
 
         <H3>Schemas to JSON Schema</H3>
         <p>
