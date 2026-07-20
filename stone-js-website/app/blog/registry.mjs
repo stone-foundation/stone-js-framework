@@ -25,6 +25,17 @@
 /** @type {Article[]} */
 export const ARTICLES = [
   {
+    slug: 'one-domain-three-runtimes',
+    title: 'One domain, three runtimes',
+    date: '2026-07-21',
+    author: 'Evens Pierre',
+    excerpt: 'One codebase, unchanged, running on Node, AWS Lambda and the edge. Not three apps: three runtimes. The thing a single-target framework cannot do.',
+    tags: ['architecture', 'adapters', 'cloud-native'],
+    ogImage: '/og/one-domain-three-runtimes.png',
+    starter: 'continuum-showcase',
+    locale: 'en'
+  },
+  {
     slug: 'introducing-stone-js',
     title: 'Introducing Stone.js',
     date: '2026-07-20',
