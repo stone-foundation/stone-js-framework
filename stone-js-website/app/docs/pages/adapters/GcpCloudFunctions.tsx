@@ -36,7 +36,7 @@ export class GcpCloudFunctions implements IPage<ReactIncomingEvent> {
   head (): HeadContext {
     return {
       title: 'GCP Cloud Functions adapter',
-      description: 'Run your domain on Google Cloud Functions HTTP triggers, unchanged. The adapter maps the Functions Framework (req, res) call to an intention and back.'
+      description: 'Run your domain on Google Cloud Functions: an HTTP adapter for HTTP triggers, and a generic adapter for CloudEvents (Pub/Sub, Storage, Eventarc).'
     }
   }
 
@@ -90,10 +90,31 @@ gcloud functions deploy tasks \\
           context is created for the request and collapses after it.
         </p>
 
+        <H2>Generic (non-HTTP) triggers</H2>
+        <p>
+          For events that are not HTTP, a Pub/Sub message, a Cloud Storage change, an Eventarc or
+          scheduler event, use the generic <code>@stone-js/gcp-cloud-functions-adapter</code> with
+          <code> @GcpCloudFunctions()</code>. Every 2nd-gen trigger arrives as a CloudEvent; the adapter
+          normalizes it into an intention whose metadata carries the event's <code>type</code>,
+          <code> source</code>, <code>subject</code> and <code>data</code>, so one handler can dispatch
+          on the event type.
+        </p>
+        <Code file='app/Application.ts'>{`import { GcpCloudFunctions } from '@stone-js/gcp-cloud-functions-adapter'
+
+@GcpCloudFunctions()
+@StoneApp({ name: 'workers' })
+export class Application {}`}</Code>
+        <p>
+          Register the returned handler with <code>functions.cloudEvent(...)</code> and deploy against
+          the trigger, e.g. <code>--trigger-topic</code> for Pub/Sub. On a thrown error the adapter
+          rethrows by default so Cloud Functions applies its retry policy; opt out with
+          <code> stone.adapter.rethrowOnError = false</code>.
+        </p>
+
         <H2>Triggers</H2>
         <PropsTable nameHeader='Package' rows={[
           { name: '@stone-js/gcp-cloud-functions-http-adapter', type: '@GcpCloudFunctionsHttp', desc: 'HTTP-triggered functions (Functions Framework req/res). Use with @Routing.' },
-          { name: '@stone-js/gcp-cloud-functions-adapter', type: '@GcpCloudFunctions', desc: 'Generic CloudEvents triggers (Pub/Sub, Storage, Eventarc). Coming next.' }
+          { name: '@stone-js/gcp-cloud-functions-adapter', type: '@GcpCloudFunctions', desc: 'Generic CloudEvents triggers (Pub/Sub, Cloud Storage, Eventarc, schedulers).' }
         ]} />
 
         <Callout kind='future' title='Stack it to keep options open'>
