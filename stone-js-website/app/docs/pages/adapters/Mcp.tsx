@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Aphorism, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, Callout, Aphorism, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/adapters/mcp'
 
@@ -66,6 +66,19 @@ stone <- task.list · task.show · task.create
 agent -> task.create { title: "Ship the docs" }
 stone <- ✓ task #42 created`}</Code>
         <Aphorism>Your REST API and your agent tools are the same domain, resolved by two contexts.</Aphorism>
+
+        <H2>Transport & config</H2>
+        <p>
+          MCP speaks over a transport. Use <strong>stdio</strong> for a local tool a desktop agent
+          launches, or an HTTP/SSE transport for a remote server. The server's name and version are
+          what clients see when they connect.
+        </p>
+        <PropsTable rows={[
+          { name: 'name', type: 'string', desc: 'The MCP server name shown to clients.' },
+          { name: 'version', type: 'string', desc: 'The server version.' },
+          { name: 'transport', type: "'stdio' | 'sse'", default: "'stdio'", desc: 'stdio for a locally-launched tool; sse for a remote HTTP server.' },
+          { name: 'tools', type: 'options', desc: 'Which handlers are exposed and how they are named as tools.' }
+        ]} />
 
         <H2>Deploy</H2>
         <p>

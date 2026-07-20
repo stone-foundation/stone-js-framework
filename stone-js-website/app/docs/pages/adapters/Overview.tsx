@@ -54,6 +54,26 @@ export class Overview implements IPage<ReactIncomingEvent> {
           platform specifics and deployment.
         </p>
 
+        <H2>How the adapter is selected</H2>
+        <p>
+          When several adapters are stacked, Stone.js resolves exactly one at run time, when the app
+          runs, not when you build or deploy. The order is:
+        </p>
+        <ol>
+          <li>the <strong>current adapter</strong>, if an <code>adapterAlias</code> names one (set per environment, so a platform can pin its own);</li>
+          <li>otherwise the adapter marked <code>default: true</code>;</li>
+          <li>otherwise the single adapter present.</li>
+        </ol>
+        <p>
+          So the same artifact, with Node and Lambda stacked, collapses onto Node when you run it
+          locally and onto Lambda when it runs there, decided freshly at run time on each host.
+        </p>
+        <Callout kind='note' title='Mark a default when you stack'>
+          With one adapter, nothing to set. With several, give one <code>default: true</code> (or set
+          <code> adapterAlias</code> per environment) so the selection is unambiguous where no platform
+          pins its own.
+        </Callout>
+
         <Callout kind='future' title='Not listed? Write it'>
           The core defines the boundary and nothing beyond it, so a runtime with no first-party adapter
           is one package away: capture, normalise, emit, register via a blueprint. See Write your own
