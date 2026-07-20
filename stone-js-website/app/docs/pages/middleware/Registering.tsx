@@ -82,9 +82,28 @@ public () { /* no auth */ }`}</Code>
           before the handler. Priority is the lever when the default order is not enough.
         </Callout>
 
+        <H2>Two layers: kernel and adapter</H2>
+        <p>
+          Almost all middleware is <strong>kernel middleware</strong>: it runs on the normalised
+          <code> IncomingEvent</code>, inside the per-event container, everything on this page so far.
+          There is also a rarer <strong>adapter middleware</strong> that runs at the integration edge,
+          on the platform's raw cause and response, before the kernel builds the event.
+        </p>
+        <Code file='app/middleware/rawTiming.ts'>{`import { defineAdapterMiddleware } from '@stone-js/core'
+
+// Runs on the raw platform context, outside the kernel. For platform-level
+// concerns only (raw timing, low-level headers); use kernel middleware otherwise.
+export const rawTiming = defineAdapterMiddleware((context, next) => next(context))`}</Code>
+        <Callout kind='important' title='Reach for kernel middleware first'>
+          If your middleware reads the event or resolves services, it is kernel middleware, the
+          default. Adapter middleware only makes sense for concerns that must touch the platform's raw
+          request or response before normalisation; most apps never need it.
+        </Callout>
+
         <SeeAlso links={[
           { title: 'Route middleware', path: '/docs/routing/middleware' },
-          { title: 'Terminating middleware', path: '/docs/middleware/terminating' }
+          { title: 'Terminating middleware', path: '/docs/middleware/terminating' },
+          { title: 'Adapters', path: '/docs/foundations/adapters' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>
