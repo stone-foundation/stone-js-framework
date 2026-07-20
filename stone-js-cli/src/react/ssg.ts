@@ -30,26 +30,41 @@ export interface PrerenderResult {
 
 /**
  * A route definition as extracted at build time (subset of the router definition).
+ *
+ * `path` mirrors the router: a single path or several aliases for one route.
  */
 export interface RouteDefinitionLike {
-  path: string
+  path: string | string[]
   methods?: string[]
 }
 
 /**
  * Collect the static (parameterless) GET routes to pre-render from the route definitions.
  *
- * Parameterized routes (`:id`, `*`) are skipped here: they require a `getStaticPaths`-style
- * expansion supplied by the app, which the caller merges in via {@link runSsg}'s `extraTargets`.
+ * This is what makes SSG zero-config: the routes the app already declares (the same
+ * definitions the router scans for lazy loading) become the pre-render set, so the user
+ * never restates them. A definition contributes every one of its parameterless GET paths
+ * (a route may declare several aliases). Parameterized routes (`:id`, `*`) are skipped:
+ * they need a `getStaticPaths`-style expansion the app supplies, merged in via
+ * {@link runSsg}'s `extraTargets`.
  *
  * @param definitions - The build-time route definitions.
- * @returns The static prerender targets.
+ * @returns The static prerender targets, de-duplicated by path.
  */
 export function collectStaticTargets (definitions: RouteDefinitionLike[]): PrerenderTarget[] {
-  return definitions
-    .filter((d) => typeof d.path === 'string' && !d.path.includes(':') && !d.path.includes('*'))
-    .filter((d) => d.methods === undefined || d.methods.length === 0 || d.methods.includes('GET'))
-    .map((d) => ({ path: normalizePath(d.path) }))
+  const paths: string[] = []
+  for (const definition of definitions) {
+    const isGet = definition.methods === undefined || definition.methods.length === 0 || definition.methods.includes('GET')
+    if (!isGet) continue
+    const candidates = Array.isArray(definition.path) ? definition.path : [definition.path]
+    for (const path of candidates) {
+      if (typeof path === 'string' && !path.includes(':') && !path.includes('*')) {
+        paths.push(normalizePath(path))
+      }
+    }
+  }
+  return paths
+    .map((path) => ({ path }))
     .filter((t, i, all) => all.findIndex((x) => x.path === t.path) === i)
 }
 
@@ -102,7 +117,8 @@ export async function runSsg (options: {
   outDir?: string
   concurrency?: number
 }): Promise<string[]> {
-  const targets = [...collectStaticTargets(options.definitions), ...(options.extraTargets ?? [])]
+  const merged = [...collectStaticTargets(options.definitions), ...(options.extraTargets ?? [])]
+  const targets = merged.filter((t, i, all) => all.findIndex((x) => x.path === t.path) === i)
   const outDir = options.outDir ?? distPath()
   const results: PrerenderResult[] = []
 

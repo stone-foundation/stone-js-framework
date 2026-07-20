@@ -23,10 +23,10 @@ const CORE_KEYS = [
 ]
 
 const BUILD_KEYS = [
-  { key: 'stone.builder.rendering', type: "'csr' | 'ssr' | 'ssg'", desc: 'The frontend rendering strategy. The --ssg flag forces ssg for one run.' },
+  { key: 'stone.builder.rendering', type: "'csr' | 'ssr' | 'ssg'", desc: 'Pins the rendering strategy; deduced from the adapters when omitted. The --ssg flag selects ssg for one run.' },
   { key: 'stone.builder.input.mainCSS', type: 'string', desc: 'Entry stylesheet, auto-linked. Defaults to /assets/css/index.css.' },
   { key: 'stone.builder.output', type: 'string', desc: 'The build output directory.' },
-  { key: 'stone.builder.ssg', type: 'object', desc: 'Static generation options (the routes to prerender).' },
+  { key: 'stone.builder.ssg.routes', type: 'string[]', desc: 'Extra static paths to pre-render, ADDED to the routes auto-derived from your pages.' },
   { key: 'stone.builder.dotenv', type: 'object', desc: 'How .env files are loaded into the build.' },
   { key: 'stone.builder.excludedModules', type: 'string[]', desc: 'Modules to keep out of the browser bundle.' },
   { key: 'stone.builder.vite / rollup', type: 'object', desc: 'Escape hatches: raw Vite (frontend) or Rollup (backend) config.' }

@@ -1,6 +1,6 @@
 import { glob } from 'glob'
 import fsExtra from 'fs-extra'
-import { runSsg } from './ssg'
+import { runSsg, collectStaticTargets, RouteDefinitionLike } from './ssg'
 import { CliError } from '../errors/CliError'
 import { relative } from 'node:path'
 import { existsSync } from 'node:fs'
@@ -162,6 +162,11 @@ export const GenerateLazyPageMiddleware = async (
       }
     }
   }
+  // Expose the scanned page routes so the SSG step can derive its pre-render set
+  // from them (zero-config): the same definitions that drive lazy loading also
+  // decide what gets pre-rendered, so the user never restates the route list.
+  context.blueprint.set('stone.builder.ssg.definitions', definitions)
+
   const replacePattern = /"(\(\) => modules\[[^)]+\]\(\)\.then\(v => v\.[^)]+\))"/g
   const pagesContent = `
   // @ts-ignore
@@ -489,9 +494,13 @@ async function waitForServer (child: ChildProcess, fallbackUrl: string, timeoutM
  * Pre-render routes to static HTML (SSG).
  *
  * SSG is SSR executed at build time: this starts the freshly-built SSR server, crawls the
- * configured routes (`stone.builder.ssg.routes`, defaulting to `/`), writes each response to
- * `dist/<route>/index.html` via the SSG orchestrator, then stops the server. Pages therefore
- * render identically whether pre-rendered or server-rendered.
+ * routes, writes each response to `dist/<route>/index.html` via the SSG orchestrator, then
+ * stops the server. Pages render identically whether pre-rendered or server-rendered.
+ *
+ * The route set is zero-config: it is derived from the app's own scanned page routes
+ * (`stone.builder.ssg.definitions`). Anything the user lists in `stone.builder.ssg.routes`
+ * is merged in as an additive escape hatch (e.g. expanded parameterized routes, extras),
+ * never a replacement. If nothing is known, it falls back to the root.
  *
  * @param context - The console context.
  * @param next - The next middleware.
@@ -502,8 +511,15 @@ export const GenerateStaticSiteMiddleware = async (
   next: NextPipe<ConsoleContext, IBlueprint>
 ): Promise<IBlueprint> => {
   const output = context.blueprint.get<string>('stone.builder.output', 'server.mjs')
-  const routes = context.blueprint.get<string[]>('stone.builder.ssg.routes', ['/'])
+  const definitions = context.blueprint.get<RouteDefinitionLike[]>('stone.builder.ssg.definitions', [])
+  const configured = context.blueprint.get<string[]>('stone.builder.ssg.routes', [])
   const adapterUrl = context.blueprint.get<string>('stone.adapter.url', 'http://localhost:8080')
+
+  // Derived (auto) + configured (opt-in). Fall back to the root only when neither
+  // the app nor the user named a single route to pre-render.
+  const derived = collectStaticTargets(definitions)
+  const extraTargets = configured.map((path) => ({ path }))
+  if (derived.length === 0 && extraTargets.length === 0) extraTargets.push({ path: '/' })
 
   const child = spawn('node', [distPath(output)], { stdio: ['ignore', 'pipe', 'pipe'] })
 
@@ -511,8 +527,8 @@ export const GenerateStaticSiteMiddleware = async (
     const baseUrl = await waitForServer(child, adapterUrl.replace('localhost', '127.0.0.1'))
 
     const written = await runSsg({
-      definitions: [],
-      extraTargets: routes.map((path) => ({ path })),
+      definitions,
+      extraTargets,
       outDir: distPath(),
       render: async (target) => {
         try {

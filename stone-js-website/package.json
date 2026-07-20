@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "stone dev",
-    "build": "stone build && node scripts/build-api.mjs",
+    "build": "stone build --ssg && node scripts/build-api.mjs",
     "build:app": "stone build",
     "api": "node scripts/build-api.mjs",
     "preview": "stone preview"
