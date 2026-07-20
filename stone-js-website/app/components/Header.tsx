@@ -1,8 +1,20 @@
 import { Portal } from './brand/Portal'
-import { JSX, useEffect } from 'react'
+import { scrollToHash } from './ScrollToHash'
+import { JSX, MouseEvent, useEffect } from 'react'
 
 const GITHUB_URL = 'https://github.com/stone-foundation'
 const MANIFESTO_URL = 'https://evens-stone.github.io/continuum-manifesto/manifesto'
+
+/**
+ * Smooth-scrolls to a same-page section, bypassing any router interception of the
+ * bare `#hash` click (which would otherwise cancel the native jump and go nowhere).
+ */
+function onHashClick (event: MouseEvent<HTMLAnchorElement>, hash: string): void {
+  if (scrollToHash(hash)) {
+    event.preventDefault()
+    history.pushState(null, '', hash)
+  }
+}
 
 /** Toggles the color theme and persists the choice. */
 function toggleTheme (): void {
@@ -35,8 +47,8 @@ export function Header (): JSX.Element {
           </a>
           <div className='links'>
             <a href='/docs'>Docs</a>
-            <a href='#ecosystem'>Ecosystem</a>
-            <a href='#agents'>Agents</a>
+            <a href='#ecosystem' onClick={(e) => onHashClick(e, '#ecosystem')}>Ecosystem</a>
+            <a href='#agents' onClick={(e) => onHashClick(e, '#agents')}>Agents</a>
             <a href={MANIFESTO_URL} target='_blank' rel='noopener noreferrer'>Manifesto</a>
           </div>
           <div className='spacer' />

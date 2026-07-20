@@ -8,6 +8,7 @@ import { Ecosystem } from '../sections/Ecosystem'
 import { CollapseLab } from '../sections/CollapseLab'
 import { Header, Footer } from '../components/Header'
 import { Analytics } from '../components/Analytics'
+import { ScrollToHash } from '../components/ScrollToHash'
 import { Manifesto, FinalCta } from '../sections/Closing'
 import { IPage, Page, ReactIncomingEvent, HeadContext } from '@stone-js/use-react'
 
@@ -31,6 +32,7 @@ export class HomePage implements IPage<ReactIncomingEvent> {
   render (): JSX.Element {
     return (
       <div>
+        <ScrollToHash />
         <Header />
         <Analytics />
         <main>

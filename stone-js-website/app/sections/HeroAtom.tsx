@@ -138,6 +138,7 @@ export function HeroAtom (): JSX.Element {
         </div>
         <div className='cta-row'>
           <a className='btn btn-primary' href='/docs/start/install'>npm create @stone-js</a>
+          <a className='btn btn-ghost hero-docs' href='/docs'>Read the docs</a>
           <a className='btn btn-ghost' href={MANIFESTO_URL} target='_blank' rel='noopener noreferrer'>Read the manifesto →</a>
         </div>
       </div>

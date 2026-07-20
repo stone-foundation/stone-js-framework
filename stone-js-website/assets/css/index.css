@@ -116,6 +116,8 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .ver { font-family: var(--mono); font-size: 12px; color: var(--gres); border: 1px solid var(--trait); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
 .site-header nav > .icon-btn { flex: 0 0 auto; }
 @media (max-width: 820px) { .site-header .links { display: none; } .site-header nav { gap: 14px; } }
+/* Clear the sticky header when jumping to an in-page section. */
+#ecosystem, #agents { scroll-margin-top: 82px; }
 @media (max-width: 480px) {
   .site-header nav { gap: 10px; height: 58px; }
   .brand { font-size: 18px; gap: 8px; }
@@ -148,12 +150,14 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
   zoom: clamp(.5, calc((100vw - 40px) / 540px), 1);
 }
 .nucleus { position: absolute; width: 122px; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 6; }
-.nucleus .key { filter: drop-shadow(0 0 16px rgba(255, 107, 43, .55)); transition: filter 500ms var(--ease); animation: pulse 4.5s var(--ease) infinite; }
-@keyframes pulse {
-  0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 107, 43, .45)); }
-  50% { filter: drop-shadow(0 0 22px rgba(255, 107, 43, .7)); }
+/* The keystone glow is a blurred SVG twin (see Portal); we pulse its opacity, not
+   a CSS filter, so nothing in the zoomed atom paints a rectangle artifact. */
+.nucleus .key { opacity: .55; transition: opacity 500ms var(--ease); animation: keyGlow 4.5s var(--ease) infinite; }
+@keyframes keyGlow {
+  0%, 100% { opacity: .45; }
+  50% { opacity: .85; }
 }
-.atom.collapsed .nucleus .key { animation: none; filter: drop-shadow(0 0 38px rgba(255, 107, 43, 1)); }
+.atom.collapsed .nucleus .key { animation: none; opacity: 1; }
 
 .orbit { position: absolute; inset: 0; animation: spin var(--d, 36s) linear infinite; }
 .orbit::before { content: ""; position: absolute; inset: var(--in); border: 1px dashed color-mix(in srgb, var(--cuivre) 42%, transparent); border-radius: 50%; }
@@ -215,6 +219,9 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .equation b { color: var(--braise-txt); font-weight: 600; }
 .equation .g { color: var(--gres); }
 .hero .cta-row { margin-top: 34px; }
+/* The header nav (with Docs) is hidden on mobile; surface Docs in the hero there. */
+.hero-docs { display: none; }
+@media (max-width: 820px) { .hero-docs { display: inline-flex; } }
 
 /* ---------- 6. Physics ---------- */
 .physics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
@@ -350,6 +357,25 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .dh-crumb { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--gres); padding-left: 12px; border-left: 1px solid var(--trait); }
 .dh-inner .spacer { flex: 1; }
 .menu-btn { display: none; }
+.dh-tools { display: flex; align-items: center; gap: 14px; }
+/* Overflow menu: only on mobile, where the inline tools would overflow the bar. */
+.dh-more { display: none; position: relative; }
+.dh-menu {
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 55;
+  display: flex; flex-direction: column; gap: 14px; padding: 16px; min-width: 216px;
+  background: var(--surface); border: 1px solid var(--trait); border-radius: 14px;
+  box-shadow: 0 26px 64px -30px rgba(0, 0, 0, .6);
+}
+.dh-menu .paradigm-switch { justify-content: space-between; }
+.dh-menu .ps-label { display: inline; }
+.dh-menu-row { display: flex; gap: 10px; }
+.dh-menu-item {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1;
+  border: 1px solid var(--trait); border-radius: 9px; padding: 9px 10px;
+  background: var(--bg); color: var(--encre); font-size: 13px; cursor: pointer;
+}
+.dh-menu-item:hover { border-color: var(--braise); }
+@media (max-width: 720px) { .dh-tools { display: none; } .dh-more { display: inline-flex; } }
 
 /* ---- 14.2 Paradigm switch ---- */
 .paradigm-switch { display: flex; align-items: center; gap: 9px; }
@@ -616,8 +642,6 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
   .dh-inner { gap: 8px; padding: 0 14px; }
   .dh-inner .brand { font-size: 17px; }
   .dh-inner .brand .portal-mark, .dh-inner .brand svg { flex: 0 0 auto; }
-  /* GitHub lives in the landing header and footer; drop it here to save room. */
-  .dh-inner > a.icon-btn { display: none; }
   .ps-btn { padding: 6px 8px; font-size: 11px; }
   .icon-btn { width: 34px; height: 34px; }
 }

@@ -112,16 +112,24 @@ function fileText (f: CodeFile): string {
   return clean((imperative ? f.imp : f.decl) ?? f.decl ?? f.imp ?? '')
 }
 
-/** Renders a file's body: its paradigm variants (CSS-toggled) or a single block. */
+/**
+ * Renders a file's body. Paradigm parity is 1:1: a file toggles between
+ * declarative and imperative only when it carries BOTH. A file with a single
+ * variant (or an explicit `code`) is common to both paradigms and stays visible
+ * whichever is selected, so nothing ever blanks out or shows the wrong paradigm.
+ */
 function FileBody ({ f }: { f: CodeFile }): JSX.Element {
   const lang = f.lang ?? 'ts'
   if (f.code !== undefined) return <Block code={clean(f.code)} lang={lang} />
-  return (
-    <>
-      <div className='p-decl'><Block code={clean(f.decl ?? f.imp ?? '')} lang={lang} /></div>
-      {f.imp !== undefined && <div className='p-imp'><Block code={clean(f.imp)} lang={lang} /></div>}
-    </>
-  )
+  if (f.decl !== undefined && f.imp !== undefined) {
+    return (
+      <>
+        <div className='p-decl'><Block code={clean(f.decl)} lang={lang} /></div>
+        <div className='p-imp'><Block code={clean(f.imp)} lang={lang} /></div>
+      </>
+    )
+  }
+  return <Block code={clean(f.decl ?? f.imp ?? '')} lang={lang} />
 }
 
 /**
