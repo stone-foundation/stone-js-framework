@@ -146,6 +146,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Node CLI', path: '/docs/adapters/node-cli' },
       { title: 'Fetch (edge & serverless)', path: '/docs/adapters/fetch' },
       { title: 'AWS Lambda', path: '/docs/adapters/aws-lambda' },
+      { title: 'GCP Cloud Functions', path: '/docs/adapters/gcp-cloud-functions' },
       { title: 'Browser', path: '/docs/adapters/browser' },
       { title: 'MCP (agents)', path: '/docs/adapters/mcp' },
       { title: 'Mobile', path: '/docs/adapters/mobile' }
