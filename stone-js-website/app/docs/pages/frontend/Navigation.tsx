@@ -64,10 +64,30 @@ async function onSubmit (values: NewTask) {
           read a param, or branch on the page. It updates as navigation happens.
         </p>
 
-        <Callout kind='note' title='Scroll and transitions'>
-          Client navigation restores scroll position sensibly and can animate transitions; both
-          respect <code>prefers-reduced-motion</code>. You get the smooth feel of an SPA without giving
-          up the server-rendered first paint.
+        <H2>Scroll restoration</H2>
+        <p>
+          Client navigation restores scroll position the way users expect: to the top on a new page,
+          back to where they were on back/forward. Enable it once; it is not something you wire per
+          link.
+        </p>
+        <Code file='app/client.ts'>{`import { setupScrollRestoration } from '@stone-js/use-react'
+
+setupScrollRestoration()   // top on navigate, remembered position on back/forward`}</Code>
+
+        <H2>View transitions</H2>
+        <p>
+          Animate between pages with the View Transitions API, a cross-fade, a shared element, without
+          hand-rolling animation state. It degrades gracefully where the API is absent and respects
+          <code> prefers-reduced-motion</code>.
+        </p>
+        <Code file='app/client.ts'>{`import { renderWithTransition } from '@stone-js/use-react'
+
+// Wrap the render so route changes animate where the browser supports it.
+renderWithTransition(app)`}</Code>
+
+        <Callout kind='note' title='SPA feel, server-rendered first paint'>
+          Scroll restoration and transitions give the smooth feel of an SPA, while the first paint
+          still comes fully rendered from the server (or a static file). You give up neither.
         </Callout>
 
         <SeeAlso links={[

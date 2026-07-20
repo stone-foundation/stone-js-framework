@@ -54,6 +54,58 @@ export class Head implements IPage<ReactIncomingEvent> {
           { name: 'htmlAttributes / bodyAttributes', type: 'Record<string,string>', desc: 'Attributes on <html> / <body> (e.g. lang).' }
         ]} />
 
+        <H2>Social cards & canonical</H2>
+        <p>
+          Open Graph and Twitter cards are meta tags; a canonical URL is a link. Set them on the page
+          that owns the content, driven by its data, and every share renders a proper card.
+        </p>
+        <Code file='app/pages/TaskPage.tsx'>{`head ({ data }: { data: Task }): HeadContext {
+  const url = \`https://tasks.example.com/tasks/\${data.id}\`
+  return {
+    title: data.title,
+    description: data.summary,
+    links: [{ rel: 'canonical', href: url }],
+    metas: [
+      // Open Graph
+      { property: 'og:type', content: 'article' },
+      { property: 'og:title', content: data.title },
+      { property: 'og:description', content: data.summary },
+      { property: 'og:url', content: url },
+      { property: 'og:image', content: data.cover },
+      // Twitter
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: data.title }
+    ]
+  }
+}`}</Code>
+
+        <H2>Structured data (JSON-LD)</H2>
+        <p>
+          Rich results come from JSON-LD. The <code>jsonLd</code> field renders each object as a
+          <code> &lt;script type="application/ld+json"&gt;</code>, so search engines read your entities
+          directly, again baked into the HTML on SSR and SSG.
+        </p>
+        <Code file='app/pages/TaskPage.tsx'>{`head ({ data }): HeadContext {
+  return {
+    title: data.title,
+    jsonLd: [{
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: data.title,
+      dateModified: data.updatedAt
+    }]
+  }
+}`}</Code>
+
+        <H3>Robots & crawling</H3>
+        <p>
+          Steer crawlers per page with a robots meta, keep a draft out of the index without touching
+          routing.
+        </p>
+        <Code file='app/pages/DraftPage.tsx'>{`head () {
+  return { metas: [{ name: 'robots', content: 'noindex, nofollow' }] }
+}`}</Code>
+
         <H3>From a component</H3>
         <p>
           Deep in the tree, a component can contribute to the head with <code>useHead</code>, merging

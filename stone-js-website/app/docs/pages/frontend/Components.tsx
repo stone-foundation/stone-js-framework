@@ -53,7 +53,12 @@ export function TaskRow ({ task }: { task: Task }) {
           { name: 'useConfig()', type: '() => Config', desc: 'The read-only Blueprint config.' },
           { name: 'useService(alias)', type: '(alias) => T', desc: 'Resolve a service from the container.' },
           { name: 'useContainer()', type: '() => Container', desc: 'The container itself (advanced).' },
-          { name: 'useEventEmitter()', type: '() => Emitter', desc: 'Emit and listen to domain events.' }
+          { name: 'useEventEmitter()', type: '() => Emitter', desc: 'Emit and listen to domain events.' },
+          { name: 'useEvent()', type: '() => IncomingEvent', desc: 'The current incoming event (the intention being rendered).' },
+          { name: 'useRawEvent()', type: '() => raw', desc: 'The platform’s raw cause (escape hatch; rarely needed).' },
+          { name: 'useBlueprint()', type: '() => Blueprint', desc: 'The frozen manifest, for advanced introspection.' },
+          { name: 'useRuntime()', type: '() => Runtime', desc: 'The React runtime (SSR/CSR state).' },
+          { name: 'useStone()', type: '() => context', desc: 'The full Stone context, when you need several of the above at once.' }
         ]} />
         <Code file='app/pages/TaskCount.tsx' lang='tsx'>{`import { useData, useRouter } from '@stone-js/use-react'
 

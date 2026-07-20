@@ -99,6 +99,14 @@ export const loadReport = defineServerLoader(async ({ event, container }) => {
   return container.make('db').query('report', event.get('id'))   // server only
 })`}</Code>
 
+        <H2>Loading states</H2>
+        <p>
+          On the first paint (SSR/SSG) the data is already there, no spinner, no layout shift. On a
+          client navigation, the loader runs before the new page shows; the current page stays put
+          until it resolves, so there is no flash of empty UI. For slow loaders, render pending UI with
+          React's ordinary tools (<code>Suspense</code>, a transition), the data layer does not fight
+          them.
+        </p>
         <Callout kind='important' title='Loaders run where you think'>
           Be deliberate about what a page loader touches. In an SSR app a naive <code>handle</code>
           runs in the browser on client navigations; keep server-only access behind a server loader,

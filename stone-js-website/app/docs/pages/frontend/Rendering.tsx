@@ -84,6 +84,32 @@ export class Rendering implements IPage<ReactIncomingEvent> {
   ssg: { routes: ['/', '/tasks', '/tasks/1', '/about'] }
 })`}</Code>
 
+        <H2>SOR: server-only, zero client JS</H2>
+        <p>
+          There is a fourth option the superposition model gives you almost for free. Render on a
+          server or edge adapter but <em>do not</em> stack the Browser adapter: the server produces the
+          HTML and there is nothing to hydrate, so no client bundle ships at all. This is
+          <strong> Server-Only Rendering</strong> (SOR), the zero-JavaScript mode for content that does
+          not need interactivity, a marketing page, a document, an email view.
+        </p>
+        <PropsTable nameHeader='Mode' rows={[
+          { name: 'SSR (hydrated)', type: 'server + Browser', desc: 'Server render, then the browser hydrates: interactive.' },
+          { name: 'SOR (server-only)', type: 'server, no Browser', desc: 'Server render, no client bundle, no hydration: zero JS.' }
+        ]} />
+        <Callout kind='note' title='Interactivity is opt-in'>
+          Because hydration comes from the Browser adapter, leaving it out is the toggle between a
+          fully interactive page and a static, zero-JS one, per app, without changing a page. Note that
+          client-only affordances (a button that navigates via the router) do nothing in SOR, by
+          definition there is no JavaScript to run them.
+        </Callout>
+
+        <H2>Streaming SSR</H2>
+        <p>
+          For large pages, the server can stream HTML as it renders instead of buffering the whole
+          document, so the browser starts painting sooner. Streaming is a render option on the server
+          adapter; the pages you wrote do not change.
+        </p>
+
         <H2>Hydration and the snapshot</H2>
         <p>
           On SSR and SSG, the server render serialises the page's data into the HTML as a snapshot; the

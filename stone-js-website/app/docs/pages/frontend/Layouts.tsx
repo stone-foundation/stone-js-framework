@@ -93,6 +93,46 @@ export const pages = [definePage(AdminPage, { path: '/admin', layout: 'admin' },
           just frames what they produce.
         </Callout>
 
+        <H2>Root providers</H2>
+        <p>
+          Some context wraps the <em>whole</em> app, not one layout: a theme, an i18n provider, a data-
+          fetching client. A <strong>view provider</strong> wraps the entire tree, above every layout
+          and page, and runs on the server render and the client hydration alike, so context is
+          consistent in both.
+        </p>
+        <CodeTabs
+          file='app/AppProviders.tsx'
+          decl={`import { ViewProvider, IViewProvider } from '@stone-js/use-react'
+import { ReactNode } from 'react'
+
+@ViewProvider()
+export class AppProviders implements IViewProvider {
+  render ({ children }: { children: ReactNode }) {
+    return (
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </ThemeProvider>
+    )
+  }
+}`}
+          imp={`import { defineViewProvider } from '@stone-js/use-react'
+
+const AppProviders = () => ({
+  render: ({ children }) => (
+    <ThemeProvider><QueryClientProvider client={queryClient}>{children}</QueryClientProvider></ThemeProvider>
+  )
+})
+
+export const viewProviders = [defineViewProvider(AppProviders, {}, true)]`}
+        />
+        <Callout kind='note' title='Provider vs layout'>
+          A layout frames a page's visible chrome and can differ per page. A view provider supplies
+          invisible, app-wide context and wraps everything. Reach for a provider for
+          <code> Context</code> that must exist everywhere; a layout for structure a page opts into.
+        </Callout>
+
         <SeeAlso links={[
           { title: 'Pages', path: '/docs/frontend/pages' },
           { title: 'Components & links', path: '/docs/frontend/components' },
