@@ -54,8 +54,21 @@ export class Container implements IPage<ReactIncomingEvent> {
           { name: 'make(key)', type: '<V>(key) => V', desc: 'Resolve, failing fast on an unknown key.' },
           { name: 'factory(key)', type: '<V>(key) => () => V', desc: 'Get a factory that resolves the key on each call.' },
           { name: 'bound(key)', type: '(key) => boolean', desc: 'Whether a key has a binding.' },
-          { name: 'has(key)', type: '(key) => boolean', desc: 'Whether a key is known to the container.' }
+          { name: 'has(key)', type: '(key) => boolean', desc: 'Whether a key is known to the container.' },
+          { name: 'singletonIf / instanceIf / bindingIf', type: 'conditional', desc: 'Register only if the key is not already bound (see below).' },
+          { name: 'getBindings() / getAliases()', type: '() => Map', desc: 'Introspect what is registered.' }
         ]} />
+
+        <H3>Conditional bindings (overridable defaults)</H3>
+        <p>
+          The <code>*If</code> variants register a binding <em>only if</em> nothing already claimed the
+          key. This is how an extension ships a sensible default that an app can override just by
+          binding its own first: last word to the app, a fallback from the package.
+        </p>
+        <Code file='src/CacheProvider.ts'>{`register () {
+  // The app may already have bound 'cache'; only fill in if it did not.
+  this.container.singletonIf('cache', () => new MemoryCache())
+}`}</Code>
 
         <H3>Prefer declaring over resolving</H3>
         <p>
