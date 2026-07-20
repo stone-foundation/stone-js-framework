@@ -1,5 +1,0 @@
-# Variable: HTTP\_TEMPORARY\_REDIRECT
-
-```ts
-const HTTP_TEMPORARY_REDIRECT: 307 = 307;
-```

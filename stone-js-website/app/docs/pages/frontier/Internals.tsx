@@ -36,6 +36,17 @@ export class Internals implements IPage<ReactIncomingEvent> {
         </p>
         <Aphorism>Setup is a pipeline over the manifest. It runs once, and freezes.</Aphorism>
 
+        <H2>The collapse, at run time</H2>
+        <p>
+          Between setup and the first event sits one decision: which context. When
+          <code> StoneFactory.run()</code> executes, it resolves a single adapter from the stack. The
+          one whose alias matches the current platform, else the one marked <code>default</code>, else
+          the only one present. That resolution is the contextual collapse, and it happens when the app
+          runs, never at build or deploy. The same artifact, started on Node, collapses to the Node
+          adapter; started on Lambda, to the Lambda one.
+        </p>
+        <Aphorism>Deploy places the artifact. Running is what chooses the context.</Aphorism>
+
         <H2>Per event</H2>
         <PropsTable nameHeader='Step' rows={[
           { name: '1. Capture', type: 'adapter', desc: 'The adapter receives the platform’s raw cause.' },

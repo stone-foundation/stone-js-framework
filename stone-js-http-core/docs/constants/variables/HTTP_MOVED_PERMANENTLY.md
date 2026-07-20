@@ -1,5 +1,0 @@
-# Variable: HTTP\_MOVED\_PERMANENTLY
-
-```ts
-const HTTP_MOVED_PERMANENTLY: 301 = 301;
-```

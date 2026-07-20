@@ -1,5 +1,0 @@
-# Variable: HTTP\_PRECONDITION\_REQUIRED
-
-```ts
-const HTTP_PRECONDITION_REQUIRED: 428 = 428;
-```
