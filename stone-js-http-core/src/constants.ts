@@ -9,7 +9,7 @@ export const PURGE = 'PURGE'
 export const DELETE = 'DELETE'
 export const CONNECT = 'CONNECT'
 export const OPTIONS = 'OPTIONS'
-export const HTTP_METHODS = [GET, PUT, HEAD, POST, PATCH, DELETE, OPTIONS]
+export const HTTP_METHODS: string[] = [GET, PUT, HEAD, POST, PATCH, DELETE, OPTIONS]
 
 // HTTP Status Codes
 export const HTTP_CONTINUE = 100

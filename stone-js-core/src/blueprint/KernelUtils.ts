@@ -483,7 +483,7 @@ function resolveModuleKind<T> (
  * defineStone((container) => ({ save(){} }), { alias: 'myService' })
  * ```
  */
-export const defineStone = defineService
+export const defineStone: typeof defineService = defineService
 
 /**
  * Registers a **functional event subscriber** into the Stone blueprint.

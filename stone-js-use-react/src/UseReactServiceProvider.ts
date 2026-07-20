@@ -2,7 +2,7 @@ import { Config } from '@stone-js/config'
 import { STONE_SNAPSHOT } from './constants'
 import { ReactRuntime } from './ReactRuntime'
 import { isSSR } from './UseReactPageInternals'
-import { IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
+import { IContainer, IServiceProvider, Promiseable, type MetaServiceProvider } from '@stone-js/core'
 
 /**
  * Options for configuring the use-react service provider.
@@ -51,4 +51,4 @@ export class UseReactServiceProvider implements IServiceProvider {
 /**
  * MetaUseReactServiceProvider
  */
-export const MetaUseReactServiceProvider = { module: UseReactServiceProvider, isClass: true }
+export const MetaUseReactServiceProvider: MetaServiceProvider = { module: UseReactServiceProvider, isClass: true }

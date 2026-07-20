@@ -16,7 +16,7 @@
     "skipLibCheck": true,
     "declarationMap": false,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "types": ["node", "vitest/globals"],
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true

@@ -1,0 +1,10 @@
+{
+  "entryPoints": ["src/**/*.ts"],
+  "out": "docs",
+  "name": "Validation",
+  "tsconfig": "./tsconfig.build.json",
+  "plugin": ["typedoc-plugin-markdown"],
+  "readme": "none",
+  "excludePrivate": true,
+  "disableSources": true
+}

@@ -24,7 +24,17 @@
       "@stone-js/use-view",
       "@stone-js/use-react",
       "@stone-js/telemetry",
-      "@stone-js/cli"
+      "@stone-js/cli",
+      "@stone-js/validation",
+      "@stone-js/fetch-adapter",
+      "@stone-js/auth",
+      "@stone-js/authz",
+      "@stone-js/resources",
+      "@stone-js/openapi",
+      "@stone-js/testing",
+      "@stone-js/mcp-adapter",
+      "@stone-js/mcp",
+      "@stone-js/edge-adapter"
     ]
   ],
   "linked": [],

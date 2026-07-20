@@ -6,4 +6,4 @@
 /**
  * A unique symbol key to mark classes as command.
  */
-export const COMMAND_KEY = Symbol.for('Command')
+export const COMMAND_KEY: symbol = Symbol.for('Command')

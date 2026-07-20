@@ -25,6 +25,15 @@ describe('collectStaticTargets', () => {
     ])
     expect(targets.map((t) => t.path)).toEqual(['/', '/about'])
   })
+
+  it('expands a route that declares several path aliases', () => {
+    const targets = collectStaticTargets([
+      { path: ['/', '/home'], methods: ['GET'] },
+      { path: ['/docs', '/docs/:section'] }
+    ])
+    // Both aliases of the first route; only the static alias of the second.
+    expect(targets.map((t) => t.path)).toEqual(['/', '/home', '/docs'])
+  })
 })
 
 describe('targetToFilePath', () => {
@@ -69,6 +78,22 @@ describe('writePrerendered / runSsg', () => {
     expect(written).toHaveLength(3)
     expect(readFileSync(join(outDir, 'blog', 'hello', 'index.html'), 'utf-8')).toContain('/blog/hello')
     expect(existsSync(join(outDir, 'index.html'))).toBe(true)
+  })
+
+  it('merges derived and configured routes without pre-rendering a path twice', async () => {
+    const rendered: string[] = []
+    const written = await runSsg({
+      definitions: [{ path: '/' }, { path: '/about' }],
+      extraTargets: [{ path: '/about' }, { path: '/contact' }], // /about duplicates a derived route
+      outDir,
+      render: async (target) => {
+        rendered.push(target.path)
+        return { path: target.path, html: `<title>${target.path}</title>`, statusCode: 200 }
+      }
+    })
+
+    expect(rendered.sort()).toEqual(['/', '/about', '/contact'])
+    expect(written).toHaveLength(3)
   })
 
   it('defaults extraTargets to none and outDir to distPath()', async () => {

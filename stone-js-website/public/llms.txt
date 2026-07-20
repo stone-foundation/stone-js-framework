@@ -1,0 +1,151 @@
+# Stone.js
+
+> The Continuum framework. Write your domain once; it lives in superposition across every execution context (server, edge, browser, agents) and collapses into one at runtime. Stone.js is the reference implementation of the Continuum Architecture: an application is an act, Domain times Context resolves into a Resolution. You write the domain; adapters supply the context at runtime, so the same code runs on Node, AWS Lambda, Cloudflare, Deno, Bun, the browser, and AI agents.
+
+Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorators with Symbol.metadata) and imperative (define* meta-modules). Three forms everywhere: class, factory, function (the function form never receives the container; providers forbid it).
+
+## Sections
+- [Docs](/docs): the manual and the architecture course.
+- [Starters](/starters): ready-to-use templates and community solutions, scaffolded in one command (npm create @stone-js --starters <id>).
+- [Blog](/blog): cloud-native architecture solutions, each with a diagram, the Stone.js modules that solve it, and a ready starter.
+- [Benchmarks](/benchmarks): an open, reproducible comparison across frameworks and runtimes, including the same domain on Node, serverless and the edge.
+
+## Start here
+- [Why Stone.js](/docs): an application is an act, not an object; the thesis in three minutes.
+- [Install and create](/docs/start/install): scaffold with npm create @stone-js, then run locally.
+- [Your first domain](/docs/start/first-domain): write the what (a service and a handler) with no reference to where it runs.
+- [Collapse it](/docs/start/collapse): choose the runtime by adding an adapter to the manifest, not by editing the domain.
+- [Project anatomy](/docs/start/anatomy): what the scaffold creates and why.
+
+## Foundations (the architecture; principle then In Stone.js)
+- [The Continuum](/docs/foundations/continuum): the app as an act; the four dimensions (Setup, Integration, Initialization, Functional).
+- [Domain times Context resolves into Resolution](/docs/foundations/domain-context): keep the domain pure, let the context arrive.
+- [The uncertainty principle](/docs/foundations/uncertainty): defer the where, own the what.
+- [Superposition and collapse](/docs/foundations/superposition): stack adapters; the collapse happens at runtime.
+- [The ephemeral context](/docs/foundations/ephemeral-context): a fresh container per event; only the adapter is long-lived.
+- [Blueprint: config as a manifest](/docs/foundations/blueprint): one immutable manifest, addressed by dotted stone.* keys.
+- [Blueprint as a pipeline](/docs/foundations/build-phase): the manifest is composed by a pipeline of steps.
+- [Lifecycle and the kernel](/docs/foundations/lifecycle): the kernel applies the domain per event; @Hook lifecycle points.
+- [Middleware and the pipeline](/docs/foundations/middleware): the chain of responsibility, applied to events.
+- [Service container and DI](/docs/foundations/container): resolve and inject services by alias.
+- [Service providers](/docs/foundations/providers): register then boot; the seam every module plugs into.
+- [Adapters](/docs/foundations/adapters): the integration dimension; capture, normalise, emit.
+- [The two paradigms](/docs/foundations/paradigms): decorators and define* at parity, one Blueprint.
+- [The three forms](/docs/foundations/forms): class, factory, function.
+
+## Contexts (the dimensions; the same domain, collapsed differently)
+- [Backend](/docs/contexts/backend): Node HTTP and CLI adapters on one domain.
+- [Frontend](/docs/contexts/frontend): React pages and layouts; CSR, SSR, SSG.
+- [Edge and Serverless](/docs/contexts/edge): one Web-standard adapter for Cloudflare, Deno, Bun, Vercel, Netlify; plus AWS Lambda.
+- [Agents](/docs/contexts/agents): expose the domain as MCP tools.
+- [Mobile](/docs/contexts/mobile): a forthcoming context (React Native / Expo) as one more adapter.
+
+## Essentials (the runtime building blocks, in detail)
+- [Application and bootstrap](/docs/essentials/application): the manifest, adapters, app options.
+- [Event handlers](/docs/essentials/event-handlers): the handler contract; the three forms.
+- [Incoming event](/docs/essentials/incoming-event): reading input via event.get; HTTP getters; files.
+- [Outgoing response](/docs/essentials/outgoing-response): return data or build a response; helpers.
+- [Cookies](/docs/essentials/cookies): read and set cookies with secure options.
+- [Filesystem and storage](/docs/essentials/filesystem): storage disks, uploaded files, project path helpers.
+- [Configuration](/docs/essentials/configuration): set and read stone.* keys on the Blueprint.
+- [Environment](/docs/essentials/environment): typed, validated env getters.
+- [Events and listeners](/docs/essentials/events): emit domain events; listeners and subscribers.
+- [Error handling](/docs/essentials/errors): throw meaningful errors; map them to responses.
+- [Logging](/docs/essentials/logging): the logger, levels, custom backend.
+- [Hooks and lifecycle](/docs/essentials/hooks): run code at startup, shutdown and around each event.
+
+## Dependency injection
+- [The container](/docs/di): bindings and resolution; singleton/instance/alias/resolve/make/factory.
+- [Services](/docs/di/services): @Service / defineService; aliases; singletons; injection by alias.
+- [Service providers](/docs/di/providers): register then boot; mustSkip; how modules attach.
+
+## Blueprint & build
+- [The Blueprint](/docs/blueprint): the keyed, immutable manifest; get/set/has/add.
+- [Blueprint middleware](/docs/blueprint/middleware): the build pipeline; insert steps to refine the manifest.
+- [Meta-modules and define*](/docs/blueprint/meta-modules): the imperative model; the define* family.
+- [The build and targets](/docs/blueprint/build): module discovery, .stone codegen, targets, stone.config.
+
+## Middleware
+- [Overview](/docs/middleware): the pipe model (in via next, out on the response).
+- [Defining middleware](/docs/middleware/defining): class/factory/function; configurable middleware.
+- [Registering middleware](/docs/middleware/registering): global/group/route; priority, alias, excludeMiddleware.
+- [Terminating middleware](/docs/middleware/terminating): shape the response and run cleanup on the way out.
+
+## Frontend (use-react)
+- [Overview](/docs/frontend): the view dimension; enable React; section map.
+- [Pages](/docs/frontend/pages): @Page with handle (loader), render, head.
+- [Layouts](/docs/frontend/layouts): @PageLayout + StoneOutlet; named layouts.
+- [Components and links](/docs/frontend/components): StoneLink/StoneOutlet/StonePage; the hooks.
+- [Navigation](/docs/frontend/navigation): StoneLink and programmatic navigation via the router.
+- [Data fetching](/docs/frontend/data): the page loader; useData; server loaders.
+- [Head and metadata](/docs/frontend/head): head() and useHead; SEO; JSON-LD.
+- [Error pages](/docs/frontend/error-pages): @ErrorPage and @AdapterErrorPage.
+- [Assets](/docs/frontend/assets): entry CSS, import aliases, the public directory.
+- [Rendering: CSR, SSR, SSG](/docs/frontend/rendering): three ways to resolve the same pages; hydration.
+- [use-view](/docs/frontend/use-view): the framework-agnostic view engine beneath use-react.
+
+## Routing (dedicated section)
+- [Overview](/docs/routing): the universal router, the mental model, section map.
+- [Route definitions](/docs/routing/definitions): verb decorators, controllers, defineRoutes, options.
+- [Parameters and constraints](/docs/routing/parameters): path params, optional, catch-all, rules.
+- [Query and body](/docs/routing/query-body): reading input via event.get, one accessor.
+- [Model binding](/docs/routing/binding): resolve a param into a model at the boundary.
+- [Groups and prefixes](/docs/routing/groups): shared base path and middleware via controllers/children.
+- [Named routes and URL generation](/docs/routing/names): name routes, router.generate.
+- [Route middleware](/docs/routing/middleware): attach middleware per route/group, order, excludeMiddleware.
+- [Redirects and responses](/docs/routing/redirects): returning data, status, redirects.
+- [Matching and precedence](/docs/routing/matching): how a route is chosen; domain/protocol/strict.
+- [Misc](/docs/routing/misc): fallback, current route, useRouter, routing in the browser.
+
+## Adapters (per platform, A to Z)
+- [Overview](/docs/adapters): the catalog and the shared install/decorate/deploy pattern.
+- [Node HTTP](/docs/adapters/node-http): @NodeHttp; a production HTTP server on Node.
+- [Node CLI](/docs/adapters/node-cli): @NodeConsole + @Command; handlers as CLI commands.
+- [Fetch](/docs/adapters/fetch): @Fetch; one Web-standard adapter for Cloudflare/Deno/Bun/Vercel/Netlify.
+- [AWS Lambda](/docs/adapters/aws-lambda): @AwsLambdaHttp (API Gateway) and @AwsLambda (generic).
+- [Browser](/docs/adapters/browser): @Browser; SPA and hydration.
+- [MCP](/docs/adapters/mcp): @Mcp; expose the domain as agent tools.
+- [Mobile](/docs/adapters/mobile): forthcoming (React Native / Expo).
+
+## Extensions (opt-in capabilities)
+- [Overview](/docs/extensions): the catalog; how extensions attach via blueprints.
+- [Validation](/docs/extensions/validation): one schema, enforced on the API and the form.
+- [Auth](/docs/extensions/auth): stateless JWT/OAuth; requireAuth / requireScopes.
+- [Authorization](/docs/extensions/authorization): isomorphic RBAC + ABAC; defineAbility / authorize.
+- [Resources](/docs/extensions/resources): shape the output; defineResource, fields, envelopes.
+- [OpenAPI](/docs/extensions/openapi): derive the public contract from your schemas.
+- [Testing](/docs/extensions/testing): createTestApp + send(makeIncomingHttpEvent); behavioural tests.
+- [MCP server and llms.txt](/docs/extensions/mcp): the framework’s agent tooling and docs-map generation.
+- [Telemetry](/docs/extensions/telemetry): spans and metrics with pluggable exporters.
+
+## Extending Stone.js
+- [Overview](/docs/extending): author the framework’s own building blocks.
+- [Write your own adapter](/docs/extending/adapter): open a new context in three verbs.
+- [Create a package or plugin](/docs/extending/package): a blueprint, providers, decorators/define*.
+- [Create a decorator](/docs/extending/decorator): TC39 stage-3 + Symbol.metadata; addMetadata/addBlueprint.
+- [Create CLI commands](/docs/extending/commands): @Command/defineCommand; args, flags, input/output.
+
+## Primitives
+- [Overview](/docs/primitives): the three libraries the kernel is built on.
+- [Pipeline](/docs/primitives/pipeline): the chain of responsibility (send/through/then).
+- [Service container](/docs/primitives/service-container): DI as a standalone library.
+- [Config](/docs/primitives/config): a deep dotted-key store; the Blueprint underneath.
+
+## Frontier (advanced)
+- [Universal apps](/docs/frontier/universal): SSR as a superposition of browser and server.
+- [Agent-native patterns](/docs/frontier/agent-native): design a domain machines can use well.
+- [Performance and cold starts](/docs/frontier/performance): fast by construction; cold-start choices.
+- [Security posture](/docs/frontier/security): trust the boundary; secure defaults; a small trusted base.
+- [Internals](/docs/frontier/internals): setup once, per-event path; how the primitives show through.
+
+## Ecosystem
+- [Marketplace](/docs/ecosystem): the full catalog, grouped by role in the architecture.
+
+## Reference
+- [API](/docs/reference/api): primary entry points per package, and the generated TypeDoc reference at /api.
+- [CLI](/docs/reference/cli): the stone command line.
+- [Configuration](/docs/reference/config): the stone.* keys.
+- [Glossary](/docs/reference/glossary): the Continuum vocabulary.
+
+## Optional
+- [The Continuum manifesto](https://evens-stone.github.io/continuum-manifesto/manifesto): the philosophy behind the framework.

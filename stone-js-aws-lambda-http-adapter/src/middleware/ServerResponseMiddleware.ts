@@ -1,5 +1,5 @@
 import statuses from 'statuses'
-import { NextMiddleware } from '@stone-js/core'
+import { NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { BinaryFileResponse } from '@stone-js/http-core'
 import { detectEventVersion } from '../event-normalizer'
 import { AwsLambdaHttpAdapterError } from '../errors/AwsLambdaHttpAdapterError'
@@ -57,4 +57,4 @@ export class ServerResponseMiddleware {
 /**
  * Meta Middleware for processing server responses.
  */
-export const MetaServerResponseMiddleware = { module: ServerResponseMiddleware, isClass: true }
+export const MetaServerResponseMiddleware: MetaMiddleware<any, any> = { module: ServerResponseMiddleware, isClass: true }

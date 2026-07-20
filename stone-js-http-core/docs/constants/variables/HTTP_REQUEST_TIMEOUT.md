@@ -1,5 +1,0 @@
-# Variable: HTTP\_REQUEST\_TIMEOUT
-
-```ts
-const HTTP_REQUEST_TIMEOUT: 408 = 408;
-```

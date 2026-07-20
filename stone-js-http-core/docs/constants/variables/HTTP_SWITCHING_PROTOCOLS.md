@@ -1,5 +1,0 @@
-# Variable: HTTP\_SWITCHING\_PROTOCOLS
-
-```ts
-const HTTP_SWITCHING_PROTOCOLS: 101 = 101;
-```

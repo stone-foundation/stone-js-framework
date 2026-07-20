@@ -8,6 +8,7 @@
     "tests/**/*.ts"
   ],
   "compilerOptions": {
+    "isolatedDeclarations": true,
     "strict": true,
     "target": "ESNext",
     "module": "ESNext",

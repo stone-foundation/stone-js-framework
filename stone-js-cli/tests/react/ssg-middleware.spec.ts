@@ -5,7 +5,11 @@ const spawnMock = vi.fn()
 const runSsgMock = vi.fn()
 
 vi.mock('node:child_process', () => ({ spawn: (...a: any[]) => spawnMock(...a), ChildProcess: class {} }))
-vi.mock('../../src/react/ssg', () => ({ runSsg: (...a: any[]) => runSsgMock(...a) }))
+// Keep the real collectStaticTargets (the derivation under test); mock only the writer.
+vi.mock('../../src/react/ssg', async (mod) => ({
+  ...(await mod<any>()),
+  runSsg: (...a: any[]) => runSsgMock(...a)
+}))
 vi.mock('@stone-js/filesystem', async (mod) => ({
   ...(await mod<any>()),
   distPath: (p = '') => `/dist/${p}`,
@@ -65,6 +69,32 @@ describe('GenerateStaticSiteMiddleware (SSG)', () => {
 
     expect(context.commandOutput.info).toHaveBeenCalledWith(expect.stringContaining('Pre-rendered 1 route'))
     expect(next).toHaveBeenCalled()
+  })
+
+  it('derives the pre-render set from the scanned page routes (zero-config)', async () => {
+    spawnMock.mockReturnValue(makeChild('url'))
+    let received: any
+    runSsgMock.mockImplementation(async (opts: any) => { received = opts; return ['a', 'b'] })
+    vi.stubGlobal('fetch', vi.fn(async () => ({ text: async () => 'x', status: 200 })))
+
+    const context: any = {
+      blueprint: {
+        get: vi.fn((key: string, fallback: any) => {
+          if (key === 'stone.builder.output') return 'server.mjs'
+          if (key === 'stone.builder.ssg.definitions') return [{ path: '/' }, { path: '/about' }, { path: '/blog/:slug' }]
+          if (key === 'stone.builder.ssg.routes') return [] // user added nothing
+          if (key === 'stone.adapter.url') return 'http://localhost:8080'
+          return fallback
+        })
+      },
+      commandOutput: { info: vi.fn() }
+    }
+    await GenerateStaticSiteMiddleware(context, vi.fn().mockResolvedValue(context.blueprint))
+
+    // Real definitions flow through; the parameterized route is not force-added here.
+    expect(received.definitions.map((d: any) => (Array.isArray(d.path) ? d.path[0] : d.path)))
+      .toEqual(['/', '/about', '/blog/:slug'])
+    expect(received.extraTargets).toEqual([]) // nothing configured, and definitions exist -> no '/' fallback
   })
 
   it('resolves the base URL from stderr too', async () => {

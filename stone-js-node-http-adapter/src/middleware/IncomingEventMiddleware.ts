@@ -9,7 +9,7 @@ import proxyAddr from 'proxy-addr'
 import { TLSSocket } from 'node:tls'
 import { IncomingMessage } from 'node:http'
 import { NODE_HTTP_PLATFORM } from '../constants'
-import { IBlueprint, NextMiddleware } from '@stone-js/core'
+import { IBlueprint, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { NodeHttpAdapterError } from '../errors/NodeHttpAdapterError'
 import { NodeHttpAdapterContext, NodeHttpAdapterResponseBuilder } from '../declarations'
 
@@ -176,4 +176,4 @@ export class IncomingEventMiddleware {
 /**
  * Meta Middleware for processing incoming events.
  */
-export const MetaIncomingEventMiddleware = { module: IncomingEventMiddleware, isClass: true }
+export const MetaIncomingEventMiddleware: MetaMiddleware<any, any> = { module: IncomingEventMiddleware, isClass: true }

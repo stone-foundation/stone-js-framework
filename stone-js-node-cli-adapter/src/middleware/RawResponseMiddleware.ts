@@ -1,4 +1,4 @@
-import { NextMiddleware } from '@stone-js/core'
+import { NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { COMMAND_NOT_FOUND_CODE } from '../constants'
 import { NodeCliAdapterError } from '../errors/NodeCliAdapterError'
 import { NodeCliAdapterContext, NodeCliAdapterResponseBuilder } from '../declarations'
@@ -35,4 +35,4 @@ export class RawResponseMiddleware {
 /**
  * Meta Middleware for processing outgoing responses.
  */
-export const MetaRawResponseMiddleware = { module: RawResponseMiddleware, isClass: true }
+export const MetaRawResponseMiddleware: MetaMiddleware<any, any> = { module: RawResponseMiddleware, isClass: true }

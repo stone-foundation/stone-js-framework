@@ -36,7 +36,7 @@ export class RouterServiceProvider<
   private registerRouter (): void {
     this
       .container
-      .singletonIf(Router, (container) => Router.create(this.getRouterOptions(container)))
+      .singletonIf(Router, (container: IContainer) => Router.create(this.getRouterOptions(container)))
       .alias(Router, ['Router', 'router'])
   }
 

@@ -184,7 +184,7 @@ export interface BuilderConfig {
  */
 export const builder: BuilderConfig = {
   dotenv,
-  lazy: false, // TODO: To be removed when the vite issue is fixed.
+  lazy: true, // Lazy pages by default: per-route code splitting, and the scanned route definitions feed zero-config SSG.
   public: 'public',
   assets: {
     dir: 'assets',

@@ -1,4 +1,4 @@
-import { IBlueprint, NextMiddleware } from '@stone-js/core'
+import { IBlueprint, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { resolveMethodOverride } from '../method-override'
 import { isMultipart, getFilesUploads } from '@stone-js/http-core'
 import { NodeHttpAdapterError } from '../errors/NodeHttpAdapterError'
@@ -59,4 +59,4 @@ export class FilesEventMiddleware {
 /**
  * Meta Middleware for processing files uploads.
  */
-export const MetaFilesEventMiddleware = { module: FilesEventMiddleware, isClass: true }
+export const MetaFilesEventMiddleware: MetaMiddleware<any, any> = { module: FilesEventMiddleware, isClass: true }

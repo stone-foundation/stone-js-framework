@@ -1,5 +1,0 @@
-# Variable: HTTP\_UPGRADE\_REQUIRED
-
-```ts
-const HTTP_UPGRADE_REQUIRED: 426 = 426;
-```

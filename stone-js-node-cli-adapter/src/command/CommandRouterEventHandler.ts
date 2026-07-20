@@ -14,7 +14,7 @@ import {
   OutgoingResponse,
   isMetaClassModule,
   isMetaFactoryModule,
-  isMetaFunctionModule
+  isMetaFunctionModule, type MetaEventHandler
 } from '@stone-js/core'
 import { COMMAND_NOT_FOUND_CODE } from '../constants'
 import { CommandOptions } from '../decorators/Command'
@@ -183,4 +183,4 @@ export class CommandRouterEventHandler<
 /**
  * MetaCommandRouterEventHandler module.
  */
-export const MetaCommandRouterEventHandler = { module: CommandRouterEventHandler, isClass: true }
+export const MetaCommandRouterEventHandler: MetaEventHandler = { module: CommandRouterEventHandler, isClass: true }

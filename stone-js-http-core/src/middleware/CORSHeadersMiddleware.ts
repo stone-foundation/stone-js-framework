@@ -1,6 +1,6 @@
 import { MetaHandleCorsMiddleware } from './HandleCorsMiddleware'
 import { EnsureCorsHeadersHook } from '../hooks/EnsureCorsHeadersHook'
-import { BlueprintContext, IBlueprint, ClassType, NextMiddleware } from '@stone-js/core'
+import { BlueprintContext, IBlueprint, ClassType, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 
 /**
  * Blueprint Middleware for setting Cross-Origin Resource Sharing (CORS) headers in the HTTP response.
@@ -34,4 +34,4 @@ export const CORSHeadersMiddleware = async (
 /**
  * Represents the metadata for the CORSHeadersMiddleware.
  */
-export const MetaCORSHeadersMiddleware = { module: CORSHeadersMiddleware, priority: 5 }
+export const MetaCORSHeadersMiddleware: MetaMiddleware<any, any> = { module: CORSHeadersMiddleware, priority: 5 }

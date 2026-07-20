@@ -1,6 +1,6 @@
 import { HeadContext, applyHeadToDocument } from '@stone-js/use-view'
 import { IErrorPage, ISnapshot, MetaErrorPage, ReactIncomingEvent } from './declarations'
-import { IBlueprint, IContainer, isEmpty, isObjectLikeModule, Promiseable } from '@stone-js/core'
+import { IBlueprint, IContainer, isEmpty, isObjectLikeModule, Promiseable, type MetaService } from '@stone-js/core'
 import { buildAppComponent, isServer, renderReactApp, resolveComponent } from './UseReactPageInternals'
 
 /**
@@ -147,4 +147,4 @@ export class ReactRuntime {
 /**
  * MetaReactRuntime
 */
-export const MetaReactRuntime = { module: ReactRuntime, isClass: true, alias: 'reactRuntime', singleton: true }
+export const MetaReactRuntime: MetaService = { module: ReactRuntime, isClass: true, alias: 'reactRuntime', singleton: true }

@@ -91,7 +91,8 @@ describe('ReactBuildMiddleware', () => {
   const mockNext = vi.fn()
   const context: any = {
     blueprint: {
-      get: vi.fn(() => 'views/**/*.tsx')
+      get: vi.fn(() => 'views/**/*.tsx'),
+      set: vi.fn()
     },
     event: {},
     commandOutput: {

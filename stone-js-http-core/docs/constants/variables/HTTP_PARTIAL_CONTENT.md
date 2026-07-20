@@ -1,5 +1,0 @@
-# Variable: HTTP\_PARTIAL\_CONTENT
-
-```ts
-const HTTP_PARTIAL_CONTENT: 206 = 206;
-```
