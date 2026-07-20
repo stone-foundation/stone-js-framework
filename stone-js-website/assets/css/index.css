@@ -667,6 +667,54 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
   .icon-btn { width: 34px; height: 34px; }
 }
 
+/* ---------- 14.9 Site sections (Starters / Blog / Benchmarks) ---------- */
+.site-main { min-height: 60vh; padding: 8px 0 40px; }
+.st-wrap { padding-top: 20px; }
+.section-hero { text-align: center; padding: 48px 0 26px; }
+.section-hero .mono-title { font-size: clamp(38px, 8vw, 68px); margin: 10px 0 0; }
+.section-hero .lede { margin: 20px auto 0; }
+
+.st-filters { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 26px 0 8px; }
+.st-fgroup { display: inline-flex; border: 1px solid var(--trait); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.st-fbtn { font-family: var(--mono); font-size: 12px; text-transform: capitalize; padding: 7px 12px; border: 0; background: transparent; color: var(--gres); cursor: pointer; transition: background 200ms var(--ease), color 200ms var(--ease); }
+.st-fbtn:hover { color: var(--encre); }
+.st-fbtn.active { background: var(--braise-grad); color: #1B1010; font-weight: 600; }
+.st-count { font-family: var(--mono); font-size: 12px; color: var(--gres); text-align: center; margin: 14px 0 20px; }
+
+.st-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 900px) { .st-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .st-grid { grid-template-columns: 1fr; } }
+.st-card { display: flex; flex-direction: column; border: 1px solid var(--trait); border-radius: 16px; background: var(--surface); padding: 18px; transition: border-color 200ms var(--ease), transform 200ms var(--ease); }
+.st-card:hover { border-color: color-mix(in srgb, var(--braise) 55%, var(--trait)); transform: translateY(-2px); }
+.st-card.is-soon { opacity: .82; }
+.st-card-head { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.st-badge { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--gres); border: 1px solid var(--trait); border-radius: 999px; padding: 2px 8px; }
+.st-badge.is-official { color: #1B1010; background: var(--braise-grad); border-color: transparent; }
+.st-badge.is-community { color: var(--braise-txt); border-color: color-mix(in srgb, var(--braise) 45%, var(--trait)); }
+.st-title { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 0 0 8px; }
+.st-desc-toggle { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; width: 100%; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 14px; color: var(--gres); }
+.st-desc-toggle:hover { color: var(--encre); }
+.st-chev { font-family: var(--mono); color: var(--braise-txt); flex: 0 0 auto; }
+.st-desc-static { font-size: 14px; color: var(--gres); margin: 0; }
+.st-cmd { display: flex; align-items: center; gap: 8px; margin: 14px 0 12px; background: var(--bg); border: 1px solid var(--trait); border-radius: 10px; padding: 8px 8px 8px 12px; }
+.st-cmd code { font-family: var(--mono); font-size: 11.5px; color: var(--encre); overflow-x: auto; white-space: nowrap; flex: 1; }
+.st-copy { font-family: var(--mono); font-size: 11px; padding: 4px 10px; border: 1px solid var(--trait); border-radius: 8px; background: var(--surface); color: var(--gres); cursor: pointer; flex: 0 0 auto; }
+.st-copy:hover { border-color: var(--braise); color: var(--encre); }
+.st-card-foot { display: flex; gap: 16px; margin-top: auto; }
+.st-link { font-family: var(--mono); font-size: 12px; color: var(--braise-txt); background: none; border: 0; padding: 0; cursor: pointer; }
+.st-link:hover { text-decoration: underline; }
+
+.st-contribute { margin: 46px 0 10px; text-align: center; border-top: 1px solid var(--trait); padding-top: 40px; }
+.st-contribute h2 { font-family: var(--display); font-size: 24px; margin: 0 0 10px; }
+.st-contribute p { color: var(--gres); max-width: 60ch; margin: 0 auto 20px; }
+
+.st-modal-scrim { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); display: grid; place-items: center; padding: 20px; }
+.st-modal { position: relative; width: 100%; max-width: 560px; background: var(--surface); border: 1px solid var(--trait); border-radius: 18px; padding: 26px; box-shadow: 0 40px 100px -40px rgba(0,0,0,.7); }
+.st-modal-close { position: absolute; top: 12px; right: 14px; font-size: 22px; line-height: 1; background: none; border: 0; color: var(--gres); cursor: pointer; }
+.st-modal-close:hover { color: var(--encre); }
+.st-about { color: color-mix(in srgb, var(--encre) 88%, var(--gres)); margin: 10px 0; }
+.st-about-meta { font-family: var(--mono); font-size: 11.5px; color: var(--gres); margin: 0 0 14px; }
+
 /* ---------- 15. Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .orbit, .u, .chip, .nucleus .key, .vein::before, .pseam::before,

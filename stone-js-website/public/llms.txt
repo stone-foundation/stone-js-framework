@@ -4,6 +4,12 @@
 
 Two paradigms are supported at strict parity: declarative (TC39 stage-3 decorators with Symbol.metadata) and imperative (define* meta-modules). Three forms everywhere: class, factory, function (the function form never receives the container; providers forbid it).
 
+## Sections
+- [Docs](/docs): the manual and the architecture course.
+- [Starters](/starters): ready-to-use templates and community solutions, scaffolded in one command (npm create @stone-js --starters <id>).
+- [Blog](/blog): cloud-native architecture solutions, each with a diagram, the Stone.js modules that solve it, and a ready starter.
+- [Benchmarks](/benchmarks): an open, reproducible comparison across frameworks and runtimes, including the same domain on Node, serverless and the edge.
+
 ## Start here
 - [Why Stone.js](/docs): an application is an act, not an object; the thesis in three minutes.
 - [Install and create](/docs/start/install): scaffold with npm create @stone-js, then run locally.
