@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/extending/adapter'
 
@@ -80,6 +80,24 @@ export class Adapter implements IPage<ReactIncomingEvent> {
 
 // consumers add it like any other:
 // defineStoneApp({ name: 'app' }, [routerBlueprint, myPlatformAdapterBlueprint])`}</Code>
+
+        <H2>Adapter-level concerns</H2>
+        <p>
+          Some work belongs at the boundary, on the raw cause and response, before the kernel builds an
+          event: raw timing, platform headers, translating a low-level failure. Adapter authors have
+          two public tools for that, distinct from kernel middleware.
+        </p>
+        <PropsTable nameHeader='Helper' rows={[
+          { name: 'defineAdapterMiddleware(fn)', type: 'raw pipe', desc: 'Runs on the platform context (raw cause/response), around the kernel call.' },
+          { name: 'defineAdapterErrorHandler(fn)', type: 'boundary errors', desc: 'Maps a failure that happens before or around the kernel into a native error response.' }
+        ]} />
+        <Code file='src/blueprint.ts'>{`import { defineAdapterErrorHandler } from '@stone-js/core'
+
+// Turn a boundary failure into a platform-shaped response, even if the kernel
+// never ran (e.g. a malformed raw request).
+export const onBoundaryError = defineAdapterErrorHandler((error, context) => {
+  return context.rawResponse({ status: 400, body: 'Bad request' })
+})`}</Code>
 
         <Callout kind='future' title='This is how the ecosystem grows'>
           The core never grows to accommodate a new platform; an adapter does, at the edge, without a

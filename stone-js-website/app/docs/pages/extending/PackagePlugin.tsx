@@ -76,6 +76,22 @@ export const App = defineStoneApp({ name: 'app' }, [routerBlueprint, cacheBluepr
 @StoneApp({ name: 'app' })
 export class Application {}`}</Code>
 
+        <H2>Test your extension</H2>
+        <p>
+          Test a package the way apps are tested: boot a real app with just your blueprint and assert
+          the behaviour it adds. <code>createTestApp</code> takes your blueprint directly, so a test
+          needs no host app.
+        </p>
+        <Code file='tests/cache.test.ts'>{`import { createTestApp } from '@stone-js/testing'
+import { cacheBlueprint } from '../src/blueprint'
+
+it('registers the cache service', async () => {
+  const app = await createTestApp({ blueprint: cacheBlueprint })
+  const cache = app.container().make('cache')
+  cache.set('k', 1)
+  expect(cache.get('k')).toBe(1)
+})`}</Code>
+
         <H2>Publishing</H2>
         <ul>
           <li>ESM only (<code>"type": "module"</code>), TypeScript, ship types.</li>
