@@ -9,11 +9,11 @@
   },
   "packageManager": "pnpm@10.12.3",
   "scripts": {
-    "build": "pnpm -r --workspace-concurrency=1 run build",
+    "build": "pnpm -r run build",
     "clean": "pnpm -r run clean",
     "rebuild": "pnpm run clean && pnpm run build",
     "doc": "pnpm -r run doc",
-    "test": "pnpm -r --workspace-concurrency=1 run test",
+    "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
     "changeset": "changeset",
     "version-packages": "changeset version",

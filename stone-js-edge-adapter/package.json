@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/edge-adapter",
   "version": "0.8.0",
-  "description": "Deploy a Stone.js app to any WinterCG/edge or JS runtime \u2014 Cloudflare Workers, Vercel Edge, Netlify Edge, Deno and Bun \u2014 with one-line serve helpers on top of @stone-js/fetch-adapter. Build once, deploy anywhere.",
+  "description": "Deploy a Stone.js app to any WinterCG/edge or JS runtime — Cloudflare Workers, Vercel Edge, Netlify Edge, Deno and Bun — with one-line serve helpers on top of @stone-js/fetch-adapter. Build once, deploy anywhere.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -71,8 +71,6 @@
     "husky": "^9.1.7",
     "rimraf": "^6.0.1",
     "rollup": "^4.44.1",
-    "rollup-plugin-delete": "^3.0.1",
-    "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-node-externals": "^8.0.1",
     "ts-standard": "^12.0.2",
     "tslib": "^2.8.1",
