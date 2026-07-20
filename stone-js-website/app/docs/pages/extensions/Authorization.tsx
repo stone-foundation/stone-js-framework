@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/extensions/authorization'
 
@@ -69,24 +69,54 @@ export class Authorization implements IPage<ReactIncomingEvent> {
             </p>
           }
         />
+        <p>
+          Under the hood it is <a href='https://casl.js.org' target='_blank' rel='noopener noreferrer'>CASL</a>,
+          so you get RBAC (action + subject type), ABAC (conditions on a subject instance) and
+          field-level rules from one declaration, and the same ability runs on the server and in the
+          browser.
+        </p>
         <Code file='app/abilities.ts'>{`import { defineAbility } from '@stone-js/authz'
 
-export const ability = defineAbility((can, user) => {
-  can('read', 'Task')                          // everyone can read
-  if (user.role === 'admin') can('delete', 'Task')   // RBAC
-  can('update', 'Task', { ownerId: user.id })  // ABAC: only your own
+export const abilityFor = (user) => defineAbility((can, cannot) => {
+  can('read', 'Task')                              // RBAC: anyone reads
+  can('update', 'Task', { ownerId: user.id })      // ABAC: only your own
+  can('update', 'Task', ['title', 'done'])         // field-level: only these fields
+  if (user.role === 'admin') can('manage', 'Task') // 'manage' = every action
+  cannot('delete', 'Task', { locked: true })       // an explicit exception
 })`}</Code>
 
+        <H3>RBAC, ABAC, fields, aliases</H3>
+        <PropsTable nameHeader='Capability' rows={[
+          { name: "can('delete', 'Task')", type: 'RBAC', desc: 'Allow an action on a subject type.' },
+          { name: "can('update', 'Task', { ownerId })", type: 'ABAC', desc: 'Allow only when the subject instance matches the conditions.' },
+          { name: "can('update', 'Task', ['title'])", type: 'field-level', desc: 'Restrict an action to specific fields.' },
+          { name: "can('manage', subject)", type: 'action alias', desc: "'manage' matches every action; define your own aliases with createAliasResolver." },
+          { name: "cannot('delete', 'Task', {...})", type: 'exception', desc: 'Carve out a denial that overrides a broader allow.' }
+        ]} />
+
         <H2>Enforce on the API</H2>
+        <p>
+          <code>authorize(action, subject, field?)</code> guards a route and throws a
+          <code> ForbiddenError</code> (403) when the ability says no. For checks inside a handler,
+          inject the <code>Authorizer</code>: it exposes <code>can</code>/<code>cannot</code> and an
+          <code> authorize</code> that throws.
+        </p>
         <CodeTabs file='app/Tasks.ts' decl={DECL} imp={IMP} />
+        <Code file='app/Tasks.ts'>{`update (event: IncomingHttpEvent) {
+  const task = this.tasks.find(event.get('id'))
+  // Check against a concrete instance (ABAC) with subject() typing.
+  this.authorizer.authorize(event.get('user'), 'update', subject('Task', task))
+  return this.tasks.update(task, event.get('body'))
+}`}</Code>
 
         <H3>Reuse in the UI</H3>
         <p>
           Because the ability is a value, the frontend asks the same question before rendering a
-          control, so the UI never offers an action the API would reject.
+          control, so the UI never offers an action the API would reject, down to individual fields.
         </p>
-        <Code file='app/pages/TaskRow.tsx' lang='tsx'>{`{ability.can('delete', task) && <button onClick={remove}>Delete</button>}`}</Code>
-        <Aphorism>One rule set. It guards the route and shapes the UI. The two can never disagree.</Aphorism>
+        <Code file='app/pages/TaskRow.tsx' lang='tsx'>{`{ability.can('delete', task) && <button onClick={remove}>Delete</button>}
+<input disabled={ability.cannot('update', task, 'title')} />`}</Code>
+        <Aphorism>One rule set. It guards the route, the field, and the button. They can never disagree.</Aphorism>
 
         <Callout kind='future' title='Guards that follow the domain to the edge'>
           Abilities are plain evaluations with no server-bound store, so the same rules hold on Node,
@@ -95,7 +125,8 @@ export const ability = defineAbility((can, user) => {
 
         <SeeAlso links={[
           { title: 'Auth', path: '/docs/extensions/auth' },
-          { title: 'Route middleware', path: '/docs/routing/middleware' }
+          { title: 'Route middleware', path: '/docs/routing/middleware' },
+          { title: 'Resources', path: '/docs/extensions/resources' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>

@@ -100,6 +100,30 @@ if (!result.success) setErrors(result.error.issues)`}</Code>
   body: NewTask
 })`}</Code>
 
+        <H3>Bring any schema</H3>
+        <p>
+          Validation speaks the Standard Schema interface, so Zod, Valibot, ArkType and others work as
+          is. For a library that is not yet Standard Schema, adapt it explicitly with
+          <code> fromZod</code> or <code>fromStandard</code>; the rest of your code stays the same.
+        </p>
+        <Code file='app/schemas.ts'>{`import { fromZod, fromStandard } from '@stone-js/validation'
+
+const NewTask = fromZod(zodSchema)          // wrap a Zod schema
+const Filter = fromStandard(anyStandard)    // wrap any Standard Schema`}</Code>
+
+        <H3>The failure shape</H3>
+        <p>
+          A failed check throws a <code>ValidationError</code> the kernel maps to <code>422</code>, with
+          the issues attached, so clients get a precise, structured error without you writing the
+          plumbing. Need it inline instead of as middleware? <code>validateEvent</code> throws the same
+          error; or resolve the <code>Validator</code> service to validate arbitrary values.
+        </p>
+        <Code file='app/Tasks.ts'>{`constructor ({ validator }) { this.validator = validator }
+
+parse (input: unknown) {
+  return this.validator.validate(input, NewTask)   // throws ValidationError (422) on mismatch
+}`}</Code>
+
         <Callout kind='note' title='Standard Schema, not a lock-in'>
           Validation speaks the Standard Schema interface, so Zod is one option, not a requirement.
           Bring the schema library you already use; the middleware does not care which.

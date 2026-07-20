@@ -81,6 +81,16 @@ it('creates a task', async () => {
           behaviour whether the app will finally run on Node, on the edge, or as agent tools. You test
           the domain once; the contexts do not change what it does.
         </p>
+        <p>
+          HTTP is not the only cause. <code>makeIncomingHttpEvent</code> builds an HTTP intention;
+          <code> makeIncomingEvent</code> builds a generic one, so the same <code>app.send()</code>
+          exercises a CLI command or an agent tool call, no server and no argv parsing required.
+        </p>
+        <Code file='tests/prune.test.ts'>{`import { createTestApp, makeIncomingEvent } from '@stone-js/testing'
+
+const app = await createTestApp({ modules: [PruneCommand, TaskService] })
+const res = await app.send(makeIncomingEvent({ name: 'tasks:prune', days: 30 }))
+expect(res.getContent()).toContain('Pruned')`}</Code>
 
         <Callout kind='note' title='The rule, not the aspiration'>
           Across the framework, every fixed bug earns a behavioural test, and each module carries its

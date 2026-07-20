@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Principle, Aphorism, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/extensions/openapi'
 
@@ -55,13 +55,27 @@ export const spec = OpenApiGenerator
   .addServer('https://api.example.com')
   .generate()   // a valid OpenAPI document`}</Code>
 
-        <H2>Serving it</H2>
+        <H2>Serving it, with Swagger UI</H2>
         <p>
-          Expose the document from a route so tools and humans can read it, and serve a docs UI from it
-          if you like.
+          Expose the document from a route for tools and machines, and serve a ready-made Swagger UI
+          for humans, <code>swaggerUiHtml</code> renders the interactive explorer against your spec, no
+          separate docs site to run.
         </p>
-        <Code file='app/Docs.ts'>{`@Get('/openapi.json')
-spec () { return spec }`}</Code>
+        <Code file='app/Docs.ts'>{`import { swaggerUiHtml } from '@stone-js/openapi'
+import { htmlHttpResponse } from '@stone-js/http-core'
+
+@Get('/openapi.json')
+spec () { return spec }                                  // the raw document
+
+@Get('/docs')
+ui () { return htmlHttpResponse(swaggerUiHtml('/openapi.json')) }  // interactive explorer`}</Code>
+
+        <H3>Schemas to JSON Schema</H3>
+        <p>
+          Under the hood <code>toJsonSchema</code> converts your validation schemas (Zod and other
+          Standard Schemas) into the JSON Schema the document embeds, which is why the contract stays a
+          faithful view of what you actually validate.
+        </p>
         <Aphorism>You wrote the schema for validation. The contract is a view of it, not a second copy.</Aphorism>
 
         <Callout kind='future' title='The contract agents read too'>

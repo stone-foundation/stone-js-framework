@@ -90,6 +90,24 @@ mine (event: IncomingHttpEvent) {
   return this.tasks.ownedBy(user.id)
 }`}</Code>
 
+        <H3>Custom strategies</H3>
+        <p>
+          The built-in verification covers JWT and OAuth. When you need something else, an API key, a
+          session, a bespoke provider, implement an <code>Authenticator</code>: it turns a request into
+          a principal (or rejects it), and the same <code>requireAuth</code>/<code>requireScopes</code>
+          guards work on top of it unchanged.
+        </p>
+        <Code file='app/ApiKeyAuthenticator.ts'>{`import { Authenticator } from '@stone-js/auth'
+
+export class ApiKeyAuthenticator extends Authenticator {
+  async authenticate (event: IncomingHttpEvent) {
+    const key = event.getHeader('x-api-key')
+    const user = await this.keys.resolve(key)
+    if (user === undefined) throw new AuthenticationError('Invalid API key')  // -> 401
+    return user                                    // becomes event.get('user')
+  }
+}`}</Code>
+
         <Callout kind='note' title='Stateless by design'>
           Nothing here touches a session table. The token is verified on each request, which is what
           lets auth run unchanged on serverless and edge runtimes. Configure issuers and keys through
