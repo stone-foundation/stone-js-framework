@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { siblings } from '../../nav'
 import { StoneLink } from '@stone-js/use-react'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Aphorism, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, Callout, Aphorism, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/contexts/mobile'
 
@@ -63,6 +63,11 @@ export class Mobile implements IPage<ReactIncomingEvent> {
           ready.
         </Callout>
 
+        <SeeAlso links={[
+          { title: 'Mobile adapter (status)', path: '/docs/adapters/mobile' },
+          { title: 'use-view', path: '/docs/frontend/use-view' },
+          { title: 'Write your own adapter', path: '/docs/extending/adapter' }
+        ]} />
         <Pager {...siblings(PATH)} />
       </>
     )

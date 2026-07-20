@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Aphorism, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, Callout, Aphorism, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/contexts/edge'
 
@@ -93,6 +93,11 @@ export class Edge implements IPage<ReactIncomingEvent> {
           domain. Superposition is not a diagram here, it is your deploy pipeline.
         </Callout>
 
+        <SeeAlso links={[
+          { title: 'Fetch adapter', path: '/docs/adapters/fetch' },
+          { title: 'AWS Lambda adapter', path: '/docs/adapters/aws-lambda' },
+          { title: 'Performance & cold starts', path: '/docs/frontier/performance' }
+        ]} />
         <Pager {...siblings(PATH)} />
       </>
     )

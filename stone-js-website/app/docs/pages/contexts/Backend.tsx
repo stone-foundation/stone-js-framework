@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code, CodeTabs, CodeGroup } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Aphorism, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, Callout, Aphorism, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/contexts/backend'
 
@@ -146,6 +146,11 @@ node app tasks:list`}</Code>
           on your own laptop.
         </Callout>
 
+        <SeeAlso links={[
+          { title: 'Node HTTP adapter', path: '/docs/adapters/node-http' },
+          { title: 'Node CLI adapter', path: '/docs/adapters/node-cli' },
+          { title: 'Application & bootstrap', path: '/docs/essentials/application' }
+        ]} />
         <Pager {...siblings(PATH)} />
       </>
     )

@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, H3, Callout, Principle, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/contexts/frontend'
 
@@ -109,6 +109,11 @@ export class TasksPage {
           pages, two contexts, collapsing in sequence. The edge context makes this vivid next.
         </Callout>
 
+        <SeeAlso links={[
+          { title: 'Frontend section (in depth)', path: '/docs/frontend' },
+          { title: 'Rendering: CSR, SSR, SSG', path: '/docs/frontend/rendering' },
+          { title: 'Browser adapter', path: '/docs/adapters/browser' }
+        ]} />
         <Pager {...siblings(PATH)} />
       </>
     )

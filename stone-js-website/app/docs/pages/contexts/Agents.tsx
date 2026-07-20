@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Principle, Aphorism, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, Callout, Principle, Aphorism, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/contexts/agents'
 
@@ -103,6 +103,11 @@ stone ← ✓ task #42 created`}</Code>
           sentence as the whole framework, now with a model on the other side of the adapter.
         </Callout>
 
+        <SeeAlso links={[
+          { title: 'MCP adapter', path: '/docs/adapters/mcp' },
+          { title: 'MCP server & llms.txt', path: '/docs/extensions/mcp' },
+          { title: 'Agent-native patterns', path: '/docs/frontier/agent-native' }
+        ]} />
         <Pager {...siblings(PATH)} />
       </>
     )
