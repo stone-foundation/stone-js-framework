@@ -25,6 +25,17 @@
 /** @type {Article[]} */
 export const ARTICLES = [
   {
+    slug: 'stateless-auth-at-the-edge',
+    title: 'Stateless auth at the edge',
+    date: '2026-07-22',
+    author: 'Evens Pierre',
+    excerpt: 'Verify a token at the boundary instead of holding a session, and the same auth guard runs on Node, serverless, the edge and agents, with nothing to store.',
+    tags: ['auth', 'edge', 'security'],
+    ogImage: '/og/stateless-auth-at-the-edge.png',
+    starter: null,
+    locale: 'en'
+  },
+  {
     slug: 'one-domain-three-runtimes',
     title: 'One domain, three runtimes',
     date: '2026-07-21',

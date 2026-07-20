@@ -36,9 +36,9 @@ const GH = 'https://github.com/stone-foundation'
 const cmd = (id: string): string => `npm create @stone-js@latest my-app --starters ${id}`
 
 const TIERS = {
-  basic: 'the minimal skeleton: one entry, wired and ready to run, nothing you have to remove.',
-  standard: 'a real starting point: routing, middleware, config and a couple of features wired the idiomatic way.',
-  full: 'batteries included: the production layout with validation, auth-ready wiring, testing and the full module set.'
+  basic: 'the minimal skeleton: routing over HTTP, wired and ready to run, nothing to remove.',
+  standard: 'a real starting point: routing, middleware and config in the idiomatic layout.',
+  full: 'the fullest scaffold: adds the filesystem, environment config and a CLI console alongside the HTTP server, with the testing setup in place.'
 } as const
 
 /** Generate the first-party matrix: tier x kind x paradigm. */
