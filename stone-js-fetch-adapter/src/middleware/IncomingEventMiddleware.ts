@@ -1,5 +1,5 @@
 import { FETCH_PLATFORM } from '../constants'
-import { IBlueprint, NextMiddleware } from '@stone-js/core'
+import { IBlueprint, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { CookieCollection } from '@stone-js/http-core'
 import { FetchAdapterError } from '../errors/FetchAdapterError'
 import { normalizeRequest, NormalizedRequest } from '../request-normalizer'
@@ -101,4 +101,4 @@ export class IncomingEventMiddleware {
 /**
  * Meta middleware for processing incoming Fetch events.
  */
-export const MetaIncomingEventMiddleware = { module: IncomingEventMiddleware, isClass: true }
+export const MetaIncomingEventMiddleware: MetaMiddleware<any, any> = { module: IncomingEventMiddleware, isClass: true }

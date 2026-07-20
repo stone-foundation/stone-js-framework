@@ -17,4 +17,4 @@ import { Service } from './Service'
  * }
  * ```
  */
-export const Stone = Service
+export const Stone: typeof Service = Service

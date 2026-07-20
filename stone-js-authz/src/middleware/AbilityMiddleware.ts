@@ -1,5 +1,5 @@
 import { IAuthorizer } from '../declarations'
-import { NextMiddleware } from '@stone-js/core'
+import { NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { IncomingHttpEvent, OutgoingHttpResponse } from '@stone-js/http-core'
 
 /**
@@ -32,4 +32,4 @@ export class AbilityMiddleware {
 /**
  * Meta middleware for attaching the ability.
  */
-export const MetaAbilityMiddleware = { module: AbilityMiddleware, isClass: true }
+export const MetaAbilityMiddleware: MetaMiddleware = { module: AbilityMiddleware, isClass: true }

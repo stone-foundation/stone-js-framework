@@ -1,4 +1,4 @@
-import { IBlueprint, NextMiddleware } from '@stone-js/core'
+import { IBlueprint, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { AuthOptions, IAuthenticator, JwtClaims } from '../declarations'
 import { IncomingHttpEvent, OutgoingHttpResponse } from '@stone-js/http-core'
 
@@ -44,4 +44,4 @@ export class AuthenticateMiddleware {
 /**
  * Meta middleware for authenticating incoming events.
  */
-export const MetaAuthenticateMiddleware = { module: AuthenticateMiddleware, isClass: true }
+export const MetaAuthenticateMiddleware: MetaMiddleware = { module: AuthenticateMiddleware, isClass: true }

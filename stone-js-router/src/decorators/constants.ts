@@ -6,14 +6,14 @@
 /**
  * A unique symbol key to mark classes method member as Match action.
  */
-export const MATCH_KEY = Symbol.for('Match')
+export const MATCH_KEY: symbol = Symbol.for('Match')
 
 /**
  * A unique symbol key to mark classes method member as Match controller.
  */
-export const GROUP_KEY = Symbol.for('Group')
+export const GROUP_KEY: symbol = Symbol.for('Group')
 
 /**
  * A unique symbol key to mark activate the router features.
  */
-export const ROUTING_KEY = Symbol.for('Routing')
+export const ROUTING_KEY: symbol = Symbol.for('Routing')

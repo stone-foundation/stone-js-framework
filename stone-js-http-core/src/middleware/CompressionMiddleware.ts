@@ -1,5 +1,5 @@
 import { IncomingHttpEvent } from '../IncomingHttpEvent'
-import { isNotEmpty, NextMiddleware } from '@stone-js/core'
+import { isNotEmpty, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { OutgoingHttpResponse } from '../OutgoingHttpResponse'
 
 /**
@@ -99,4 +99,4 @@ export class CompressionMiddleware {
 /**
  * Meta Middleware for compressing response content.
  */
-export const MetaCompressionMiddleware = { module: CompressionMiddleware, isClass: true, global: true }
+export const MetaCompressionMiddleware: MetaMiddleware = { module: CompressionMiddleware, isClass: true, global: true }

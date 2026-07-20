@@ -1,4 +1,4 @@
-import { NextMiddleware } from '@stone-js/core'
+import { NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { NODE_CONSOLE_PLATFORM } from '../constants'
 import { NodeCliAdapterError } from '../errors/NodeCliAdapterError'
 import { NodeCliAdapterContext, NodeCliAdapterResponseBuilder } from '../declarations'
@@ -49,4 +49,4 @@ export class IncomingEventMiddleware {
 /**
  * Meta Middleware for processing incoming events.
  */
-export const MetaIncomingEventMiddleware = { module: IncomingEventMiddleware, isClass: true }
+export const MetaIncomingEventMiddleware: MetaMiddleware<any, any> = { module: IncomingEventMiddleware, isClass: true }

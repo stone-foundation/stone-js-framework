@@ -4,7 +4,7 @@ import rawBody from 'raw-body'
 import bodyParser from 'co-body'
 import { IncomingMessage } from 'node:http'
 import { resolveMethodOverride } from '../method-override'
-import { IBlueprint, NextMiddleware } from '@stone-js/core'
+import { IBlueprint, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { isMultipart, getCharset } from '@stone-js/http-core'
 import { NodeHttpAdapterError } from '../errors/NodeHttpAdapterError'
 import { NodeHttpAdapterContext, NodeHttpAdapterResponseBuilder } from '../declarations'
@@ -121,4 +121,4 @@ export class BodyEventMiddleware {
 /**
  * Meta Middleware for processing the request body.
  */
-export const MetaBodyEventMiddleware = { module: BodyEventMiddleware, isClass: true }
+export const MetaBodyEventMiddleware: MetaMiddleware<any, any> = { module: BodyEventMiddleware, isClass: true }

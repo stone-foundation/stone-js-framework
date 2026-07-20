@@ -1,5 +1,5 @@
 import statuses from 'statuses'
-import { NextMiddleware } from '@stone-js/core'
+import { NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { FetchAdapterError } from '../errors/FetchAdapterError'
 import { FetchAdapterContext, FetchAdapterResponseBuilder } from '../declarations'
 
@@ -64,4 +64,4 @@ export class ServerResponseMiddleware {
 /**
  * Meta middleware for processing server responses.
  */
-export const MetaServerResponseMiddleware = { module: ServerResponseMiddleware, isClass: true }
+export const MetaServerResponseMiddleware: MetaMiddleware<any, any> = { module: ServerResponseMiddleware, isClass: true }

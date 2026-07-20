@@ -1,4 +1,4 @@
-import { NextMiddleware } from '@stone-js/core'
+import { NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { AWS_LAMBDA_PLATFORM } from '../constants'
 import { AwsLambdaAdapterError } from '../errors/AwsLambdaAdapterError'
 import { AwsLambdaAdapterContext, AwsLambdaAdapterResponseBuilder } from '../declarations'
@@ -48,4 +48,4 @@ export class IncomingEventMiddleware {
 /**
  * Meta Middleware for processing incoming events.
  */
-export const MetaIncomingEventMiddleware = { module: IncomingEventMiddleware, isClass: true }
+export const MetaIncomingEventMiddleware: MetaMiddleware<any, any> = { module: IncomingEventMiddleware, isClass: true }

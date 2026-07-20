@@ -5,7 +5,7 @@ import { HeadContext, applyHeadToDocument } from '@stone-js/use-view'
 import { NAVIGATION_EVENT } from '@stone-js/router'
 import { BrowserAdapterResponseBuilder } from '@stone-js/browser-adapter'
 import { hydrateReactApp, renderReactApp } from '../../UseReactPageInternals'
-import { IBlueprint, isEmpty, isNotEmpty, NextMiddleware } from '@stone-js/core'
+import { IBlueprint, isEmpty, isNotEmpty, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { BrowserResponseContent, ReactBrowserAdapterContext } from '../../declarations'
 import { OutgoingBrowserResponse, RedirectBrowserResponse } from '@stone-js/browser-core'
 
@@ -139,4 +139,4 @@ export class BrowserResponseMiddleware {
 /**
  * Meta Middleware for processing browser responses.
  */
-export const MetaBrowserResponseMiddleware = { module: BrowserResponseMiddleware, isClass: true }
+export const MetaBrowserResponseMiddleware: MetaMiddleware = { module: BrowserResponseMiddleware, isClass: true }

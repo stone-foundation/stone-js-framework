@@ -1,7 +1,7 @@
 import { HttpCorsConfig } from '../options/HttpConfig'
 import { IncomingHttpEvent } from '../IncomingHttpEvent'
 import { OutgoingHttpResponse } from '../OutgoingHttpResponse'
-import { IBlueprint, isNotEmpty, isEmpty, NextMiddleware } from '@stone-js/core'
+import { IBlueprint, isNotEmpty, isEmpty, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 
 /**
  * Kernel Middleware for adding Cross-Origin Resource Sharing (CORS) headers to HTTP responses.
@@ -257,4 +257,4 @@ export class HandleCorsMiddleware {
 /**
  * Meta Middleware for processing CORS headers.
  */
-export const MetaHandleCorsMiddleware = { module: HandleCorsMiddleware, isClass: true, global: true }
+export const MetaHandleCorsMiddleware: MetaMiddleware = { module: HandleCorsMiddleware, isClass: true, global: true }

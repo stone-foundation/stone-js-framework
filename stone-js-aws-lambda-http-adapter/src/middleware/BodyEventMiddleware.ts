@@ -3,7 +3,7 @@ import typeIs from 'type-is'
 import { IncomingMessage } from 'node:http'
 import { getRawBody, normalizeHeaders } from '../event-normalizer'
 import { isMultipart, getCharset } from '@stone-js/http-core'
-import { IBlueprint, isNotEmpty, NextMiddleware } from '@stone-js/core'
+import { IBlueprint, isNotEmpty, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { AwsLambdaHttpAdapterError } from '../errors/AwsLambdaHttpAdapterError'
 import { AwsLambdaHttpAdapterContext, AwsLambdaHttpAdapterResponseBuilder, AwsLambdaHttpEvent } from '../declarations'
 
@@ -182,4 +182,4 @@ export class BodyEventMiddleware {
 /**
  * Meta Middleware for processing the request body.
  */
-export const MetaBodyEventMiddleware = { module: BodyEventMiddleware, isClass: true }
+export const MetaBodyEventMiddleware: MetaMiddleware<any, any> = { module: BodyEventMiddleware, isClass: true }

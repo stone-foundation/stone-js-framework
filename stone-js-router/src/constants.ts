@@ -8,7 +8,7 @@ export const POST: HttpMethod = 'POST'
 export const PATCH: HttpMethod = 'PATCH'
 export const DELETE: HttpMethod = 'DELETE'
 export const OPTIONS: HttpMethod = 'OPTIONS'
-export const HTTP_METHODS = [GET, PUT, HEAD, POST, PATCH, DELETE, OPTIONS]
+export const HTTP_METHODS: HttpMethod[] = [GET, PUT, HEAD, POST, PATCH, DELETE, OPTIONS]
 
 // Node.js Console Platform name
 export const NODE_CONSOLE_PLATFORM = 'node_console'

@@ -2,6 +2,7 @@
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "tests/**/*.ts"],
   "compilerOptions": {
+    "isolatedDeclarations": true,
     "strict": true,
     "target": "ESNext",
     "module": "ESNext",
