@@ -14,3 +14,6 @@ export const ALGOLIA = {
 
 export const GITHUB_URL = 'https://github.com/stone-foundation'
 export const MANIFESTO_URL = 'https://evens-stone.github.io/continuum-manifesto/manifesto'
+
+/** Canonical site origin (see public/CNAME). Used for absolute share/OG/RSS URLs. */
+export const SITE_URL = 'https://stonejs.dev'

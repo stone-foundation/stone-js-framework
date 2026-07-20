@@ -681,9 +681,8 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .st-fbtn.active { background: var(--braise-grad); color: #1B1010; font-weight: 600; }
 .st-count { font-family: var(--mono); font-size: 12px; color: var(--gres); text-align: center; margin: 14px 0 20px; }
 
-.st-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-@media (max-width: 900px) { .st-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) { .st-grid { grid-template-columns: 1fr; } }
+.st-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 620px) { .st-grid { grid-template-columns: 1fr; } }
 .st-card { display: flex; flex-direction: column; border: 1px solid var(--trait); border-radius: 16px; background: var(--surface); padding: 18px; transition: border-color 200ms var(--ease), transform 200ms var(--ease); }
 .st-card:hover { border-color: color-mix(in srgb, var(--braise) 55%, var(--trait)); transform: translateY(-2px); }
 .st-card.is-soon { opacity: .82; }
@@ -697,7 +696,7 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .st-chev { font-family: var(--mono); color: var(--braise-txt); flex: 0 0 auto; }
 .st-desc-static { font-size: 14px; color: var(--gres); margin: 0; }
 .st-cmd { display: flex; align-items: center; gap: 8px; margin: 14px 0 12px; background: var(--bg); border: 1px solid var(--trait); border-radius: 10px; padding: 8px 8px 8px 12px; }
-.st-cmd code { font-family: var(--mono); font-size: 11.5px; color: var(--encre); overflow-x: auto; white-space: nowrap; flex: 1; }
+.st-cmd code { font-family: var(--mono); font-size: 11.5px; color: var(--encre); overflow-x: auto; white-space: nowrap; flex: 1; min-width: 0; }
 .st-copy { font-family: var(--mono); font-size: 11px; padding: 4px 10px; border: 1px solid var(--trait); border-radius: 8px; background: var(--surface); color: var(--gres); cursor: pointer; flex: 0 0 auto; }
 .st-copy:hover { border-color: var(--braise); color: var(--encre); }
 .st-card-foot { display: flex; gap: 16px; margin-top: auto; }
@@ -714,6 +713,63 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .st-modal-close:hover { color: var(--encre); }
 .st-about { color: color-mix(in srgb, var(--encre) 88%, var(--gres)); margin: 10px 0; }
 .st-about-meta { font-family: var(--mono); font-size: 11.5px; color: var(--gres); margin: 0 0 14px; }
+
+/* ---- 14.10 Blog list + article ---- */
+.blog-list { display: flex; flex-direction: column; max-width: 760px; margin: 6px auto 0; }
+.blog-item { display: block; padding: 26px 0; border-bottom: 1px solid var(--trait); text-decoration: none; color: inherit; }
+.blog-item:first-child { border-top: 1px solid var(--trait); }
+.blog-item-meta { font-family: var(--mono); font-size: 12px; color: var(--gres); margin: 0 0 6px; }
+.blog-item-title { font-family: var(--display); font-weight: 600; font-size: 24px; margin: 0 0 8px; transition: color 180ms var(--ease); }
+.blog-item:hover .blog-item-title { color: var(--braise-txt); }
+.blog-item-excerpt { color: var(--gres); margin: 0 0 12px; max-width: 64ch; }
+.blog-item-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.article { max-width: 760px; }
+.article-back { font-family: var(--mono); font-size: 12px; color: var(--braise-txt); display: inline-block; margin: 10px 0 22px; text-decoration: none; }
+.article-back:hover { text-decoration: underline; }
+.article-head { margin-bottom: 30px; }
+.article-title { font-family: var(--display); font-weight: 700; font-size: clamp(30px, 6vw, 46px); line-height: 1.12; margin: 0 0 14px; text-wrap: balance; }
+.article-meta { font-family: var(--mono); font-size: 13px; color: var(--gres); margin: 0 0 12px; }
+.article-dot { margin: 0 8px; }
+.article-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.article-tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--braise-txt); border: 1px solid var(--trait); border-radius: 999px; padding: 2px 10px; }
+.article-body { font-size: 16.5px; line-height: 1.7; }
+.article-body .doc-lead { font-size: 20px; line-height: 1.55; color: var(--encre); margin: 0 0 28px; }
+.article-body h2 { font-family: var(--display); font-weight: 600; font-size: 25px; margin: 40px 0 14px; scroll-margin-top: 80px; }
+.article-body p { margin: 0 0 18px; color: color-mix(in srgb, var(--encre) 90%, var(--gres)); }
+.article-body strong { color: var(--encre); }
+.article-body :not(pre) > code { font-family: var(--mono); font-size: .88em; background: var(--surface); border: 1px solid var(--trait); border-radius: 5px; padding: 1px 5px; }
+.article-starter { margin: 42px 0; padding: 22px; border: 1px solid color-mix(in srgb, var(--braise) 40%, var(--trait)); border-radius: 16px; background: var(--surface); }
+.article-starter-eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--braise-txt); margin: 0 0 6px; }
+.article-starter h2 { font-family: var(--display); font-size: 20px; margin: 0 0 8px; }
+.article-starter p { color: var(--gres); margin: 0 0 14px; }
+
+/* ---- 14.11 Architecture diagram (bespoke, build-time) ---- */
+.arch { margin: 28px 0; }
+.arch-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 0; list-style: none; margin: 0; padding: 0; }
+.arch-node { display: flex; align-items: center; }
+.arch-box { display: flex; flex-direction: column; gap: 3px; border: 1px solid var(--trait); border-radius: 12px; background: var(--surface); padding: 12px 16px; min-width: 116px; }
+.arch-label { font-family: var(--display); font-weight: 600; font-size: 14.5px; }
+.arch-sub { font-family: var(--mono); font-size: 10.5px; color: var(--gres); }
+.arch-arrow { flex: 0 0 auto; width: 32px; height: 2px; margin: 0 3px; background: var(--braise-grad); position: relative; }
+.arch-arrow::after { content: ''; position: absolute; right: -1px; top: -3px; border: 4px solid transparent; border-left-color: var(--braise); }
+.tone-domain .arch-box { border-color: color-mix(in srgb, var(--braise) 55%, var(--trait)); box-shadow: 0 0 16px rgba(255, 107, 43, .16); }
+.tone-store .arch-box { border-color: color-mix(in srgb, var(--braise) 32%, var(--trait)); }
+.arch-caption { font-family: var(--mono); font-size: 12px; color: var(--gres); text-align: center; margin-top: 14px; }
+@media (max-width: 640px) {
+  .arch-flow { flex-direction: column; align-items: stretch; }
+  .arch-node { flex-direction: column; align-items: stretch; }
+  .arch-arrow { width: 2px; height: 20px; margin: 5px 0 5px 24px; }
+  .arch-arrow::after { right: auto; left: -3px; top: auto; bottom: -1px; border: 4px solid transparent; border-top-color: var(--braise); }
+}
+
+/* ---- 14.12 Share bar ---- */
+.sharebar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 44px 0 10px; padding-top: 26px; border-top: 1px solid var(--trait); }
+.sharebar-label { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--gres); margin-right: 4px; }
+.sharebar-btn { font-family: var(--mono); font-size: 12px; padding: 5px 12px; border: 1px solid var(--trait); border-radius: 999px; background: var(--surface); color: var(--gres); cursor: pointer; text-decoration: none; }
+.sharebar-btn:hover { border-color: var(--braise); color: var(--encre); }
+.sharebar-native { display: none; }
+@media (hover: none) { .sharebar-native { display: inline-block; } }
 
 /* ---------- 15. Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {

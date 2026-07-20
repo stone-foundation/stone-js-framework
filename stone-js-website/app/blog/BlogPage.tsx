@@ -1,28 +1,30 @@
+import { publishedArticles } from './registry.mjs'
 import { JSX } from 'react'
-import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
+import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
-/** The launch set, previewed while the blog is being built. */
-const UPCOMING = [
-  { title: 'Introducing Stone.js', blurb: 'The Continuum thesis: write the domain once, let the context apply at run time.' },
-  { title: 'Direct-to-cloud file uploads with signed URLs', blurb: 'SPA to signed URL to cloud storage, then submit. The whole architecture, and a ready starter.' },
-  { title: 'One domain, three runtimes', blurb: 'The same app on Node, serverless and the edge. The thing a single-target framework cannot do.' },
-  { title: 'Stateless auth at the edge', blurb: 'JWT and OAuth with no session store, so the same guard runs everywhere.' }
-]
+/** Human date, e.g. "20 Jul 2026". */
+function fmtDate (iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${d} ${months[(m ?? 1) - 1]} ${y}`
+}
 
 /**
- * Blog landing (header nav, own section). Full article system, diagrams, sharing
- * and RSS land next; this previews the launch set.
+ * Blog landing (header nav, own section): the published articles from the
+ * registry. Each recipe ships a diagram, the modules that solve it, and a starter.
  */
 @Page('/blog', { layout: 'site' })
 export class BlogPage implements IPage<ReactIncomingEvent> {
   head (): HeadContext {
     return {
       title: 'Blog · Stone.js',
-      description: 'Cloud-native architecture solutions, each with a diagram, the Stone.js modules that solve it, and a ready-to-install starter.'
+      description: 'Cloud-native architecture solutions, each with a diagram, the Stone.js modules that solve it, and a ready-to-install starter.',
+      links: [{ rel: 'alternate', type: 'application/rss+xml', href: '/blog/feed.xml', title: 'Stone.js Blog' }]
     }
   }
 
   render (): JSX.Element {
+    const articles = publishedArticles('en')
     return (
       <div className='wrap st-wrap'>
         <header className='section-hero'>
@@ -33,14 +35,14 @@ export class BlogPage implements IPage<ReactIncomingEvent> {
             Stone.js modules that carry it, and a starter you can install and run today.
           </p>
         </header>
-        <p className='st-count'>Launching soon</p>
-        <div className='st-grid'>
-          {UPCOMING.map((a) => (
-            <article key={a.title} className='st-card is-soon'>
-              <div className='st-card-head'><span className='st-badge'>soon</span></div>
-              <h3 className='st-title'>{a.title}</h3>
-              <p className='st-desc-static'>{a.blurb}</p>
-            </article>
+        <div className='blog-list'>
+          {articles.map((a) => (
+            <StoneLink key={a.slug} to={`/blog/${a.slug}`} className='blog-item'>
+              <p className='blog-item-meta'>{fmtDate(a.date)} · {a.author}</p>
+              <h2 className='blog-item-title'>{a.title}</h2>
+              <p className='blog-item-excerpt'>{a.excerpt}</p>
+              <div className='blog-item-tags'>{a.tags.map((t) => <span key={t} className='article-tag'>{t}</span>)}</div>
+            </StoneLink>
           ))}
         </div>
       </div>
