@@ -44,7 +44,7 @@
     "lint:fix": "ts-standard --fix src tests",
     "predoc": "rimraf docs",
     "doc": "typedoc",
-    "prebuild": "rimraf dist && npm run doc",
+    "clean": "rimraf dist",
     "build": "rollup -c",
     "test": "vitest run",
     "test:cvg": "npm run test -- --coverage",
