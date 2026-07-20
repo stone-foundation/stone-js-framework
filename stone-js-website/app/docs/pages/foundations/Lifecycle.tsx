@@ -1,6 +1,7 @@
 import { JSX } from 'react'
 import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
+import { Lifecycle as LifecycleDiagram, APP_LIFECYCLE, REQUEST_LIFECYCLE } from '../../components/Lifecycle'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, Pager } from '../../components/content'
 
@@ -49,11 +50,27 @@ export class Lifecycle implements IPage<ReactIncomingEvent> {
         />
         <Aphorism>The adapter says what happened. The kernel decides what to do about it. Your domain says what it means.</Aphorism>
 
+        <H2>The application lifecycle</H2>
+        <p>
+          There are two timelines. The first runs once: the app is built, collapses to one context at
+          run time, starts, serves events, and terminates. The long-lived adapter is the only thing
+          that persists across events.
+        </p>
+        <LifecycleDiagram stages={APP_LIFECYCLE} caption='Startup to shutdown, once per process.' />
+
+        <H2>The per-event lifecycle</H2>
+        <p>
+          The second timeline runs for every cause: from the raw platform event to the native effect,
+          inside a fresh container that is created and discarded per event. The pills mark the hooks
+          that fire at each step.
+        </p>
+        <LifecycleDiagram stages={REQUEST_LIFECYCLE} caption='One intention, from cause to effect.' />
+
         <H2>Lifecycle hooks</H2>
         <p>
-          Hooks let you run code at precise moments, application startup, shutdown, around each
-          event, without threading that code through your handlers. Mark a method with
-          <code> @Hook(name)</code>; the kernel calls it at the right time.
+          Hooks let you run code at the precise moments above, application startup, shutdown, and
+          around each event, without threading that code through your handlers. Mark a method with
+          <code> @Hook(name)</code> and the kernel calls it at the right time.
         </p>
         <Code file='app/Application.ts'>{`import { Hook, StoneApp } from '@stone-js/core'
 
@@ -65,20 +82,14 @@ export class Application {
   @Hook('onTerminate')
   async drain () { /* flush and close, once at shutdown */ }
 }`}</Code>
-        <p>
-          The available moments span the whole life of the app and of each event:
-          <code> onInit</code>, <code>onStart</code>, <code>onHandlingEvent</code>,
-          <code> onExecutingEventHandler</code>, <code>onExecutingErrorHandler</code>,
-          <code> onStop</code> and <code>onTerminate</code>.
-        </p>
 
         <H3>Two scopes, dimension-bound</H3>
         <p>
           Hooks are scoped to the dimension they observe, which sorts them into two lifetimes:
         </p>
         <ul>
-          <li><strong>Global hooks</strong> fire once over the app's lifetime, when it starts and stops (<code>onStart</code>, <code>onStop</code>, <code>onTerminate</code>). They live with the long-lived adapter.</li>
-          <li><strong>Per-intent hooks</strong> fire for every event, inside its ephemeral container (<code>onHandlingEvent</code>, <code>onExecutingEventHandler</code>, <code>onExecutingErrorHandler</code>), from the moment the context is created to when the response is sent and it is torn down.</li>
+          <li><strong>Global hooks</strong> fire once over the app's lifetime (<code>onInit</code>, <code>onStart</code>, <code>onTerminate</code>), plus the setup pair around the Blueprint (<code>onPreparingBlueprint</code>, <code>onBlueprintPrepared</code>). They live with the long-lived adapter.</li>
+          <li><strong>Per-intent hooks</strong> fire for every event, inside its ephemeral container (<code>onHandlingEvent</code>, <code>onProcessingKernelMiddleware</code>, <code>onExecutingEventHandler</code>, <code>onEventHandled</code>, <code>onExecutingErrorHandler</code>, <code>onPreparingResponse</code>), from the moment the context is created to when the response is sent and it is torn down.</li>
         </ul>
         <Aphorism>Hooks exist to observe the lifecycle, not to alter it. To change what happens to an event, use middleware.</Aphorism>
 

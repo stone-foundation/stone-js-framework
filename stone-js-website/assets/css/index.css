@@ -593,6 +593,27 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .deflist dt .term-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--cuivre); margin-left: 10px; font-weight: 400; }
 .deflist dd { margin: 0; color: color-mix(in srgb, var(--encre) 86%, var(--gres)); }
 
+/* ---- Lifecycle timeline (bespoke diagram) ---- */
+.lifecycle { margin: 30px 0; }
+.lc-track { list-style: none; margin: 0; padding: 0; }
+.lc-stage { position: relative; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 16px; padding-bottom: 26px; }
+.lc-stage:last-child { padding-bottom: 0; }
+.lc-rail { position: relative; }
+/* the braise spine, drawn between successive nodes */
+.lc-rail::before { content: ''; position: absolute; left: 11px; top: 8px; bottom: -26px; width: 2px; background: var(--braise-grad); opacity: .45; }
+.lc-stage:last-child .lc-rail::before { display: none; }
+.lc-node { position: absolute; left: 4px; top: 3px; width: 15px; height: 15px; border-radius: 50%; background: var(--surface); border: 2px solid var(--braise); box-shadow: 0 0 10px rgba(255, 107, 43, .35); }
+.lc-phase { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--gres); margin: 1px 0 0; display: flex; align-items: center; gap: 10px; }
+.lc-tag { font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; color: #1B1010; background: var(--braise-grad); border-radius: 999px; padding: 2px 8px; text-transform: uppercase; }
+.lc-title { font-family: var(--display); font-weight: 600; font-size: 16.5px; margin: 3px 0 4px; }
+.lc-detail { font-size: 14px; line-height: 1.55; color: var(--gres); margin: 0; }
+.lc-hooks { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.lc-hook { font-family: var(--mono); font-size: 11px; color: var(--braise-txt); border: 1px solid var(--trait); border-radius: 999px; padding: 2px 9px; background: var(--surface); }
+/* the run-time collapse: the hot moment */
+.lc-stage.is-collapse .lc-node { background: var(--braise-grad); border-color: transparent; box-shadow: 0 0 20px rgba(255, 107, 43, .85); }
+.lc-stage.is-collapse .lc-title { color: var(--braise-txt); }
+.lc-caption { font-family: var(--mono); font-size: 12px; color: var(--gres); margin-top: 14px; text-align: center; }
+
 /* ---- 14.115 Marketplace (docs ecosystem page) ---- */
 .market-group { margin: 0 0 10px; }
 .market-blurb { color: var(--gres); font-size: 15px; margin: -6px 0 16px; }
