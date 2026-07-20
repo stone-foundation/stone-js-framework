@@ -53,9 +53,29 @@ export class Matching implements IPage<ReactIncomingEvent> {
 @Get('/tasks/:slug')                            // /tasks/ship-the-docs
 // The constraint keeps these two from ever competing for the same URL.`}</Code>
 
-        <H2>Host and scheme</H2>
-        <Code file='app/routes.ts'>{`@Get('/', { domain: 'admin.example.com' })         // only on that host
-@Post('/hook', { protocol: 'https' })              // only over https`}</Code>
+        <H2>Domain & subdomain routing</H2>
+        <p>
+          A route can be scoped to a host, and the host can itself carry parameters. A subdomain
+          parameter turns multi-tenancy into routing: capture the tenant from the host and read it on
+          the event like any other value.
+        </p>
+        <Code file='app/routes.ts'>{`@Get('/', { domain: 'admin.example.com' })          // only on that exact host
+
+@EventHandler('/', { domain: '{tenant}.example.com' })   // capture a subdomain
+export class TenantController {
+  @Get('/dashboard')
+  dashboard (event: IncomingHttpEvent) {
+    const tenant = event.get<string>('tenant')      // from the host, not the path
+    return this.tenants.dashboard(tenant)
+  }
+}`}</Code>
+        <p>
+          Host parameters take constraints too (<code>rules</code>), and a whole group can share a
+          domain, so an admin subdomain and a tenant subdomain are two groups over the same routes.
+        </p>
+
+        <H2>Scheme</H2>
+        <Code file='app/routes.ts'>{`@Post('/hook', { protocol: 'https' })              // only over https`}</Code>
 
         <Callout kind='important' title='A missed match is a 404, not a crash'>
           If no route matches, the router raises a not-found the error handler maps to a 404. Add a
