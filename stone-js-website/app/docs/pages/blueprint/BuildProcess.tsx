@@ -53,14 +53,26 @@ export default defineConfig({
   ssg: { routes: ['/', '/about'] }
 })`}</Code>
 
-        <H3>Targets</H3>
+        <H3>Config reference</H3>
         <PropsTable nameHeader='Setting' rows={[
           { name: "builder.target", type: "'react' | 'service'", desc: 'A frontend (React) app, or a backend service.' },
           { name: 'rendering', type: "'csr' | 'ssr' | 'ssg'", desc: 'How a React app is rendered (see Frontend).' },
           { name: 'ssg.routes', type: 'string[]', desc: 'The routes pre-rendered to static HTML.' },
+          { name: 'builder.lazy', type: 'boolean', desc: 'Lazily load pages, layouts and error pages (smaller initial bundle).' },
+          { name: 'builder.imperative', type: 'boolean', desc: 'Favour the imperative (define*) programming style.' },
+          { name: 'builder.dotenv', type: 'object', desc: 'How .env files are loaded.' },
+          { name: 'builder.input', type: '{ app, views, mainCSS }', desc: 'Module-discovery globs and the auto-linked entry stylesheet.' },
+          { name: 'builder.browser.excludedModules', type: 'string[]', desc: 'Modules to keep out of the browser build (server-only code).' },
           { name: 'public', type: 'string', default: "'public'", desc: 'A directory copied verbatim to the build root.' },
-          { name: 'output', type: 'string', desc: 'The build output path.' }
+          { name: 'output', type: 'string', desc: 'The build output path.' },
+          { name: 'builder.vite / builder.rollup', type: 'passthrough', desc: 'Escape hatches to the underlying Vite (frontend) and Rollup (service) configs.' }
         ]} />
+        <p>
+          Two escape hatches matter when you outgrow the defaults: <code>builder.vite</code> and
+          <code> builder.rollup</code> pass options straight to the bundlers, and
+          <code> builder.browser.excludedModules</code> keeps server-only code (a database driver, a
+          secret) out of the client bundle.
+        </p>
 
         <H2>The .stone directory</H2>
         <p>
