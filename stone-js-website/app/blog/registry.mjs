@@ -76,7 +76,7 @@ export const ARTICLES = [
     excerpt: 'A hand-written OpenAPI spec drifts the day after you write it. Derive the document from your validation schemas instead, and serve it with Swagger UI.',
     tags: ['openapi', 'api'],
     ogImage: '/og/openapi-from-your-schemas.png',
-    starter: null,
+    starter: 'openapi-contract',
     locale: 'en'
   },
   {
