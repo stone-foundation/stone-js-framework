@@ -10,14 +10,15 @@ export interface JobHandlerOptions {
 }
 
 /**
- * Class decorator: mark a class as the handler for a job name.
+ * Class decorator: mark a class as a job handler.
  *
  * The class is registered as a container service and contributed to `stone.queue.handlers`; the
- * {@link QueueServiceProvider} resolves it (with dependency injection) and routes jobs of `name` to
- * its `handle(payload, job)` method.
+ * {@link QueueServiceProvider} resolves it (with dependency injection). With a `name`, jobs of that
+ * name are routed to the class's `handle(payload, job)` method. Without a `name`, the class carries
+ * one or more `@OnJob('...')` methods, one job per method.
  *
- * @param name - The job name this class handles.
- * @param options - The action method (defaults to `handle`).
+ * @param name - The job name this class handles (omit when using `@OnJob` methods).
+ * @param options - The action method for the whole-class form (defaults to `handle`).
  * @returns A class decorator.
  *
  * @example
@@ -27,9 +28,15 @@ export interface JobHandlerOptions {
  *   constructor (private readonly mailer) {}
  *   async handle (payload: { to: string }) { await this.mailer.send(payload.to) }
  * }
+ *
+ * @JobHandler()
+ * export class Jobs {
+ *   @OnJob('resize') resize (payload) { ... }
+ *   @OnJob('purge')  purge (payload) { ... }
+ * }
  * ```
  */
-export const JobHandler = <T extends ClassType = ClassType>(name: string, options: JobHandlerOptions = {}): ClassDecorator => {
+export const JobHandler = <T extends ClassType = ClassType>(name?: string, options: JobHandlerOptions = {}): ClassDecorator => {
   return classDecoratorLegacyWrapper<T>((target: T, context: ClassDecoratorContext<T>): undefined => {
     setMetadata(context, SERVICE_KEY, { singleton: true, isClass: true })
     addBlueprint(target, context, queueBlueprint, {

@@ -120,8 +120,8 @@ export interface RedisConnectionOptions extends ConnectionConfig {
  * A registered job-handler meta-module (`stone.queue.handlers`).
  */
 export interface JobHandlerMeta {
-  /** The job name this handler processes. */
-  name: string
+  /** The job name this handler processes. Omitted for classes that only carry `@OnJob` methods. */
+  name?: string
   /** The handler: a class, a factory, or a function/instance. */
   module: unknown
   /** The class method to call (defaults to `handle`) when `isClass`/`isFactory`. */

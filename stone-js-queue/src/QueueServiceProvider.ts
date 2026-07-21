@@ -4,7 +4,9 @@ import { QueueManager } from './QueueManager'
 import { MemoryQueue } from './drivers/MemoryQueue'
 import { RedisQueue } from './drivers/RedisQueue'
 import { QueueError } from './errors/QueueError'
-import { IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
+import { ON_JOB_KEY } from './decorators/OnJob'
+import { collectKeyHandlers } from '@stone-js/key-router'
+import { ClassType, IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
 import { QueueConfig, ConnectionConfig, JobHandlerMeta, JobHandler, QueueConnectionFactory } from './declarations'
 
 /**
@@ -82,9 +84,19 @@ export class QueueServiceProvider implements IServiceProvider {
    * @param meta - The handler meta-module.
    */
   private registerHandler (registry: JobRegistry, meta: JobHandlerMeta): void {
-    const handler = (meta.isClass === true || meta.isFactory === true)
-      ? this.container.make<JobHandler>(meta.module as any)
-      : (meta.module as JobHandler)
-    registry.register(meta.name, handler, meta.action ?? 'handle')
+    const isResolvable = meta.isClass === true || meta.isFactory === true
+    const handler = isResolvable ? this.container.make<JobHandler>(meta.module as any) : (meta.module as JobHandler)
+
+    // Whole-class (or function/instance) handler: routes the named job to the action method.
+    if (meta.name !== undefined) {
+      registry.register(meta.name, handler, meta.action ?? 'handle')
+    }
+
+    // Per-method handlers declared with `@OnJob('...')` on the class.
+    if (isResolvable) {
+      for (const { key, action } of collectKeyHandlers(meta.module as ClassType, ON_JOB_KEY)) {
+        registry.register(key, handler, action)
+      }
+    }
   }
 }
