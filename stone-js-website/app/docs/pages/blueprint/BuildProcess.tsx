@@ -113,8 +113,8 @@ export default defineConfig({})`}</Code>
 
         <Callout kind='note' title='One source tree, every target'>
           The same <code>app/</code> builds to a Node service, an edge function, a static site or an
-          agent runtime. Only the manifest (adapters) and a line of config change, which is the whole
-          "build once, deploy anywhere" promise made mechanical.
+          agent runtime. Only the manifest (adapters) and a line of config change: "your app exists
+          in every runtime, until you run it" made mechanical.
         </Callout>
 
         <SeeAlso links={[

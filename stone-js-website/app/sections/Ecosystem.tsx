@@ -87,7 +87,7 @@ export function Ecosystem (): JSX.Element {
           ))}
         </div>
         <Reveal className='market-cta'>
-          <a className='btn btn-ghost' href='/docs/ecosystem'>Browse the full ecosystem →</a>
+          <a className='btn btn-ghost' href='/ecosystem'>Browse the full ecosystem →</a>
         </Reveal>
       </div>
     </section>

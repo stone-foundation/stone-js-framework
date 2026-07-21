@@ -89,7 +89,7 @@ export const STARTERS: Starter[] = [
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'The full Continuum tour: one domain running across every context.',
-    about: 'A guided showcase of the Continuum Architecture: the same domain served over HTTP, on the edge, as a CLI and as agent tools, with both paradigms side by side. The best place to feel "build once, deploy anywhere".',
+    about: 'A guided showcase of the Continuum Architecture: the same domain served over HTTP, on the edge, as a CLI and as agent tools, with both paradigms side by side. The best place to feel "your app exists in every runtime, until you run it".',
     blogSlug: 'one-domain-three-runtimes'
   },
   ...official()

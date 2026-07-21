@@ -3,10 +3,13 @@ import { Reveal } from '../components/ui/Reveal'
 import { STARTERS } from '../starters/registry'
 import { publishedArticles } from '../blog/registry.mjs'
 
-interface Article { slug: string, title: string, excerpt: string, tags: string[] }
+interface Article { slug: string, title: string, excerpt: string, tags: string[], date: string, author: string }
+
+const fmtDate = (iso: string): string =>
+  new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
 const FEATURED_STARTERS = STARTERS.filter((s) => s.official).slice(0, 3)
-const FEATURED_ARTICLES = (publishedArticles('en') as Article[]).slice(0, 3)
+const FEATURED_ARTICLES = (publishedArticles('en') as Article[]).slice(0, 4)
 
 /**
  * Ship-faster section: scaffold from a starter, then learn from the blog recipes.
@@ -43,12 +46,13 @@ export function Showcase (): JSX.Element {
           <h3>From the blog</h3>
           <a className='show-all' href='/blog'>All posts →</a>
         </Reveal>
-        <div className='mods'>
+        <div className='blog-cards'>
           {FEATURED_ARTICLES.map((a) => (
-            <Reveal key={a.slug} href={`/blog/${a.slug}`} className='mod'>
-              <span className='tier'>{a.tags[0]}</span>
-              <h3>{a.title}</h3>
-              <p>{a.excerpt}</p>
+            <Reveal key={a.slug} href={`/blog/${a.slug}`} className='blog-card'>
+              <p className='bc-meta'>{fmtDate(a.date)} · {a.author}</p>
+              <h3 className='bc-title'>{a.title}</h3>
+              <p className='bc-excerpt'>{a.excerpt}</p>
+              <div className='bc-tags'>{a.tags.slice(0, 3).map((t) => <span key={t} className='bc-tag'>{t}</span>)}</div>
             </Reveal>
           ))}
         </div>

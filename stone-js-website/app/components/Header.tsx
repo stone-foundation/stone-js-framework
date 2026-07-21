@@ -1,6 +1,6 @@
 import { Portal } from './brand/Portal'
 import { StoneLink } from '@stone-js/use-react'
-import { JSX, useEffect } from 'react'
+import { JSX, useEffect, useState } from 'react'
 
 const GITHUB_URL = 'https://github.com/stone-foundation'
 const MANIFESTO_URL = 'https://evens-stone.github.io/continuum-manifesto/manifesto'
@@ -18,7 +18,17 @@ function toggleTheme (): void {
 /**
  * The site header: brand, primary navigation, version, theme toggle, GitHub.
  */
+const NAV_LINKS: Array<{ to: string, label: string, external?: boolean }> = [
+  { to: '/docs', label: 'Docs' },
+  { to: '/ecosystem', label: 'Modules' },
+  { to: '/starters', label: 'Starters' },
+  { to: '/blog', label: 'Blog' },
+  { to: MANIFESTO_URL, label: 'Manifesto', external: true }
+]
+
 export function Header (): JSX.Element {
+  const [open, setOpen] = useState(false)
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem('stone-theme')
@@ -35,13 +45,25 @@ export function Header (): JSX.Element {
             Stone<span className='dot'>.</span>js
           </a>
           <div className='links'>
-            <StoneLink to='/docs'>Docs</StoneLink>
-            <StoneLink to='/starters'>Starters</StoneLink>
-            <StoneLink to='/blog'>Blog</StoneLink>
-            <StoneLink to='/benchmarks'>Benchmarks</StoneLink>
-            <a href={MANIFESTO_URL} target='_blank' rel='noopener noreferrer'>Manifesto</a>
+            {NAV_LINKS.map((l) => (
+              l.external === true
+                ? <a key={l.to} href={l.to} target='_blank' rel='noopener noreferrer'>{l.label}</a>
+                : <StoneLink key={l.to} to={l.to}>{l.label}</StoneLink>
+            ))}
           </div>
           <div className='spacer' />
+          <button
+            className='icon-btn menu-btn'
+            aria-label='Menu'
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+              {open
+                ? <path d='M6 6l12 12M18 6L6 18' />
+                : <path d='M3 6h18M3 12h18M3 18h18' />}
+            </svg>
+          </button>
           <span className='ver'>v0.8.0</span>
           <button className='icon-btn' onClick={toggleTheme} aria-label='Toggle theme' title='Toggle theme'>
             <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
@@ -54,6 +76,15 @@ export function Header (): JSX.Element {
             </svg>
           </a>
         </nav>
+        {open && (
+          <div className='mobile-menu'>
+            {NAV_LINKS.map((l) => (
+              l.external === true
+                ? <a key={l.to} href={l.to} target='_blank' rel='noopener noreferrer' onClick={() => setOpen(false)}>{l.label}</a>
+                : <StoneLink key={l.to} to={l.to} onClick={() => setOpen(false)}>{l.label}</StoneLink>
+            ))}
+          </div>
+        )}
       </div>
     </header>
   )
