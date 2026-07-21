@@ -126,8 +126,8 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 
 .site-footer { padding: 56px 0 46px; }
 .foot { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: center; padding-top: 40px; }
-.foot .muted { font-size: 12.5px; }
-.slogan { font-family: var(--display); font-size: 17px; }
+.foot .muted { font-size: 16px; }
+.slogan { font-family: var(--display); font-size: 20px; }
 .slogan .dot { color: var(--braise); }
 .foot .right { text-align: right; }
 @media (max-width: 640px) {
