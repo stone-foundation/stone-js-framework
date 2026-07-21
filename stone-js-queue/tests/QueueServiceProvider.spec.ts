@@ -1,12 +1,12 @@
 import { Worker } from '../src/Worker'
-import { collectKeyHandlers } from '@stone-js/key-router'
+import { collectKeyHandlers } from '@stone-js/router'
 import { JobRegistry } from '../src/JobRegistry'
 import { QueueManager } from '../src/QueueManager'
 import { QueueError } from '../src/errors/QueueError'
 import { QueueServiceProvider } from '../src/QueueServiceProvider'
 
 // Keep KeyRouter real; only stub the class-metadata scan so we can drive @OnJob discovery.
-vi.mock('@stone-js/key-router', async (importOriginal) => {
+vi.mock('@stone-js/router', async (importOriginal) => {
   const actual: any = await importOriginal()
   return { ...actual, collectKeyHandlers: vi.fn(() => []) }
 })

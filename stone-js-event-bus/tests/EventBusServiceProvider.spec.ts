@@ -1,9 +1,9 @@
-import { KeyRouter, collectKeyHandlers } from '@stone-js/key-router'
+import { KeyRouter, collectKeyHandlers } from '@stone-js/router'
 import { EventBusManager } from '../src/EventBusManager'
 import { EventBusError } from '../src/errors/EventBusError'
 import { EventBusServiceProvider } from '../src/EventBusServiceProvider'
 
-vi.mock('@stone-js/key-router', async (importOriginal) => {
+vi.mock('@stone-js/router', async (importOriginal) => {
   const actual: any = await importOriginal()
   return { ...actual, collectKeyHandlers: vi.fn(() => []) }
 })

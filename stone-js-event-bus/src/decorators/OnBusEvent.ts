@@ -1,4 +1,4 @@
-import { createKeyDecorator } from '@stone-js/key-router'
+import { createKeyDecorator } from '@stone-js/router'
 
 /** Metadata key under which `@OnBusEvent` records the (event name -> method) mappings on a class. */
 export const ON_BUS_EVENT_KEY: symbol = Symbol.for('stone.eventBus.onBusEvent')

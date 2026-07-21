@@ -37,7 +37,7 @@ export class KeyRouting implements IPage<ReactIncomingEvent> {
           generation, everything an HTTP surface needs. An event consumer needs none of that: it maps
           <code> order.shipped</code> to a handler. Forcing the full router onto a queue worker or a
           bus consumer is weight with no benefit. <code>@KeyRouting()</code> is that mapping and
-          nothing else, built on the <code>@stone-js/key-router</code> primitive.
+          nothing else, a minimal key-to-handler registry that ships inside the router package.
         </p>
         <Callout kind='note' title='They are mutually exclusive'>
           Both routers provide <code>stone.kernel.eventHandler</code>, so an application uses one or

@@ -1,11 +1,11 @@
-import { collectKeyHandlers } from '@stone-js/key-router'
+import { collectKeyHandlers } from '@stone-js/router'
 import { RealtimeManager } from '../src/RealtimeManager'
 import { RealtimeRouter } from '../src/RealtimeRouter'
 import { RealtimeError } from '../src/errors/RealtimeError'
 import { RealtimeServiceProvider } from '../src/RealtimeServiceProvider'
 
 // Keep KeyRouter real; only stub the class-metadata scan so we can drive @On* discovery.
-vi.mock('@stone-js/key-router', async (importOriginal) => {
+vi.mock('@stone-js/router', async (importOriginal) => {
   const actual: any = await importOriginal()
   return { ...actual, collectKeyHandlers: vi.fn(() => []) }
 })

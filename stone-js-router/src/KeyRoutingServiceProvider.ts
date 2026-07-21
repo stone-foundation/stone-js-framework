@@ -1,5 +1,6 @@
+import { KeyRouter } from './KeyRouter'
 import { KEY_ROUTING_KEY } from './decorators/OnKey'
-import { KeyRouter, collectKeyHandlers } from '@stone-js/key-router'
+import { collectKeyHandlers } from './keyRouterDecorators'
 import { ClassType, IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
 import { KeyHandlerDefinition, KeyRouteDefinition, KeyRoutingConfig } from './keyRoutingDeclarations'
 

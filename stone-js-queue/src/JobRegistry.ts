@@ -1,6 +1,6 @@
 import { Job, JobHandler } from './declarations'
 import { QueueError } from './errors/QueueError'
-import { KeyRouter, KeyHandler } from '@stone-js/key-router'
+import { KeyRouter, KeyRouteHandler } from '@stone-js/router'
 
 /** A normalized handler function. */
 export type JobHandlerFn = (payload: any, job: Job) => unknown | Promise<unknown>
@@ -55,7 +55,7 @@ export class JobRegistry {
    */
   register (name: string, handler: JobHandler, action: string = 'handle'): this {
     try {
-      this.router.register(name, handler as KeyHandler, action)
+      this.router.register(name, handler as KeyRouteHandler, action)
     } catch (error: any) {
       throw new QueueError(`Invalid handler for job "${name}".`, { cause: error })
     }

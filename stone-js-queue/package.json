@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "@stone-js/config": "workspace:*",
-    "@stone-js/key-router": "workspace:*"
+    "@stone-js/router": "workspace:*"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

@@ -1,7 +1,8 @@
-import { KeyRouter, collectKeyHandlers } from '@stone-js/key-router'
+import { KeyRouter } from '../src/KeyRouter'
+import { collectKeyHandlers } from '../src/keyRouterDecorators'
 import { KeyRoutingServiceProvider } from '../src/KeyRoutingServiceProvider'
 
-vi.mock('@stone-js/key-router', async (importOriginal) => {
+vi.mock('../src/keyRouterDecorators', async (importOriginal) => {
   const actual: any = await importOriginal()
   return { ...actual, collectKeyHandlers: vi.fn(() => []) }
 })

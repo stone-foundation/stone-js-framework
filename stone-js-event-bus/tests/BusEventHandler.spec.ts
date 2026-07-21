@@ -1,4 +1,4 @@
-import { KeyRouter } from '@stone-js/key-router'
+import { KeyRouter } from '@stone-js/router'
 import { BusEventHandler } from '../src/BusEventHandler'
 
 const blueprintWith = (listen: any): any => ({ get: (key: string, d: any) => (key === 'stone.eventBus.listen' ? listen : d) })

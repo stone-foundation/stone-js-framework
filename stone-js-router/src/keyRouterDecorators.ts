@@ -1,11 +1,11 @@
-import { KeyMethodHandler, KeyHandlerMeta } from './declarations'
+import { KeyMethodHandler, KeyHandlerMeta } from './keyRouterDeclarations'
 import { addMetadata, getMetadata, methodDecoratorLegacyWrapper, ClassType } from '@stone-js/core'
 
 /**
  * Build a method decorator that marks a method as the handler for a key, under a given metadata key.
  *
  * Consuming modules use it to create their own named decorators, e.g.
- * `export const OnJob = createKeyDecorator(QUEUE_KEY)` → `@OnJob('send-email')`. Each decorated
+ * `export const OnJob = createKeyDecorator(QUEUE_KEY)` -> `@OnJob('send-email')`. Each decorated
  * method appends `{ key, action }` to the class's metadata under `metaKey`; the module later reads
  * them with {@link collectKeyHandlers}. Purely additive: it annotates, it does not wrap the method.
  *

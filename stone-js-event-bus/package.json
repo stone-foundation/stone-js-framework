@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@stone-js/config": "workspace:*",
-    "@stone-js/key-router": "workspace:*"
+    "@stone-js/router": "workspace:*"
   },
   "devDependencies": {
     "@aws-sdk/client-eventbridge": "^3.700.0",

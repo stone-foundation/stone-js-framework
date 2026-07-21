@@ -1,4 +1,4 @@
-import { createKeyDecorator } from '@stone-js/key-router'
+import { createKeyDecorator } from '@stone-js/router'
 import { REALTIME_HANDLER_KEY, CONNECT, DISCONNECT, MESSAGE, ERROR, SUBSCRIBE, UNSUBSCRIBE, eventKey } from '../constants'
 
 /** The shared `(key) => MethodDecorator` factory backing every realtime handler decorator. */

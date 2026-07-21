@@ -1,6 +1,6 @@
 import { ON_BUS_EVENT_KEY } from '../src/decorators/OnBusEvent'
 
-vi.mock('@stone-js/key-router', () => ({
+vi.mock('@stone-js/router', () => ({
   createKeyDecorator: vi.fn((metaKey: symbol) => (key: string) => ({ metaKey, key }))
 }))
 
