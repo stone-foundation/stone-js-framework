@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
 import { addMetadata, getMetadata } from '@stone-js/core'
-import { createKeyDecorator, collectKeyHandlers, defineKeyHandler } from '../src/decorators'
+import { createKeyDecorator, collectKeyHandlers, defineKeyHandler } from '../src/keyRouterDecorators'
 
 vi.mock('@stone-js/core', async (importOriginal) => {
   const actual: any = await importOriginal()

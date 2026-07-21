@@ -1,13 +1,14 @@
 import { KeyRouterError } from './errors/KeyRouterError'
-import { KeyHandler, KeyHandlerFn } from './declarations'
+import { KeyRouteHandler, KeyHandlerFn } from './keyRouterDeclarations'
 
 /**
- * A minimal key → handler router.
+ * A minimal key -> handler router.
  *
- * The small sibling of `@stone-js/router`: no paths, params, constraints or groups, just "this key
- * maps to this handler". It is the reusable core behind job dispatch (job name → handler), realtime
- * events (event name → handler), CLI commands (command → handler) and any simple adapter that keys
- * work by an event type. Handlers may be plain functions or objects/instances with an action method.
+ * The small sibling of the full path {@link Router}: no paths, params, constraints or groups, just
+ * "this key maps to this handler". It is the reusable core behind job dispatch (job name -> handler),
+ * bus events (event name -> handler), realtime events, CLI commands (command -> handler) and the
+ * light {@link KeyRoutingEventHandler}. Handlers may be plain functions or objects/instances with an
+ * action method.
  */
 export class KeyRouter {
   private readonly handlers = new Map<string, KeyHandlerFn>()
@@ -29,7 +30,7 @@ export class KeyRouter {
    * @param action - The method to call for object handlers (defaults to `handle`).
    * @returns This router for chaining.
    */
-  register (key: string, handler: KeyHandler, action: string = 'handle'): this {
+  register (key: string, handler: KeyRouteHandler, action: string = 'handle'): this {
     this.handlers.set(key, this.normalize(handler, action))
     return this
   }
@@ -98,7 +99,7 @@ export class KeyRouter {
    * @returns A handler function.
    * @throws {KeyRouterError} When an object handler lacks the action method.
    */
-  private normalize (handler: KeyHandler, action: string): KeyHandlerFn {
+  private normalize (handler: KeyRouteHandler, action: string): KeyHandlerFn {
     if (typeof handler === 'function') { return handler as KeyHandlerFn }
     const method = handler?.[action]
     if (typeof method !== 'function') {

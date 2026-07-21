@@ -52,9 +52,6 @@
   "peerDependencies": {
     "@stone-js/core": "workspace:*"
   },
-  "dependencies": {
-    "@stone-js/key-router": "workspace:*"
-  },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",

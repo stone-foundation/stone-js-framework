@@ -1,4 +1,4 @@
-import { KeyRouter, KeyHandler } from '@stone-js/key-router'
+import { KeyRouter, KeyRouteHandler } from '@stone-js/router'
 import { CONNECT, DISCONNECT, MESSAGE, ERROR, SUBSCRIBE, UNSUBSCRIBE, eventKey } from './constants'
 
 /**
@@ -53,7 +53,7 @@ export class RealtimeRouter {
    * @param action - The method to call for object handlers (defaults to `handle`).
    * @returns This router for chaining.
    */
-  register (key: string, handler: KeyHandler, action: string = 'handle'): this {
+  register (key: string, handler: KeyRouteHandler, action: string = 'handle'): this {
     this.router.register(key, handler, action)
     return this
   }

@@ -1,7 +1,7 @@
 /**
  * A key handler: a function, or an object/instance exposing an action method.
  */
-export type KeyHandler<A extends any[] = any[], R = unknown> =
+export type KeyRouteHandler<A extends any[] = any[], R = unknown> =
   | ((...args: A) => R | Promise<R>)
   | Record<string, any>
 

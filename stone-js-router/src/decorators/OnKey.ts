@@ -1,4 +1,4 @@
-import { createKeyDecorator } from '@stone-js/key-router'
+import { createKeyDecorator } from '../keyRouterDecorators'
 
 /** Metadata key under which `@OnKey` records the (key -> method) mappings on a class. */
 export const KEY_ROUTING_KEY: symbol = Symbol.for('stone.keyRouting.onKey')

@@ -1,5 +1,5 @@
 import { defaultExtractor } from './utils'
-import { KeyRouter } from '@stone-js/key-router'
+import { KeyRouter } from '@stone-js/router'
 import { DEFAULT_KEY_SOURCE } from './constants'
 import { IBlueprint, IEventHandler, IncomingEvent } from '@stone-js/core'
 import { BusEventExtractor, BusListenConfig } from './declarations'

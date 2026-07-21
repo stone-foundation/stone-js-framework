@@ -1,4 +1,4 @@
-import { createKeyDecorator } from '@stone-js/key-router'
+import { createKeyDecorator } from '@stone-js/router'
 
 /** Metadata key under which `@OnJob` records the (job name → method) mappings on a class. */
 export const ON_JOB_KEY: symbol = Symbol.for('stone.queue.onJob')
