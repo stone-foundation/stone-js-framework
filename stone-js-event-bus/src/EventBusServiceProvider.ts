@@ -1,4 +1,4 @@
-import { KeyRouter, collectKeyHandlers } from '@stone-js/key-router'
+import { KeyRouter, collectKeyHandlers } from '@stone-js/router'
 import { LocalEventBus } from './drivers/LocalEventBus'
 import { EventBusManager } from './EventBusManager'
 import { ON_BUS_EVENT_KEY } from './decorators/OnBusEvent'

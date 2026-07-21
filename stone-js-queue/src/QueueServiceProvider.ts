@@ -5,7 +5,7 @@ import { MemoryQueue } from './drivers/MemoryQueue'
 import { RedisQueue } from './drivers/RedisQueue'
 import { QueueError } from './errors/QueueError'
 import { ON_JOB_KEY } from './decorators/OnJob'
-import { collectKeyHandlers } from '@stone-js/key-router'
+import { collectKeyHandlers } from '@stone-js/router'
 import { ClassType, IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
 import { QueueConfig, ConnectionConfig, JobHandlerMeta, JobHandler, QueueConnectionFactory } from './declarations'
 

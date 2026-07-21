@@ -6,7 +6,8 @@ All notable changes to the "Stone.js Router" extension will be documented in thi
 
 ### Features
 
-* add the light key-router: `@KeyRouting()` / `@KeyHandler()` / `@OnKey()`, `keyRoutingBlueprint`, `defineKeyRouting` / `defineKeyRoute`. Routes events by a configurable key instead of a path, installs itself as the kernel event handler (mutually exclusive with `@Routing()`), and is tree-shaken away when unused. Built on `@stone-js/key-router`.
+* add the light key-router: `@KeyRouting()` / `@KeyHandler()` / `@OnKey()`, `keyRoutingBlueprint`, `defineKeyRouting` / `defineKeyRoute`. Routes events by a configurable key instead of a path, installs itself as the kernel event handler (mutually exclusive with `@Routing()`), and is tree-shaken away when unused.
+* absorb the former `@stone-js/key-router` package (now deleted): `KeyRouter`, `createKeyDecorator`, `collectKeyHandlers`, `defineKeyHandler` and `KeyRouterError` ship here now. Consuming modules (`@stone-js/queue`, `@stone-js/event-bus`, `@stone-js/realtime`) import them from `@stone-js/router`.
 
 
 ## [0.2.1](https://github.com/stone-foundation/stone-js-router/compare/v0.2.0...v0.2.1) (2026-06-12)

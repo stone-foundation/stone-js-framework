@@ -1,4 +1,4 @@
-import { KeyRouter } from '@stone-js/key-router'
+import { KeyRouter } from '../src/KeyRouter'
 import { KeyRoutingError } from '../src/errors/KeyRoutingError'
 import { KeyRoutingEventHandler } from '../src/KeyRoutingEventHandler'
 import { DEFAULT_KEY_SOURCE, defaultExtractor } from '../src/keyRoutingDeclarations'

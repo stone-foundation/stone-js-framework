@@ -1,6 +1,6 @@
 import { REALTIME_HANDLER_KEY } from '../../src/constants'
 
-vi.mock('@stone-js/key-router', () => ({
+vi.mock('@stone-js/router', () => ({
   createKeyDecorator: vi.fn((metaKey: symbol) => (key: string) => ({ metaKey, key }))
 }))
 
