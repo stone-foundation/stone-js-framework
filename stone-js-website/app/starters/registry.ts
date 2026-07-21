@@ -92,6 +92,21 @@ export const STARTERS: Starter[] = [
     about: 'A guided showcase of the Continuum Architecture: the same domain served over HTTP, on the edge, as a CLI and as agent tools, with both paradigms side by side. The best place to feel "your app exists in every runtime, until you run it".',
     blogSlug: 'one-domain-three-runtimes'
   },
+  {
+    id: 'realtime-chat',
+    title: 'Realtime chat',
+    official: true,
+    target: 'backend',
+    paradigm: 'decorators',
+    problem: 'realtime',
+    command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
+    repo: `${GH}/stone-js-blog-starters/tree/main/realtime-chat`,
+    author: 'Stone Foundation',
+    authorUrl: GH,
+    description: 'Channels, presence and broadcast over WebSockets, ready to run.',
+    about: 'The realtime recipe as a runnable app: @NodeWs bridges sockets to the kernel, @Realtime broadcasts, and a @RealtimeGateway handles connect / disconnect / message. This is an opt-in blog starter kept out of the default listing: request it with --starters github:stone-foundation/stone-js-blog-starters. Switch the driver to redis to scale across nodes; the same gateway runs unchanged on the AWS API Gateway WebSocket adapter.',
+    blogSlug: 'real-time-features'
+  },
   ...official()
 ]
 

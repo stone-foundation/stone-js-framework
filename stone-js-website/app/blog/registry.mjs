@@ -120,7 +120,7 @@ export const ARTICLES = [
     excerpt: 'Live dashboards, presence and notifications, framed by their architecture: the SSE and WebSocket flow, how a held-open connection fits the per-event model, and where it runs on the edge.',
     tags: ['realtime', 'cloud-native'],
     ogImage: '/og/real-time-features.png',
-    starter: null,
+    starter: 'realtime-chat',
     locale: 'en'
   }
 ]
