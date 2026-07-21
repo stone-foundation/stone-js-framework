@@ -22,10 +22,13 @@ describe('viteConfig', () => {
     expect(typeof reactPlugin).toBe('object')
     expect(reactPlugin).toHaveProperty('name')
 
-    // Plugin 2: vite-plugin-babel
+    // Plugin 2: vite-plugin-babel (include/exclude replace the deprecated filter option)
     const babelPlugin = viteConfig.plugins[1]
     expect(typeof babelPlugin).toBe('object')
-    expect(babelPlugin.filter('/src/file.js')).toBe(true)
+    expect(babelPlugin.include.test('/src/file.js')).toBe(true)
+    expect(babelPlugin.include.test('/src/file.tsx')).toBe(true)
+    expect(babelPlugin.include.test('/src/style.css')).toBe(false)
+    expect(babelPlugin.exclude.test('/node_modules/react/index.js')).toBe(true)
 
     // Build config
     expect(viteConfig.build?.target).toBe('es2018')
