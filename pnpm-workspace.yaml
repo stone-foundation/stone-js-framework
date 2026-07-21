@@ -3,5 +3,6 @@ packages:
   - 'stone-js-*'
   - '!stone-js-docs'
   - '!stone-js-starters'
+  - '!stone-js-blog-starters'
   - '!stone-js-lab'
   - 'stone-js-lab/apps/*'
