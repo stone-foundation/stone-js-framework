@@ -147,6 +147,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Node CLI', path: '/docs/adapters/node-cli' },
       { title: 'Fetch (edge & serverless)', path: '/docs/adapters/fetch' },
       { title: 'AWS Lambda', path: '/docs/adapters/aws-lambda' },
+      { title: 'AWS API Gateway WebSocket', path: '/docs/adapters/aws-apigw-ws' },
       { title: 'GCP Cloud Functions', path: '/docs/adapters/gcp-cloud-functions' },
       { title: 'Azure Functions', path: '/docs/adapters/azure-functions' },
       { title: 'Alibaba Cloud FC', path: '/docs/adapters/alibaba-fc' },
