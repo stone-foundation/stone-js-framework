@@ -79,10 +79,38 @@ export class Application {}`}</Code>
 
         <H2>Deploy</H2>
         <p>
-          Build the Lambda output and deploy the handler with your IaC of choice (SAM, CDK, Serverless
-          Framework, Terraform). The ephemeral per-event container matches Lambda's execution model
-          exactly, so there is nothing long-lived to warm but the adapter.
+          <code>stone build</code> produces the handler bundle in <code>dist/</code>; point your IaC at
+          it. Here it is with AWS SAM: an HTTP API in front of the function, whose <code>Handler</code>
+          is the built server file exporting the adapter handler. The ephemeral per-event container
+          matches Lambda's execution model exactly, so there is nothing long-lived to warm.
         </p>
+        <Code file='terminal' lang='bash'>{`npm run build            # -> dist/ (handler bundle)
+sam deploy --guided`}</Code>
+        <Code file='template.yaml' lang='yaml'>{`AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  Api:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/                 # the stone build output
+      Handler: server.handler        # built entry (e.g. dist/server.mjs) exporting the handler
+      Runtime: nodejs20.x
+      Architectures: [arm64]
+      MemorySize: 256
+      Timeout: 15
+      Environment:
+        Variables:
+          NODE_ENV: production
+      Events:
+        HttpApi:
+          Type: HttpApi              # API Gateway HTTP API -> @AwsLambdaHttp
+          Properties: { Path: /{proxy+}, Method: ANY }`}</Code>
+        <Callout kind='note' title='Match the handler to your build output'>
+          Set <code>Handler</code> to your build's entry and exported handler name (the CLI emits the
+          server bundle under <code>dist/</code>). For CDK, Serverless Framework or Terraform, wire the
+          same <code>CodeUri</code>/<code>Handler</code> pair; nothing about the app changes.
+        </Callout>
 
         <Callout kind='future' title='Stack it to keep options open'>
           Add <code>@Fetch()</code> or <code>@NodeHttp()</code> alongside <code>@AwsLambdaHttp()</code>

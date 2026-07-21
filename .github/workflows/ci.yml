@@ -43,7 +43,11 @@ jobs:
       - name: Security audit (high · critical)
         run: pnpm audit --audit-level=high
 
+      # Type-aware lint is Node-version-independent, so run it once on the primary Node.
+      # (typescript-eslint's project service mis-resolves workspace package types to `any`
+      # on Node 22, producing false positives; build + test still run on every matrix leg.)
       - name: Lint
+        if: ${{ matrix.node-version == '20' }}
         run: pnpm lint
 
       - name: Test (with coverage)
