@@ -31,6 +31,7 @@ Any package (first- or third-party) that declares `stone.starters` works the sam
 | `realtime-chat` | [Realtime features](https://stonejs.dev/blog/real-time-features): channels, presence and broadcast over WebSockets. |
 | `multi-tenant` | [Multi-tenancy with subdomain routing](https://stonejs.dev/blog/multi-tenant-subdomains): capture the tenant from the host. |
 | `isomorphic-validation` | [One schema, validated on the backend and the form](https://stonejs.dev/blog/isomorphic-validation): one Zod schema, a 422 at the boundary. |
+| `stateless-auth` | [Stateless auth at the edge](https://stonejs.dev/blog/stateless-auth-at-the-edge): verify a JWT at the boundary, guard routes, no session store. |
 
 The set grows with the blog.
 

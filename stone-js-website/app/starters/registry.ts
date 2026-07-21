@@ -137,6 +137,21 @@ export const STARTERS: Starter[] = [
     about: 'Write the shape of the data once as a Zod schema: validate({ body: NewTask }) gates the route and rejects a malformed body with a 422 before the handler runs, while the same schema validates the frontend form, so the API and UI can never drift. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
     blogSlug: 'isomorphic-validation'
   },
+  {
+    id: 'stateless-auth',
+    title: 'Stateless auth',
+    official: true,
+    target: 'backend',
+    paradigm: 'decorators',
+    problem: 'auth',
+    command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
+    repo: `${GH}/stone-js-blog-starters/tree/main/stateless-auth`,
+    author: 'Stone Foundation',
+    authorUrl: GH,
+    description: 'Verify a JWT at the boundary and guard routes, no session store.',
+    about: 'Identity established once at the edge: a kernel middleware verifies the Bearer token on every request, then requireAuth() (401) and requireScopes(...) (403) guard routes. Nothing touches a session store, so the same code runs on Node, serverless and the edge. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
+    blogSlug: 'stateless-auth-at-the-edge'
+  },
   ...official()
 ]
 
