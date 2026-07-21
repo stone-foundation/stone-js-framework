@@ -93,6 +93,17 @@ export class SendReceipt {
     await this.mailer.receipt(payload.orderId)
   }
 }`}</Code>
+        <p>
+          One class can also handle several jobs, one method each, with <code>@OnJob</code> (a
+          name-less <code>@JobHandler()</code> marks the class for scanning):
+        </p>
+        <Code file='app/Jobs.ts'>{`import { JobHandler, OnJob } from '@stone-js/queue'
+
+@JobHandler()
+export class Jobs {
+  @OnJob('resize') async resize (payload) { /* … */ }
+  @OnJob('purge')  async purge (payload) { /* … */ }
+}`}</Code>
 
         <H3>Process</H3>
         <p>

@@ -58,7 +58,8 @@
     "ioredis": "^5.0.0"
   },
   "dependencies": {
-    "@stone-js/config": "workspace:*"
+    "@stone-js/config": "workspace:*",
+    "@stone-js/key-router": "workspace:*"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

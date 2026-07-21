@@ -1,8 +1,15 @@
 import { Worker } from '../src/Worker'
+import { collectKeyHandlers } from '@stone-js/key-router'
 import { JobRegistry } from '../src/JobRegistry'
 import { QueueManager } from '../src/QueueManager'
 import { QueueError } from '../src/errors/QueueError'
 import { QueueServiceProvider } from '../src/QueueServiceProvider'
+
+// Keep KeyRouter real; only stub the class-metadata scan so we can drive @OnJob discovery.
+vi.mock('@stone-js/key-router', async (importOriginal) => {
+  const actual: any = await importOriginal()
+  return { ...actual, collectKeyHandlers: vi.fn(() => []) }
+})
 
 class SendEmail { async handle (): Promise<string> { return 'sent' } }
 const fnHandler = vi.fn(async () => 'done')
@@ -56,6 +63,16 @@ describe('QueueServiceProvider', () => {
     const container = makeContainer({ connections: [{ name: 'ram', driver: 'memory' }] })
     new QueueServiceProvider(container).register()
     expect(managerArg(container).connection('ram').name).toBe('ram')
+  })
+
+  it('scans @OnJob methods on a name-less handler class', () => {
+    vi.mocked(collectKeyHandlers).mockReturnValueOnce([{ key: 'resize', action: 'onResize' }])
+    class Jobs { async onResize (): Promise<void> {} }
+    const container = makeContainer({ handlers: [{ module: Jobs, isClass: true }] }) // no `name`
+
+    new QueueServiceProvider(container).register()
+
+    expect(JobRegistry.getInstance()?.has('resize')).toBe(true)
   })
 
   it('is zero-config: the default memory connection resolves as `queue`', () => {

@@ -77,6 +77,18 @@ export class SendReceipt {
 }
 ```
 
+One class can handle several jobs, one method each, with `@OnJob` (a name-less `@JobHandler()` marks the class for scanning):
+
+```ts
+import { JobHandler, OnJob } from '@stone-js/queue'
+
+@JobHandler()
+export class Jobs {
+  @OnJob('resize') async resize (payload) { /* … */ }
+  @OnJob('purge')  async purge (payload) { /* … */ }
+}
+```
+
 Register handlers imperatively too: `defineQueue({ handlers: [ defineJobHandler('send-receipt', SendReceipt, { isClass: true }) ] })`.
 
 ## Process jobs
