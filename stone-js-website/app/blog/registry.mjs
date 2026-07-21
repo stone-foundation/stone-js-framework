@@ -65,7 +65,7 @@ export const ARTICLES = [
     excerpt: 'Validation duplicated between the API and the UI always drifts. Write the shape once, enforce it at the boundary with a 422, and validate the same schema in the form.',
     tags: ['validation', 'dx'],
     ogImage: '/og/isomorphic-validation.png',
-    starter: null,
+    starter: 'isomorphic-validation',
     locale: 'en'
   },
   {
@@ -98,7 +98,7 @@ export const ARTICLES = [
     excerpt: 'Tenant-per-subdomain without header-parsing plumbing. A subdomain parameter turns multi-tenancy into routing: capture the tenant from the host and read it on the event.',
     tags: ['routing', 'saas', 'multi-tenancy'],
     ogImage: '/og/multi-tenant-subdomains.png',
-    starter: null,
+    starter: 'multi-tenant',
     locale: 'en'
   },
   {

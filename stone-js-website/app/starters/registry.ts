@@ -107,6 +107,36 @@ export const STARTERS: Starter[] = [
     about: 'The realtime recipe as a runnable app: @NodeWs bridges sockets to the kernel, @Realtime broadcasts, and a @RealtimeGateway handles connect / disconnect / message. This is an opt-in blog starter kept out of the default listing: request it with --starters github:stone-foundation/stone-js-blog-starters. Switch the driver to redis to scale across nodes; the same gateway runs unchanged on the AWS API Gateway WebSocket adapter.',
     blogSlug: 'real-time-features'
   },
+  {
+    id: 'multi-tenant',
+    title: 'Multi-tenant (subdomain routing)',
+    official: true,
+    target: 'backend',
+    paradigm: 'decorators',
+    problem: 'multi-tenant',
+    command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
+    repo: `${GH}/stone-js-blog-starters/tree/main/multi-tenant`,
+    author: 'Stone Foundation',
+    authorUrl: GH,
+    description: 'Capture the tenant from the subdomain and scope every request to it.',
+    about: 'Multi-tenancy as routing: a controller scoped to {tenant}.example.com captures the tenant from the host during matching, and every handler reads it off the event, no header parsing, no lookup middleware. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
+    blogSlug: 'multi-tenant-subdomains'
+  },
+  {
+    id: 'isomorphic-validation',
+    title: 'Isomorphic validation',
+    official: true,
+    target: 'backend',
+    paradigm: 'decorators',
+    problem: 'validation',
+    command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
+    repo: `${GH}/stone-js-blog-starters/tree/main/isomorphic-validation`,
+    author: 'Stone Foundation',
+    authorUrl: GH,
+    description: 'One schema, enforced at the API boundary and reusable on the form.',
+    about: 'Write the shape of the data once as a Zod schema: validate({ body: NewTask }) gates the route and rejects a malformed body with a 422 before the handler runs, while the same schema validates the frontend form, so the API and UI can never drift. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
+    blogSlug: 'isomorphic-validation'
+  },
   ...official()
 ]
 
