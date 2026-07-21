@@ -77,10 +77,26 @@ app.http('stone', {
   handler: await stoneApp.run()
 })`}</Code>
 
-        <Callout kind='note' title='HTTP triggers, this adapter; other triggers, coming'>
-          This adapter targets the HTTP trigger. A generic adapter for Azure's non-HTTP triggers
-          (Queue Storage, Timer, Blob, Service Bus) will follow, exactly like the AWS and GCP split.
-        </Callout>
+        <H2>Generic (non-HTTP) triggers</H2>
+        <p>
+          For triggers that are not HTTP, a Queue Storage or Service Bus message, an Event Grid or
+          Event Hub event, a Timer or a Blob, use the generic
+          <code> @stone-js/azure-functions-adapter</code> with <code>@AzureFunctions()</code>. The host
+          invokes your function with a trigger input and an <code>InvocationContext</code>; the adapter
+          normalizes it into an intention whose metadata carries the trigger payload and
+          <code> context.triggerMetadata</code>, so one handler can dispatch on the trigger.
+        </p>
+        <Code file='app/Application.ts'>{`import { AzureFunctions } from '@stone-js/azure-functions-adapter'
+
+@AzureFunctions()
+@StoneApp({ name: 'workers' })
+export class Application {}`}</Code>
+        <p>
+          Register the returned handler with the matching binding, e.g.
+          <code> app.storageQueue(...)</code> or <code>app.serviceBusQueue(...)</code>. On a thrown
+          error the adapter rethrows by default so Azure applies the trigger's retry / poison-queue
+          policy; opt out with <code>stone.adapter.rethrowOnError = false</code>.
+        </p>
 
         <H2>Deploy</H2>
         <p>
@@ -93,7 +109,7 @@ func azure functionapp publish <your-app-name>`}</Code>
         <H2>Which adapter</H2>
         <PropsTable nameHeader='Package' rows={[
           { name: '@stone-js/azure-functions-http-adapter', type: '@AzureFunctionsHttp', desc: 'HTTP-triggered functions (v4 HttpRequest → HttpResponseInit). Use with @Routing.' },
-          { name: '@stone-js/fetch-adapter', type: '@Fetch', desc: 'The Web-standard sibling for edge/WinterCG runtimes (Cloudflare, Deno, Bun, Vercel/Netlify Edge).' }
+          { name: '@stone-js/azure-functions-adapter', type: '@AzureFunctions', desc: 'Generic non-HTTP triggers (Queue Storage, Service Bus, Event Grid, Timer, Blob).' }
         ]} />
 
         <Callout kind='future' title='Stack it to keep options open'>
