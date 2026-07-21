@@ -170,6 +170,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Cache', path: '/docs/extensions/cache' },
       { title: 'Queue', path: '/docs/extensions/queue' },
       { title: 'Realtime', path: '/docs/extensions/realtime' },
+      { title: 'Event Bus', path: '/docs/extensions/event-bus' },
       { title: 'OpenAPI', path: '/docs/extensions/openapi' },
       { title: 'Testing', path: '/docs/extensions/testing' },
       { title: 'MCP server & llms.txt', path: '/docs/extensions/mcp' },
