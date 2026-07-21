@@ -32,6 +32,7 @@ Any package (first- or third-party) that declares `stone.starters` works the sam
 | `multi-tenant` | [Multi-tenancy with subdomain routing](https://stonejs.dev/blog/multi-tenant-subdomains): capture the tenant from the host. |
 | `isomorphic-validation` | [One schema, validated on the backend and the form](https://stonejs.dev/blog/isomorphic-validation): one Zod schema, a 422 at the boundary. |
 | `stateless-auth` | [Stateless auth at the edge](https://stonejs.dev/blog/stateless-auth-at-the-edge): verify a JWT at the boundary, guard routes, no session store. |
+| `api-as-tools` | [Your API as MCP tools for agents](https://stonejs.dev/blog/api-as-agent-tools): stack the MCP adapter, agents call the same domain. |
 
 The set grows with the blog.
 

@@ -87,7 +87,7 @@ export const ARTICLES = [
     excerpt: 'AI agents are a new kind of caller. Instead of a second API, stack the MCP adapter and the domain that already answers HTTP answers agents as MCP tools.',
     tags: ['agents', 'mcp', 'ai'],
     ogImage: '/og/api-as-agent-tools.png',
-    starter: null,
+    starter: 'api-as-tools',
     locale: 'en'
   },
   {
