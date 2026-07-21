@@ -51,7 +51,8 @@
     "prepare": "husky"
   },
   "peerDependencies": {
-    "@stone-js/core": "workspace:*"
+    "@stone-js/core": "workspace:*",
+    "@stone-js/pipeline": "workspace:*"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

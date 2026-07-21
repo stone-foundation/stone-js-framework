@@ -3285,6 +3285,9 @@ importers:
       '@stone-js/core':
         specifier: workspace:*
         version: link:../stone-js-core
+      '@stone-js/pipeline':
+        specifier: workspace:*
+        version: link:../stone-js-pipeline
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
