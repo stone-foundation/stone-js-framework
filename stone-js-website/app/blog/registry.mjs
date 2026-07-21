@@ -32,7 +32,7 @@ export const ARTICLES = [
     excerpt: 'Verify a token at the boundary instead of holding a session, and the same auth guard runs on Node, serverless, the edge and agents, with nothing to store.',
     tags: ['auth', 'edge', 'security'],
     ogImage: '/og/stateless-auth-at-the-edge.png',
-    starter: null,
+    starter: 'stateless-auth',
     locale: 'en'
   },
   {

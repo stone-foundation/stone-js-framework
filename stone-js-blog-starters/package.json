@@ -27,7 +27,8 @@
     "starters": [
       { "value": "realtime-chat", "title": "Realtime chat", "description": "Channels, presence and broadcast over WebSockets with @stone-js/realtime.", "tags": ["realtime", "websocket", "node-ws"], "path": "realtime-chat" },
       { "value": "multi-tenant", "title": "Multi-tenant (subdomain routing)", "description": "Capture the tenant from the subdomain and scope every request to it, with the universal router.", "tags": ["routing", "multi-tenant", "subdomain"], "path": "multi-tenant" },
-      { "value": "isomorphic-validation", "title": "Isomorphic validation", "description": "One schema, enforced at the API boundary (422) and reusable on the frontend form, with @stone-js/validation + Zod.", "tags": ["validation", "zod", "dx"], "path": "isomorphic-validation" }
+      { "value": "isomorphic-validation", "title": "Isomorphic validation", "description": "One schema, enforced at the API boundary (422) and reusable on the frontend form, with @stone-js/validation + Zod.", "tags": ["validation", "zod", "dx"], "path": "isomorphic-validation" },
+      { "value": "stateless-auth", "title": "Stateless auth", "description": "Verify a JWT at the boundary and guard routes with requireAuth/requireScopes, no session store, with @stone-js/auth.", "tags": ["auth", "jwt", "edge", "security"], "path": "stateless-auth" }
     ]
   },
   "scripts": {
