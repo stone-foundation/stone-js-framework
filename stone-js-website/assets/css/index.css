@@ -773,23 +773,30 @@ a.market-card.is-link { text-decoration: none; color: inherit; display: block; }
 .article-starter p { color: var(--gres); margin: 0 0 14px; }
 
 /* ---- 14.11 Architecture diagram (bespoke, build-time) ---- */
-.arch { margin: 28px 0; }
-.arch-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 0; list-style: none; margin: 0; padding: 0; }
-.arch-node { display: flex; align-items: center; }
-.arch-box { display: flex; flex-direction: column; gap: 3px; border: 1px solid var(--trait); border-radius: 12px; background: var(--surface); padding: 12px 16px; min-width: 116px; }
-.arch-label { font-family: var(--display); font-weight: 600; font-size: 14.5px; }
-.arch-sub { font-family: var(--mono); font-size: 10.5px; color: var(--gres); }
-.arch-arrow { flex: 0 0 auto; width: 32px; height: 2px; margin: 0 3px; background: var(--braise-grad); position: relative; }
-.arch-arrow::after { content: ''; position: absolute; right: -1px; top: -3px; border: 4px solid transparent; border-left-color: var(--braise); }
-.tone-domain .arch-box { border-color: color-mix(in srgb, var(--braise) 55%, var(--trait)); box-shadow: 0 0 16px rgba(255, 107, 43, .16); }
-.tone-store .arch-box { border-color: color-mix(in srgb, var(--braise) 32%, var(--trait)); }
-.arch-caption { font-family: var(--mono); font-size: 12px; color: var(--gres); text-align: center; margin-top: 14px; }
-@media (max-width: 640px) {
-  .arch-flow { flex-direction: column; align-items: stretch; }
-  .arch-node { flex-direction: column; align-items: stretch; }
-  .arch-arrow { width: 2px; height: 20px; margin: 5px 0 5px 24px; }
-  .arch-arrow::after { right: auto; left: -3px; top: auto; bottom: -1px; border: 4px solid transparent; border-top-color: var(--braise); }
-}
+/* ---- 14.11b Diagram (premium, bespoke) ---- */
+.dg { margin: 34px 0; overflow-x: auto; }
+.dg-svg { display: block; width: 100%; min-width: 600px; height: auto; overflow: visible; }
+.dg-edge { fill: none; stroke: url(#dg-braise); stroke-width: 2; stroke-linecap: round; opacity: .5; }
+.dg-edge.is-dashed { stroke-dasharray: 2 8; opacity: .55; }
+.dg-tip { fill: var(--braise); }
+.dg-flow { fill: none; stroke: url(#dg-braise); stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 5 210; animation: dg-run 2.8s linear infinite; }
+.dg-edge-label { font-family: var(--mono); font-size: 10.5px; fill: var(--gres); text-anchor: middle; letter-spacing: .02em; }
+.dg-pill { fill: var(--surface); stroke: var(--trait); stroke-width: 1.5; }
+.dg-dot { fill: var(--braise); }
+.dg-label { font-family: var(--display); font-weight: 600; font-size: 15px; fill: var(--encre); }
+.dg-sub { font-family: var(--mono); font-size: 10.5px; fill: var(--gres); }
+.kind-core .dg-pill { fill: url(#dg-core); stroke: none; }
+.kind-core .dg-label { fill: #fff; font-size: 16px; }
+.kind-core .dg-sub { fill: rgba(255,255,255,.82); }
+.kind-core .dg-dot { fill: rgba(255,255,255,.9); }
+.kind-domain .dg-pill { stroke: color-mix(in srgb, var(--braise) 60%, var(--trait)); stroke-width: 2; }
+.kind-store .dg-pill { stroke: color-mix(in srgb, var(--braise) 30%, var(--trait)); }
+.kind-client .dg-dot { fill: var(--cuivre); }
+.kind-ghost .dg-pill { stroke-dasharray: 4 5; opacity: .8; }
+.kind-ghost .dg-dot { fill: var(--gres); }
+.kind-ghost .dg-label { fill: var(--gres); }
+.dg-caption { font-family: var(--mono); font-size: 12px; color: var(--gres); text-align: center; margin-top: 16px; line-height: 1.5; }
+@keyframes dg-run { from { stroke-dashoffset: 215; } to { stroke-dashoffset: 0; } }
 
 /* ---- 14.12 Share bar ---- */
 .sharebar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 44px 0 10px; padding-top: 26px; border-top: 1px solid var(--trait); }
@@ -802,7 +809,8 @@ a.market-card.is-link { text-decoration: none; color: inherit; display: block; }
 /* ---------- 15. Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .orbit, .u, .chip, .nucleus .key, .vein::before, .pseam::before,
-  .mono-title .shimmer, .wire .pulse, .caret, .ch { animation: none; }
+  .mono-title .shimmer, .wire .pulse, .caret, .ch, .dg-flow { animation: none; }
+  .dg-flow { display: none; }
   .chip { opacity: .8; }
   .cl { opacity: 1; animation: none; }
   .mono-title .shimmer { background: none; color: var(--encre); }

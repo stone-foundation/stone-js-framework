@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
@@ -34,13 +34,13 @@ export class MultiTenantSubdomains implements IPage<ReactIncomingEvent> {
           per-handler plumbing, no tenant argument passed down a call chain.
         </p>
 
-        <Architecture
-          caption='The subdomain is a route parameter. The router captures the tenant; the handler just reads it.'
+        <Diagram
+          caption='The subdomain is a route parameter. The router captures the tenant during matching; the handler just reads it, no header-parsing plumbing.'
           nodes={[
-            { label: 'acme.example.com', sub: 'a tenant request', tone: 'client' },
-            { label: 'Host match', sub: '{tenant}.example.com', tone: 'context' },
-            { label: 'Handler', sub: "event.get('tenant')", tone: 'domain' },
-            { label: "Tenant's data", sub: 'scoped by tenant', tone: 'store' }
+            { label: 'acme.example.com', sub: 'a tenant request', kind: 'client' },
+            { label: 'Host match', sub: '{tenant}.example.com', kind: 'context' },
+            { label: 'Handler', sub: "event.get('tenant')", kind: 'domain' },
+            { label: "Tenant's data", sub: 'scoped by tenant', kind: 'store' }
           ]}
         />
 

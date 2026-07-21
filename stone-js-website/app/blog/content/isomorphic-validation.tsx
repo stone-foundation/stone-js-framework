@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
@@ -42,12 +42,14 @@ export class IsomorphicValidation implements IPage<ReactIncomingEvent> {
           only one description of the data, so the two can never disagree.
         </p>
 
-        <Architecture
-          caption='One schema, two consumers: the route that accepts the data and the form that produces it.'
+        <Diagram
+          layout='hub'
+          height={360}
+          caption='One schema, two consumers: the route that accepts the data and the form that produces it. They cannot drift because there is only one definition.'
           nodes={[
-            { label: 'One schema', sub: 'Zod or Standard Schema', tone: 'domain' },
-            { label: 'validate() at the API', sub: '422 before the handler', tone: 'context' },
-            { label: 'safeParse() in the form', sub: 'the same rules, in the UI', tone: 'client' }
+            { label: 'One schema', sub: 'Zod / Standard Schema', kind: 'core' },
+            { label: 'API', sub: 'validate() → 422', kind: 'context' },
+            { label: 'Form', sub: 'safeParse() in the UI', kind: 'client' }
           ]}
         />
 

@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
@@ -39,13 +39,13 @@ export class StatelessAuthAtTheEdge implements IPage<ReactIncomingEvent> {
           store and nothing to look up, so the same code runs anywhere a request can arrive.
         </p>
 
-        <Architecture
-          caption='The token is verified once, at the boundary; the principal rides the event inward.'
+        <Diagram
+          caption='The token is verified once, at the boundary; the principal rides the event inward. No session store, so the same guard runs on Node, the edge and agents.'
           nodes={[
-            { label: 'Client', sub: 'sends a token', tone: 'client' },
-            { label: 'Boundary', sub: 'verify JWT / OAuth', tone: 'context' },
-            { label: 'Handler', sub: 'reads the principal', tone: 'domain' },
-            { label: 'Response', sub: 'no session touched', tone: 'store' }
+            { label: 'Client', sub: 'Bearer token', kind: 'client' },
+            { label: 'Boundary', sub: 'verify JWT / OAuth', kind: 'context' },
+            { label: 'Handler', sub: "event.get('user')", kind: 'domain' },
+            { label: 'Response', sub: 'no session touched', kind: 'store' }
           ]}
         />
 
