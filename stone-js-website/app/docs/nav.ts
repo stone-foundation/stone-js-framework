@@ -149,6 +149,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'GCP Cloud Functions', path: '/docs/adapters/gcp-cloud-functions' },
       { title: 'Azure Functions', path: '/docs/adapters/azure-functions' },
       { title: 'Alibaba Cloud FC', path: '/docs/adapters/alibaba-fc' },
+      { title: 'Tencent Cloud SCF', path: '/docs/adapters/tencent-scf' },
       { title: 'Browser', path: '/docs/adapters/browser' },
       { title: 'MCP (agents)', path: '/docs/adapters/mcp' },
       { title: 'Mobile', path: '/docs/adapters/mobile' }
