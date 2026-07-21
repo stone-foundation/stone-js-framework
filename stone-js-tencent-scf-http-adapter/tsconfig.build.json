@@ -1,0 +1,23 @@
+{
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "tests/**/*.ts"
+  ],
+  "compilerOptions": {
+    "isolatedDeclarations": true,
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "outDir": "./dist",
+    "declaration": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "emitDeclarationOnly": false,
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+  }
+}
