@@ -6,11 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/stone-foundation/stone-js-event-bus.git"
+    "url": "git+https://github.com/stone-foundation/stone-js-framework.git",
+    "directory": "stone-js-event-bus"
   },
   "homepage": "https://stonejs.dev",
   "bugs": {
-    "url": "https://github.com/stone-foundation/stone-js-event-bus/issues"
+    "url": "https://github.com/stone-foundation/stone-js-framework/issues"
   },
   "keywords": [
     "stonejs",

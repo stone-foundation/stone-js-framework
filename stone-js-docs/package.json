@@ -8,7 +8,11 @@
     "name": "Mr. Stone",
     "email": "pierre.evens16@gmail.com"
   },
-  "repository": "https://github.com/stone-foundation/stone-js-docs.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stone-foundation/stone-js-framework.git",
+    "directory": "stone-js-docs"
+  },
   "homepage": "https://stonejs.dev",
   "scripts": {
     "generate-docs": "node ./scripts/auto-generate-docs.mjs",
