@@ -107,6 +107,21 @@ export const STARTERS: Starter[] = [
     about: 'The realtime recipe as a runnable app: @NodeWs bridges sockets to the kernel, @Realtime broadcasts, and a @RealtimeGateway handles connect / disconnect / message. This is an opt-in blog starter kept out of the default listing: request it with --starters github:stone-foundation/stone-js-blog-starters. Switch the driver to redis to scale across nodes; the same gateway runs unchanged on the AWS API Gateway WebSocket adapter.',
     blogSlug: 'real-time-features'
   },
+  {
+    id: 'multi-tenant',
+    title: 'Multi-tenant (subdomain routing)',
+    official: true,
+    target: 'backend',
+    paradigm: 'decorators',
+    problem: 'multi-tenant',
+    command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
+    repo: `${GH}/stone-js-blog-starters/tree/main/multi-tenant`,
+    author: 'Stone Foundation',
+    authorUrl: GH,
+    description: 'Capture the tenant from the subdomain and scope every request to it.',
+    about: 'Multi-tenancy as routing: a controller scoped to {tenant}.example.com captures the tenant from the host during matching, and every handler reads it off the event, no header parsing, no lookup middleware. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
+    blogSlug: 'multi-tenant-subdomains'
+  },
   ...official()
 ]
 

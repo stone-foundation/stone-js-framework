@@ -98,7 +98,7 @@ export const ARTICLES = [
     excerpt: 'Tenant-per-subdomain without header-parsing plumbing. A subdomain parameter turns multi-tenancy into routing: capture the tenant from the host and read it on the event.',
     tags: ['routing', 'saas', 'multi-tenancy'],
     ogImage: '/og/multi-tenant-subdomains.png',
-    starter: null,
+    starter: 'multi-tenant',
     locale: 'en'
   },
   {
