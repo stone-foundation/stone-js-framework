@@ -59,7 +59,9 @@
     "@stone-js/core": "workspace:*",
     "@stone-js/filesystem": "workspace:*",
     "@aws-sdk/client-s3": "^3.0.0",
-    "@aws-sdk/s3-request-presigner": "^3.0.0"
+    "@aws-sdk/s3-request-presigner": "^3.0.0",
+    "@google-cloud/storage": "^7.0.0",
+    "@azure/storage-blob": "^12.0.0"
   },
   "dependencies": {
     "@stone-js/config": "workspace:*",
@@ -87,7 +89,9 @@
     "typescript": "^5.6.3",
     "vitest": "^3.2.4",
     "@aws-sdk/client-s3": "^3.0.0",
-    "@aws-sdk/s3-request-presigner": "^3.0.0"
+    "@aws-sdk/s3-request-presigner": "^3.0.0",
+    "@google-cloud/storage": "^7.0.0",
+    "@azure/storage-blob": "^12.0.0"
   },
   "ts-standard": {
     "globals": [
@@ -104,6 +108,12 @@
       "optional": true
     },
     "@aws-sdk/s3-request-presigner": {
+      "optional": true
+    },
+    "@google-cloud/storage": {
+      "optional": true
+    },
+    "@azure/storage-blob": {
       "optional": true
     }
   }

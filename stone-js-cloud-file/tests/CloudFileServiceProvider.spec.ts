@@ -31,6 +31,21 @@ describe('CloudFileServiceProvider', () => {
     expect(storage.disk('s3').name).toBe('s3')
   })
 
+  it('registers the gcs and azure drivers too', () => {
+    const container = makeContainer({
+      disks: [
+        { name: 'gcs', driver: 'gcs', bucket: 'b' },
+        { name: 'azure', driver: 'azure', container: 'c' }
+      ]
+    })
+
+    new CloudFileServiceProvider(container).register()
+
+    const storage = storageArg(container)
+    expect(storage.disk('gcs').name).toBe('gcs')
+    expect(storage.disk('azure').name).toBe('azure')
+  })
+
   it('is zero-config: with no disks, the default local disk resolves as `fileSystem`', () => {
     const container = makeContainer({})
 

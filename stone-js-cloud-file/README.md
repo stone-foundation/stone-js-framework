@@ -8,7 +8,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-cloud-file&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-cloud-file)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
-**Cloud storage for Stone.js.** Drivers for the agnostic `@stone-js/filesystem` contract, plus a signed-URL contract for direct-to-storage uploads and private downloads. Ships the **S3 driver** (and every S3-compatible store: Cloudflare R2, MinIO, DigitalOcean Spaces, Alibaba OSS, Tencent COS). GCS and Azure Blob follow.
+**Cloud storage for Stone.js.** Drivers for the agnostic `@stone-js/filesystem` contract, plus a signed-URL contract for direct-to-storage uploads and private downloads. Ships drivers for **S3** (and every S3-compatible store: Cloudflare R2, MinIO, DigitalOcean Spaces, Alibaba OSS, Tencent COS), **Google Cloud Storage** and **Azure Blob**.
 
 ---
 
@@ -22,8 +22,11 @@ The cloud SDK is **never bundled**: it is an optional peer dependency, imported 
 
 ```bash
 npm install @stone-js/cloud-file
-# + the SDK for your provider (S3 / R2 / MinIO / Spaces / OSS / COS):
-npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+
+# + the SDK for your provider:
+npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner   # S3 / R2 / MinIO / Spaces / OSS / COS
+npm install @google-cloud/storage                              # Google Cloud Storage
+npm install @azure/storage-blob                                # Azure Blob
 ```
 
 > Peer dependencies: `@stone-js/core`, `@stone-js/filesystem`.
