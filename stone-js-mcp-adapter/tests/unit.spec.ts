@@ -2,7 +2,7 @@ import { MCP_PLATFORM } from '../src/declarations'
 import { Mcp } from '../src/decorators/Mcp'
 import { toContent } from '../src/toContent'
 import { McpDispatcher } from '../src/McpDispatcher'
-import { defineMcpTool, defineMcpTools } from '../src/defineMcpTool'
+import { defineMcp, defineMcpTool, defineMcpTools } from '../src/defineMcpTool'
 import { mcpAdapterBlueprint } from '../src/options/McpAdapterBlueprint'
 import { SetMcpKernelMiddleware } from '../src/middleware/BlueprintMiddleware'
 
@@ -66,6 +66,12 @@ describe('helpers, blueprint, decorator', () => {
     const tool = { name: 't', handler: async () => 1 }
     expect(defineMcpTool(tool)).toBe(tool)
     expect(defineMcpTools([tool])).toEqual({ stone: { mcp: { tools: [tool] } } })
+  })
+
+  it('defineMcp builds a full stone.mcp fragment', () => {
+    const tool = { name: 't', handler: async () => 1 }
+    expect(defineMcp({ name: 'app', version: '1.0.0', instructions: 'hi', tools: [tool] }))
+      .toEqual({ stone: { mcp: { name: 'app', version: '1.0.0', instructions: 'hi', tools: [tool] } } })
   })
 
   it('mcpAdapterBlueprint registers the adapter', () => {

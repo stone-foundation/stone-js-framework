@@ -3,6 +3,23 @@ import { AdapterContext, IncomingEvent, IncomingEventOptions, OutgoingResponse, 
 /** Platform identifier for the MCP adapter. */
 export const MCP_PLATFORM = 'mcp'
 
+/**
+ * Default `instructions` advertised to the MCP client (the LLM/agent). It states the Continuum
+ * contract so the agent knows what it is looking at: the tools ARE the developer's domain, Stone.js
+ * supplies the context, and a tool call is resolved by the same kernel as an HTTP request. When the
+ * app also exposes the `@stone-js/mcp` framework tools (`stone_*`), the agent is told to use them to
+ * understand the framework itself.
+ */
+export const DEFAULT_MCP_INSTRUCTIONS: string = [
+  'This MCP server exposes a Stone.js application as callable tools.',
+  'In the Continuum model the developer owns the domain (these tools) and Stone.js supplies the context:',
+  'a tool call is resolved by the same kernel (middleware, DI, validation, hooks) as an HTTP request,',
+  'so a tool behaves exactly like the matching REST endpoint. Prefer calling these tools over guessing',
+  'the application\'s shape. If tools named `stone_*` are present, they answer questions about the',
+  'Stone.js framework itself (concepts, modules, conventions, gaps); use them to understand how this',
+  'application is built before changing it.'
+].join(' ')
+
 /** A Zod raw shape (`{ field: zodType }`) describing a tool's arguments. */
 export type ZodRawShape = Record<string, unknown>
 
@@ -34,6 +51,11 @@ export interface McpOptions {
   name?: string
   /** Server version advertised to clients (default `0.0.0`). */
   version?: string
+  /**
+   * Instructions advertised to the client (the LLM/agent) describing how to use the server.
+   * Defaults to {@link DEFAULT_MCP_INSTRUCTIONS}; pass an empty string to advertise none.
+   */
+  instructions?: string
   /** The tools to expose. */
   tools?: McpTool[]
 }

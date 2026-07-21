@@ -1,7 +1,7 @@
 import { toContent } from './toContent'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { McpAdapterContext, McpExecutionContext, McpOptions, MCP_PLATFORM } from './declarations'
+import { DEFAULT_MCP_INSTRUCTIONS, McpAdapterContext, McpExecutionContext, McpOptions, MCP_PLATFORM } from './declarations'
 import {
   Adapter,
   IBlueprint,
@@ -47,7 +47,10 @@ McpAdapterContext
     await this.onStart()
 
     const options = this.blueprint.get<McpOptions>('stone.mcp', {})
-    const server = new McpServer({ name: options.name ?? 'stone-app', version: options.version ?? '0.0.0' })
+    const server = new McpServer(
+      { name: options.name ?? 'stone-app', version: options.version ?? '0.0.0' },
+      { instructions: options.instructions ?? DEFAULT_MCP_INSTRUCTIONS }
+    )
 
     for (const tool of options.tools ?? []) {
       server.registerTool(

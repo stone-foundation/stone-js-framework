@@ -46,7 +46,7 @@ describe('McpAdapter', () => {
     const adapter = McpAdapter.create(blueprintStub(tools))
     const server: any = await adapter.run()
 
-    expect(McpServerMock).toHaveBeenCalledWith({ name: 'lab', version: '1.0.0' })
+    expect(McpServerMock).toHaveBeenCalledWith({ name: 'lab', version: '1.0.0' }, { instructions: expect.any(String) })
     expect(registerTool).toHaveBeenCalledTimes(2)
     expect(registerTool.mock.calls[0][0]).toBe('ping')
     expect(connect).toHaveBeenCalledOnce()
@@ -77,7 +77,20 @@ describe('McpAdapter', () => {
     const bp = blueprintStub([])
     bp.store['stone.mcp'] = {}
     await McpAdapter.create(bp).run()
-    expect(McpServerMock).toHaveBeenCalledWith({ name: 'stone-app', version: '0.0.0' })
+    expect(McpServerMock).toHaveBeenCalledWith({ name: 'stone-app', version: '0.0.0' }, { instructions: expect.any(String) })
     expect(registerTool).not.toHaveBeenCalled()
+  })
+
+  it('advertises the default Continuum instructions, and a custom override when set', async () => {
+    await McpAdapter.create(blueprintStub([])).run()
+    const defaultInstructions = McpServerMock.mock.calls[0][1].instructions
+    expect(defaultInstructions).toContain('Stone.js')
+    expect(defaultInstructions).toContain('kernel')
+
+    McpServerMock.mockClear()
+    const bp = blueprintStub([])
+    bp.store['stone.mcp'] = { instructions: 'custom contract' }
+    await McpAdapter.create(bp).run()
+    expect(McpServerMock).toHaveBeenCalledWith({ name: 'stone-app', version: '0.0.0' }, { instructions: 'custom contract' })
   })
 })
