@@ -2,7 +2,7 @@
   "name": "@stone-js/monorepo",
   "version": "0.3.0",
   "private": true,
-  "description": "Stone.js — micro-kernel universel (Continuum Architecture). Monorepo de contrôle (Phase 1 workspace-first).",
+  "description": "Stone.js: universal micro-kernel (Continuum Architecture). Control monorepo for every @stone-js/* package.",
   "type": "module",
   "engines": {
     "node": ">=20.11.0"
@@ -14,14 +14,28 @@
     "rebuild": "pnpm run clean && pnpm run build",
     "doc": "pnpm -r run doc",
     "test": "pnpm -r run test",
+    "test:coverage": "pnpm -r run test:cvg",
     "lint": "pnpm -r run lint",
+    "audit:ci": "pnpm audit --audit-level=moderate",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm run clean && pnpm run build && changeset publish"
+    "release": "pnpm run clean && pnpm run build && changeset publish",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
+    "ts-standard": "^12.0.2",
     "turbo": "^2.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "uuid@<11.1.1": ">=11.1.1",
+      "@hono/node-server@<2.0.5": ">=2.0.5"
+    }
   },
   "keywords": [
     "stone.js",
