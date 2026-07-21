@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
@@ -33,13 +33,14 @@ export class ApiAsAgentTools implements IPage<ReactIncomingEvent> {
           not a new API; it is a new context over the same domain.
         </p>
 
-        <Architecture
-          caption='A tool call is an intention like an HTTP request. The adapter maps it onto the handlers you already have.'
+        <Diagram
+          layout='hub'
+          height={370}
+          caption='A tool call is an intention like an HTTP request. Two contexts, one domain: the REST adapter and the MCP adapter both resolve onto the handlers you already have.'
           nodes={[
-            { label: 'Agent', sub: 'an MCP client', tone: 'client' },
-            { label: 'MCP adapter', sub: 'tool call to intention', tone: 'context' },
-            { label: 'Your handlers', sub: 'the same domain', tone: 'domain' },
-            { label: 'Result', sub: 'HTTP and MCP, one domain', tone: 'store' }
+            { label: 'Your handlers', sub: 'the domain, written once', kind: 'core' },
+            { label: 'REST client', sub: 'node-http · GET /tasks', kind: 'client' },
+            { label: 'AI agent', sub: 'mcp adapter · tools/call', kind: 'client' }
           ]}
         />
 

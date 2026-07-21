@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
@@ -38,14 +38,19 @@ export class SignedUrlFileUploads implements IPage<ReactIncomingEvent> {
           bytes straight to cloud storage. Your API only ever sees small JSON.
         </p>
 
-        <Architecture
-          caption='The bytes go client to cloud, directly. Your API only issues permission and records the result.'
+        <Diagram
+          height={260}
+          caption='The bytes go client to cloud, directly (the dashed path). Your API only issues permission and records the pointer, never the file.'
           nodes={[
-            { label: 'Client', sub: 'has a large file', tone: 'client' },
-            { label: 'Issue signed URL', sub: 'your API, one handler', tone: 'domain' },
-            { label: 'Cloud storage', sub: 'direct upload, short TTL', tone: 'external' },
-            { label: 'Submit', sub: 'your API, save the record', tone: 'domain' },
-            { label: 'Database', sub: 'the metadata, not the bytes', tone: 'store' }
+            { label: 'Client', sub: 'has a large file', kind: 'client' },
+            { label: 'Your API', sub: 'signs · records', kind: 'domain' },
+            { label: 'Cloud storage', sub: 'short-lived URL', kind: 'ghost' },
+            { label: 'Metadata store', sub: 'the pointer, not the bytes', kind: 'store' }
+          ]}
+          edges={[
+            { from: 0, to: 1, flow: true, label: 'ask · record' },
+            { from: 0, to: 2, dashed: true, dir: 'to', curve: -96, label: 'bytes · direct PUT' },
+            { from: 1, to: 3, flow: true, curve: 46, label: 'save the pointer' }
           ]}
         />
 
@@ -59,45 +64,48 @@ export class SignedUrlFileUploads implements IPage<ReactIncomingEvent> {
 
 @EventHandler('/uploads')
 export class UploadController {
-  constructor ({ storage, files }) {
-    this.storage = storage   // wraps your cloud SDK
-    this.files = files       // your metadata store
+  constructor ({ fileSystem, files }) {
+    this.fileSystem = fileSystem   // the default disk, injected by @CloudFile
+    this.files = files             // your metadata store
   }
 
   // 1. The client asks for permission to upload one object.
   @Post('/sign')
   async sign (event) {
-    const { filename, contentType } = event.get('body')
-    const key = \`uploads/\${crypto.randomUUID()}/\${filename}\`
-    const url = await this.storage.signedPutUrl({ key, contentType, expiresIn: 300 })
-    return { key, url }   // small JSON: no bytes here
+    const key = \`uploads/\${crypto.randomUUID()}.png\`
+    // a signed, direct-to-storage PUT target: no bytes here
+    return await this.fileSystem.temporaryUploadUrl(key, { contentType: 'image/png', expiresIn: 300 })
   }
 
-  // 2. After the direct upload succeeds, the client submits the form.
-  @Post('/')
-  async submit (event) {
+  // 2. After the direct upload succeeds, the client records the pointer.
+  @Post('/complete')
+  async complete (event) {
     const { key, title } = event.get('body')
     return this.files.save({ key, title })   // record the pointer, not the file
   }
 }`}</Code>
         <p>
-          The client uses the returned <code>url</code> to <code>PUT</code> the file directly to storage,
-          then posts the form to <code>/uploads</code> with the <code>key</code> it was given. The
-          temporary URL expires on its own, so an unfinished upload leaves nothing to clean up.
+          The client uses the returned target to <code>PUT</code> the file directly to storage, then
+          posts to <code>/uploads/complete</code> with the <code>key</code> it was given. The temporary
+          URL expires on its own, so an unfinished upload leaves nothing to clean up.
         </p>
 
-        <h2>The signing lives in a service, for now</h2>
+        <h2>The signing is a blueprint concern</h2>
         <p>
-          The <code>storage</code> service above is yours today: a thin wrapper around your cloud
-          provider's SDK that turns <code>signedPutUrl</code> into a call to S3, R2, GCS or Azure Blob.
-          That is a deliberate, honest boundary. The routing, the handlers and the per-event model are
-          Stone.js; the signing is one SDK call you own.
+          <code>@stone-js/cloud-file</code> makes signing, TTLs and provider choice a blueprint concern
+          instead of hand-written SDK glue, the same way the runtime is already an adapter concern. You
+          declare one disk, and the default filesystem is injected as <code>fileSystem</code>:
         </p>
+        <Code file='app/Application.ts'>{`@CloudFile({ driver: 's3', bucket: 'uploads', region: 'eu-west-3' })
+@StoneApp({ name: 'uploads' })
+export class Application {}`}</Code>
         <p>
-          The ergonomic <code>@stone-js/cloud-file</code> module is on the way. It will make signing,
-          TTLs and provider choice a blueprint concern instead of hand-written SDK glue, the same way
-          the runtime is already an adapter concern. Until it ships, the pattern on this page is the
-          whole recipe and it works on every provider.
+          <code>fileSystem</code> speaks one agnostic contract: <code>temporaryUploadUrl</code> for the
+          direct upload, <code>temporaryUrl</code> for a private download, <code>put</code> and
+          <code> url</code> for the rest. The <code>s3</code> driver is S3-compatible, so the same code
+          targets AWS, Cloudflare R2, MinIO and DigitalOcean Spaces by setting <code>endpoint</code>, and
+          your domain never talks to a cloud SDK. The <code>signed-url-uploads</code> starter below is
+          this recipe, ready to run.
         </p>
 
         <h2>Why it matters</h2>

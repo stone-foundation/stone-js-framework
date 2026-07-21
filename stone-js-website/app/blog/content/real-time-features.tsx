@@ -1,13 +1,13 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
 const SLUG = 'real-time-features'
 
 /**
- * Blog: Real-time features, live updates and presence (architecture, deferred module).
+ * Blog: Real-time features, live updates and presence.
  */
 @Page(`/blog/${SLUG}`, { layout: 'site' })
 export class RealTimeFeatures implements IPage<ReactIncomingEvent> {
@@ -34,13 +34,13 @@ export class RealTimeFeatures implements IPage<ReactIncomingEvent> {
           editing want, at the cost of a stateful connection. Most live dashboards need only the first.
         </p>
 
-        <Architecture
-          caption='A client subscribes; a change becomes an event; subscribers hear it. The same intention model, held open.'
+        <Diagram
+          caption='A client subscribes; a change becomes an event; subscribers hear it. The connection is the adapter’s to hold, so the same gateway runs on Node WebSockets or API Gateway.'
           nodes={[
-            { label: 'Client', sub: 'subscribes: SSE / WebSocket', tone: 'client' },
-            { label: 'Adapter', sub: 'holds the connection', tone: 'context' },
-            { label: 'Handler', sub: 'a change becomes an event', tone: 'domain' },
-            { label: 'Broadcast', sub: 'to subscribers · presence', tone: 'store' }
+            { label: 'Client', sub: 'SSE / WebSocket', kind: 'client' },
+            { label: 'Adapter', sub: 'holds the connection', kind: 'context' },
+            { label: 'Gateway', sub: '@RealtimeGateway', kind: 'domain' },
+            { label: 'Broadcast', sub: 'fan-out · presence', kind: 'store' }
           ]}
         />
 
@@ -59,38 +59,42 @@ export class RealTimeFeatures implements IPage<ReactIncomingEvent> {
           server should stream from the edge, unchanged.
         </p>
 
-        <h2>What you can build today</h2>
+        <h2>How you build it</h2>
         <p>
-          You do not have to wait to ship live features. A subscription is a route, and pushing an update
-          is a response held open. Today you wire the stream in a handler with the tools your runtime
-          gives you; the routing, the per-event model and the adapters are all already here.
+          <code>@stone-js/realtime</code> turns channels, broadcast fan-out and presence into a blueprint
+          concern, the same way the runtime is already an adapter concern. You write a gateway; its
+          <code> @On*</code> methods react to socket lifecycle and channel events, and the broadcaster
+          fans a message out to every subscriber. The connection plumbing is gone.
         </p>
-        <Code file='app/LiveController.ts'>{`import { EventHandler, Get } from '@stone-js/router'
+        <Code file='app/ChatGateway.ts'>{`import { RealtimeGateway, OnConnect, OnEvent, connectionOf } from '@stone-js/realtime'
 
-@EventHandler('/live')
-export class LiveController {
-  @Get('/tasks')
-  stream (event) {
-    // A subscription is an event held open. Today you return a
-    // text/event-stream response and push updates as changes happen,
-    // using your runtime's streaming primitives.
-    // @stone-js/realtime (on the way) will make the channel, the
-    // fan-out and presence ergonomic, without changing this shape.
+@RealtimeGateway()
+export class ChatGateway {
+  constructor (private readonly realtime) {}
+
+  @OnConnect()
+  async onConnect (_payload, event) {
+    await this.realtime.to('room:general').emit('presence', { joined: connectionOf(event)?.id })
+  }
+
+  @OnEvent('room:general', 'message')
+  async onMessage (payload) {
+    await this.realtime.to('room:general').emit('message', payload)  // fan out to every subscriber
   }
 }`}</Code>
         <p>
-          The comment is the honest boundary. The route and the per-event model are Stone.js; the stream
-          itself is wired by hand for now. The upcoming <code>@stone-js/realtime</code> module will turn
-          channels, broadcast fan-out and presence into a blueprint concern, the same way the runtime is
-          already an adapter concern, so the connection plumbing disappears and the handler stays exactly
-          this small.
+          Because the gateway is dispatched through the kernel by the router, the exact same class runs on
+          <code> @stone-js/node-ws-adapter</code> and on <code>@stone-js/aws-apigw-ws-adapter</code>: a
+          different adapter on the app, no change to the gateway. Switch the broadcaster from memory to
+          Redis and presence and broadcasts span every node. The <code>realtime-chat</code> starter below
+          is this, ready to run.
         </p>
 
         <h2>Why it matters</h2>
         <ul>
           <li><strong>The transport is not your logic.</strong> SSE or WebSocket is a context detail an adapter should own, not something threaded through your domain.</li>
           <li><strong>It runs where you run.</strong> Holding a connection is the runtime's job, so the same live handler works on Node, serverless and the edge.</li>
-          <li><strong>Nothing to rewrite later.</strong> The handler shape you build today is the one the realtime module will slot under, so adopting it is additive.</li>
+          <li><strong>The same gateway, every transport.</strong> Node WebSockets today, API Gateway on serverless, the edge next: the gateway is dispatched through the kernel, so the transport is the adapter’s concern, not yours.</li>
         </ul>
 
         <p>

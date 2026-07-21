@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
@@ -35,13 +35,13 @@ export class OpenApiFromYourSchemas implements IPage<ReactIncomingEvent> {
           The contract should be a view of those, not a parallel artifact you maintain in parallel.
         </p>
 
-        <Architecture
-          caption='The schemas you validate against become the JSON Schema in the document. One source, generated.'
+        <Diagram
+          caption='The schemas you validate against become the JSON Schema in the document. One source, generated, never a second copy to maintain.'
           nodes={[
-            { label: 'Your schemas', sub: 'validation + resources', tone: 'domain' },
-            { label: 'toJsonSchema', sub: 'schema to JSON Schema', tone: 'context' },
-            { label: 'OpenApiGenerator', sub: 'a valid OpenAPI doc', tone: 'context' },
-            { label: '/openapi.json', sub: 'served from a route', tone: 'store' }
+            { label: 'Your schemas', sub: 'validation', kind: 'domain' },
+            { label: 'toJsonSchema', sub: 'schema → JSON Schema', kind: 'context' },
+            { label: 'OpenApiGenerator', sub: 'a valid OpenAPI doc', kind: 'context' },
+            { label: '/openapi.json', sub: 'served from a route', kind: 'store' }
           ]}
         />
 

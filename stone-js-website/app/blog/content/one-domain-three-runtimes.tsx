@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
@@ -43,13 +43,16 @@ export class OneDomainThreeRuntimes implements IPage<ReactIncomingEvent> {
           selected until the app runs, when Stone.js resolves exactly one, the contextual collapse.
         </p>
 
-        <Architecture
-          caption='One codebase, adapters stacked; the run-time collapse picks the target’s adapter.'
+        <Diagram
+          layout='hub'
+          height={420}
+          caption='One codebase at the centre. At run time the collapse picks the target’s adapter, so the same domain is served on Node, Lambda, the edge or the browser, unchanged.'
           nodes={[
-            { label: 'Your domain', sub: 'written once', tone: 'domain' },
-            { label: 'Adapters', sub: 'node-http · aws-lambda · fetch', tone: 'context' },
-            { label: 'Run → collapse', sub: 'the target’s adapter', tone: 'context' },
-            { label: 'Serving', sub: 'Node · Lambda · Edge', tone: 'store' }
+            { label: 'Your domain', sub: 'written once', kind: 'core' },
+            { label: 'Node', sub: 'node-http-adapter', kind: 'context' },
+            { label: 'AWS Lambda', sub: 'aws-lambda-adapter', kind: 'context' },
+            { label: 'Edge', sub: 'fetch-adapter', kind: 'context' },
+            { label: 'Browser', sub: 'browser-adapter', kind: 'context' }
           ]}
         />
 

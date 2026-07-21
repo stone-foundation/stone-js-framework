@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import { Code } from '../../docs/components/Code'
-import { Architecture } from '../components/Architecture'
+import { Diagram } from '../components/Diagram'
 import { ArticleLayout, articleHead } from '../ArticleLayout'
 import { HeadContext, IPage, Page, ReactIncomingEvent, StoneLink } from '@stone-js/use-react'
 
@@ -37,12 +37,18 @@ export class IntroducingStoneJs implements IPage<ReactIncomingEvent> {
           apart: you write the domain once, and the context applies to it, not the other way around.
         </p>
 
-        <Architecture
-          caption='You write the domain. Adapters supply the context. The two resolve, once per event.'
+        <Diagram
+          layout='hub'
+          height={430}
+          caption='Application = Domain × Context → Resolution. You write the domain once; every context applies to it at run time, one resolution per event.'
           nodes={[
-            { label: 'Domain', sub: 'what it means, written once', tone: 'domain' },
-            { label: 'Context', sub: 'runtime + protocol, from an adapter', tone: 'context' },
-            { label: 'Resolution', sub: 'the response, per event', tone: 'store' }
+            { label: 'Your domain', sub: 'written once', kind: 'core' },
+            { label: 'HTTP', sub: 'node-http', kind: 'context' },
+            { label: 'Serverless', sub: 'aws-lambda', kind: 'context' },
+            { label: 'Edge', sub: 'fetch adapter', kind: 'context' },
+            { label: 'CLI', sub: 'node-cli', kind: 'context' },
+            { label: 'Agent', sub: 'mcp adapter', kind: 'context' },
+            { label: 'Browser', sub: 'browser adapter', kind: 'context' }
           ]}
         />
 
