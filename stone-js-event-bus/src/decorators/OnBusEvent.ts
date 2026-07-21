@@ -1,16 +1,9 @@
-import { createKeyDecorator } from '@stone-js/router'
-
-/** Metadata key under which `@OnBusEvent` records the (event name -> method) mappings on a class. */
-export const ON_BUS_EVENT_KEY: symbol = Symbol.for('stone.eventBus.onBusEvent')
-
 /**
  * Method decorator: mark a method as the handler for a bus event name.
  *
- * Use it on the methods of a class also decorated with `@BusHandler()`. One class can handle several
- * events, one method each. The method receives `(payload, event)`.
- *
- * @param name - The event name this method handles.
- * @returns A method decorator.
+ * A bus-flavoured alias of the light router's `@OnKey`: incoming bus events are routed to the
+ * matching method by the `@stone-js/router` light key-router (enabled by `@BusListener()`). Use it on
+ * a `@BusHandler()` class; the method receives `(payload, event)`.
  *
  * @example
  * ```typescript
@@ -21,4 +14,4 @@ export const ON_BUS_EVENT_KEY: symbol = Symbol.for('stone.eventBus.onBusEvent')
  * }
  * ```
  */
-export const OnBusEvent: (name: string) => MethodDecorator = createKeyDecorator(ON_BUS_EVENT_KEY)
+export { OnKey as OnBusEvent } from '@stone-js/router'

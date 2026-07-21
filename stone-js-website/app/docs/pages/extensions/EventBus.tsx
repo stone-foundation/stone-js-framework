@@ -83,9 +83,12 @@ npm i @aws-sdk/client-eventbridge   # only for the EventBridge driver`}</Code>
 
         <H2>Listen, on any cloud adapter</H2>
         <p>
-          The listener side needs no adapter of its own: it injects itself as the kernel event
-          handler, exactly as <code>@stone-js/router</code> does. Stack <code>@BusListener()</code> on
-          a simple cloud adapter (here AWS Lambda); the adapter receives the event, the bus routes it.
+          The listener side needs no adapter of its own: it is the light key-router from
+          <code> @stone-js/router</code>. <code>@BusListener</code>, <code>@BusHandler</code> and
+          <code> @OnBusEvent</code> are bus-flavoured aliases of <code>@KeyRouting</code>,
+          <code> @KeyHandler</code> and <code>@OnKey</code>, so the router installs itself as the
+          kernel event handler. Stack <code>@BusListener()</code> on a simple cloud adapter (here AWS
+          Lambda); the adapter receives the event, the light router dispatches it.
         </p>
         <Code file='app/Application.ts'>{`import { AwsLambda } from '@stone-js/aws-lambda-adapter'
 import { BusListener } from '@stone-js/event-bus'

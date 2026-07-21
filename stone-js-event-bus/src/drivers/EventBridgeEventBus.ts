@@ -6,8 +6,8 @@ import { EmitOptions, EventBusConnection, EventBridgeOptions } from '../declarat
  *
  * Publishes each event as a `PutEvents` entry (`Source`, `DetailType`, `Detail`) on the configured
  * event bus. The domain emits; EventBridge rules fan out to targets (Lambda, SQS, ...), where the
- * listener side ({@link BusEventHandler}) routes the event to its `@OnBusEvent` handler.
- * `@aws-sdk/client-eventbridge` is imported lazily as an optional peer dependency.
+ * listener side (the light key-router from `@stone-js/router`, via `@BusListener`) routes the event
+ * to its `@OnBusEvent` handler. `@aws-sdk/client-eventbridge` is imported lazily as an optional peer.
  */
 export class EventBridgeEventBus implements EventBusConnection {
   readonly name: string

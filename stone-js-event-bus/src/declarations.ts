@@ -1,5 +1,3 @@
-import { IncomingEvent } from '@stone-js/core'
-
 /**
  * A message published on the bus: an event name and its payload.
  */
@@ -79,39 +77,9 @@ export interface EventBridgeOptions extends ConnectionOptions {
 export type ConnectionFactory = (options: ConnectionOptions) => EventBusConnection
 
 /**
- * Extracts the routing key (and payload) from an incoming event for the listener.
- */
-export type BusEventExtractor = (event: IncomingEvent) => { key?: string, payload?: unknown }
-
-/**
- * The listener configuration: which incoming-event property carries the routing key, or a full
- * extractor for non-trivial shapes.
- */
-export interface BusListenConfig {
-  /** The incoming-event property holding the routing key (defaults to `detail-type`). */
-  source?: string
-  /** A full extractor, taking precedence over `source`. */
-  extractor?: BusEventExtractor
-}
-
-/**
- * A bus-handler meta-module for imperative registration under `stone.eventBus.handlers`.
- */
-export interface BusHandlerMeta {
-  /** The event name this handler answers (omit when using `@OnBusEvent` methods). */
-  name?: string
-  /** The handler: a function, an instance, a class or a factory. */
-  module: unknown
-  /** The method to call for class/factory handlers (defaults to `handle`). */
-  action?: string
-  /** Whether `module` is a class to resolve. */
-  isClass?: boolean
-  /** Whether `module` is a factory to resolve. */
-  isFactory?: boolean
-}
-
-/**
- * The `stone.eventBus` configuration bucket.
+ * The `stone.eventBus` configuration bucket (emit side).
+ *
+ * The listener side is configured under `stone.keyRouting` by the light router (`@BusListener()`).
  */
 export interface EventBusConfig {
   /** The default connection name for `connection()`. */
@@ -120,8 +88,4 @@ export interface EventBusConfig {
   targets?: string[]
   /** The connections to register. */
   connections?: ConnectionOptions[]
-  /** The handlers (classes with `@OnBusEvent` methods, or named handlers) to register. */
-  handlers?: BusHandlerMeta[]
-  /** The listener configuration (enables routing incoming bus events to handlers). */
-  listen?: BusListenConfig
 }

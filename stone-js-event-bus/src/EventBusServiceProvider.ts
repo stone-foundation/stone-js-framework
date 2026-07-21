@@ -1,12 +1,10 @@
-import { KeyRouter, collectKeyHandlers } from '@stone-js/router'
 import { LocalEventBus } from './drivers/LocalEventBus'
 import { EventBusManager } from './EventBusManager'
-import { ON_BUS_EVENT_KEY } from './decorators/OnBusEvent'
 import { MemoryEventBus } from './drivers/MemoryEventBus'
 import { EventBusError } from './errors/EventBusError'
 import { EventBridgeEventBus } from './drivers/EventBridgeEventBus'
-import { ClassType, IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
-import { EventBusConfig, ConnectionOptions, ConnectionFactory, BusHandlerMeta } from './declarations'
+import { IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
+import { EventBusConfig, ConnectionOptions, ConnectionFactory } from './declarations'
 
 /**
  * Built-in connection factories, keyed by driver name. `memory` needs nothing; `eventbridge` imports
@@ -19,12 +17,12 @@ const DRIVERS: Record<string, ConnectionFactory> = {
 }
 
 /**
- * Wires the event bus into the container.
+ * Wires the emit side of the event bus into the container.
  *
  * Builds an {@link EventBusManager} (with a default `local` connection bound to the container's
- * `EventEmitter`), a key-router populated from the configured/decorated `@OnBusEvent` handlers, then
- * publishes the manager process-wide and binds `eventBus`, `eventBusManager` and `eventBusRouter`.
- * The core is never touched: the local driver uses the emitter, it does not modify it.
+ * `EventEmitter`), publishes it process-wide and binds `eventBus` / `eventBusManager`. The listener
+ * side is the light key-router from `@stone-js/router` (enabled by `@BusListener()`), so this
+ * provider no longer owns a router. The core is never touched: the local driver uses the emitter.
  */
 export class EventBusServiceProvider implements IServiceProvider {
   /**
@@ -33,7 +31,7 @@ export class EventBusServiceProvider implements IServiceProvider {
   constructor (private readonly container: IContainer) {}
 
   /**
-   * Register the event-bus services.
+   * Register the event-bus emit services.
    */
   register (): Promiseable<void> {
     const config = this.container.make<IBlueprint>('blueprint').get<EventBusConfig>('stone.eventBus', {})
@@ -44,18 +42,11 @@ export class EventBusServiceProvider implements IServiceProvider {
       this.registerConnection(manager, connection)
     }
 
-    const router = KeyRouter.create()
-    for (const handler of config.handlers ?? []) {
-      this.registerHandler(router, handler)
-    }
-
     EventBusManager.setInstance(manager)
 
     this.container
       .instanceIf(EventBusManager, manager)
       .alias(EventBusManager, ['eventBus', 'eventBusManager'])
-      .instanceIf(KeyRouter, router)
-      .alias(KeyRouter, ['eventBusRouter'])
   }
 
   /**
@@ -71,26 +62,5 @@ export class EventBusServiceProvider implements IServiceProvider {
       throw new EventBusError(`Unknown event-bus driver "${String(connection.driver)}" for connection "${connection.name}".`)
     }
     manager.registerFactory(connection.name, () => factory(connection))
-  }
-
-  /**
-   * Register one handler meta-module into the key-router, resolving classes/factories via the container.
-   *
-   * @param router - The key-router.
-   * @param meta - The handler meta-module.
-   */
-  private registerHandler (router: KeyRouter, meta: BusHandlerMeta): void {
-    const isResolvable = meta.isClass === true || meta.isFactory === true
-    const handler = isResolvable ? this.container.make(meta.module as any) : meta.module
-
-    if (meta.name !== undefined) {
-      router.register(meta.name, handler as any, meta.action ?? 'handle')
-    }
-
-    if (isResolvable) {
-      for (const { key, action } of collectKeyHandlers(meta.module as ClassType, ON_BUS_EVENT_KEY)) {
-        router.register(key, handler as any, action)
-      }
-    }
   }
 }

@@ -52,8 +52,10 @@ export class OrderService {
 
 ## Listen (on any cloud adapter)
 
-The listener side plugs onto a simple cloud adapter (here AWS Lambda). `@BusListener()` makes the bus
-the kernel event handler; the adapter receives the event, the bus routes it to the handler.
+The listener side is the light key-router from `@stone-js/router`: `@BusListener`, `@BusHandler` and
+`@OnBusEvent` are bus-flavoured aliases of `@KeyRouting`, `@KeyHandler` and `@OnKey`. It installs
+itself as the kernel event handler and plugs onto a simple cloud adapter (here AWS Lambda); the
+adapter receives the event, the light router routes it to the handler.
 
 ```ts
 import { StoneApp } from '@stone-js/core'
