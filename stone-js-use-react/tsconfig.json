@@ -23,6 +23,6 @@
     "allowSyntheticDefaultImports": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "forceConsistentCasingInFileNames": true,
-    "types": ["node", "vitest/globals", "vite/client"],
+    "types": ["node", "vitest/globals"],
   }
 }

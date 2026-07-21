@@ -18,7 +18,6 @@
     "@docsearch/js": "^3.9.0",
     "@stone-js/browser-adapter": "workspace:*",
     "@stone-js/core": "workspace:*",
-    "@stone-js/node-cli-adapter": "workspace:*",
     "@stone-js/node-http-adapter": "workspace:*",
     "@stone-js/router": "workspace:*",
     "@stone-js/use-react": "workspace:*",

@@ -16,25 +16,21 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint · Test · Build (Node ${{ matrix.node-version }})
+    name: Build · Lint · Test · Sonar
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: ['20', '22']
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Sonar needs full history for blame/new-code.
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
@@ -43,22 +39,23 @@ jobs:
       - name: Security audit (high · critical)
         run: pnpm audit --audit-level=high
 
-      # Type-aware lint is Node-version-independent, so run it once on the primary Node.
-      # (typescript-eslint's project service mis-resolves workspace package types to `any`
-      # on Node 22, producing false positives; build + test still run on every matrix leg.)
+      # CI gates the published framework packages. The website (built + shipped by
+      # deploy-website.yml) and the lab demo apps are internal apps, excluded here.
+      #
+      # Build BEFORE lint: type-aware lint (ts-standard) reads each package's dependency
+      # types from the built dist/*.d.ts; without a prior build the workspace @stone-js/*
+      # imports resolve to `any` and trip strict-boolean-expressions / return-await.
+      - name: Build (packages)
+        run: pnpm run build:ci
+
       - name: Lint
-        if: ${{ matrix.node-version == '20' }}
-        run: pnpm lint
+        run: pnpm run lint:ci
 
       - name: Test (with coverage)
-        run: pnpm run test:coverage
+        run: pnpm run test:ci
 
-      - name: Build
-        run: pnpm build
-
-      # Sonar runs once, on the primary Node version, with the aggregated lcov reports.
       - name: SonarCloud Scan
-        if: ${{ matrix.node-version == '20' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        uses: SonarSource/sonarqube-scan-action@v5
+        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
