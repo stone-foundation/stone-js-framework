@@ -191,6 +191,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Route middleware', path: '/docs/routing/middleware' },
       { title: 'Redirects & responses', path: '/docs/routing/redirects' },
       { title: 'Matching & precedence', path: '/docs/routing/matching' },
+      { title: 'Key routing (light)', path: '/docs/routing/key-routing' },
       { title: 'Misc', path: '/docs/routing/misc' }
     ]
   },

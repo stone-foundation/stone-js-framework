@@ -33,6 +33,7 @@ Stone.js router for both Node.js and browser environments, designed for serverle
 - **Regex and Dynamic Params**: Advanced matching for custom use cases.
 - **Error Handling & Fallbacks**: Integrated with the event lifecycle.
 - **Smart Defaults**: Supports defaults, route rules, redirect handling, etc.
+- **Key routing (light)**: `@KeyRouting()`, the event-routing sibling of `@Routing()`, routes events by a key (bus events, realtime gateways, CLI commands) instead of a path. Mutually exclusive with `@Routing()`, and tree-shaken away when unused.
 
 ## Installation
 

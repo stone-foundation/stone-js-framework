@@ -3225,6 +3225,9 @@ importers:
       '@stone-js/core':
         specifier: workspace:*
         version: link:../stone-js-core
+      '@stone-js/key-router':
+        specifier: workspace:*
+        version: link:../stone-js-key-router
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
