@@ -166,6 +166,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Resources', path: '/docs/extensions/resources' },
       { title: 'Cloud File (storage)', path: '/docs/extensions/cloud-file' },
       { title: 'Cache', path: '/docs/extensions/cache' },
+      { title: 'Queue', path: '/docs/extensions/queue' },
       { title: 'OpenAPI', path: '/docs/extensions/openapi' },
       { title: 'Testing', path: '/docs/extensions/testing' },
       { title: 'MCP server & llms.txt', path: '/docs/extensions/mcp' },
