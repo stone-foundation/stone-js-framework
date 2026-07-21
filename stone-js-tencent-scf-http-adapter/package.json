@@ -6,11 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/stone-foundation/stone-js-tencent-scf-http-adapter.git"
+    "url": "git+https://github.com/stone-foundation/stone-js-framework.git",
+    "directory": "stone-js-tencent-scf-http-adapter"
   },
   "homepage": "https://stonejs.dev",
   "bugs": {
-    "url": "https://github.com/stone-foundation/stone-js-tencent-scf-http-adapter/issues"
+    "url": "https://github.com/stone-foundation/stone-js-framework/issues"
   },
   "keywords": [
     "tencent",

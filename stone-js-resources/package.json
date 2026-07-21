@@ -6,11 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/stone-foundation/stone-js-resources.git"
+    "url": "git+https://github.com/stone-foundation/stone-js-framework.git",
+    "directory": "stone-js-resources"
   },
   "homepage": "https://stonejs.dev",
   "bugs": {
-    "url": "https://github.com/stone-foundation/stone-js-resources/issues"
+    "url": "https://github.com/stone-foundation/stone-js-framework/issues"
   },
   "keywords": [
     "StoneJS",

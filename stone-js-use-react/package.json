@@ -6,11 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/stone-foundation/stone-js-use-react.git"
+    "url": "git+https://github.com/stone-foundation/stone-js-framework.git",
+    "directory": "stone-js-use-react"
   },
   "homepage": "https://stonejs.dev",
   "bugs": {
-    "url": "https://github.com/stone-foundation/stone-js-use-react/issues"
+    "url": "https://github.com/stone-foundation/stone-js-framework/issues"
   },
   "keywords": [
     "browser",

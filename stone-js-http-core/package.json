@@ -6,11 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/stone-foundation/stone-js-http-core.git"
+    "url": "git+https://github.com/stone-foundation/stone-js-framework.git",
+    "directory": "stone-js-http-core"
   },
   "homepage": "https://stonejs.dev",
   "bugs": {
-    "url": "https://github.com/stone-foundation/stone-js-http-core/issues"
+    "url": "https://github.com/stone-foundation/stone-js-framework/issues"
   },
   "keywords": [
     "Http",
