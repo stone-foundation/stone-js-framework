@@ -109,7 +109,7 @@ export const ARTICLES = [
     excerpt: 'Uploading large files without proxying the bytes through your API. Issue a short-lived signed URL, let the client upload straight to storage, then save only the metadata.',
     tags: ['architecture', 'storage', 'cloud-native'],
     ogImage: '/og/signed-url-file-uploads.png',
-    starter: null,
+    starter: 'signed-url-uploads',
     locale: 'en'
   },
   {

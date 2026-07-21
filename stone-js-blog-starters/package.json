@@ -30,7 +30,8 @@
       { "value": "isomorphic-validation", "title": "Isomorphic validation", "description": "One schema, enforced at the API boundary (422) and reusable on the frontend form, with @stone-js/validation + Zod.", "tags": ["validation", "zod", "dx"], "path": "isomorphic-validation" },
       { "value": "stateless-auth", "title": "Stateless auth", "description": "Verify a JWT at the boundary and guard routes with requireAuth/requireScopes, no session store, with @stone-js/auth.", "tags": ["auth", "jwt", "edge", "security"], "path": "stateless-auth" },
       { "value": "api-as-tools", "title": "API as agent tools", "description": "Expose the same domain served over HTTP to AI agents as MCP tools by stacking the MCP adapter.", "tags": ["mcp", "agents", "ai"], "path": "api-as-tools" },
-      { "value": "openapi-contract", "title": "OpenAPI contract from your schemas", "description": "Generate a public OpenAPI document from the Zod schemas you already validate with, and serve it with Swagger UI.", "tags": ["openapi", "validation", "api"], "path": "openapi-contract" }
+      { "value": "openapi-contract", "title": "OpenAPI contract from your schemas", "description": "Generate a public OpenAPI document from the Zod schemas you already validate with, and serve it with Swagger UI.", "tags": ["openapi", "validation", "api"], "path": "openapi-contract" },
+      { "value": "signed-url-uploads", "title": "Direct-to-cloud uploads", "description": "Direct-to-cloud file uploads with short-lived signed URLs, the bytes never touch your function, with @stone-js/cloud-file.", "tags": ["storage", "s3", "uploads"], "path": "signed-url-uploads" }
     ]
   },
   "scripts": {
