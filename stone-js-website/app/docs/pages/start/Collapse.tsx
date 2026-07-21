@@ -71,7 +71,7 @@ curl localhost:8080/tasks           # [{ "id": "...", "title": "Ship it", "done"
         </p>
         <Aphorism>The runtime is a value you set in the manifest, not a foundation you pour under the code.</Aphorism>
 
-        <H2>Build once, deploy anywhere</H2>
+        <H2>Your app exists in every runtime. Until you run it.</H2>
         <p>
           <code>npm run build</code> emits a single self-contained artifact in <code>dist/</code>,
           with no <code>node_modules</code> to carry. That one artifact drops onto any JavaScript

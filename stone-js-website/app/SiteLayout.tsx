@@ -8,9 +8,9 @@ import { IPageLayout, PageLayout, PageLayoutRenderContext, StoneOutlet } from '@
 const NO_FLASH = "(function(){try{var d=document.documentElement,t=localStorage.getItem('stone-theme');if(t)d.setAttribute('data-theme',t);}catch(e){}})();"
 
 /**
- * The site shell for the marketing/content sections (Starters, Blog,
- * Benchmarks): the global header + footer around a page outlet. Distinct from
- * the docs layout; pages opt in with `@Page(path, { layout: 'site' })`.
+ * The site shell for the marketing/content sections (Modules, Starters, Blog):
+ * the global header + footer around a page outlet. Distinct from the docs
+ * layout; pages opt in with `@Page(path, { layout: 'site' })`.
  */
 @PageLayout({ name: 'site' })
 export class SiteLayout implements IPageLayout {

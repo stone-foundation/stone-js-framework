@@ -21,7 +21,7 @@ import { IPage, Page, ReactIncomingEvent, HeadContext } from '@stone-js/use-reac
 export class HomePage implements IPage<ReactIncomingEvent> {
   head (): HeadContext {
     return {
-      title: 'Stone.js · Build once, deploy anywhere',
+      title: 'Stone.js · Your app exists in every runtime. Until you run it.',
       description: 'The Continuum framework. Write your domain once: it lives in superposition across every context (server, edge, browser, agents) and collapses into one at runtime.',
       metas: [
         { name: 'author', content: 'Stone Foundation' },

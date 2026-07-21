@@ -78,7 +78,7 @@ export class TaskController {
           domain never changes.
         </p>
         <p>
-          That is what "build once, deploy anywhere" means when it is mechanical rather than marketing:
+          That is what "your app exists in every runtime, until you run it" means when it is mechanical rather than marketing:
           one codebase, every runtime the industry has, and the ones it invents next arrive as a package
           someone writes, not a release you wait for.
         </p>
