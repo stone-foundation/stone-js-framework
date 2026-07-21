@@ -78,6 +78,24 @@ exports.handler = await stoneApp.run()`}</Code>
           trigger's <code>(req, resp, context)</code> model.
         </Callout>
 
+        <H2>Generic (non-HTTP) triggers</H2>
+        <p>
+          For triggers that are not HTTP, an OSS object change, an MNS/queue message, a Timer or an
+          EventBridge event, use the generic <code>@stone-js/alibaba-fc-adapter</code> with
+          <code> @AlibabaFc()</code>. The function is invoked with <code>(event, context)</code>; the
+          adapter normalizes it into an intention whose metadata carries the event payload, so one
+          handler can dispatch on the trigger.
+        </p>
+        <Code file='app/Application.ts'>{`import { AlibabaFc } from '@stone-js/alibaba-fc-adapter'
+
+@AlibabaFc()
+@StoneApp({ name: 'workers' })
+export class Application {}`}</Code>
+        <p>
+          On a thrown error the adapter rethrows by default so FC applies its retry / dead-letter
+          policy; opt out with <code>stone.adapter.rethrowOnError = false</code>.
+        </p>
+
         <H2>Deploy</H2>
         <p>
           Build the function output and deploy with Serverless Devs (<code>s deploy</code>) or the
@@ -89,7 +107,7 @@ s deploy   # Serverless Devs`}</Code>
         <H2>Triggers</H2>
         <PropsTable nameHeader='Package' rows={[
           { name: '@stone-js/alibaba-fc-http-adapter', type: '@AlibabaFcHttp', desc: 'HTTP-triggered functions (FC 2.0 req/resp/context). Use with @Routing.' },
-          { name: '@stone-js/alibaba-fc-adapter', type: '@AlibabaFc', desc: 'Generic event triggers (OSS, MNS, Timer, EventBridge). Coming next.' }
+          { name: '@stone-js/alibaba-fc-adapter', type: '@AlibabaFc', desc: 'Generic event triggers (OSS, MNS, Timer, EventBridge, Log).' }
         ]} />
 
         <Callout kind='future' title='Stack it to keep options open'>
