@@ -1,15 +1,6 @@
-import { KeyRouter, collectKeyHandlers } from '@stone-js/router'
 import { EventBusManager } from '../src/EventBusManager'
 import { EventBusError } from '../src/errors/EventBusError'
 import { EventBusServiceProvider } from '../src/EventBusServiceProvider'
-
-vi.mock('@stone-js/router', async (importOriginal) => {
-  const actual: any = await importOriginal()
-  return { ...actual, collectKeyHandlers: vi.fn(() => []) }
-})
-
-class Orders { async handle (): Promise<string> { return 'ok' }; async onCancelled (): Promise<void> {} }
-const fnHandler = vi.fn(async () => 'done')
 
 const makeContainer = (config: any): any => {
   const emitter = { emit: vi.fn() }
@@ -23,45 +14,31 @@ const makeContainer = (config: any): any => {
 }
 
 const managerArg = (c: any): EventBusManager => c.instanceIf.mock.calls.find((call: any[]) => call[0] === EventBusManager)[1]
-const routerArg = (c: any): KeyRouter => c.instanceIf.mock.calls.find((call: any[]) => call[0] === KeyRouter)[1]
 
-describe('EventBusServiceProvider', () => {
-  afterEach(() => { EventBusManager.setInstance(undefined); vi.mocked(collectKeyHandlers).mockReset().mockReturnValue([]) })
+describe('EventBusServiceProvider (emit side)', () => {
+  afterEach(() => { EventBusManager.setInstance(undefined) })
 
-  it('binds eventBus, eventBusManager and eventBusRouter, and a local connection', async () => {
-    const container = makeContainer({ handlers: [{ name: 'order.shipped', module: Orders, isClass: true, action: 'handle' }, { name: 'ping', module: fnHandler }] })
+  it('binds eventBus / eventBusManager and a local connection', () => {
+    const container = makeContainer({})
 
     new EventBusServiceProvider(container).register()
 
     expect(container.instanceIf).toHaveBeenCalledWith(EventBusManager, expect.any(EventBusManager))
     expect(container.alias).toHaveBeenCalledWith(EventBusManager, ['eventBus', 'eventBusManager'])
-    expect(container.instanceIf).toHaveBeenCalledWith(KeyRouter, expect.any(KeyRouter))
-    expect(container.alias).toHaveBeenCalledWith(KeyRouter, ['eventBusRouter'])
 
     const manager = managerArg(container)
     expect(manager.has('local')).toBe(true)
     expect(manager.connection('local').name).toBe('local') // built via the emitter-backed factory
     expect(EventBusManager.getInstance()).toBe(manager)
-
-    const router = routerArg(container)
-    expect(router.has('order.shipped')).toBe(true)
-    expect(router.has('ping')).toBe(true)
   })
 
-  it('registers config-driven connections (memory) and scans @OnBusEvent methods', async () => {
-    vi.mocked(collectKeyHandlers).mockReturnValueOnce([{ key: 'order.cancelled', action: 'onCancelled' }])
-    const container = makeContainer({
-      connections: [{ name: 'rec', driver: 'memory' }],
-      handlers: [{ module: Orders, isClass: true }] // no name: @OnBusEvent scan
-    })
-
+  it('registers a config-driven memory connection', () => {
+    const container = makeContainer({ connections: [{ name: 'rec', driver: 'memory' }] })
     new EventBusServiceProvider(container).register()
-
     expect(managerArg(container).connection('rec').name).toBe('rec')
-    expect(routerArg(container).has('order.cancelled')).toBe(true)
   })
 
-  it('registers an eventbridge connection (no handlers configured)', () => {
+  it('registers an eventbridge connection', () => {
     const container = makeContainer({ connections: [{ name: 'cloud', driver: 'eventbridge' }] })
     new EventBusServiceProvider(container).register()
     expect(managerArg(container).connection('cloud').name).toBe('cloud')

@@ -1,12 +1,19 @@
-import { ON_BUS_EVENT_KEY } from '../src/decorators/OnBusEvent'
+import { OnKey, KeyHandler, KeyRouting } from '@stone-js/router'
+import { OnBusEvent } from '../src/decorators/OnBusEvent'
+import { BusHandler } from '../src/decorators/BusHandler'
+import { BusListener } from '../src/decorators/BusListener'
 
-vi.mock('@stone-js/router', () => ({
-  createKeyDecorator: vi.fn((metaKey: symbol) => (key: string) => ({ metaKey, key }))
-}))
+describe('bus listen decorators are light-router aliases', () => {
+  it('@OnBusEvent is the light router @OnKey', () => {
+    expect(OnBusEvent).toBe(OnKey)
+    expect(typeof OnBusEvent('order.shipped')).toBe('function')
+  })
 
-describe('OnBusEvent', () => {
-  it('maps an event name to a key under ON_BUS_EVENT_KEY', async () => {
-    const { OnBusEvent } = await import('../src/decorators/OnBusEvent')
-    expect(OnBusEvent('order.shipped')).toEqual({ metaKey: ON_BUS_EVENT_KEY, key: 'order.shipped' })
+  it('@BusHandler is the light router @KeyHandler', () => {
+    expect(BusHandler).toBe(KeyHandler)
+  })
+
+  it('@BusListener is the light router @KeyRouting', () => {
+    expect(BusListener).toBe(KeyRouting)
   })
 })
