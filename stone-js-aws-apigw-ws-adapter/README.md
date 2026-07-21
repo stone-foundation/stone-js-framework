@@ -1,0 +1,88 @@
+# Stone.js - AWS API Gateway WebSocket Adapter
+
+[![npm](https://img.shields.io/npm/l/@stone-js/aws-apigw-ws-adapter)](https://opensource.org/licenses/MIT)
+[![npm](https://img.shields.io/npm/v/@stone-js/aws-apigw-ws-adapter)](https://www.npmjs.com/package/@stone-js/aws-apigw-ws-adapter)
+[![npm](https://img.shields.io/npm/dm/@stone-js/aws-apigw-ws-adapter)](https://www.npmjs.com/package/@stone-js/aws-apigw-ws-adapter)
+![Maintenance](https://img.shields.io/maintenance/yes/2026)
+[![Build Status](https://github.com/stone-foundation/stone-js-aws-apigw-ws-adapter/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-aws-apigw-ws-adapter/actions/workflows/main.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-aws-apigw-ws-adapter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-aws-apigw-ws-adapter)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+
+**AWS API Gateway WebSocket adapter for Stone.js.** Runs your realtime app serverlessly: each socket event (`$connect`, `$disconnect`, a message) is a Lambda invocation, mapped onto [`@stone-js/realtime`](https://www.npmjs.com/package/@stone-js/realtime). The adapter keeps presence in DynamoDB (shared across the ephemeral invocations), fires your `@On*` gateways, and pushes messages back through the API Gateway Management API. The same gateway code runs here and on the Node `ws` adapter, no change.
+
+---
+
+## Installation
+
+```bash
+npm install @stone-js/aws-apigw-ws-adapter @stone-js/realtime
+
+# the AWS SDKs it uses (optional peers, imported lazily):
+npm install @aws-sdk/client-apigatewaymanagementapi @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
+```
+
+> Peer dependencies: `@stone-js/core`, `@stone-js/env` and `@stone-js/realtime`. The three `@aws-sdk/*` packages are optional peers, imported lazily when used.
+
+## Enable it
+
+```ts
+import { StoneApp } from '@stone-js/core'
+import { Realtime } from '@stone-js/realtime'
+import { ApiGatewayWs } from '@stone-js/aws-apigw-ws-adapter'
+
+@ApiGatewayWs()
+@Realtime({ driver: 'memory' })   // bootstraps the RealtimeManager
+@StoneApp({ name: 'chat' })
+export class Application {}
+```
+
+Register the serverless broadcaster (DynamoDB-backed presence) as the realtime default with a small
+provider. The adapter then resolves it from the manager and points it at each event's management
+endpoint:
+
+```ts
+import { IServiceProvider } from '@stone-js/core'
+import { RealtimeManager } from '@stone-js/realtime'
+import { ApiGatewayWsBroadcaster, DynamoDbConnectionStore } from '@stone-js/aws-apigw-ws-adapter'
+
+export class ApiGatewayWsRealtimeProvider implements IServiceProvider {
+  register (): void {
+    RealtimeManager.getInstance()
+      ?.register('apigw-ws', ApiGatewayWsBroadcaster.create({
+        store: DynamoDbConnectionStore.create({ table: 'ws_connections' })
+      }))
+      .setDefaultConnection('apigw-ws')
+  }
+}
+```
+
+## Gateways react to sockets
+
+```ts
+import { RealtimeGateway, OnConnect, OnEvent } from '@stone-js/realtime'
+
+@RealtimeGateway()
+export class Chat {
+  constructor (private readonly realtime) {}
+
+  @OnConnect() onConnect (connection) { /* authorize… */ }
+
+  @OnEvent('room:1', 'message')
+  async onMessage (payload, connection) {
+    await this.realtime.to('room:1').emit('message', payload)   // fans out via postToConnection
+  }
+}
+```
+
+## How it works
+
+- `run()` returns the `(event, context)` Lambda handler for your WebSocket API's routes.
+- `requestContext.eventType` is mapped: `CONNECT` adds the connection to the store and fires `@OnConnect`; `DISCONNECT` removes it and fires `@OnDisconnect`; `MESSAGE` parses the frame.
+- Control frames (`{ type: 'subscribe' | 'unsubscribe', channel }`) update DynamoDB presence and fire the matching gateway.
+- Data frames (`{ channel, event, payload }`) fire `@OnMessage` / `@OnEvent`.
+- A `broadcast` reads the channel's members from DynamoDB and posts to each via the Management API (the endpoint is taken from the event).
+- Set `stone.adapter.dispatchToKernel = true` to also route data frames through the kernel.
+
+## License
+
+[MIT](./LICENSE)
