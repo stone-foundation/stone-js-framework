@@ -143,6 +143,7 @@ export const DOC_NAV: DocSection[] = [
     items: [
       { title: 'Overview', path: '/docs/adapters' },
       { title: 'Node HTTP', path: '/docs/adapters/node-http' },
+      { title: 'Node WebSocket', path: '/docs/adapters/node-ws' },
       { title: 'Node CLI', path: '/docs/adapters/node-cli' },
       { title: 'Fetch (edge & serverless)', path: '/docs/adapters/fetch' },
       { title: 'AWS Lambda', path: '/docs/adapters/aws-lambda' },
