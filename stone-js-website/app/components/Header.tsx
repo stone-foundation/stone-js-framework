@@ -69,7 +69,7 @@ export function Footer (): JSX.Element {
       <div className='wrap foot'>
         <div>
           <div className='slogan'>Stone<span className='dot'>.</span>js</div>
-          <p className='muted' style={{ margin: '8px 0 0' }}>Build once, deploy anywhere.</p>
+          <p className='muted' style={{ margin: '8px 0 0' }}>Your app exists in every runtime. Until you run it.</p>
         </div>
         <div className='muted right'>
           An open-source project by <strong style={{ color: 'var(--encre)' }}>Stone Foundation</strong><br />

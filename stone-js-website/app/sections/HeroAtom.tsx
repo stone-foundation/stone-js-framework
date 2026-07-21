@@ -14,10 +14,10 @@ const ORBITS: Orbit[] = [
     cls: 'o1',
     electrons: [
       { name: 'node-http', th: '262deg', r: '214px', fd: '3.4s', fD: '.1s' },
-      { name: 'aws-lambda', th: '78deg', r: '214px', fd: '2.9s', fD: '.6s' }
+      { name: 'aws-lambda', th: '78deg', r: '214px', fd: '2.9s', fD: '.6s' },
+      { name: 'gcp·azure', th: '340deg', r: '214px', fd: '3.3s', fD: '.4s' }
     ],
     dots: [
-      { th: '10deg', r: '214px', sz: '5px' },
       { th: '150deg', r: '214px', sz: '4px', copper: true },
       { th: '200deg', r: '214px', sz: '6px' }
     ]
@@ -26,12 +26,12 @@ const ORBITS: Orbit[] = [
     cls: 'o2',
     electrons: [
       { name: 'cloudflare', th: '180deg', r: '156px', fd: '3.8s', fD: '.3s' },
-      { name: 'browser', th: '0deg', r: '156px', fd: '3.1s', fD: '.8s' }
+      { name: 'browser', th: '0deg', r: '156px', fd: '3.1s', fD: '.8s' },
+      { name: 'node-ws', th: '110deg', r: '156px', fd: '3.5s', fD: '.7s' }
     ],
     dots: [
-      { th: '70deg', r: '156px', sz: '5px', copper: true },
       { th: '250deg', r: '156px', sz: '4px' },
-      { th: '300deg', r: '156px', sz: '5px' }
+      { th: '300deg', r: '156px', sz: '5px', copper: true }
     ]
   },
   {

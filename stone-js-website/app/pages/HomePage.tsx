@@ -5,6 +5,7 @@ import { Agents } from '../sections/Agents'
 import { HeroAtom } from '../sections/HeroAtom'
 import { Paradigms } from '../sections/Paradigms'
 import { Ecosystem } from '../sections/Ecosystem'
+import { Showcase } from '../sections/Showcase'
 import { CollapseLab } from '../sections/CollapseLab'
 import { Header, Footer } from '../components/Header'
 import { Analytics } from '../components/Analytics'
@@ -44,6 +45,7 @@ export class HomePage implements IPage<ReactIncomingEvent> {
           <Strata />
           <hr className='filet' />
           <Ecosystem />
+          <Showcase />
           <Agents />
           <Manifesto />
           <FinalCta />

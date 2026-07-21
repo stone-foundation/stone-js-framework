@@ -1,11 +1,12 @@
-import { JSX, ReactNode, useEffect, useRef } from 'react'
+import { JSX, ReactNode, RefObject, useEffect, useRef } from 'react'
 
 /**
  * Scroll-reveal wrapper: fades its content in when it enters the viewport.
- * Respects prefers-reduced-motion (content shows immediately).
+ * Respects prefers-reduced-motion (content shows immediately). Renders an anchor
+ * when `href` is provided (so a revealed card can be a link), a `div` otherwise.
  */
-export function Reveal ({ children, className = '' }: { children: ReactNode, className?: string }): JSX.Element {
-  const ref = useRef<HTMLDivElement>(null)
+export function Reveal ({ children, className = '', href }: { children: ReactNode, className?: string, href?: string }): JSX.Element {
+  const ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const el = ref.current
@@ -23,5 +24,8 @@ export function Reveal ({ children, className = '' }: { children: ReactNode, cla
     return () => io.disconnect()
   }, [])
 
-  return <div ref={ref} className={`reveal ${className}`}>{children}</div>
+  const cls = `reveal ${className}`
+  return href !== undefined
+    ? <a ref={ref as RefObject<HTMLAnchorElement>} className={cls} href={href}>{children}</a>
+    : <div ref={ref as RefObject<HTMLDivElement>} className={cls}>{children}</div>
 }

@@ -2,21 +2,21 @@ import { Reveal } from '../components/ui/Reveal'
 import { JSX, useEffect, useRef } from 'react'
 
 const STATS = [
-  { value: 28, label: 'packages' },
-  { value: 10, label: 'deploy targets' },
+  { value: 45, label: 'packages' },
+  { value: 15, label: 'deploy targets' },
   { value: 2, label: 'paradigms, 1:1' },
   { value: 100, suffix: '%', label: 'behavioural tests' }
 ]
 
 const MODULES = [
-  { tier: 'extension', name: '@stone-js/validation', text: 'One schema, validated on the backend and the frontend form.' },
-  { tier: 'extension', name: '@stone-js/auth', text: 'Stateless JWT/OAuth on jose: edge-native, no session.' },
-  { tier: 'extension', name: '@stone-js/authz', text: 'Isomorphic RBAC + ABAC: the same rules guard API and UI.' },
-  { tier: 'extension', name: '@stone-js/openapi', text: 'A public contract derived from the schemas you already write.' },
-  { tier: 'adapter', name: '@stone-js/fetch-adapter', text: 'One Web-standard adapter for Cloudflare, Deno, Bun, Vercel, Netlify.' },
-  { tier: 'adapter', name: '@stone-js/mcp-adapter', text: 'Your domain as MCP tools: a REST API for agents.' },
-  { tier: 'extension', name: '@stone-js/telemetry', text: 'Spans, counters and gauges with pluggable exporters.' },
-  { tier: 'extension', name: '@stone-js/testing', text: 'Boot the real app in-memory; dispatch events through the kernel.' }
+  { tier: 'extension', name: '@stone-js/validation', text: 'One schema, validated on the backend and the frontend form.', href: '/docs/extensions/validation' },
+  { tier: 'extension', name: '@stone-js/auth', text: 'Stateless JWT/OAuth on jose: edge-native, no session.', href: '/docs/extensions/auth' },
+  { tier: 'extension', name: '@stone-js/realtime', text: 'One Broadcaster API, backend and frontend: channels and presence.', href: '/docs/extensions/realtime' },
+  { tier: 'extension', name: '@stone-js/event-bus', text: 'Emit domain events to local and cloud targets; route them anywhere.', href: '/docs/extensions/event-bus' },
+  { tier: 'adapter', name: '@stone-js/fetch-adapter', text: 'One Web-standard adapter for Cloudflare, Deno, Bun, Vercel, Netlify.', href: '/docs/adapters/fetch' },
+  { tier: 'adapter', name: '@stone-js/mcp-adapter', text: 'Your domain as MCP tools: a REST API for agents.', href: '/docs/adapters/mcp' },
+  { tier: 'extension', name: '@stone-js/queue', text: 'Dispatch work now or later, process with a worker, retry with backoff.', href: '/docs/extensions/queue' },
+  { tier: 'extension', name: '@stone-js/openapi', text: 'A public contract derived from the schemas you already write.', href: '/docs/extensions/openapi' }
 ]
 
 /** Animates a number from 0 to its target when it becomes visible. */
@@ -79,7 +79,7 @@ export function Ecosystem (): JSX.Element {
         </Reveal>
         <div className='mods'>
           {MODULES.map((m) => (
-            <Reveal key={m.name} className='mod'>
+            <Reveal key={m.name} href={m.href} className='mod'>
               <span className='tier'>{m.tier}</span>
               <h3>{m.name}</h3>
               <p>{m.text}</p>
@@ -87,7 +87,7 @@ export function Ecosystem (): JSX.Element {
           ))}
         </div>
         <Reveal className='market-cta'>
-          <a className='btn btn-ghost' href='#ecosystem'>Browse the full ecosystem →</a>
+          <a className='btn btn-ghost' href='/docs/ecosystem'>Browse the full ecosystem →</a>
         </Reveal>
       </div>
     </section>
