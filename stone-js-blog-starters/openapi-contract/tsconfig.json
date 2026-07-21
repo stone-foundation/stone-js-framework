@@ -1,0 +1,25 @@
+{
+  "include": [
+    "app",
+    "tests",
+    ".stone",
+    "vitest.config.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": false,
+    "target": "esnext",
+    "module": "ESNext",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "types": ["node", "vitest/globals"],
+  }
+}

@@ -167,6 +167,21 @@ export const STARTERS: Starter[] = [
     about: 'An AI agent is just another caller. Stack @Mcp() on the app and your existing router handlers are listed to agents as MCP tools, the same domain your REST API serves, with no handler change. stdio by default for a local tool, sse for a remote server. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
     blogSlug: 'api-as-agent-tools'
   },
+  {
+    id: 'openapi-contract',
+    title: 'OpenAPI contract from your schemas',
+    official: true,
+    target: 'backend',
+    paradigm: 'decorators',
+    problem: 'openapi',
+    command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
+    repo: `${GH}/stone-js-blog-starters/tree/main/openapi-contract`,
+    author: 'Stone Foundation',
+    authorUrl: GH,
+    description: 'Generate an OpenAPI document from your Zod schemas, served with Swagger UI.',
+    about: 'A hand-written OpenAPI spec drifts immediately. Here OpenApiGenerator derives the document from the same Zod schema the API validates with, so the contract stays a view of the code; GET /openapi.json serves it to tools and agents, GET /docs serves a Swagger UI for humans. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
+    blogSlug: 'openapi-from-your-schemas'
+  },
   ...official()
 ]
 
