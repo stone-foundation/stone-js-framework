@@ -63,7 +63,9 @@ export const viteConfig = defineConfig(() => {
         }
       }),
       babel({
-        filter: (file) => /\.(t|j)sx?$/.test(file) && !file.includes('node_modules'),
+        // `include`/`exclude` replace the deprecated `filter` option (vite-plugin-babel >= 1.7).
+        include: /\.[tj]sx?$/,
+        exclude: /node_modules/,
         babelConfig: {
           babelrc: false,
           configFile: false,

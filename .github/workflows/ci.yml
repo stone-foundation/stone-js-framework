@@ -15,9 +15,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Lint · Test · Build
+  quality:
+    name: Lint · Test · Build (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['20', '22']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,23 +34,27 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Security audit (high · critical)
+        run: pnpm audit --audit-level=high
+
       - name: Lint
         run: pnpm lint
 
       - name: Test (with coverage)
-        run: pnpm run test -- --coverage --coverage.reporter=lcov
+        run: pnpm run test:coverage
 
       - name: Build
         run: pnpm build
 
+      # Sonar runs once, on the primary Node version, with the aggregated lcov reports.
       - name: SonarCloud Scan
-        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+        if: ${{ matrix.node-version == '20' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
