@@ -152,6 +152,21 @@ export const STARTERS: Starter[] = [
     about: 'Identity established once at the edge: a kernel middleware verifies the Bearer token on every request, then requireAuth() (401) and requireScopes(...) (403) guard routes. Nothing touches a session store, so the same code runs on Node, serverless and the edge. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
     blogSlug: 'stateless-auth-at-the-edge'
   },
+  {
+    id: 'api-as-tools',
+    title: 'API as agent tools',
+    official: true,
+    target: 'backend',
+    paradigm: 'decorators',
+    problem: 'agents',
+    command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
+    repo: `${GH}/stone-js-blog-starters/tree/main/api-as-tools`,
+    author: 'Stone Foundation',
+    authorUrl: GH,
+    description: 'The same domain served over HTTP, exposed to agents as MCP tools.',
+    about: 'An AI agent is just another caller. Stack @Mcp() on the app and your existing router handlers are listed to agents as MCP tools, the same domain your REST API serves, with no handler change. stdio by default for a local tool, sse for a remote server. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
+    blogSlug: 'api-as-agent-tools'
+  },
   ...official()
 ]
 
