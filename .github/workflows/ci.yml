@@ -16,12 +16,12 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint · Test · Build (Node ${{ matrix.node-version }})
+    name: Build · Lint · Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['20', '22']
+        node-version: ['20', '22', '24']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,22 +43,23 @@ jobs:
       - name: Security audit (high · critical)
         run: pnpm audit --audit-level=high
 
-      # Type-aware lint is Node-version-independent, so run it once on the primary Node.
-      # (typescript-eslint's project service mis-resolves workspace package types to `any`
-      # on Node 22, producing false positives; build + test still run on every matrix leg.)
+      # Build BEFORE lint: type-aware lint (ts-standard) reads each package's dependency types
+      # from the built `dist/*.d.ts`. Without a prior build the workspace `@stone-js/*` imports
+      # resolve to `any`, which trips strict-boolean-expressions / return-await across core.
+      - name: Build
+        run: pnpm build
+
+      # Lint is Node-version-independent; run it once on the primary Node (22).
       - name: Lint
-        if: ${{ matrix.node-version == '20' }}
+        if: ${{ matrix.node-version == '22' }}
         run: pnpm lint
 
       - name: Test (with coverage)
         run: pnpm run test:coverage
 
-      - name: Build
-        run: pnpm build
-
       # Sonar runs once, on the primary Node version, with the aggregated lcov reports.
       - name: SonarCloud Scan
-        if: ${{ matrix.node-version == '20' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        if: ${{ matrix.node-version == '22' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
