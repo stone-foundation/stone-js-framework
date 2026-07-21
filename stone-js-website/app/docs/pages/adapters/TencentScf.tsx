@@ -77,6 +77,24 @@ exports.main_handler = await stoneApp.run()`}</Code>
           full request event and returns the structured response the adapter builds.
         </Callout>
 
+        <H2>Generic (non-HTTP) triggers</H2>
+        <p>
+          For triggers that are not HTTP, a COS object change, a CMQ/TDMQ message, a Timer or CKafka
+          records, use the generic <code>@stone-js/tencent-scf-adapter</code> with
+          <code> @TencentScf()</code>. The function is invoked with <code>(event, context)</code>; the
+          adapter normalizes it into an intention whose metadata carries the event payload, so one
+          handler can dispatch on the trigger.
+        </p>
+        <Code file='app/Application.ts'>{`import { TencentScf } from '@stone-js/tencent-scf-adapter'
+
+@TencentScf()
+@StoneApp({ name: 'workers' })
+export class Application {}`}</Code>
+        <p>
+          On a thrown error the adapter rethrows by default so SCF applies its retry / dead-letter
+          policy; opt out with <code>stone.adapter.rethrowOnError = false</code>.
+        </p>
+
         <H2>Deploy</H2>
         <p>
           Build the function output and deploy with Serverless Framework or the console. The
@@ -88,7 +106,7 @@ serverless deploy`}</Code>
         <H2>Triggers</H2>
         <PropsTable nameHeader='Package' rows={[
           { name: '@stone-js/tencent-scf-http-adapter', type: '@TencentScfHttp', desc: 'HTTP-triggered functions (API Gateway proxy event). Use with @Routing.' },
-          { name: '@stone-js/tencent-scf-adapter', type: '@TencentScf', desc: 'Generic event triggers (COS, CMQ/TDMQ, Timer). Coming next.' }
+          { name: '@stone-js/tencent-scf-adapter', type: '@TencentScf', desc: 'Generic event triggers (COS, CMQ/TDMQ, Timer, CKafka).' }
         ]} />
 
         <Callout kind='future' title='Stack it to keep options open'>
