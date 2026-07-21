@@ -49,6 +49,38 @@ export interface S3DriverOptions extends FileSystemOptions {
 }
 
 /**
+ * Options for the Google Cloud Storage driver.
+ */
+export interface GcsDriverOptions extends FileSystemOptions {
+  /** The bucket name. */
+  bucket: string
+  /** The GCP project id (optional when inferred from credentials/environment). */
+  projectId?: string
+  /** Path to a service-account key file. */
+  keyFilename?: string
+  /** Inline service-account credentials (alternative to `keyFilename`). */
+  credentials?: { client_email: string, private_key: string }
+  /** Default expiry (seconds) for signed URLs. Defaults to 900 (15 min). */
+  signedUrlExpiresIn?: number
+}
+
+/**
+ * Options for the Azure Blob Storage driver.
+ */
+export interface AzureBlobDriverOptions extends FileSystemOptions {
+  /** The container name (used as the disk's "bucket"). */
+  container: string
+  /** A full connection string (alternative to account name + key). */
+  connectionString?: string
+  /** The storage account name (required for signed URLs when no connection string). */
+  accountName?: string
+  /** The storage account key (required for signed URLs). */
+  accountKey?: string
+  /** Default expiry (seconds) for signed URLs. Defaults to 900 (15 min). */
+  signedUrlExpiresIn?: number
+}
+
+/**
  * The `stone.filesystem` configuration bucket.
  */
 export interface CloudFileConfig {

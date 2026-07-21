@@ -47,15 +47,19 @@ export class CloudFile implements IPage<ReactIncomingEvent> {
         <ArticleTop eyebrow='Extensions' title='Cloud File' />
         <Lead>
           Your domain talks to one agnostic storage contract, never to a cloud SDK.
-          <code> @stone-js/cloud-file</code> supplies the cloud drivers (S3 and every S3-compatible
-          store: R2, MinIO, Spaces, OSS, COS) and wires them into the container, so switching or mixing
-          backends is configuration, not code. GCS and Azure Blob follow.
+          <code> @stone-js/cloud-file</code> supplies the cloud drivers, S3 (and every S3-compatible
+          store: R2, MinIO, Spaces, OSS, COS), Google Cloud Storage and Azure Blob, and wires them
+          into the container, so switching or mixing backends is configuration, not code.
         </Lead>
 
         <H2>Install</H2>
         <p>The provider SDK is never bundled: install the module, then the SDK for the store you use.</p>
         <Code file='terminal' lang='bash'>{`npm i @stone-js/cloud-file
-npm i @aws-sdk/client-s3 @aws-sdk/s3-request-presigner   # S3 / R2 / MinIO / Spaces / OSS / COS`}</Code>
+
+# then the SDK for your provider:
+npm i @aws-sdk/client-s3 @aws-sdk/s3-request-presigner   # S3 / R2 / MinIO / Spaces / OSS / COS
+npm i @google-cloud/storage                              # Google Cloud Storage
+npm i @azure/storage-blob                                # Azure Blob`}</Code>
 
         <H2>Enable it</H2>
         <Principle
@@ -119,9 +123,10 @@ export class UploadController {
 
         <H2>Drivers</H2>
         <PropsTable nameHeader='driver' rows={[
-          { name: 's3', type: 'ships now', desc: 'Amazon S3 + S3-compatible: Cloudflare R2, MinIO (forcePathStyle), DigitalOcean Spaces, Alibaba OSS, Tencent COS (set endpoint).' },
-          { name: 'local', type: 'built-in', desc: 'From @stone-js/filesystem; the default disk. No signed URLs.' },
-          { name: 'gcs / azure', type: 'coming next', desc: 'Google Cloud Storage and Azure Blob, same contract.' }
+          { name: 's3', type: '@aws-sdk/client-s3', desc: 'Amazon S3 + S3-compatible: Cloudflare R2, MinIO (forcePathStyle), DigitalOcean Spaces, Alibaba OSS, Tencent COS (set endpoint).' },
+          { name: 'gcs', type: '@google-cloud/storage', desc: 'Google Cloud Storage. Signed v4 upload/download URLs.' },
+          { name: 'azure', type: '@azure/storage-blob', desc: 'Azure Blob Storage. SAS upload/download URLs (needs accountName + accountKey).' },
+          { name: 'local', type: 'built-in', desc: 'From @stone-js/filesystem; the default disk. No signed URLs.' }
         ]} />
 
         <Callout kind='note' title='S3-compatible in one line'>

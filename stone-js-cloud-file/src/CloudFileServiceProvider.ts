@@ -1,15 +1,19 @@
 import { StorageManager } from '@stone-js/filesystem'
 import { S3FileSystem } from './drivers/S3FileSystem'
 import { CloudFileError } from './errors/CloudFileError'
+import { GcsFileSystem } from './drivers/GcsFileSystem'
+import { AzureBlobFileSystem } from './drivers/AzureBlobFileSystem'
 import { IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
 import { CloudFileConfig, DiskConfig, CloudFileDriverFactory } from './declarations'
 
 /**
  * Built-in driver factories, keyed by driver name. `local` is provided by the StorageManager
- * itself; `gcs`/`azure` are added here as their drivers ship.
+ * itself. Each driver's cloud SDK is an optional peer dependency, imported lazily on first use.
  */
 const DRIVERS: Record<string, CloudFileDriverFactory> = {
-  s3: (config) => S3FileSystem.create(config as any)
+  s3: (config) => S3FileSystem.create(config as any),
+  gcs: (config) => GcsFileSystem.create(config as any),
+  azure: (config) => AzureBlobFileSystem.create(config as any)
 }
 
 /**
