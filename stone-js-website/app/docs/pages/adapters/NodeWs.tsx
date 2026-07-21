@@ -69,17 +69,17 @@ npm i ws   # the WebSocket server (optional peer, imported lazily)`}</Code>
           A gateway is a plain, dependency-injected class. The adapter dispatches connection lifecycle
           and channel events into it, one method each:
         </p>
-        <Code file='app/Chat.ts'>{`import { RealtimeGateway, OnConnect, OnDisconnect, OnEvent } from '@stone-js/realtime'
+        <Code file='app/Chat.ts'>{`import { RealtimeGateway, OnConnect, OnDisconnect, OnEvent, connectionOf } from '@stone-js/realtime'
 
 @RealtimeGateway()
 export class Chat {
   constructor (private readonly realtime) {}
 
-  @OnConnect()    onConnect (connection) { /* authorize, greet… */ }
-  @OnDisconnect() onLeave (connection)   { /* clean up presence… */ }
+  @OnConnect()    onConnect (_, event) { const connection = connectionOf(event) /* authorize, greet… */ }
+  @OnDisconnect() onLeave (_, event)   { /* clean up presence… */ }
 
   @OnEvent('room:1', 'message')
-  async onMessage (payload, connection) {
+  async onMessage (payload, event) {
     await this.realtime.to('room:1').emit('message', payload)   // fans out to every subscriber
   }
 }`}</Code>
@@ -93,18 +93,17 @@ export class Chat {
 { "type": "unsubscribe", "channel": "room:1" }
 { "channel": "room:1", "event": "message", "payload": { "text": "hi" } }`}</Code>
 
-        <Callout kind='note' title='Run the same handlers through the kernel'>
-          Set <code>stone.adapter.dispatchToKernel = true</code> and each data frame is additionally
-          normalized into an <code>IncomingEvent</code> and run through your kernel (middleware,
-          routing, handlers); the handler's response is sent back to the sender. Leave it off for a
-          pure gateway/broadcast app.
+        <Callout kind='note' title='Every event runs through the kernel'>
+          Each socket event is normalized into an <code>IncomingEvent</code> (keyed by its lifecycle
+          or <code>event:channel:event</code> key) and run through your kernel, where the light
+          key-router routes it to the matching gateway method, middleware, hooks and error handlers
+          apply as usual. If a gateway returns content, it is sent back to the sender.
         </Callout>
 
         <H2>Configuration</H2>
         <PropsTable nameHeader='key' rows={[
           { name: 'stone.adapter.url', type: 'ws://localhost:8080', desc: 'The bind URL (host + port).' },
-          { name: 'stone.adapter.server', type: '{}', desc: 'Options forwarded to the ws WebSocketServer (e.g. attach to an http server).' },
-          { name: 'stone.adapter.dispatchToKernel', type: 'false', desc: 'Also route each data frame through the kernel and reply to the sender.' }
+          { name: 'stone.adapter.server', type: '{}', desc: 'Options forwarded to the ws WebSocketServer (e.g. attach to an http server).' }
         ]} />
 
         <Callout kind='future' title='Scale out with Redis, and edge with API Gateway'>

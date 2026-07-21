@@ -1,6 +1,6 @@
-import { resolveModuleDefault } from '../src/utils'
 import { eventKey } from '../src/constants'
 import { RealtimeError } from '../src/errors/RealtimeError'
+import { resolveModuleDefault, connectionOf } from '../src/utils'
 
 describe('utils & constants', () => {
   it('resolveModuleDefault unwraps a default export or returns the namespace', () => {
@@ -11,6 +11,14 @@ describe('utils & constants', () => {
 
   it('eventKey builds a channel:event routing key', () => {
     expect(eventKey('room:1', 'message')).toBe('event:room:1:message')
+  })
+
+  it('connectionOf reads the connection a WS adapter attached to the event metadata', () => {
+    const connection = { id: 'c1' }
+    const event: any = { get: (key: string, fallback: any) => (key === 'metadata' ? { connection } : fallback) }
+    expect(connectionOf(event)).toBe(connection)
+    const empty: any = { get: (_key: string, fallback: any) => fallback }
+    expect(connectionOf(empty)).toBeUndefined()
   })
 })
 

@@ -70,9 +70,10 @@ npm i ws        # only for the Node client (the browser uses the global WebSocke
           incarnation={
             <p>
               One agnostic <code>Broadcaster</code> contract backs every driver. The provider binds
-              the manager as <code>realtimeManager</code>, the default connection as
-              <code> realtime</code>, and the <code>realtimeRouter</code> the transports dispatch
-              into. The core is never touched.
+              the manager as <code>realtimeManager</code> and the default connection as
+              <code> realtime</code>. Gateways are routed by the light key-router from
+              <code> @stone-js/router</code> (a WS adapter runs each socket event through the kernel).
+              The core is never touched.
             </p>
           }
         />
@@ -91,26 +92,30 @@ npm i ws        # only for the Node client (the browser uses the global WebSocke
         <H3>Listen with a gateway</H3>
         <p>
           A gateway is a plain, dependency-injected class. Its methods react to connection lifecycle
-          events and to specific channel events, one method each:
+          events and to specific channel events, one method each. Like every keyed handler they
+          receive <code>(payload, event)</code>; reach the originating connection with
+          <code> connectionOf(event)</code>.
         </p>
-        <Code file='app/Chat.ts'>{`import { RealtimeGateway, OnConnect, OnDisconnect, OnEvent } from '@stone-js/realtime'
+        <Code file='app/Chat.ts'>{`import { RealtimeGateway, OnConnect, OnDisconnect, OnEvent, connectionOf } from '@stone-js/realtime'
 
 @RealtimeGateway()
 export class Chat {
   constructor (private readonly realtime) {}
 
-  @OnConnect()    onConnect (connection)  { /* greet, authorize… */ }
-  @OnDisconnect() onLeave (connection)    { /* clean up presence… */ }
+  @OnConnect()    onConnect (_, event) { const connection = connectionOf(event) /* greet, authorize… */ }
+  @OnDisconnect() onLeave (_, event)   { /* clean up presence… */ }
 
   @OnEvent('room:1', 'message')
-  async onMessage (payload, connection) {
+  async onMessage (payload, event) {
     await this.realtime.to('room:1').emit('message', payload)
   }
 }`}</Code>
         <p>
           The full set of method decorators: <code>@OnConnect</code>, <code>@OnDisconnect</code>,
           <code> @OnMessage</code>, <code>@OnError</code>, <code>@OnSubscribe</code>,
-          <code> @OnUnsubscribe</code> and <code>@OnEvent(channel, event)</code>.
+          <code> @OnUnsubscribe</code> and <code>@OnEvent(channel, event)</code>. Each is a thin alias
+          of the light router's <code>@OnKey</code>; <code>@RealtimeGateway</code> is
+          <code> @KeyHandler</code>.
         </p>
 
         <H3>Presence</H3>
