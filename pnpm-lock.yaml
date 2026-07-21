@@ -3938,9 +3938,6 @@ importers:
       '@stone-js/core':
         specifier: workspace:*
         version: link:../stone-js-core
-      '@stone-js/node-cli-adapter':
-        specifier: workspace:*
-        version: link:../stone-js-node-cli-adapter
       '@stone-js/node-http-adapter':
         specifier: workspace:*
         version: link:../stone-js-node-http-adapter

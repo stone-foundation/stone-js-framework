@@ -43,19 +43,23 @@ jobs:
       - name: Security audit (high · critical)
         run: pnpm audit --audit-level=high
 
+      # CI gates the published framework packages. The website (its own deploy-website
+      # workflow builds/ships it) and the lab demo apps are internal apps excluded here, so
+      # the matrix stays fast and free of the SSG-server step.
+      #
       # Build BEFORE lint: type-aware lint (ts-standard) reads each package's dependency types
       # from the built `dist/*.d.ts`. Without a prior build the workspace `@stone-js/*` imports
       # resolve to `any`, which trips strict-boolean-expressions / return-await across core.
-      - name: Build
-        run: pnpm build
+      - name: Build (packages)
+        run: pnpm run build:ci
 
       # Lint is Node-version-independent; run it once on the primary Node (22).
       - name: Lint
         if: ${{ matrix.node-version == '22' }}
-        run: pnpm lint
+        run: pnpm run lint:ci
 
       - name: Test (with coverage)
-        run: pnpm run test:coverage
+        run: pnpm run test:ci
 
       # Sonar runs once, on the primary Node version, with the aggregated lcov reports.
       - name: SonarCloud Scan
