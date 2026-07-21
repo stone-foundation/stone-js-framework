@@ -1,5 +1,6 @@
 # Stone.js monorepo — pnpm workspace.
 packages:
+  - 'stone-js'
   - 'stone-js-*'
   - '!stone-js-docs'
   - '!stone-js-starters'

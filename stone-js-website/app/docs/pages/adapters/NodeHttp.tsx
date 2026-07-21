@@ -81,6 +81,26 @@ curl localhost:8080/tasks   # your routes, served`}</Code>
         </p>
         <Code file='terminal' lang='bash'>{`npm run build      # produces the Node server
 node dist/server.mjs`}</Code>
+        <p>
+          A minimal production container: multi-stage so only the runtime and pruned dependencies ship.
+        </p>
+        <Code file='Dockerfile' lang='docker'>{`# --- build stage ---
+FROM node:20-slim AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build                       # -> dist/server.mjs
+
+# --- runtime stage ---
+FROM node:20-slim
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=build /app/dist ./dist
+EXPOSE 8080
+CMD ["node", "dist/server.mjs"]`}</Code>
 
         <Callout kind='note' title='Stack it with the CLI'>
           Add <code>@NodeConsole()</code> alongside and the same domain answers CLI commands too, from

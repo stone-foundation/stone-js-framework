@@ -57,6 +57,36 @@ export class Auth implements IPage<ReactIncomingEvent> {
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i @stone-js/auth`}</Code>
 
+        <H2>Configure the signing strategy</H2>
+        <p>
+          Auth is enabled from a <code>@Configuration()</code> that merges the auth blueprint (its
+          service provider and the kernel middleware that verifies the Bearer token) and sets how
+          tokens are signed and verified. Use a shared HMAC <code>secret</code> for symmetric JWT, or a
+          <code> publicKey</code>/<code>jwksUri</code> to verify tokens minted by an external identity
+          provider. Read secrets from the environment, never hard-code them.
+        </p>
+        <Code file='app/configurations/AuthConfiguration.ts'>{`import { getString } from '@stone-js/env'
+import { authBlueprint } from '@stone-js/auth'
+import { Configuration, IBlueprint, IConfiguration } from '@stone-js/core'
+
+@Configuration()
+export class AuthConfiguration implements IConfiguration {
+  configure (blueprint: IBlueprint): void {
+    blueprint
+      .set(authBlueprint)                                    // provider + verify middleware
+      .set('stone.auth.secret', getString('JWT_SECRET'))     // HMAC (HS256); or publicKey / jwksUri
+      .set('stone.auth.issuer', 'https://your-issuer.example')
+      .set('stone.auth.audience', 'your-api')
+      .set('stone.auth.ttl', '1h')
+  }
+}`}</Code>
+        <Callout kind='important' title='Provide exactly one verification strategy'>
+          A shared <code>secret</code> (HMAC), an asymmetric <code>publicKey</code> (RS/ES), and/or a
+          remote <code>jwksUri</code>. For third-party OAuth/OIDC, point <code>jwksUri</code> at the
+          provider's JWKS endpoint and set <code>issuer</code>/<code>audience</code> to match the
+          tokens you accept.
+        </Callout>
+
         <H2>Identity at the boundary</H2>
         <Principle
           principle={

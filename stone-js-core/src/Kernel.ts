@@ -466,9 +466,12 @@ export class Kernel<
         throw new InitializationError('Returned response must be an instance of `OutgoingResponse` or a subclass of it.')
       }
       const valueOptions = returnedValue as ResponseResolverOptions
+      // The kernel stays platform-agnostic: it wraps a bare value as `content` and lets the
+      // platform's responseResolver assign the default status (HTTP defaults to 200, a CLI
+      // adapter to its own exit code). No HTTP semantics are baked into the core here.
       const options = (
         isEmpty(valueOptions?.statusCode)
-          ? { content: returnedValue, statusCode: 200 }
+          ? { content: returnedValue }
           : returnedValue
       ) as ResponseResolverOptions
       return await responseResolver(options)

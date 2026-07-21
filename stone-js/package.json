@@ -1,16 +1,17 @@
 {
   "name": "@stone-js/create",
-  "version": "0.1.3",
+  "version": "0.8.0",
   "description": "Scaffold a new Stone.js app in seconds using your terminal.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/stone-foundation/stone-js.git"
+    "url": "git+https://github.com/stone-foundation/stone-js-framework.git",
+    "directory": "stone-js"
   },
   "homepage": "https://stonejs.dev",
   "bugs": {
-    "url": "https://github.com/stone-foundation/stone-js/issues"
+    "url": "https://github.com/stone-foundation/stone-js-framework/issues"
   },
   "keywords": [
     "stone",
@@ -43,7 +44,7 @@
   },
   "dependencies": {
     "cross-spawn": "^7.0.6",
-    "@stone-js/cli": "^0.1.2"
+    "@stone-js/cli": "workspace:*"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

@@ -39,7 +39,8 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Install & create', path: '/docs/start/install' },
       { title: 'Your first domain', path: '/docs/start/first-domain' },
       { title: 'Collapse it', path: '/docs/start/collapse' },
-      { title: 'Project anatomy', path: '/docs/start/anatomy' }
+      { title: 'Project anatomy', path: '/docs/start/anatomy' },
+      { title: 'Troubleshooting & FAQ', path: '/docs/start/troubleshooting' }
     ]
   },
   {
