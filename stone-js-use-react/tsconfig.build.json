@@ -19,7 +19,7 @@
     "esModuleInterop": true,
     "moduleResolution": "bundler",
     "emitDeclarationOnly": false,
-    "types": ["node", "vite/client"],
+    "types": ["node"],
     "allowSyntheticDefaultImports": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "forceConsistentCasingInFileNames": true,
