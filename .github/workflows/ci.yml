@@ -55,6 +55,6 @@ jobs:
       # Sonar runs once, on the primary Node version, with the aggregated lcov reports.
       - name: SonarCloud Scan
         if: ${{ matrix.node-version == '20' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
