@@ -79,16 +79,16 @@ export class ApiGatewayWsRealtimeProvider {
 
         <H2>Gateways</H2>
         <p>The same gateway API as everywhere else, one method per event:</p>
-        <Code file='app/Chat.ts'>{`import { RealtimeGateway, OnConnect, OnEvent } from '@stone-js/realtime'
+        <Code file='app/Chat.ts'>{`import { RealtimeGateway, OnConnect, OnEvent, connectionOf } from '@stone-js/realtime'
 
 @RealtimeGateway()
 export class Chat {
   constructor (private readonly realtime) {}
 
-  @OnConnect() onConnect (connection) { /* … */ }
+  @OnConnect() onConnect (_, event) { const connection = connectionOf(event) /* … */ }
 
   @OnEvent('room:1', 'message')
-  async onMessage (payload, connection) {
+  async onMessage (payload, event) {
     await this.realtime.to('room:1').emit('message', payload)   // fans out via postToConnection
   }
 }`}</Code>
@@ -102,7 +102,6 @@ export class Chat {
 
         <H2>Configuration</H2>
         <PropsTable nameHeader='key' rows={[
-          { name: 'stone.adapter.dispatchToKernel', type: 'false', desc: 'Also route each data frame through the kernel (middleware, routing, handlers).' },
           { name: 'DynamoDbConnectionStore.table', type: 'stone_ws_connections', desc: 'The DynamoDB table holding connections and channel memberships.' }
         ]} />
 

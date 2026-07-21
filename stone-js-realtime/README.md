@@ -73,23 +73,23 @@ export class OrderService {
 A gateway is a plain, dependency-injected class; its methods react to lifecycle and channel events:
 
 ```ts
-import { RealtimeGateway, OnConnect, OnDisconnect, OnEvent } from '@stone-js/realtime'
+import { RealtimeGateway, OnConnect, OnDisconnect, OnEvent, connectionOf } from '@stone-js/realtime'
 
 @RealtimeGateway()
 export class Chat {
   constructor (private readonly realtime) {}
 
-  @OnConnect()    onConnect (connection) { /* … */ }
-  @OnDisconnect() onLeave (connection)   { /* … */ }
+  @OnConnect()    onConnect (_, event) { const connection = connectionOf(event) /* … */ }
+  @OnDisconnect() onLeave (_, event)   { /* … */ }
 
   @OnEvent('room:1', 'message')
-  async onMessage (payload, connection) {
+  async onMessage (payload, event) {
     await this.realtime.to('room:1').emit('message', payload)
   }
 }
 ```
 
-The full set of method decorators: `@OnConnect`, `@OnDisconnect`, `@OnMessage`, `@OnError`, `@OnSubscribe`, `@OnUnsubscribe` and `@OnEvent(channel, event)`.
+Every keyed handler receives `(payload, event)`; reach the originating connection with `connectionOf(event)`. The full set of method decorators: `@OnConnect`, `@OnDisconnect`, `@OnMessage`, `@OnError`, `@OnSubscribe`, `@OnUnsubscribe` and `@OnEvent(channel, event)`, thin aliases of the light router's `@OnKey` (and `@RealtimeGateway` is `@KeyHandler`).
 
 ## On the frontend
 

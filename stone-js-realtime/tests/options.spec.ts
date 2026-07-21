@@ -1,9 +1,7 @@
 import { RealtimeServiceProvider } from '../src/RealtimeServiceProvider'
 import { RealtimeClientServiceProvider } from '../src/RealtimeClientServiceProvider'
-import { realtimeBlueprint, defineRealtime, defineRealtimeGateway } from '../src/options/RealtimeBlueprint'
+import { realtimeBlueprint, defineRealtime } from '../src/options/RealtimeBlueprint'
 import { realtimeClientBlueprint } from '../src/options/RealtimeClientBlueprint'
-
-/* eslint-disable @typescript-eslint/no-extraneous-class */
 
 describe('realtime blueprints & define* helpers', () => {
   it('the server blueprint registers the RealtimeServiceProvider', () => {
@@ -17,12 +15,5 @@ describe('realtime blueprints & define* helpers', () => {
 
   it('defineRealtime wraps a config fragment', () => {
     expect(defineRealtime({ default: 'memory' })).toEqual({ realtime: { default: 'memory' } })
-  })
-
-  it('defineRealtimeGateway builds a gateway meta-module', () => {
-    class Chat {}
-    expect(defineRealtimeGateway(Chat, { isClass: true })).toEqual({ module: Chat, isClass: true })
-    const fn = (): void => {}
-    expect(defineRealtimeGateway(fn)).toEqual({ module: fn })
   })
 })

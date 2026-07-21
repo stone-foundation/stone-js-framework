@@ -37,6 +37,7 @@ describe('NodeWsAdapter (lifecycle & server)', () => {
     expect(() => errorHandler(new Error('boom'))).not.toThrow()
 
     // the connection handler delegates to handleConnection (cover the arrow)
+    vi.spyOn(adapter as any, 'dispatch').mockResolvedValue(undefined)
     const connectionHandler = server.on.mock.calls.find((c: any[]) => c[0] === 'connection')?.[1]
     const socket = { send: vi.fn(), close: vi.fn(), on: vi.fn() }
     expect(() => connectionHandler(socket)).not.toThrow()

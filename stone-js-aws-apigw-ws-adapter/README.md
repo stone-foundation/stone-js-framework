@@ -59,16 +59,16 @@ export class ApiGatewayWsRealtimeProvider implements IServiceProvider {
 ## Gateways react to sockets
 
 ```ts
-import { RealtimeGateway, OnConnect, OnEvent } from '@stone-js/realtime'
+import { RealtimeGateway, OnConnect, OnEvent, connectionOf } from '@stone-js/realtime'
 
 @RealtimeGateway()
 export class Chat {
   constructor (private readonly realtime) {}
 
-  @OnConnect() onConnect (connection) { /* authorize… */ }
+  @OnConnect() onConnect (_, event) { const connection = connectionOf(event) /* authorize… */ }
 
   @OnEvent('room:1', 'message')
-  async onMessage (payload, connection) {
+  async onMessage (payload, event) {
     await this.realtime.to('room:1').emit('message', payload)   // fans out via postToConnection
   }
 }
@@ -77,11 +77,10 @@ export class Chat {
 ## How it works
 
 - `run()` returns the `(event, context)` Lambda handler for your WebSocket API's routes.
-- `requestContext.eventType` is mapped: `CONNECT` adds the connection to the store and fires `@OnConnect`; `DISCONNECT` removes it and fires `@OnDisconnect`; `MESSAGE` parses the frame.
-- Control frames (`{ type: 'subscribe' | 'unsubscribe', channel }`) update DynamoDB presence and fire the matching gateway.
-- Data frames (`{ channel, event, payload }`) fire `@OnMessage` / `@OnEvent`.
+- `requestContext.eventType` is mapped to a routing key: `CONNECT` adds the connection to the store; `DISCONNECT` removes it; `MESSAGE` parses the frame.
+- Each event is normalized into an `IncomingEvent` and run through the kernel, where the light key-router routes it to the matching `@On*` gateway (`@OnConnect`, `@OnEvent`, ...).
+- Control frames (`{ type: 'subscribe' | 'unsubscribe', channel }`) also update DynamoDB presence.
 - A `broadcast` reads the channel's members from DynamoDB and posts to each via the Management API (the endpoint is taken from the event).
-- Set `stone.adapter.dispatchToKernel = true` to also route data frames through the kernel.
 
 ## License
 

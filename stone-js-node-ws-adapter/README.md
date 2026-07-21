@@ -39,16 +39,16 @@ export class Application {}
 That is all: connect a client, subscribe to a channel, and `broadcast` from anywhere reaches it.
 
 ```ts
-import { RealtimeGateway, OnConnect, OnEvent } from '@stone-js/realtime'
+import { RealtimeGateway, OnConnect, OnEvent, connectionOf } from '@stone-js/realtime'
 
 @RealtimeGateway()
 export class Chat {
   constructor (private readonly realtime) {}
 
-  @OnConnect() onConnect (connection) { /* … */ }
+  @OnConnect() onConnect (_, event) { const connection = connectionOf(event) /* … */ }
 
   @OnEvent('room:1', 'message')
-  async onMessage (payload, connection) {
+  async onMessage (payload, event) {
     await this.realtime.to('room:1').emit('message', payload)
   }
 }
@@ -58,9 +58,8 @@ export class Chat {
 
 - The adapter runs a `ws` server bound to `stone.adapter.url` (default `ws://localhost:8080`).
 - Each accepted socket becomes a realtime `Connection` with a `send`, added to the shared connection store.
-- Control frames (`{ type: 'subscribe' | 'unsubscribe', channel }`) update presence and notify gateways.
-- Data frames (`{ channel, event, payload }`) fire `@OnMessage` / `@OnEvent` gateways.
-- Set `stone.adapter.dispatchToKernel = true` to additionally route each data frame through the Stone.js kernel and reply to the sender with the handler's response.
+- Control frames (`{ type: 'subscribe' | 'unsubscribe', channel }`) update presence.
+- Every socket event is normalized into an `IncomingEvent`, keyed by its lifecycle or `event:channel:event` key, and run through the kernel, where the light key-router routes it to the matching `@On*` gateway. If a gateway returns content, it is sent back to the sender.
 
 ## Configuration
 
@@ -69,7 +68,6 @@ export class Chat {
 | `stone.adapter.url`             | `ws://localhost:8080`| The bind URL (host + port).                       |
 | `stone.adapter.server`          | `{}`                 | Options passed to the `ws` `WebSocketServer`.     |
 | `stone.adapter.serverFactory`   | `undefined`          | Inject a custom/fake server (tests, attach to an http server). |
-| `stone.adapter.dispatchToKernel`| `false`              | Run data frames through the kernel and reply.     |
 
 ## License
 

@@ -19,7 +19,18 @@ import { parseFrame, managementEndpoint } from './utils'
 import { RawResponseWrapper } from './RawResponseWrapper'
 import { CONNECT, DISCONNECT, MESSAGE } from './constants'
 import { ApiGatewayWsAdapterError } from './errors/ApiGatewayWsAdapterError'
-import { Connection, ConnectionStore, RealtimeManager, RealtimeRouter } from '@stone-js/realtime'
+import {
+  Connection,
+  ConnectionStore,
+  RealtimeManager,
+  eventKey,
+  CONNECT as KEY_CONNECT,
+  DISCONNECT as KEY_DISCONNECT,
+  MESSAGE as KEY_MESSAGE,
+  ERROR as KEY_ERROR,
+  SUBSCRIBE as KEY_SUBSCRIBE,
+  UNSUBSCRIBE as KEY_UNSUBSCRIBE
+} from '@stone-js/realtime'
 
 const OK: RawWsResponse = { statusCode: 200 }
 
@@ -27,11 +38,11 @@ const OK: RawWsResponse = { statusCode: 200 }
  * AWS API Gateway WebSocket adapter for Stone.js.
  *
  * API Gateway invokes a fresh Lambda per socket event, so this adapter maps `requestContext.eventType`
- * (`CONNECT` / `DISCONNECT` / `MESSAGE`) onto `@stone-js/realtime`: it maintains the shared connection
- * store (DynamoDB in production) and dispatches lifecycle, subscribe/unsubscribe and channel events
- * into the realtime router, firing `@On*` gateways. Replies to clients go through the API Gateway
- * Management API (see {@link ApiGatewayWsBroadcaster}); the management endpoint is taken from each
- * event. Data frames can also run through the kernel when `stone.adapter.dispatchToKernel` is set.
+ * (`CONNECT` / `DISCONNECT` / `MESSAGE`) into a keyed `IncomingEvent` and runs it through the kernel,
+ * where the light key-router from `@stone-js/router` routes it to the matching `@On*` gateway method,
+ * the same pattern as every adapter. It maintains the shared connection store (DynamoDB in production);
+ * replies to clients go through the API Gateway Management API (see {@link ApiGatewayWsBroadcaster}),
+ * the management endpoint taken from each event.
  */
 export class ApiGatewayWsAdapter extends Adapter<
 ApiGatewayWsEvent,
@@ -94,11 +105,11 @@ ApiGatewayWsAdapterContext
     switch (event.requestContext.eventType) {
       case CONNECT:
         await this.store()?.add(connection)
-        await this.router()?.connect(connection)
+        await this.dispatch(context, connection, KEY_CONNECT)
         return OK
       case DISCONNECT:
         await this.store()?.remove(connection.id)
-        await this.router()?.disconnect(connection)
+        await this.dispatch(context, connection, KEY_DISCONNECT)
         return OK
       case MESSAGE:
         return await this.handleMessage(event, context, connection)
@@ -108,8 +119,7 @@ ApiGatewayWsAdapterContext
   }
 
   /**
-   * Handle a `MESSAGE` event: control frames update presence; data frames drive gateways and,
-   * optionally, the kernel.
+   * Handle a `MESSAGE` event: control frames update presence; every frame is routed through the kernel.
    *
    * @param event - The raw event.
    * @param context - The Lambda execution context.
@@ -120,42 +130,40 @@ ApiGatewayWsAdapterContext
     const frame = parseFrame(event.body)
 
     if (frame === undefined) {
-      await this.router()?.error(new ApiGatewayWsAdapterError('Malformed WebSocket frame.'), connection)
+      await this.dispatch(context, connection, KEY_ERROR, new ApiGatewayWsAdapterError('Malformed WebSocket frame.'))
       return { statusCode: 400 }
     }
 
     if (frame.type === 'subscribe' && typeof frame.channel === 'string') {
       await this.store()?.subscribe(connection.id, frame.channel)
-      await this.router()?.subscribe(frame.channel, connection)
+      await this.dispatch(context, connection, KEY_SUBSCRIBE, frame.channel)
       return OK
     }
 
     if (frame.type === 'unsubscribe' && typeof frame.channel === 'string') {
       await this.store()?.unsubscribe(connection.id, frame.channel)
-      await this.router()?.unsubscribe(frame.channel, connection)
+      await this.dispatch(context, connection, KEY_UNSUBSCRIBE, frame.channel)
       return OK
     }
 
-    await this.router()?.message(frame, connection)
+    await this.dispatch(context, connection, KEY_MESSAGE, frame)
     if (typeof frame.channel === 'string' && typeof frame.event === 'string') {
-      await this.router()?.event(frame.channel, frame.event, frame.payload, connection)
-    }
-
-    if (this.blueprint.get<boolean>('stone.adapter.dispatchToKernel', false)) {
-      return await this.dispatchToKernel(event, context)
+      await this.dispatch(context, connection, eventKey(frame.channel, frame.event), frame.payload)
     }
 
     return OK
   }
 
   /**
-   * Run an event through the Stone.js kernel and return the raw ack response.
+   * Normalize a socket event into an `IncomingEvent` and route it through the kernel.
    *
-   * @param event - The raw event.
    * @param context - The Lambda execution context.
+   * @param connection - The connection.
+   * @param key - The routing key (a lifecycle key or `event:<channel>:<event>`).
+   * @param payload - The payload carried to the handler.
    * @returns The raw response.
    */
-  protected async dispatchToKernel (event: ApiGatewayWsEvent, context: LambdaContext): Promise<RawWsResponse> {
+  protected async dispatch (context: LambdaContext, connection: Connection, key: string, payload?: unknown): Promise<RawWsResponse> {
     const incomingEventBuilder = AdapterEventBuilder.create<IncomingEventOptions, IncomingEvent>({
       resolver: (options) => IncomingEvent.create(options)
     })
@@ -165,7 +173,9 @@ ApiGatewayWsAdapterContext
     })
 
     const adapterContext: ApiGatewayWsAdapterContext = {
-      rawEvent: event,
+      // The kernel event is normalized to a keyed routing event (not the raw API Gateway event);
+      // the light router reads the key from `detail-type` and the payload from `detail`.
+      rawEvent: { 'detail-type': key, detail: payload, connection } as unknown as ApiGatewayWsEvent,
       rawResponse: {},
       rawResponseBuilder,
       incomingEventBuilder,
@@ -195,15 +205,6 @@ ApiGatewayWsAdapterContext
     if (endpoint !== undefined && typeof broadcaster?.useEndpoint === 'function') {
       broadcaster.useEndpoint(endpoint)
     }
-  }
-
-  /**
-   * The realtime router, if realtime is enabled.
-   *
-   * @returns The router, or `undefined`.
-   */
-  protected router (): RealtimeRouter | undefined {
-    return RealtimeRouter.getInstance()
   }
 
   /**

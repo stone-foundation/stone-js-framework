@@ -1,14 +1,20 @@
-import { createKeyDecorator } from '@stone-js/router'
-import { REALTIME_HANDLER_KEY, CONNECT, DISCONNECT, MESSAGE, ERROR, SUBSCRIBE, UNSUBSCRIBE, eventKey } from '../constants'
+import { createKeyDecorator, KEY_ROUTING_KEY } from '@stone-js/router'
+import { CONNECT, DISCONNECT, MESSAGE, ERROR, SUBSCRIBE, UNSUBSCRIBE, eventKey } from '../constants'
 
-/** The shared `(key) => MethodDecorator` factory backing every realtime handler decorator. */
-const onKey: (key: string) => MethodDecorator = createKeyDecorator(REALTIME_HANDLER_KEY)
+/**
+ * The shared `(key) => MethodDecorator` factory backing every realtime handler decorator.
+ *
+ * It writes to the light key-router's metadata key, so a `@RealtimeGateway()` (an alias of the light
+ * router's `@KeyHandler`) has its methods routed by the kernel event handler the WS adapters drive.
+ */
+const onKey: (key: string) => MethodDecorator = createKeyDecorator(KEY_ROUTING_KEY)
 
 /**
  * Method decorator: handle new connections.
  *
- * The method runs when a transport (WS/SSE adapter) accepts a connection; it receives the
- * {@link Connection}. Use it on a method of a `@RealtimeGateway()` class.
+ * The method runs when a transport (WS adapter) accepts a connection. Like every keyed handler it
+ * receives `(payload, event)`; for `connect` the payload is empty, read the connection with
+ * `connectionOf(event)`.
  *
  * @returns A method decorator.
  *
@@ -16,7 +22,7 @@ const onKey: (key: string) => MethodDecorator = createKeyDecorator(REALTIME_HAND
  * ```typescript
  * @RealtimeGateway()
  * export class Presence {
- *   @OnConnect() onConnect (connection) { ... }
+ *   @OnConnect() onConnect (_, event) { const connection = connectionOf(event) }
  * }
  * ```
  */
@@ -25,7 +31,7 @@ export const OnConnect = (): MethodDecorator => onKey(CONNECT)
 /**
  * Method decorator: handle closed connections.
  *
- * The method runs when a connection closes; it receives the {@link Connection}.
+ * Receives `(payload, event)`; the connection is `connectionOf(event)`.
  *
  * @returns A method decorator.
  */
@@ -34,7 +40,8 @@ export const OnDisconnect = (): MethodDecorator => onKey(DISCONNECT)
 /**
  * Method decorator: handle raw inbound messages.
  *
- * The method runs for every message a connection sends; it receives `(message, connection)`.
+ * Receives `(frame, event)` for every message a connection sends; the connection is
+ * `connectionOf(event)`.
  *
  * @returns A method decorator.
  */
@@ -43,7 +50,7 @@ export const OnMessage = (): MethodDecorator => onKey(MESSAGE)
 /**
  * Method decorator: handle transport errors.
  *
- * The method runs when a connection errors; it receives `(error, connection)`.
+ * Receives `(error, event)`; the connection is `connectionOf(event)`.
  *
  * @returns A method decorator.
  */
@@ -52,7 +59,7 @@ export const OnError = (): MethodDecorator => onKey(ERROR)
 /**
  * Method decorator: handle channel subscriptions.
  *
- * The method runs when a connection subscribes to a channel; it receives `(channel, connection)`.
+ * Receives `(channel, event)`; the connection is `connectionOf(event)`.
  *
  * @returns A method decorator.
  */
@@ -61,7 +68,7 @@ export const OnSubscribe = (): MethodDecorator => onKey(SUBSCRIBE)
 /**
  * Method decorator: handle channel unsubscriptions.
  *
- * The method runs when a connection leaves a channel; it receives `(channel, connection)`.
+ * Receives `(channel, event)`; the connection is `connectionOf(event)`.
  *
  * @returns A method decorator.
  */
@@ -70,7 +77,8 @@ export const OnUnsubscribe = (): MethodDecorator => onKey(UNSUBSCRIBE)
 /**
  * Method decorator: handle a specific event on a specific channel.
  *
- * The method runs when the named event arrives on the channel; it receives `(payload, connection)`.
+ * Receives `(payload, event)` when the named event arrives on the channel; the connection is
+ * `connectionOf(event)`.
  *
  * @param channel - The channel to listen on.
  * @param event - The event name to handle.
@@ -80,7 +88,7 @@ export const OnUnsubscribe = (): MethodDecorator => onKey(UNSUBSCRIBE)
  * ```typescript
  * @RealtimeGateway()
  * export class Chat {
- *   @OnEvent('room:1', 'message') onMessage (payload, connection) { ... }
+ *   @OnEvent('room:1', 'message') onMessage (payload, event) { ... }
  * }
  * ```
  */

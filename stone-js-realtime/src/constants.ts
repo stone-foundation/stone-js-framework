@@ -1,7 +1,4 @@
-/** Metadata key under which the realtime `@On*` decorators record their (key → method) mappings. */
-export const REALTIME_HANDLER_KEY: symbol = Symbol.for('stone.realtime.handlers')
-
-/** Reserved lifecycle keys dispatched by the transports/adapters. */
+/** Reserved lifecycle routing keys dispatched by the transports/adapters. */
 export const CONNECT = 'connect'
 export const DISCONNECT = 'disconnect'
 export const MESSAGE = 'message'

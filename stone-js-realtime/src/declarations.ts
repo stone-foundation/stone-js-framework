@@ -120,19 +120,6 @@ export interface RedisBroadcasterOptions extends ConnectionOptions {
 }
 
 /**
- * A gateway meta-module: a class carrying `@On*`-decorated methods (or a whole-class handler),
- * contributed under `stone.realtime.gateways` and resolved by the provider with dependency injection.
- */
-export interface RealtimeGatewayMeta {
-  /** The gateway class (or handler function/instance/factory). */
-  module: unknown
-  /** Whether `module` is a class to resolve. */
-  isClass?: boolean
-  /** Whether `module` is a factory to resolve. */
-  isFactory?: boolean
-}
-
-/**
  * The `stone.realtime` configuration bucket.
  */
 export interface RealtimeConfig {
@@ -140,8 +127,6 @@ export interface RealtimeConfig {
   default?: string
   /** The connections to register. */
   connections?: ConnectionOptions[]
-  /** The gateways (classes with `@On*` methods) to register handlers from. */
-  gateways?: RealtimeGatewayMeta[]
   /** The client endpoint (WebSocket URL) used by the isomorphic client. */
   url?: string
 }

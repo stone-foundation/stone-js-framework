@@ -23,16 +23,28 @@ import {
 import { parseFrame, resolveWebSocketServer } from './utils'
 import { RawResponseWrapper } from './RawResponseWrapper'
 import { NodeWsAdapterError } from './errors/NodeWsAdapterError'
-import { Connection, ConnectionStore, RealtimeManager, RealtimeRouter } from '@stone-js/realtime'
+import {
+  Connection,
+  ConnectionStore,
+  RealtimeManager,
+  eventKey,
+  CONNECT,
+  DISCONNECT,
+  MESSAGE,
+  ERROR,
+  SUBSCRIBE,
+  UNSUBSCRIBE
+} from '@stone-js/realtime'
 
 /**
  * Node.js WebSocket adapter for Stone.js.
  *
  * Runs a `ws` server and bridges sockets to `@stone-js/realtime`: each accepted socket becomes a
- * {@link Connection} added to the shared connection store (so `broadcast` reaches it) and its
- * lifecycle (connect, subscribe, unsubscribe, message, error, disconnect) is dispatched into the
- * realtime router (so `@On*` gateways fire). Data frames are additionally run through the Stone.js
- * kernel when `stone.adapter.dispatchToKernel` is enabled, so apps can answer a frame with a route.
+ * {@link Connection} added to the shared connection store (so `broadcast` reaches it). Every socket
+ * event (connect, subscribe, unsubscribe, message, per-channel event, error, disconnect) is
+ * normalized into an `IncomingEvent`, keyed by its lifecycle/channel key, and run through the kernel,
+ * where the light key-router from `@stone-js/router` routes it to the matching `@On*` gateway method.
+ * The connection store stays in the adapter (infrastructure); dispatch is one pattern everywhere.
  *
  * `ws` is an optional peer dependency, imported lazily. The core is never touched: this adapter is
  * pure Integration, normalizing socket causes into intentions.
@@ -144,16 +156,15 @@ NodeWsAdapterContext
     }
 
     void this.store()?.add(connection)
-    void this.router()?.connect(connection)
+    void this.dispatch(socket, connection, CONNECT)
 
     socket.on('message', (data: unknown) => { void this.handleMessage(socket, connection, data) })
-    socket.on('close', () => { void this.handleClose(connection) })
-    socket.on('error', (error: Error) => { void this.router()?.error(error, connection) })
+    socket.on('close', () => { void this.handleClose(socket, connection) })
+    socket.on('error', (error: Error) => { void this.dispatch(socket, connection, ERROR, error) })
   }
 
   /**
-   * Handle an inbound frame: control frames update presence; data frames drive gateways and,
-   * optionally, the kernel.
+   * Handle an inbound frame: control frames update presence; every frame is routed through the kernel.
    *
    * @param socket - The originating socket.
    * @param connection - The connection.
@@ -163,52 +174,50 @@ NodeWsAdapterContext
     const frame = parseFrame(data)
 
     if (frame === undefined) {
-      await this.router()?.error(new NodeWsAdapterError('Malformed WebSocket frame.'), connection)
+      await this.dispatch(socket, connection, ERROR, new NodeWsAdapterError('Malformed WebSocket frame.'))
       return
     }
 
     if (frame.type === 'subscribe' && typeof frame.channel === 'string') {
       await this.store()?.subscribe(connection.id, frame.channel)
-      await this.router()?.subscribe(frame.channel, connection)
+      await this.dispatch(socket, connection, SUBSCRIBE, frame.channel)
       return
     }
 
     if (frame.type === 'unsubscribe' && typeof frame.channel === 'string') {
       await this.store()?.unsubscribe(connection.id, frame.channel)
-      await this.router()?.unsubscribe(frame.channel, connection)
+      await this.dispatch(socket, connection, UNSUBSCRIBE, frame.channel)
       return
     }
 
-    await this.router()?.message(frame, connection)
+    await this.dispatch(socket, connection, MESSAGE, frame)
     if (typeof frame.channel === 'string' && typeof frame.event === 'string') {
-      await this.router()?.event(frame.channel, frame.event, frame.payload, connection)
-    }
-
-    if (this.blueprint.get<boolean>('stone.adapter.dispatchToKernel', false)) {
-      const response = await this.dispatchToKernel(frame, socket, connection)
-      this.sendResponse(socket, response)
+      await this.dispatch(socket, connection, eventKey(frame.channel, frame.event), frame.payload)
     }
   }
 
   /**
    * Handle a closed socket: drop the connection and notify gateways.
    *
+   * @param socket - The originating socket.
    * @param connection - The connection.
    */
-  protected async handleClose (connection: Connection): Promise<void> {
+  protected async handleClose (socket: WsSocket, connection: Connection): Promise<void> {
     await this.store()?.remove(connection.id)
-    await this.router()?.disconnect(connection)
+    await this.dispatch(socket, connection, DISCONNECT)
   }
 
   /**
-   * Run a data frame through the Stone.js kernel and return the raw response.
+   * Normalize a socket event into an `IncomingEvent` and route it through the kernel.
    *
-   * @param frame - The data frame.
    * @param socket - The originating socket.
    * @param connection - The connection.
-   * @returns The raw response.
+   * @param key - The routing key (a lifecycle key or `event:<channel>:<event>`).
+   * @param payload - The payload carried to the handler.
    */
-  protected async dispatchToKernel (frame: RawWsEvent, socket: WsSocket, connection: Connection): Promise<RawWsResponse> {
+  protected async dispatch (socket: WsSocket, connection: Connection, key: string, payload?: unknown): Promise<void> {
+    const rawEvent: RawWsEvent = { 'detail-type': key, detail: payload, connection }
+
     const incomingEventBuilder = AdapterEventBuilder.create<IncomingEventOptions, IncomingEvent>({
       resolver: (options) => IncomingEvent.create(options)
     })
@@ -218,7 +227,7 @@ NodeWsAdapterContext
     })
 
     const context: NodeWsAdapterContext = {
-      rawEvent: frame,
+      rawEvent,
       rawResponse: {},
       rawResponseBuilder,
       incomingEventBuilder,
@@ -230,10 +239,10 @@ NodeWsAdapterContext
     try {
       eventHandler = this.resolveEventHandler()
       await this.executeEventHandlerHooks('onInit', eventHandler)
-      return await this.sendEventThroughDestination(context, eventHandler)
+      this.sendResponse(socket, await this.sendEventThroughDestination(context, eventHandler))
     } catch (error: any) {
       const builder = await this.handleError(error, context)
-      return await this.buildRawResponse({ ...context, rawResponseBuilder: builder }, eventHandler)
+      this.sendResponse(socket, await this.buildRawResponse({ ...context, rawResponseBuilder: builder }, eventHandler))
     }
   }
 
@@ -247,15 +256,6 @@ NodeWsAdapterContext
     if (response?.content !== undefined) {
       socket.send(JSON.stringify(response.content))
     }
-  }
-
-  /**
-   * The realtime router, if realtime is enabled (else `undefined`, and gateways simply do not fire).
-   *
-   * @returns The router, or `undefined`.
-   */
-  protected router (): RealtimeRouter | undefined {
-    return RealtimeRouter.getInstance()
   }
 
   /**
