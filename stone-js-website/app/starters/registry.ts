@@ -182,6 +182,21 @@ export const STARTERS: Starter[] = [
     about: 'A hand-written OpenAPI spec drifts immediately. Here OpenApiGenerator derives the document from the same Zod schema the API validates with, so the contract stays a view of the code; GET /openapi.json serves it to tools and agents, GET /docs serves a Swagger UI for humans. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
     blogSlug: 'openapi-from-your-schemas'
   },
+  {
+    id: 'signed-url-uploads',
+    title: 'Direct-to-cloud uploads',
+    official: true,
+    target: 'backend',
+    paradigm: 'decorators',
+    problem: 'file-upload',
+    command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
+    repo: `${GH}/stone-js-blog-starters/tree/main/signed-url-uploads`,
+    author: 'Stone Foundation',
+    authorUrl: GH,
+    description: 'Upload straight to the bucket with signed URLs, the bytes never touch your function.',
+    about: 'Large files should not travel through your function. @CloudFile injects the agnostic fileSystem; /sign mints a short-lived temporaryUploadUrl so the client PUTs straight to the bucket, /complete stores only the metadata, and /:id/url mints a private read URL. S3-compatible: AWS, R2, MinIO, Spaces. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
+    blogSlug: 'signed-url-file-uploads'
+  },
   ...official()
 ]
 

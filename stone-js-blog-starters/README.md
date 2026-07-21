@@ -34,6 +34,7 @@ Any package (first- or third-party) that declares `stone.starters` works the sam
 | `stateless-auth` | [Stateless auth at the edge](https://stonejs.dev/blog/stateless-auth-at-the-edge): verify a JWT at the boundary, guard routes, no session store. |
 | `api-as-tools` | [Your API as MCP tools for agents](https://stonejs.dev/blog/api-as-agent-tools): stack the MCP adapter, agents call the same domain. |
 | `openapi-contract` | [A public API contract, generated from your schemas](https://stonejs.dev/blog/openapi-from-your-schemas): OpenAPI from Zod, served with Swagger UI. |
+| `signed-url-uploads` | [Direct-to-cloud file uploads with signed URLs](https://stonejs.dev/blog/signed-url-file-uploads): upload straight to the bucket, store only metadata. |
 
 The set grows with the blog.
 
