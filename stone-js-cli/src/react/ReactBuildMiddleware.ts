@@ -471,7 +471,14 @@ async function waitForServer (child: ChildProcess, fallbackUrl: string, timeoutM
 
     const onData = (chunk: Buffer): void => {
       const match = /https?:\/\/[^\s]*?:(\d+)/.exec(chunk.toString())
-      if (match !== null) { done(`http://127.0.0.1:${match[1]}`) }
+      if (match !== null) {
+        // Crawl the SAME host the app is configured to bind (from fallbackUrl), with the port the
+        // server actually announced. Forcing 127.0.0.1 while the server bound `localhost` (which is
+        // ::1 on IPv6-first Linux CI) is what made SSG "fetch failed" there.
+        const url = new URL(fallbackUrl)
+        url.port = match[1]
+        done(url.origin)
+      }
     }
     const onStderr = (chunk: Buffer): void => { stderr += chunk.toString(); onData(chunk) }
     // If the server exits before ever announcing a URL, it has no HTTP endpoint to crawl:
@@ -524,7 +531,7 @@ export const GenerateStaticSiteMiddleware = async (
   const child = spawn('node', [distPath(output)], { stdio: ['ignore', 'pipe', 'pipe'] })
 
   try {
-    const baseUrl = await waitForServer(child, adapterUrl.replace('localhost', '127.0.0.1'))
+    const baseUrl = await waitForServer(child, adapterUrl)
 
     const written = await runSsg({
       definitions,
