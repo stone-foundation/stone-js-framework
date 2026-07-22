@@ -23,7 +23,7 @@ export class OutgoingResponse extends Event {
    *
    * @event OutgoingResponse#OUTGOING_RESPONSE
    */
-  static OUTGOING_RESPONSE: string = 'stonejs@outgoing_response'
+  static readonly OUTGOING_RESPONSE: string = 'stonejs@outgoing_response'
 
   /**
    * The original content of the response.

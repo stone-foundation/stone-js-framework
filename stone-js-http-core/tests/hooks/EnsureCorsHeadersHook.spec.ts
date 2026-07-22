@@ -62,7 +62,7 @@ describe('EnsureCorsHeadersHook', () => {
     expect(context.incomingEvent.ip).toBe('192.168.1.1')
   })
 
-  it('should create an IncomingHttpEvent from rawEvent if not present', async () => {
+  it('should create an IncomingHttpEvent with defaults when rawEvent context is empty', async () => {
     context.rawEvent = {
       requestContext: {
         http: {}

@@ -1,4 +1,4 @@
-import { existsSync } from 'fs'
+import { existsSync } from 'node:fs'
 import { RollupOptions } from 'rollup'
 import { IBlueprint } from '@stone-js/core'
 import { RollupConfig } from '../options/BuilderConfig'

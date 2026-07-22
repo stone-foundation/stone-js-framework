@@ -20,7 +20,7 @@ export interface IncomingBrowserEventOptions extends IncomingEventOptions {
  * @author Mr. Stone <evensstone@gmail.com>
  */
 export class IncomingBrowserEvent extends IncomingEvent {
-  static INCOMING_BROWSER_EVENT = 'stonejs@incoming_browser_event'
+  static readonly INCOMING_BROWSER_EVENT = 'stonejs@incoming_browser_event'
 
   /** The URL of the request. */
   public readonly url: URL
@@ -368,7 +368,7 @@ export class IncomingBrowserEvent extends IncomingEvent {
     /* v8 ignore next 3 */ // The browser btoa branch can't run under the Node test runtime (Buffer always defined).
     return typeof Buffer !== 'undefined'
       ? Buffer.from(raw, 'utf-8').toString('base64')
-      : btoa(String.fromCharCode(...new TextEncoder().encode(raw)))
+      : btoa(String.fromCodePoint(...new TextEncoder().encode(raw)))
   }
 
   /**

@@ -38,8 +38,8 @@ export function mcpServerEntry (command: string = 'stone'): { command: string, a
  * @returns The merged config and whether it changed.
  */
 export function mergeMcpJson (existing: Record<string, unknown> | undefined): { config: Record<string, unknown>, changed: boolean } {
-  const config: Record<string, unknown> = { ...(existing ?? {}) }
-  const servers: Record<string, unknown> = { ...((config.mcpServers as Record<string, unknown> | undefined) ?? {}) }
+  const config: Record<string, unknown> = { ...existing }
+  const servers: Record<string, unknown> = { ...(config.mcpServers as Record<string, unknown> | undefined) }
   const changed = servers.stone === undefined
   if (changed) { servers.stone = mcpServerEntry() }
   config.mcpServers = servers

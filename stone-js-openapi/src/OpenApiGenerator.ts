@@ -81,7 +81,7 @@ export class OpenApiGenerator {
    * @param operation - The operation definition.
    * @returns This generator.
    */
-  addPath (method: HttpMethod | string, path: string, operation: OpenApiOperation): this {
+  addPath (method: HttpMethod | (string & {}), path: string, operation: OpenApiOperation): this {
     this.paths[path] = this.paths[path] ?? {}
     this.paths[path][method.toLowerCase()] = this.buildOperation(operation)
     return this

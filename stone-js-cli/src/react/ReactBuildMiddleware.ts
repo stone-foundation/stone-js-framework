@@ -213,9 +213,10 @@ export const GenerateClientFileMiddleware = async (
     : reactClientEntryPointTemplate(pattern)
 
   // Add the lazy pages to the client file.
+  const pagesExt = isTypescript ? '' : '.mjs'
   content = !isLazy
     ? content.replace('%pattern%', pattern)
-    : `import * as pages from './pages${isTypescript ? '' : '.mjs'}';\n`
+    : `import * as pages from './pages${pagesExt}';\n`
       .concat(content)
       .replace('%pattern%', pattern)
       .replace('// %concat%', '.concat(Object.values(pages))')

@@ -138,7 +138,7 @@ export interface PageOptions extends DecoratorPageRouteDefinition {
  * Options for configuring the `PageLayout` decorator.
  */
 export interface PageLayoutOptions {
-  name?: 'default' | string
+  name?: 'default' | (string & {})
 }
 
 /**
@@ -253,7 +253,7 @@ export interface IPage<
 export type FactoryPage<
   IncomingEventType extends ReactIncomingEvent,
   OutgoingResponseType = unknown
-> = (container?: IContainer | any) => IPage<IncomingEventType, OutgoingResponseType>
+> = (container?: any) => IPage<IncomingEventType, OutgoingResponseType>
 
 /**
  * Represents a page type.
@@ -309,13 +309,13 @@ export type PageLayoutClass = new (...args: any[]) => IPageLayout
 */
 export interface IPageLayout {
   head?: () => Promiseable<HeadContext>
-  render: (context: PageLayoutRenderContext | AdapterPageLayoutRenderContext | any) => ReactNode
+  render: (context: any) => ReactNode
 }
 
 /**
  * Represents a factory page layout.
 */
-export type FactoryPageLayout = (container?: IContainer | any) => IPageLayout
+export type FactoryPageLayout = (container?: any) => IPageLayout
 
 /**
  * Represents a page layout type.
@@ -381,7 +381,7 @@ export interface IErrorPage<
 export type FactoryErrorPage<
   IncomingEventType extends ReactIncomingEvent,
   OutgoingResponseType = unknown
-> = (container?: IContainer | any) => IErrorPage<IncomingEventType, OutgoingResponseType>
+> = (container?: any) => IErrorPage<IncomingEventType, OutgoingResponseType>
 
 /**
  * Represents an error page type.
@@ -444,7 +444,7 @@ export interface IAdapterErrorPage<
 */
 export type FactoryAdapterErrorPage<
   RawEventType, RawResponseType, ExecutionContextType
-> = (container?: IContainer | any) => IAdapterErrorPage<RawEventType, RawResponseType, ExecutionContextType>
+> = (container?: any) => IAdapterErrorPage<RawEventType, RawResponseType, ExecutionContextType>
 
 /**
  * Represents an Adapter component error handler type.

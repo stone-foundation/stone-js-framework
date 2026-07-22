@@ -105,7 +105,7 @@ export function serializeHead (head: HeadContext): string {
   // JSON-LD structured data: serialized as JSON (not HTML-escaped) inside a typed script.
   // The `<` in the payload is neutralized so it cannot close the tag.
   for (const data of head.jsonLd ?? []) {
-    const json = JSON.stringify(data).replace(/</g, '\\u003C')
+    const json = JSON.stringify(data).replace(/</g, String.raw`\u003C`)
     out.push(`<script type="application/ld+json">${json}</script>`)
   }
 

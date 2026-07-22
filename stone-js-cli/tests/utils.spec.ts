@@ -100,17 +100,14 @@ describe('utils: dirPath', () => {
 })
 
 describe('utils: getFileHash', () => {
-  it('should return the correct md5 hash of a file', () => {
+  it('should return the correct sha256 hash of a file', () => {
     const filePath = path.join(TMP_DIR, 'file.js')
     const content = 'console.log("Hello, Stone!");'
     writeTempFile(filePath, content)
 
     const hash = getFileHash(filePath)
 
-    // MD5 is intentionally used here for fast, non-cryptographic hashing in test/caching logic.
-    // This is not a security-sensitive context.
-    // NOSONAR
-    const expected = crypto.createHash('md5').update(content).digest('hex')
+    const expected = crypto.createHash('sha256').update(content).digest('hex')
 
     expect(hash).toBe(expected)
   })

@@ -75,7 +75,7 @@ export const SetReactKernelErrorPageMiddleware = (
     .filter(module => hasMetadata(module, REACT_ERROR_PAGE_KEY))
     .forEach(module => {
       const { error, layout } = getMetadata<ClassType, ErrorPageOptions>(module, REACT_ERROR_PAGE_KEY, { error: 'default' })
-      Array(error).flat().forEach(name => {
+      new Array(error).flat().forEach(name => {
         context
           .blueprint
           .set(`stone.useReact.errorPages.${name}`, { layout, module, isClass: true })

@@ -2,6 +2,7 @@ import mime from 'mime'
 import type { Readable } from 'node:stream'
 import { CloudFileError } from '../errors/CloudFileError'
 import type { S3DriverOptions } from '../declarations'
+import { trimSlashes, trimTrailingSlashes } from '../utils'
 import type {
   FileSystem,
   StorageStat,
@@ -57,7 +58,7 @@ export class S3FileSystem implements FileSystem, SignedUrlCapable {
     this.baseUrl = options.baseUrl
     this.expiresIn = options.signedUrlExpiresIn ?? DEFAULT_EXPIRES_IN
     // A root acts as a key prefix within the bucket; normalized without leading/trailing slashes.
-    this.prefix = (options.root ?? '').replace(/^\/+|\/+$/g, '')
+    this.prefix = trimSlashes(options.root ?? '')
   }
 
   /** @inheritdoc */
@@ -172,10 +173,10 @@ export class S3FileSystem implements FileSystem, SignedUrlCapable {
   /** @inheritdoc */
   async url (path: string): Promise<string> {
     if (typeof this.baseUrl === 'string' && this.baseUrl.length > 0) {
-      return `${this.baseUrl.replace(/\/+$/, '')}/${this.key(path)}`
+      return `${trimTrailingSlashes(this.baseUrl)}/${this.key(path)}`
     }
     if (typeof this.options.endpoint === 'string' && this.options.endpoint.length > 0) {
-      const base = this.options.endpoint.replace(/\/+$/, '')
+      const base = trimTrailingSlashes(this.options.endpoint)
       return this.options.forcePathStyle === true ? `${base}/${this.bucket}/${this.key(path)}` : `${base}/${this.key(path)}`
     }
     return `https://${this.bucket}.s3.${this.options.region ?? 'us-east-1'}.amazonaws.com/${this.key(path)}`
@@ -186,7 +187,7 @@ export class S3FileSystem implements FileSystem, SignedUrlCapable {
     const { ListObjectsV2Command } = await this.sdk()
     const client = await this.client()
     // `key()` already applies the disk root prefix, so this is the full listing prefix.
-    const prefix = this.key(directory).replace(/\/+$/, '')
+    const prefix = trimTrailingSlashes(this.key(directory))
     const listPrefix = prefix.length > 0 ? `${prefix}/` : ''
     const out: string[] = []
     let token: string | undefined

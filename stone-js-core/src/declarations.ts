@@ -206,7 +206,7 @@ export interface AdapterErrorHandlerOptions {
   /**
    * Additional configuration settings for the AdapterErrorHandler, if needed.
    */
-  error: string | 'default' | string[]
+  error: string | string[]
 
   /**
    * The alias name for which the AdapterErrorHandler is used.
@@ -228,7 +228,7 @@ export interface ErrorHandlerOptions {
   /**
    * Additional configuration settings for the ErrorHandler, if needed.
    */
-  error: string | 'default' | string[]
+  error: string | string[]
 }
 
 /**
@@ -361,7 +361,7 @@ export type ILoggerClass = new (...args: any[]) => ILogger
  * @param container - The dependency injection container.
  * @returns The logger object.
  */
-export type FactoryLogger = (container: IContainer | any) => ILogger
+export type FactoryLogger = (container: any) => ILogger
 
 /**
  * Represents a Logger type.
@@ -428,7 +428,7 @@ export interface IServiceProvider {
  * @param container - The dependency injection container.
  * @returns The service provider object.
  */
-export type FactoryServiceProvider = (container: IContainer | any) => IServiceProvider
+export type FactoryServiceProvider = (container: any) => IServiceProvider
 
 /**
  * Represents a ServiceProvider type.
@@ -460,7 +460,7 @@ export type IServiceClass = new (...args: any[]) => any
  * @param container - The dependency injection container.
  * @returns The service object.
  */
-export type FactoryService = (container: IContainer | any) => Record<PropertyKey, any>
+export type FactoryService = (container: any) => Record<PropertyKey, any>
 
 /**
  * Represents a ServiceProvider type.
@@ -511,7 +511,7 @@ export type FunctionalEventListener<TEvent extends Event = Event> = (event: TEve
  * @param container - The dependency injection container.
  * @returns The event listener function.
  */
-export type FactoryEventListener<TEvent extends Event = Event> = (container: IContainer | any) => FunctionalEventListener<TEvent>
+export type FactoryEventListener<TEvent extends Event = Event> = (container: any) => FunctionalEventListener<TEvent>
 
 /**
  * Represents a EventListener type.
@@ -565,7 +565,7 @@ export type FunctionalEventSubscriber = (eventEmitter: EventEmitter) => Promisea
  * @param container - The dependency injection container.
  * @returns The event subscriber function.
  */
-export type FactoryEventSubscriber = (container: IContainer | any) => FunctionalEventSubscriber
+export type FactoryEventSubscriber = (container: any) => FunctionalEventSubscriber
 
 /**
  * Represents a EventSubscriber type.
@@ -628,7 +628,7 @@ export type FunctionalEventHandler<TEvent extends IncomingEvent, UResponse = unk
  * @returns The event handler function.
  */
 export type FactoryEventHandler<TEvent extends IncomingEvent, UResponse = unknown> = (
-  container: IContainer | any
+  container: any
 ) => FunctionalEventHandler<TEvent, UResponse>
 
 /**
@@ -715,7 +715,7 @@ OutgoingResponseType extends OutgoingResponse
  *
  * Represents a listener hook that can either be synchronous or asynchronous.
  */
-export type KernelHookListener = (container?: IContainer | any) => Promiseable<void>
+export type KernelHookListener = (container?: any) => Promiseable<void>
 
 /**
  * Represents a IBlueprintBuilder type.
@@ -883,7 +883,7 @@ UResponse = unknown
  * @returns The error handler function.
  */
 export type FactoryErrorHandler<TEvent extends IncomingEvent, UResponse = unknown> = (
-  container: IContainer | any
+  container: any
 ) => FunctionalErrorHandler<TEvent, UResponse>
 
 /**
@@ -1116,7 +1116,7 @@ export type ProposalMethodDecorator<T extends Function = Function> = <TFunction 
 export type ProposalPropertyDecorator = (
   target: undefined,
   context: ClassFieldDecoratorContext
-) => (initialValue: unknown) => unknown | undefined
+) => (initialValue: unknown) => unknown
 
 /**
  * Represents an accessor decorator using the 2023-11 proposal syntax.

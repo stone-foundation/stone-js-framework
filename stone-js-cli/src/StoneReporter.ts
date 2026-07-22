@@ -32,7 +32,8 @@ export const STONE_LOGO = {
 /** The version suffix shown after the wordmark (empty for none / 0.0.0). */
 function versionSuffix (version: string): string {
   const hasVersion = version.length > 0 && version !== '0.0.0'
-  return hasVersion ? `   ${version.startsWith('v') ? version : `v${version}`}` : ''
+  const label = version.startsWith('v') ? version : `v${version}`
+  return hasVersion ? `   ${label}` : ''
 }
 
 /** The rule under the wordmark, sized to the subtitle. */

@@ -31,10 +31,10 @@ export function dirPath (...paths: string[]): string {
  * Creates a file hash for caching purposes.
  *
  * @param filename - The path to the file.
- * @returns The MD5 hash of the file content.
+ * @returns The SHA-256 hash of the file content.
  */
 export function getFileHash (filename: string): string {
-  return createHash('md5').update(readFileSync(filename)).digest('hex')
+  return createHash('sha256').update(readFileSync(filename)).digest('hex')
 }
 
 /**

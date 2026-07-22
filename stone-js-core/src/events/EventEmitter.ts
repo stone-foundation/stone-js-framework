@@ -58,7 +58,7 @@ export class EventEmitter {
   once<TEvent extends Event = Event>(event: WildcardEventName, handler: MixedListenerHandler<TEvent, WildcardEventName>): this {
     const onceHandler = (async (...args: any[]): Promise<void> => {
       this.off(event, onceHandler)
-      await (handler as (...a: any[]) => unknown | Promise<unknown>)(...args)
+      await (handler as (...a: any[]) => unknown)(...args)
     }) as MixedListenerHandler<TEvent, WildcardEventName>
 
     return this.on(event, onceHandler)
@@ -112,7 +112,7 @@ export class EventEmitter {
     const wildcardHandlers = this.listeners.get('*')
     const errors: unknown[] = []
 
-    const run = async (invoke: () => unknown | Promise<unknown>): Promise<void> => {
+    const run = async (invoke: () => unknown): Promise<void> => {
       try {
         await invoke()
       } catch (error) {

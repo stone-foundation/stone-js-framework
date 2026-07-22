@@ -44,7 +44,7 @@ describe('Path Utilities', () => {
   it('should return correct file hash', () => {
     const testFilePath = tmpPath('stonejs_test.txt')
     writeFileSync(testFilePath, 'stonejs testing content')
-    expect(getFileHash(testFilePath)).toBe('6906f31d806d5a052b0c95608b070fdc')
+    expect(getFileHash(testFilePath)).toBe('64389e3fd63da1edd03d411e69481c3a2a04195d010829b7e0d241edf8de5555')
     rmSync(testFilePath)
   })
 

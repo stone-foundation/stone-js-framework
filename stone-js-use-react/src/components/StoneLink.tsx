@@ -85,6 +85,13 @@ export const StoneLink: FunctionComponent<StoneLinkOptions> = ({
     }
   }, [router])
 
+  let relValue = rest.rel
+  if (noRel === true) {
+    relValue = undefined
+  } else if (isExternal) {
+    relValue = 'noopener noreferrer'
+  }
+
   return (
     // eslint-disable-next-line react/jsx-no-target-blank
     <a
@@ -93,13 +100,7 @@ export const StoneLink: FunctionComponent<StoneLinkOptions> = ({
       className={elemClassName}
       target={isExternal ? '_blank' : rest.target}
       aria-current={isNotEmpty(selectedClassName) ? ariaCurrentValue : undefined}
-      rel={
-        noRel === true
-          ? undefined
-          : isExternal
-            ? 'noopener noreferrer'
-            : rest.rel
-      }
+      rel={relValue}
       onClick={shouldHandleNav ? handleClick : rest.onClick}
     >
       {children}

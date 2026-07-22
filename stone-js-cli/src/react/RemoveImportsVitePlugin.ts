@@ -22,7 +22,7 @@ export function removeImportsVitePlugin (modulesToRemove: Array<string | RegExp>
       modulesToRemove.forEach(module => {
         // Match import statements
         const moduleValue = module instanceof RegExp ? module.source : module
-        const importRegex = new RegExp(`import\\s*(\\*\\s*as\\s+\\w+|{[^}]+}|\\w+)\\s+from\\s*['"]${String(moduleValue)}['"];?`, 'g')
+        const importRegex = new RegExp(String.raw`import\s*(\*\s*as\s+\w+|{[^}]+}|\w+)\s+from\s*['"]${String(moduleValue)}['"];?`, 'g')
         const matches = [...modifiedCode.matchAll(importRegex)]
 
         let importedIdentifiers: string[] = []
@@ -57,27 +57,27 @@ export function removeImportsVitePlugin (modulesToRemove: Array<string | RegExp>
 
         importedIdentifiers.forEach(value => {
           // Replace new instantiations
-          modifiedCode = modifiedCode.replace(new RegExp(`new\\s+${value}\\s*\\([^)]*\\)`, 'g'), '{}')
+          modifiedCode = modifiedCode.replace(new RegExp(String.raw`new\s+${value}\s*\([^)]*\)`, 'g'), '{}')
 
           // Remove factory methods and static calls
-          modifiedCode = modifiedCode.replace(new RegExp(`${value}\\.\\w+\\s*\\([^)]*\\)`, 'g'), '{}')
+          modifiedCode = modifiedCode.replace(new RegExp(String.raw`${value}\.\w+\s*\([^)]*\)`, 'g'), '{}')
 
           // Remove function calls
-          modifiedCode = modifiedCode.replace(new RegExp(`\\b${value}\\s*\\([^)]*\\)`, 'g'), '{}')
+          modifiedCode = modifiedCode.replace(new RegExp(String.raw`\b${value}\s*\([^)]*\)`, 'g'), '{}')
 
           // Remove namespace property access (e.g., `Http.SomeFunction()`)
-          modifiedCode = modifiedCode.replace(new RegExp(`\\b${value}\\.\\w+`, 'g'), '{}')
+          modifiedCode = modifiedCode.replace(new RegExp(String.raw`\b${value}\.\w+`, 'g'), '{}')
 
           // Remove variable test like `if (value === IncomingHttpEvent)`
-          modifiedCode = modifiedCode.replace(new RegExp(`!==?\\s*\\b${value}\\b`, 'g'), '!== undefined')
-          modifiedCode = modifiedCode.replace(new RegExp(`===?\\s*\\b${value}\\b`, 'g'), '=== undefined')
+          modifiedCode = modifiedCode.replace(new RegExp(String.raw`!==?\s*\b${value}\b`, 'g'), '!== undefined')
+          modifiedCode = modifiedCode.replace(new RegExp(String.raw`===?\s*\b${value}\b`, 'g'), '=== undefined')
 
           // Remove variable assignments like `const event = IncomingHttpEvent.create()`
-          modifiedCode = modifiedCode.replace(new RegExp(`\\b${value}\\b`, 'g'), '{}')
+          modifiedCode = modifiedCode.replace(new RegExp(String.raw`\b${value}\b`, 'g'), '{}')
         })
 
         // Remove dynamic imports `import('module').then()`
-        modifiedCode = modifiedCode.replace(new RegExp(`import\\(['"]${String(moduleValue)}['"]\\)\\.then\\([^)]*\\)`, 'g'), '{}')
+        modifiedCode = modifiedCode.replace(new RegExp(String.raw`import\(['"]${String(moduleValue)}['"]\)\.then\([^)]*\)`, 'g'), '{}')
 
         // Ensure no broken syntax (empty statements)
         modifiedCode = modifiedCode.replace(/^\s{0,20};\s{0,20}$/gm, '')

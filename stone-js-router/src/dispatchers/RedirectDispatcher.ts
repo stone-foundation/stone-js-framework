@@ -44,7 +44,7 @@ export class RedirectDispatcher<
     statusCode: number = 302
   ): Promise<OutgoingResponseType> {
     if (typeof redirect === 'object') {
-      return await this.runRedirection(route, event, redirect.location as string, parseInt(redirect.status as string))
+      return await this.runRedirection(route, event, redirect.location as string, Number.parseInt(redirect.status as string, 10))
     } else if (isFunctionModule<RouteDefinitionRedirect<IncomingEventType, OutgoingResponseType>>(redirect)) {
       return await this.runRedirection(route, event, await redirect(route, event))
     } else {

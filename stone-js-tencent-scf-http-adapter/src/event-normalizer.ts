@@ -154,7 +154,7 @@ export function normalizeHttpEvent (event: TencentScfHttpEvent): NormalizedHttpE
  * @param event - The raw SCF event.
  * @returns The raw body as a Buffer, string, the original value, or undefined.
  */
-export function getRawBody (event: TencentScfHttpEvent): Buffer | string | unknown {
+export function getRawBody (event: TencentScfHttpEvent): unknown {
   if (typeof event.body === 'string') {
     return event.isBase64Encoded === true ? Buffer.from(event.body, 'base64') : event.body
   }

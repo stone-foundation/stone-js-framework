@@ -22,7 +22,7 @@ export class IncomingEvent extends Event {
    *
    * @event IncomingEvent#INCOMING_EVENT
    */
-  static INCOMING_EVENT: string = 'stonejs@incoming_event'
+  static readonly INCOMING_EVENT: string = 'stonejs@incoming_event'
 
   /**
    * The locale of the event.

@@ -91,7 +91,7 @@ export interface ConnectionStore {
 export type BroadcasterFactory = (config: ConnectionOptions) => Broadcaster
 
 /** Built-in driver identifiers. `memory` and `redis` ship now; provider fan-out follows. */
-export type RealtimeDriver = 'memory' | 'redis' | string
+export type RealtimeDriver = 'memory' | 'redis' | (string & {})
 
 /**
  * Options common to every realtime connection, plus the driver selector.

@@ -65,7 +65,8 @@ export const uriRegex = (options: RegexPatternOptions, flags: string = 'i'): Reg
   const domainConstraint = getDomainConstraints(options)
   /* v8 ignore next -- `buildDomainPattern` always yields a string for a parsed domain (suffix is mandatory); the `?? ''` is a type guard. */
   const domain = domainConstraint === undefined ? '' : (buildDomainPattern(domainConstraint, nextGroupName(domainConstraint, counter)) ?? '')
-  const trailingSlash = options.strict === true ? (options.path.endsWith('/') ? '/' : '') : '/?'
+  const strictTrailingSlash = options.path.endsWith('/') ? '/' : ''
+  const trailingSlash = options.strict === true ? strictTrailingSlash : '/?'
   const path = getSegmentsConstraints(options)
     .reduce((prev, curr) => `${prev}${buildSegmentPattern(curr, nextGroupName(curr, counter))}`, '')
   return new RegExp(`^${domain}${path}${trailingSlash}$`, flags)
@@ -90,7 +91,8 @@ export const uriRegex = (options: RegexPatternOptions, flags: string = 'i'): Reg
 export const pathRegex = (options: RegexPatternOptions, flags: string = 'i'): RegExp => {
   flags = options.strict === true ? '' : flags
   const counter = { value: 0 }
-  const trailingSlash = options.strict === true ? (options.path.endsWith('/') ? '/' : '') : '/?'
+  const strictTrailingSlash = options.path.endsWith('/') ? '/' : ''
+  const trailingSlash = options.strict === true ? strictTrailingSlash : '/?'
   const pattern = getSegmentsConstraints(options)
     .reduce((prev, curr) => `${prev}${buildSegmentPattern(curr, nextGroupName(curr, counter))}`, '')
   return new RegExp(`^${pattern}${trailingSlash}$`, flags)

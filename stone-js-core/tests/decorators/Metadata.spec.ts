@@ -121,7 +121,7 @@ describe('Metadata Utilities', () => {
     expect(() => setMethodMetadata(metadataKey, metadataValue)(() => {}, context)).toThrowError(SetupError)
   })
 
-  it('should throw an error when it is not a 2023-11 decorators proposal', () => {
+  it('should throw an error when setMethodMetadata gets no 2023-11 decorator context', () => {
     const context = undefined
     // @ts-expect-error - Testing legacy decorator as 2023-11 proposal decorator
     expect(() => setMethodMetadata(metadataKey, metadataValue)(() => {}, context)).toThrowError(SetupError)
@@ -138,7 +138,7 @@ describe('Metadata Utilities', () => {
     expect(() => setFieldMetadata(metadataKey, metadataValue)(class {}, context)).toThrowError(SetupError)
   })
 
-  it('should throw an error when it is not a 2023-11 decorators proposal', () => {
+  it('should throw an error when setFieldMetadata gets no 2023-11 decorator context', () => {
     const context = undefined
     // @ts-expect-error - Testing legacy decorator as 2023-11 proposal decorator
     expect(() => setFieldMetadata(metadataKey, metadataValue)(class {}, context)).toThrowError(SetupError)

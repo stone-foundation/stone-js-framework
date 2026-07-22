@@ -21,7 +21,7 @@ import {
   AdapterErrorPageOptions,
   REACT_ADAPTER_ERROR_PAGE_KEY
 } from '@stone-js/use-react'
-import { existsSync } from 'fs'
+import { existsSync } from 'node:fs'
 import { viteConfig } from './vite-config'
 import { AssetsConfig } from '../options/BuilderConfig'
 import { getStoneBuilderConfig } from '../utils'

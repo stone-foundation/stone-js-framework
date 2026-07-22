@@ -306,7 +306,7 @@ describe('ReactBuildMiddleware', () => {
     )
   })
 
-  it('should skip if not lazy views', async () => {
+  it('should skip building views if not lazy views', async () => {
     vi.mocked(isLazyViews).mockReturnValue(false)
 
     const result = await BuildViewsMiddleware(context, mockNext)

@@ -77,7 +77,7 @@ export function setPath (target: Record<string, any>, segments: string[], value:
  */
 export async function transformLeaves (
   value: unknown,
-  transform: (value: unknown, key: string) => unknown | Promise<unknown>,
+  transform: (value: unknown, key: string) => unknown,
   key: string = ''
 ): Promise<unknown> {
   if (Array.isArray(value)) {

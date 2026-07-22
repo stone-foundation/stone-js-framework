@@ -43,7 +43,7 @@ export interface IEventBus {
 }
 
 /** Built-in driver identifiers. `local` and `memory` ship now; `eventbridge` is the first cloud driver. */
-export type EventBusDriver = 'local' | 'memory' | 'eventbridge' | string
+export type EventBusDriver = 'local' | 'memory' | 'eventbridge' | (string & {})
 
 /**
  * Options common to every connection, plus the driver selector.
