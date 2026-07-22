@@ -43,5 +43,5 @@ export function fromStandard<T> (schema: StandardSchemaV1<T>): ValidationSchema<
  */
 export function isStandardSchema (value: unknown): value is StandardSchemaV1 {
   const std = (value as StandardSchemaV1 | undefined)?.['~standard']
-  return std !== undefined && std.version === 1 && typeof std.validate === 'function'
+  return std?.version === 1 && typeof std?.validate === 'function'
 }

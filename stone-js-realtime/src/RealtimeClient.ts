@@ -188,7 +188,7 @@ export class RealtimeClient implements Broadcaster {
    */
   private async resolveWebSocket (): Promise<any> {
     if (this.options.WebSocket !== undefined && this.options.WebSocket !== null) { return this.options.WebSocket }
-    if (typeof (globalThis as any).WebSocket !== 'undefined') { return (globalThis as any).WebSocket }
+    if ((globalThis as any).WebSocket !== undefined) { return (globalThis as any).WebSocket }
     return await import('ws').then(resolveModuleDefault).catch(() => {
       throw new RealtimeError('No WebSocket implementation available. On Node install "ws": npm i ws')
     })
