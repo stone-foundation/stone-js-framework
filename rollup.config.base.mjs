@@ -36,7 +36,7 @@ export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [] } = 
       })
       const rels = walk(dir)
         .filter((p) => p.endsWith('.d.ts'))
-        .map((p) => relative(dir, p).replace(/\\/g, '/'))
+        .map((p) => relative(dir, p).replaceAll('\\', '/'))
         .filter((r) => r !== out && !exclude.some((e) => r.startsWith(e)))
         .sort()
       const lines = rels.map((r) => `export * from './${r.replace(/\.d\.ts$/, '')}';`)
