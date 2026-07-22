@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/realtime",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Agnostic, plug-and-play realtime for Stone.js: one Broadcaster API for backend and frontend, channels and presence, memory and Redis fan-out, an isomorphic client, and @Realtime/@RealtimeGateway/@On* decorators.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

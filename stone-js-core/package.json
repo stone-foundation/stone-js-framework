@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/core",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Stone.js core library, providing the kernel, factory, and context for building applications.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

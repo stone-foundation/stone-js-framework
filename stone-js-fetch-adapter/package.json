@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/fetch-adapter",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Web-standard (WinterCG Fetch) adapter for Stone.js. One adapter, every edge/serverless runtime: Cloudflare Workers, Deno, Bun, Vercel Edge, Netlify Edge — build once, deploy anywhere.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

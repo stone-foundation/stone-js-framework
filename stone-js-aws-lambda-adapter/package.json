@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/aws-lambda-adapter",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "General-purpose AWS Lambda adapter for Stone.js, run any app in serverless environments, beyond HTTP. Supports queues, events, schedulers, and background jobs.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

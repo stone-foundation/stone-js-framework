@@ -1,5 +1,7 @@
 # Change Log
 
+## 0.8.2
+
 ## 0.8.1
 
 All notable changes to the "Stone.js pipeline" extension will be documented in this file.
