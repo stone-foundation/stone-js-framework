@@ -38,9 +38,10 @@ vi.mock('@stone-js/filesystem', () => ({
   buildPath: vi.fn(() => '/dist/server.mjs')
 }))
 
-// A chalk-like formatter: every color is a callable that also carries `.bold`.
+// A chalk-like formatter: every color is a callable that also carries `.bold`; `hex(color)`
+// returns a colour so `hex('#rrggbb').bold(text)` works too.
 const makeColor = (): any => Object.assign((s: string) => s, { bold: (s: string) => s })
-const format = new Proxy({}, { get: () => makeColor() })
+const format = new Proxy({}, { get: (_t, prop) => prop === 'hex' ? (() => makeColor()) : makeColor() })
 
 const createContext = (): any => {
   const spinner = { succeed: vi.fn(), fail: vi.fn() }

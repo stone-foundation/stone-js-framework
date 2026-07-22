@@ -1,21 +1,7 @@
 # Variable: MetaCommandRouterEventHandler
 
 ```ts
-const MetaCommandRouterEventHandler: object;
+const MetaCommandRouterEventHandler: MetaEventHandler;
 ```
 
 MetaCommandRouterEventHandler module.
-
-## Type Declaration
-
-### isClass
-
-```ts
-isClass: boolean = true;
-```
-
-### module
-
-```ts
-module: typeof CommandRouterEventHandler = CommandRouterEventHandler;
-```

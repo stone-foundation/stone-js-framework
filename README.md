@@ -81,7 +81,6 @@ This repository is the **monorepo** for the whole framework: every `@stone-js/*`
 | [`@stone-js/edge-adapter`](./stone-js-edge-adapter) | Any WinterCG/edge runtime (Cloudflare Workers, Deno, Bun). |
 | [`@stone-js/fetch-adapter`](./stone-js-fetch-adapter) | Web-standard (WinterCG Fetch) adapter. |
 | [`@stone-js/browser-adapter`](./stone-js-browser-adapter) | Browser SPA. |
-| [`@stone-js/mcp-adapter`](./stone-js-mcp-adapter) | Model Context Protocol: expose your domain to AI agents as tools. |
 
 ### Frontend
 | Package | Description |
@@ -102,7 +101,7 @@ This repository is the **monorepo** for the whole framework: every `@stone-js/*`
 | [`@stone-js/queue`](./stone-js-queue) | Agnostic job queue (delay, retries, backoff). |
 | [`@stone-js/cache`](./stone-js-cache) | Agnostic cache (get/set/ttl/tags/remember). |
 | [`@stone-js/cloud-file`](./stone-js-cloud-file) | Cloud storage on the filesystem contract, signed URLs. |
-| [`@stone-js/mcp`](./stone-js-mcp) | The agent-native map of the framework (tools + llms.txt). |
+| [`@stone-js/mcp-dev`](./stone-js-mcp-dev) | `stone mcp`: serve the framework's knowledge + your tools to a coding agent (MCP, stdio). |
 | [`@stone-js/testing`](./stone-js-testing) | Boot a real app in-memory and dispatch events. |
 
 ### Tooling

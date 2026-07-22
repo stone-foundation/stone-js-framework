@@ -1,21 +1,7 @@
 # Variable: MetaRawResponseMiddleware
 
 ```ts
-const MetaRawResponseMiddleware: object;
+const MetaRawResponseMiddleware: MetaMiddleware<any, any>;
 ```
 
 Meta Middleware for processing outgoing responses.
-
-## Type Declaration
-
-### isClass
-
-```ts
-isClass: boolean = true;
-```
-
-### module
-
-```ts
-module: typeof RawResponseMiddleware = RawResponseMiddleware;
-```

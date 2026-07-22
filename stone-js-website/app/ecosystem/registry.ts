@@ -59,8 +59,7 @@ export const CATALOG: CatalogTier[] = [
       { name: '@stone-js/alibaba-fc-adapter', desc: 'Alibaba Cloud Function Compute.', href: '/docs/adapters/alibaba-fc' },
       { name: '@stone-js/tencent-scf-adapter', desc: 'Tencent Cloud Serverless Cloud Functions.', href: '/docs/adapters/tencent-scf' },
       { name: '@stone-js/fetch-adapter', desc: 'One Web-standard adapter: Cloudflare, Deno, Bun, Vercel, Netlify.', href: '/docs/adapters/fetch' },
-      { name: '@stone-js/browser-adapter', desc: 'Run the app in the browser (SPA, hydration).', href: '/docs/adapters/browser' },
-      { name: '@stone-js/mcp-adapter', desc: 'Expose your domain to AI agents as MCP tools.', href: '/docs/adapters/mcp' }
+      { name: '@stone-js/browser-adapter', desc: 'Run the app in the browser (SPA, hydration).', href: '/docs/adapters/browser' }
     ]
   },
   {
@@ -87,7 +86,7 @@ export const CATALOG: CatalogTier[] = [
       { name: '@stone-js/config-source', desc: 'Load config from env, files, SSM, Secrets Manager, HTTP and KMS.', href: '/docs/extensions/config-source' },
       { name: '@stone-js/openapi', desc: 'A public contract derived from your schemas.', href: '/docs/extensions/openapi' },
       { name: '@stone-js/testing', desc: 'Boot the real app in memory; dispatch real events.', href: '/docs/extensions/testing' },
-      { name: '@stone-js/mcp', desc: 'An MCP server for the framework itself, for coding agents.', href: '/docs/extensions/mcp' }
+      { name: '@stone-js/mcp-dev', desc: 'Serve the framework knowledge + your app to a coding agent via `stone mcp`.', href: '/docs/extensions/mcp' }
     ]
   },
   {

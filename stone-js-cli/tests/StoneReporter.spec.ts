@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
-  STONE_MARK,
   stoneBanner,
   formatElapsed,
   renderSummary,
@@ -8,9 +7,9 @@ import {
 } from '../src/StoneReporter'
 
 describe('stoneBanner', () => {
-  it('renders the signature mark and subtitle', () => {
+  it('renders the wordmark, version and subtitle', () => {
     const banner = stoneBanner('1.2.3')
-    expect(banner).toContain(`${STONE_MARK} Stone.js`)
+    expect(banner).toContain('Stone.js')
     expect(banner).toContain('v1.2.3')
     expect(banner).toContain('The continuum framework')
   })
@@ -28,6 +27,12 @@ describe('stoneBanner', () => {
     const banner = stoneBanner('v2.0.0')
     expect(banner).toContain('v2.0.0')
     expect(banner).not.toContain('vv2.0.0')
+  })
+
+  it('draws the portal logo above the wordmark', () => {
+    const banner = stoneBanner('1.0.0')
+    expect(banner).toContain('●●●●●')
+    expect(banner.indexOf('●●●●●')).toBeLessThan(banner.indexOf('Stone.js'))
   })
 })
 
@@ -59,7 +64,9 @@ describe('renderSummary', () => {
 function fakeOutput (): any {
   const identity: any = new Proxy((v: string) => v, {
     get: () => identity,
-    apply: (_t, _this, args) => args[0]
+    // Return the styled text. For `hex('#rrggbb')…(text)` the colour arg returns the callable
+    // again, so a later call yields the text.
+    apply: (_t, _this, args) => (typeof args[0] === 'string' && args[0].startsWith('#')) ? identity : args[0]
   })
   return {
     format: identity,

@@ -153,19 +153,19 @@ export const STARTERS: Starter[] = [
     blogSlug: 'stateless-auth-at-the-edge'
   },
   {
-    id: 'api-as-tools',
-    title: 'API as agent tools',
+    id: 'agent-superpowers',
+    title: 'Agent superpowers (MCP dev)',
     official: true,
     target: 'backend',
     paradigm: 'decorators',
     problem: 'agents',
     command: 'npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters',
-    repo: `${GH}/stone-js-blog-starters/tree/main/api-as-tools`,
+    repo: `${GH}/stone-js-blog-starters/tree/main/agent-superpowers`,
     author: 'Stone Foundation',
     authorUrl: GH,
-    description: 'The same domain served over HTTP, exposed to agents as MCP tools.',
-    about: 'An AI agent is just another caller. Stack @Mcp() on the app and your existing router handlers are listed to agents as MCP tools, the same domain your REST API serves, with no handler change. stdio by default for a local tool, sse for a remote server. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
-    blogSlug: 'api-as-agent-tools'
+    description: 'Give your coding agent Stone.js superpowers: `stone mcp` serves the framework + your app.',
+    about: 'Add @McpDev() and one command, stone mcp, starts an MCP server (stdio) that gives your coding agent the framework knowledge (stone_search, stone_docs) AND a read-only view of this app (stone_routes, stone_app, stone_config), plus any tools you declare, so it stops guessing. `stone mcp --init` writes .mcp.json; the package also ships Agent Skills. An opt-in blog starter, request it with --starters github:stone-foundation/stone-js-blog-starters.',
+    blogSlug: 'agent-superpowers'
   },
   {
     id: 'openapi-contract',

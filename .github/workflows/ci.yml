@@ -7,6 +7,8 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened]
 
+# Least privilege: CI only needs to read the repo. Each workflow declares its own scopes, so the
+# repository default can stay read-only.
 permissions:
   contents: read
 
@@ -15,47 +17,90 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
-    name: Build · Lint · Test · Sonar
+  # Build once. Lint and Test both need the built dist/*.d.ts of the workspace @stone-js/*
+  # dependencies, so they cannot start before this; they then run in parallel (see `needs`).
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0 # Sonar needs full history for blame/new-code.
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 22
           cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Security audit (high · critical)
         run: pnpm audit --audit-level=high
-
-      # CI gates the published framework packages. The website (built + shipped by
-      # deploy-website.yml) and the lab demo apps are internal apps, excluded here.
-      #
-      # Build BEFORE lint: type-aware lint (ts-standard) reads each package's dependency
-      # types from the built dist/*.d.ts; without a prior build the workspace @stone-js/*
-      # imports resolve to `any` and trip strict-boolean-expressions / return-await.
       - name: Build (packages)
         run: pnpm run build:ci
+      - name: Upload dist
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dist
+          path: stone-js-*/dist
+          retention-days: 1
 
-      - name: Lint
-        run: pnpm run lint:ci
+  lint:
+    name: Lint
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Download dist
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dist
+      - run: pnpm run lint:ci
 
+  test:
+    name: Test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Download dist
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dist
       - name: Test (with coverage)
         run: pnpm run test:ci
+      - name: Upload coverage
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage
+          path: stone-js-*/coverage/lcov.info
+          retention-days: 1
 
+  # Sonar needs the coverage reports (from Test) and the full git history for new-code/blame.
+  # It analyses source only (dist/docs/coverage are excluded in sonar-project.properties), so it
+  # needs neither a build nor an install here.
+  sonar:
+    name: SonarCloud
+    needs: test
+    if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Download coverage
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: coverage
       - name: SonarCloud Scan
-        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
-        uses: SonarSource/sonarqube-scan-action@v8
+        uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f # v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

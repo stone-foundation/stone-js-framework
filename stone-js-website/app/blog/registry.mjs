@@ -80,14 +80,14 @@ export const ARTICLES = [
     locale: 'en'
   },
   {
-    slug: 'api-as-agent-tools',
-    title: 'Your API as MCP tools for agents',
-    date: '2026-07-17',
+    slug: 'agent-superpowers',
+    title: 'Give your coding agent Stone.js superpowers',
+    date: '2026-07-22',
     author: 'Evens Pierre',
-    excerpt: 'AI agents are a new kind of caller. Instead of a second API, stack the MCP adapter and the domain that already answers HTTP answers agents as MCP tools.',
+    excerpt: 'One command, `stone mcp`, serves your coding agent the framework’s knowledge and a live, read-only view of your own app: its routes, commands and config, plus any tools you add.',
     tags: ['agents', 'mcp', 'ai'],
-    ogImage: '/og/api-as-agent-tools.png',
-    starter: 'api-as-tools',
+    ogImage: '/og/agent-superpowers.png',
+    starter: 'agent-superpowers',
     locale: 'en'
   },
   {

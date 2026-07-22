@@ -10,24 +10,52 @@ import { CommandOutput } from '@stone-js/node-cli-adapter'
  */
 
 /**
- * The Stone.js signature mark (diamond motif — "Stone" as a cut gem).
+ * The Stone.js signature mark: a circle (echoing « Le Portail »), used as the wordmark and step bullet.
  */
-export const STONE_MARK = '◆'
+export const STONE_MARK = '●'
 
 /**
- * Build the signature banner as plain text (no ANSI), given a version and optional subtitle.
+ * The brand primary accent: the "braise" ember of « Obsidienne & Braise ».
+ */
+export const STONE_EMBER = '#FF5A1F'
+
+/**
+ * The Stone.js logo, "Le Portail": a ring of dots forming a circle. The `top` rows carry the ember
+ * accent (the brand's top arc); the `bottom` rows are ink. Split so {@link StoneReporter.banner}
+ * can colour each half (the halves are mirror images, so they cannot be told apart by text).
+ */
+export const STONE_LOGO = {
+  top: ['    ●●●●●', '  ●●     ●●'],
+  bottom: [' ●●       ●●', '  ●●     ●●', '    ●●●●●']
+} as const
+
+/** The version suffix shown after the wordmark (empty for none / 0.0.0). */
+function versionSuffix (version: string): string {
+  const hasVersion = version.length > 0 && version !== '0.0.0'
+  return hasVersion ? `   ${version.startsWith('v') ? version : `v${version}`}` : ''
+}
+
+/** The rule under the wordmark, sized to the subtitle. */
+function bannerRule (subtitle: string): string {
+  return '─'.repeat(Math.max(subtitle.length, 20) + 4)
+}
+
+/**
+ * Build the signature banner as plain text (no ANSI): the portal logo, the wordmark with version, a
+ * rule, and the subtitle. The {@link StoneReporter.banner} method applies the brand colour on top.
  *
  * @param version - The CLI/app version to display.
  * @param subtitle - An optional subtitle line.
  * @returns The multi-line banner string.
  */
 export function stoneBanner (version = '', subtitle = 'The continuum framework'): string {
-  const hasVersion = version.length > 0 && version !== '0.0.0'
-  const v = hasVersion ? `  ${version.startsWith('v') ? version : `v${version}`}` : ''
   return [
     '',
-    `  ${STONE_MARK} Stone.js${v}`,
-    `  ${'─'.repeat(Math.max(subtitle.length, 10) + 4)}`,
+    ...STONE_LOGO.top,
+    ...STONE_LOGO.bottom,
+    '',
+    `  ${STONE_MARK} Stone.js${versionSuffix(version)}`,
+    `  ${bannerRule(subtitle)}`,
     `  ${subtitle}`,
     ''
   ].join('\n')
@@ -95,13 +123,20 @@ export class StoneReporter {
    *
    * @param subtitle - An optional subtitle.
    */
-  banner (subtitle?: string): this {
-    const text = stoneBanner(this.version, subtitle)
-    const [, brand, rule, sub] = text.split('\n')
-    this.output.show(this.output.format.cyanBright.bold(brand))
-    this.output.show(this.output.format.gray(rule))
-    this.output.show(this.output.format.gray(sub))
+  banner (subtitle = 'The continuum framework'): this {
+    const f = this.output.format
+
+    this.output.show('')
+    // The portal: top arcs in the brand ember, lower arcs in ink.
+    for (const line of STONE_LOGO.top) { this.output.show(f.hex(STONE_EMBER).bold(line)) }
+    for (const line of STONE_LOGO.bottom) { this.output.show(f.whiteBright.bold(line)) }
+    this.output.show('')
+    // The wordmark: ember mark, bold white wordmark, dim version.
+    this.output.show(`  ${f.hex(STONE_EMBER)(STONE_MARK)} ${f.whiteBright.bold('Stone.js')}${f.gray(versionSuffix(this.version))}`)
+    this.output.show(f.gray(`  ${bannerRule(subtitle)}`))
+    this.output.show(f.gray(`  ${subtitle}`))
     this.output.breakLine(1)
+
     return this
   }
 

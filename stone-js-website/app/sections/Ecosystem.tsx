@@ -14,7 +14,7 @@ const MODULES = [
   { tier: 'extension', name: '@stone-js/realtime', text: 'One Broadcaster API, backend and frontend: channels and presence.', href: '/docs/extensions/realtime' },
   { tier: 'extension', name: '@stone-js/event-bus', text: 'Emit domain events to local and cloud targets; route them anywhere.', href: '/docs/extensions/event-bus' },
   { tier: 'adapter', name: '@stone-js/fetch-adapter', text: 'One Web-standard adapter for Cloudflare, Deno, Bun, Vercel, Netlify.', href: '/docs/adapters/fetch' },
-  { tier: 'adapter', name: '@stone-js/mcp-adapter', text: 'Your domain as MCP tools: a REST API for agents.', href: '/docs/adapters/mcp' },
+  { tier: 'extension', name: '@stone-js/mcp-dev', text: 'Serve the framework + your app to a coding agent: `stone mcp`.', href: '/docs/extensions/mcp' },
   { tier: 'extension', name: '@stone-js/queue', text: 'Dispatch work now or later, process with a worker, retry with backoff.', href: '/docs/extensions/queue' },
   { tier: 'extension', name: '@stone-js/openapi', text: 'A public contract derived from the schemas you already write.', href: '/docs/extensions/openapi' }
 ]

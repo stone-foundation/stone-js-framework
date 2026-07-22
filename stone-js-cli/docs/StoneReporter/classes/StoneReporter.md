@@ -44,7 +44,7 @@ Print the signature banner.
 
 ##### subtitle?
 
-`string`
+`string` = `'The continuum framework'`
 
 An optional subtitle.
 

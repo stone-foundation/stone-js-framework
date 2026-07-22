@@ -45,7 +45,7 @@ const mockEvent: any = {
 // Identity proxy standing in for chalk: any `.color.modifier(text)` returns `text`.
 const identityFormat: any = new Proxy((v: string) => v, {
   get: () => identityFormat,
-  apply: (_t, _this, args) => args[0]
+  apply: (_t, _this, args) => (typeof args[0] === 'string' && args[0].startsWith('#')) ? identityFormat : args[0]
 })
 
 const mockContext: any = {
