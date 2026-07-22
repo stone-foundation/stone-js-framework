@@ -44,7 +44,15 @@ knowledge helpers, not your domain, so they do not need to traverse the kernel. 
 logged to **stderr** (stdout is reserved for the JSON-RPC protocol) so you watch the agent think in
 real time.
 
-Point your editor's agent at it via `.mcp.json` (Claude Code, Cursor, Claude Desktop, …):
+### Register it for your agent
+
+Let `stone mcp` write `.mcp.json` for you (create or merge, never clobbering your own config):
+
+```bash
+stone mcp --init
+```
+
+Or add the entry yourself (Claude Code, Cursor, Claude Desktop, …):
 
 ```jsonc
 { "mcpServers": {
@@ -52,7 +60,9 @@ Point your editor's agent at it via `.mcp.json` (Claude Code, Cursor, Claude Des
 } }
 ```
 
-### Built-in tools
+`.mcp.json` can be committed or `.gitignore`d per developer.
+
+### Framework-knowledge tools
 
 | Tool | What it returns |
 |---|---|
@@ -63,6 +73,22 @@ Point your editor's agent at it via `.mcp.json` (Claude Code, Cursor, Claude Des
 | `stone_best_practices` | Conventions and anti-patterns, each with its rationale. |
 | `stone_gaps` | What the framework does not (yet) provide, and what to reach for. |
 | `stone_brief` | The full agent brief (`llms-full.txt`). |
+
+### App-introspection tools
+
+These read *your* app's resolved blueprint (read-only, secrets redacted), so the agent understands
+the app you are building, not just the framework:
+
+| Tool | What it returns |
+|---|---|
+| `stone_app` | App name, env, active platform, and counts of routes/commands/providers/adapters. |
+| `stone_routes` | The route tree (path, methods, name, handler, middleware). |
+| `stone_commands` | The CLI commands (name, alias, args, description). |
+| `stone_adapters` | Registered adapters (platform, alias, default/current) and the active platform. |
+| `stone_providers` | The service providers. |
+| `stone_kernel` | The kernel pipeline: event handler, middleware, error handlers. |
+| `stone_key_routes` | Key-routing definitions (event-bus / realtime): key to handler. |
+| `stone_config` | A resolved `stone.*` config value by dotted key (secrets redacted); omit the key to list them. |
 
 ### Your own tools
 
@@ -85,6 +111,19 @@ export class Application {}
 
 The knowledge base and `llms.txt` helpers are also exported directly (`stoneMcpTools`,
 `searchKnowledge`, `generateLlmsTxt`, `generateLlmsFullTxt`) if you want to serve them elsewhere.
+
+## Agent Skills
+
+The package ships [Agent Skills](https://agentskills.io) (`stone-js`, `stone-js-routing`,
+`stone-js-adapters`) under [`skills/`](./skills): portable `SKILL.md` folders that teach a
+skills-compatible agent the framework's conventions on demand. They complement the MCP tools (the
+tools introspect the app; the skills say how to build it). Copy the ones you want into your agent's
+skills directory:
+
+```bash
+mkdir -p .claude/skills
+cp -R node_modules/@stone-js/mcp-dev/skills/stone-js* .claude/skills/
+```
 
 ## Documentation
 

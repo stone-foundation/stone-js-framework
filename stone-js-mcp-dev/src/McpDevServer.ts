@@ -1,3 +1,4 @@
+import { hasMcpJson } from './mcpJson'
 import { stoneMcpTools, createReportTools } from './tools'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { McpDevLogger, McpDevOptions, McpToolDef } from './declarations'
@@ -123,6 +124,10 @@ export async function startMcpDevServer (options: McpDevOptions): Promise<void> 
   }
   process.once('SIGINT', shutdown)
   process.once('SIGTERM', shutdown)
+
+  if (!hasMcpJson(process.cwd())) {
+    log('mcp: no .mcp.json found — run `stone mcp --init` to register this server for your agent')
+  }
 
   await server.connect(transport)
   log(`mcp: ${resolveTools(options).length} tools ready on stdio — press Ctrl+C to stop`)

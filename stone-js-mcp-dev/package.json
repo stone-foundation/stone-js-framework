@@ -25,7 +25,8 @@
     "knowledge"
   ],
   "files": [
-    "/dist"
+    "/dist",
+    "/skills"
   ],
   "type": "module",
   "sideEffects": false,

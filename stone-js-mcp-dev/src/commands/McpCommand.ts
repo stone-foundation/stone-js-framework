@@ -1,5 +1,7 @@
+import { initMcpJson } from '../mcpJson'
 import { McpDevError } from '../errors/McpDevError'
 import { startMcpDevServer } from '../McpDevServer'
+import { createIntrospectionTools } from '../introspection'
 import { IBlueprint, IContainer, IncomingEvent } from '@stone-js/core'
 import { CommandOptions, IArgv, McpDevOptions } from '../declarations'
 
@@ -9,9 +11,10 @@ import { CommandOptions, IArgv, McpDevOptions } from '../declarations'
 export const mcpCommandOptions: CommandOptions = {
   name: 'mcp',
   alias: 'm',
-  desc: 'Start an MCP server (stdio) exposing Stone.js knowledge + your tools to a coding agent',
+  desc: 'Start an MCP server (stdio) exposing Stone.js knowledge + your app + your tools to a coding agent',
   options: (yargs: IArgv) => {
     return yargs
+      .option('init', { type: 'boolean', desc: 'Register this server in .mcp.json (create/merge) and exit' })
       .option('name', { type: 'string', desc: 'Override the MCP server name' })
       .option('quiet', { type: 'boolean', desc: 'Silence the stderr activity log' })
   }
@@ -42,10 +45,18 @@ export class McpCommand {
    */
   async handle (event: IncomingEvent): Promise<void> {
     const blueprint = this.container.make<IBlueprint>('blueprint')
+
+    if (event.getMetadataValue<boolean>('init', false)) {
+      const { file, changed } = initMcpJson(process.cwd())
+      process.stderr.write(changed ? `mcp: registered this server in ${file}\n` : `mcp: ${file} already registers this server\n`)
+      return
+    }
+
     const options = blueprint.get<McpDevOptions>('stone.mcpDev', {})
     const name = event.getMetadataValue<string | undefined>('name', options.name)
     const quiet = event.getMetadataValue<boolean>('quiet', options.quiet ?? false)
+    const tools = [...createIntrospectionTools(blueprint), ...(options.tools ?? [])]
 
-    await startMcpDevServer({ ...options, name, quiet })
+    await startMcpDevServer({ ...options, name, quiet, tools })
   }
 }
