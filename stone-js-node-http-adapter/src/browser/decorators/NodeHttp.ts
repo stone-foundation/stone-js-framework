@@ -22,7 +22,7 @@ export interface NodeHttpOptions extends Partial<NodeHttpAdapterAdapterConfig> {
  *
  * @template T - The type of the class being decorated, defaulting to `ClassType`.
  *
- * @param options - An object containing configuration options for the Node.js HTTP adapter.
+ * @param _options - An object containing configuration options for the Node.js HTTP adapter.
  *
  * @returns A class decorator function.
  *

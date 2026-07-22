@@ -19,7 +19,7 @@ export interface NodeConsoleOptions extends Partial<NodeConsoleAdapterAdapterCon
  * where the Node.js HTTP adapter is applicable.
  *
  * @template T - The type of the class being decorated. Defaults to `ClassType`.
- * @param options - Optional configuration to customize the Node Cli Adapter.
+ * @param _options - Optional configuration to customize the Node Cli Adapter.
  *
  * @returns A class decorator that applies the Node Cli adapter configuration.
  *

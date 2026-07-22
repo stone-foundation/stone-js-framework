@@ -19,7 +19,7 @@ export interface AwsLambdaHttpOptions extends Partial<AwsLambdaHttpAdapterAdapte
  * where the Node.js HTTP adapter is applicable.
  *
  * @template T - The type of the class being decorated. Defaults to `ClassType`.
- * @param options - Optional configuration to customize the AWS Lambda HTTP Adapter.
+ * @param _options - Optional configuration to customize the AWS Lambda HTTP Adapter.
  *
  * @returns A class decorator that applies the AWS Lambda HTTP adapter configuration.
  *
