@@ -31,9 +31,8 @@ describe('stoneBanner', () => {
 
   it('draws the portal logo above the wordmark', () => {
     const banner = stoneBanner('1.0.0')
-    expect(banner).toContain('◜ ◝')
-    expect(banner).toContain('◟ ◞')
-    expect(banner.indexOf('◜ ◝')).toBeLessThan(banner.indexOf('Stone.js'))
+    expect(banner).toContain('●●●●●')
+    expect(banner.indexOf('●●●●●')).toBeLessThan(banner.indexOf('Stone.js'))
   })
 })
 

@@ -10,9 +10,9 @@ import { CommandOutput } from '@stone-js/node-cli-adapter'
  */
 
 /**
- * The Stone.js signature mark used as a step bullet.
+ * The Stone.js signature mark: a circle (echoing « Le Portail »), used as the wordmark and step bullet.
  */
-export const STONE_MARK = '◆'
+export const STONE_MARK = '●'
 
 /**
  * The brand primary accent: the "braise" ember of « Obsidienne & Braise ».
@@ -20,14 +20,25 @@ export const STONE_MARK = '◆'
 export const STONE_EMBER = '#FF5A1F'
 
 /**
- * The Stone.js logo, "Le Portail": a circle drawn from arcs. The top arc carries the ember accent;
- * the lower arcs are ink. Rendered here with quadrant-arc glyphs so it stays terminal-safe.
- * `TOP` and `BOTTOM` are separated so {@link StoneReporter.banner} can colour the top arc.
+ * The Stone.js logo, "Le Portail": a ring of dots forming a circle. The `top` rows carry the ember
+ * accent (the brand's top arc); the `bottom` rows are ink. Split so {@link StoneReporter.banner}
+ * can colour each half (the halves are mirror images, so they cannot be told apart by text).
  */
 export const STONE_LOGO = {
-  top: '  ◜ ◝',
-  bottom: '  ◟ ◞'
+  top: ['    ●●●●●', '  ●●     ●●'],
+  bottom: [' ●●       ●●', '  ●●     ●●', '    ●●●●●']
 } as const
+
+/** The version suffix shown after the wordmark (empty for none / 0.0.0). */
+function versionSuffix (version: string): string {
+  const hasVersion = version.length > 0 && version !== '0.0.0'
+  return hasVersion ? `   ${version.startsWith('v') ? version : `v${version}`}` : ''
+}
+
+/** The rule under the wordmark, sized to the subtitle. */
+function bannerRule (subtitle: string): string {
+  return '─'.repeat(Math.max(subtitle.length, 20) + 4)
+}
 
 /**
  * Build the signature banner as plain text (no ANSI): the portal logo, the wordmark with version, a
@@ -38,15 +49,13 @@ export const STONE_LOGO = {
  * @returns The multi-line banner string.
  */
 export function stoneBanner (version = '', subtitle = 'The continuum framework'): string {
-  const hasVersion = version.length > 0 && version !== '0.0.0'
-  const v = hasVersion ? `   ${version.startsWith('v') ? version : `v${version}`}` : ''
   return [
     '',
-    STONE_LOGO.top,
-    STONE_LOGO.bottom,
+    ...STONE_LOGO.top,
+    ...STONE_LOGO.bottom,
     '',
-    `  Stone.js${v}`,
-    `  ${'─'.repeat(Math.max(subtitle.length, 20) + 4)}`,
+    `  ${STONE_MARK} Stone.js${versionSuffix(version)}`,
+    `  ${bannerRule(subtitle)}`,
     `  ${subtitle}`,
     ''
   ].join('\n')
@@ -114,29 +123,20 @@ export class StoneReporter {
    *
    * @param subtitle - An optional subtitle.
    */
-  banner (subtitle?: string): this {
+  banner (subtitle = 'The continuum framework'): this {
     const f = this.output.format
 
-    for (const line of stoneBanner(this.version, subtitle).split('\n')) {
-      if (line.trim().length === 0) {
-        this.output.show('')
-      } else if (line === STONE_LOGO.top) {
-        // The portal's top arc, in the brand ember.
-        this.output.show(f.hex(STONE_EMBER).bold(line))
-      } else if (line === STONE_LOGO.bottom) {
-        // The lower arcs, in ink.
-        this.output.show(f.whiteBright.bold(line))
-      } else if (line.includes('Stone.js')) {
-        // The wordmark: bold white, dim version.
-        const [, rest = ''] = line.split('Stone.js')
-        this.output.show(`  ${f.whiteBright.bold('Stone.js')}${f.gray(rest)}`)
-      } else {
-        // The rule and subtitle.
-        this.output.show(f.gray(line))
-      }
-    }
-
+    this.output.show('')
+    // The portal: top arcs in the brand ember, lower arcs in ink.
+    for (const line of STONE_LOGO.top) { this.output.show(f.hex(STONE_EMBER).bold(line)) }
+    for (const line of STONE_LOGO.bottom) { this.output.show(f.whiteBright.bold(line)) }
+    this.output.show('')
+    // The wordmark: ember mark, bold white wordmark, dim version.
+    this.output.show(`  ${f.hex(STONE_EMBER)(STONE_MARK)} ${f.whiteBright.bold('Stone.js')}${f.gray(versionSuffix(this.version))}`)
+    this.output.show(f.gray(`  ${bannerRule(subtitle)}`))
+    this.output.show(f.gray(`  ${subtitle}`))
     this.output.breakLine(1)
+
     return this
   }
 

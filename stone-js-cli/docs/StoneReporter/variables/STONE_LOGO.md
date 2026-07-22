@@ -4,20 +4,20 @@
 const STONE_LOGO: object;
 ```
 
-The Stone.js logo, "Le Portail": a circle drawn from arcs. The top arc carries the ember accent;
-the lower arcs are ink. Rendered here with quadrant-arc glyphs so it stays terminal-safe.
-`TOP` and `BOTTOM` are separated so [StoneReporter.banner](../classes/StoneReporter.md#banner) can colour the top arc.
+The Stone.js logo, "Le Portail": a ring of dots forming a circle. The `top` rows carry the ember
+accent (the brand's top arc); the `bottom` rows are ink. Split so [StoneReporter.banner](../classes/StoneReporter.md#banner)
+can colour each half (the halves are mirror images, so they cannot be told apart by text).
 
 ## Type Declaration
 
 ### bottom
 
 ```ts
-readonly bottom: "  ◟ ◞" = '  ◟ ◞';
+readonly bottom: readonly [" ●●       ●●", "  ●●     ●●", "    ●●●●●"];
 ```
 
 ### top
 
 ```ts
-readonly top: "  ◜ ◝" = '  ◜ ◝';
+readonly top: readonly ["    ●●●●●", "  ●●     ●●"];
 ```
