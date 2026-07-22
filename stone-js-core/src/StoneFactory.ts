@@ -160,7 +160,8 @@ export class StoneFactory<TEvent extends IncomingEvent, UResponse extends Outgoi
     // initializers run and `this` resolves to an instance rather than `undefined`.
     let instance: Record<string, (...args: any[]) => unknown> | undefined
     const getInstance = (): Record<string, (...args: any[]) => unknown> => {
-      return (instance ??= new (module as unknown as new () => Record<string, (...args: any[]) => unknown>)())
+      instance ??= new (module as unknown as new () => Record<string, (...args: any[]) => unknown>)()
+      return instance
     }
 
     getMetadata<ClassType, HookOptions[]>(module, LIFECYCLE_HOOK_KEY, []).forEach(options => {

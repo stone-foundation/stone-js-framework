@@ -175,7 +175,7 @@ export class CommandRouterEventHandler<
       return command.match(event)
     } else {
       const task = event.getMetadataValue<string>('_task')
-      return options.name === task || options.alias === task || (Array.isArray(options.alias) && options.alias.some((alias) => alias === task))
+      return options.name === task || options.alias === task || (Array.isArray(options.alias) && task !== undefined && options.alias.includes(task))
     }
   }
 }

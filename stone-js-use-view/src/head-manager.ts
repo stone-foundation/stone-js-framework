@@ -221,7 +221,8 @@ export class HeadManager {
    * @param descriptor - The script descriptor.
    */
   script (descriptor: ScriptDescriptor): this {
-    (this.context.scripts ??= []).push(descriptor)
+    this.context.scripts ??= []
+    this.context.scripts.push(descriptor)
     return this
   }
 
@@ -233,7 +234,8 @@ export class HeadManager {
    */
   style (css: string, attrs: Record<string, unknown> = {}): this {
     const descriptor: StyleDescriptor = { content: css, ...attrs }
-    ;(this.context.styles ??= []).push(descriptor)
+    this.context.styles ??= []
+    this.context.styles.push(descriptor)
     return this
   }
 
@@ -320,7 +322,8 @@ export class HeadManager {
    * @param data - The JSON-LD object.
    */
   jsonLd (data: Record<string, unknown>): this {
-    (this.context.jsonLd ??= []).push(data)
+    this.context.jsonLd ??= []
+    this.context.jsonLd.push(data)
     return this
   }
 
@@ -360,7 +363,7 @@ export class HeadManager {
     ctx.metas?.forEach((m) => this.meta(m))
     ctx.links?.forEach((l) => this.link(l))
     ctx.scripts?.forEach((s) => this.script(s))
-    ctx.styles?.forEach((s) => { (this.context.styles ??= []).push(s) })
+    ctx.styles?.forEach((s) => { this.context.styles ??= []; this.context.styles.push(s) })
     ctx.jsonLd?.forEach((j) => this.jsonLd(j))
     if (ctx.htmlAttributes !== undefined) { this.htmlAttributes(ctx.htmlAttributes) }
     if (ctx.bodyAttributes !== undefined) { this.bodyAttributes(ctx.bodyAttributes) }

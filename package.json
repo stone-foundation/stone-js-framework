@@ -2,7 +2,7 @@
   "name": "@stone-js/monorepo",
   "version": "0.3.0",
   "private": true,
-  "description": "Stone.js: universal micro-kernel (Continuum Architecture). Control monorepo for every @stone-js/* package.",
+  "description": "The Continuum framework. Write your TypeScript domain once; it runs anywhere: Node, serverless, edge, browser, CLI and AI agents. Build once, deploy anywhere.",
   "type": "module",
   "engines": {
     "node": ">=20.11.0"

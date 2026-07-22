@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { Code } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, SeeAlso, Pager } from '../../components/content'
@@ -61,14 +61,25 @@ export const spec = OpenApiGenerator
           OpenAPI viewer (Swagger UI, Scalar) at that URL for a human-friendly, interactive explorer, no
           separate docs site to keep in sync.
         </p>
-        <Code file='app/OpenApiController.ts'>{`import { EventHandler, Get } from '@stone-js/router'
+        <CodeTabs
+          file='app/OpenApiController.ts'
+          decl={`import { EventHandler, Get } from '@stone-js/router'
 import { spec } from './openapi'
 
 @EventHandler('/openapi.json')
 export class OpenApiController {
   @Get('/')
   document () { return spec }   // the generated OpenAPI document, as JSON
-}`}</Code>
+}`}
+          imp={`import { defineEventHandler, defineRoutes } from '@stone-js/router'
+import { spec } from './openapi'
+
+const OpenApiController = () => ({ document: () => spec })
+
+export const routes = defineRoutes([
+  [defineEventHandler(OpenApiController, 'document'), { path: '/openapi.json', method: 'GET' }]
+])`}
+        />
 
         <H3>Schemas to JSON Schema</H3>
         <p>

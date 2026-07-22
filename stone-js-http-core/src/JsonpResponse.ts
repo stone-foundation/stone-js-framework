@@ -55,7 +55,7 @@ export class JsonpResponse extends JsonResponse {
     if (typeof callback === 'string' && callback.length > 0) {
       this.setContentType('application/javascript').setHeader('X-Content-Type-Options', 'nosniff')
 
-      const sanitizedCallback = callback.replace(/[^\\[\\]\w$.]/g, '')
+      const sanitizedCallback = callback.replace(/[^\\[\]\w$.]/g, '')
 
       if (typeof this.content === 'string') {
         this.setContent(this.content.replace(/\u2028/g, String.raw`\u2028`).replace(/\u2029/g, String.raw`\u2029`))

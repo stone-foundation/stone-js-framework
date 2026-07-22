@@ -31,6 +31,9 @@ import { FilesystemError } from '../errors/FilesystemError'
  *
  * @author Mr. Stone <evensstone@gmail.com>
  */
+/** A filesystem stat timestamp in milliseconds (number, or bigint under bigint stat mode). */
+export type StatTimeMs = number | bigint | undefined
+
 export class File {
   private readonly path: string
   private stats?: ReturnType<typeof statSync>
@@ -178,7 +181,7 @@ export class File {
    * @param formatted - Whether to return the file size as a formatted string.
    * @returns The file size as a string or number.
    */
-  getSize (formatted: boolean = false): string | number | bigint | undefined {
+  getSize (formatted: boolean = false): string | StatTimeMs {
     const size = this.getStats()?.size
     return size !== undefined && formatted ? filesize(Number(size)) : size
   }
@@ -297,7 +300,7 @@ export class File {
    *
    * @returns The last access time in milliseconds.
    */
-  getATime (): number | bigint | undefined {
+  getATime (): StatTimeMs {
     return this.getStats()?.atimeMs
   }
 
@@ -306,7 +309,7 @@ export class File {
    *
    * @returns The last modified time in milliseconds.
    */
-  getMTime (): number | bigint | undefined {
+  getMTime (): StatTimeMs {
     return this.getStats()?.mtimeMs
   }
 
@@ -315,7 +318,7 @@ export class File {
    *
    * @returns The created time in milliseconds.
    */
-  getCTime (): number | bigint | undefined {
+  getCTime (): StatTimeMs {
     return this.getStats()?.ctimeMs
   }
 

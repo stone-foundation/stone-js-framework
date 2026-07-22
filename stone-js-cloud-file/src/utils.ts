@@ -17,7 +17,7 @@ const SLASH = 47 // '/'
  */
 export function trimTrailingSlashes (value: string): string {
   let end = value.length
-  while (end > 0 && value.charCodeAt(end - 1) === SLASH) { end-- }
+  while (end > 0 && value.codePointAt(end - 1) === SLASH) { end-- }
   return value.slice(0, end)
 }
 
@@ -30,7 +30,7 @@ export function trimTrailingSlashes (value: string): string {
 export function trimSlashes (value: string): string {
   let start = 0
   let end = value.length
-  while (start < end && value.charCodeAt(start) === SLASH) { start++ }
-  while (end > start && value.charCodeAt(end - 1) === SLASH) { end-- }
+  while (start < end && value.codePointAt(start) === SLASH) { start++ }
+  while (end > start && value.codePointAt(end - 1) === SLASH) { end-- }
   return value.slice(start, end)
 }

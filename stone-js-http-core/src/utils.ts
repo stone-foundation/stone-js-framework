@@ -222,8 +222,9 @@ export async function getFilesUploads (
 
     // Best-effort removal of every temp file already written, so a failed/aborted upload never
     // leaks files on disk (combined with the limits above, prevents disk exhaustion).
+    const removeQuietly = async (path: string): Promise<void> => { await rm(path, { force: true }).catch(() => {}) }
     const cleanup = async (): Promise<void> => {
-      await Promise.all(createdFiles.map(async (path) => await rm(path, { force: true }).catch(() => {})))
+      await Promise.all(createdFiles.map(removeQuietly))
     }
     const fail = (error: Error): void => { void cleanup().finally(() => reject(error)) }
 

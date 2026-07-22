@@ -251,8 +251,9 @@ describe('File', () => {
     })
 
     it('should return false if it is not the file path prefix', () => {
+      (resolve as Mock).mockImplementation((p: string) => p)
       const file = File.create('/path/to/file.txt', false)
-      // expect(file.isPathPrefix('/pathsss/')).toBe(false) // TODO - To fix
+      expect(file.isPathPrefix('/pathsss/')).toBe(false)
     })
   })
 

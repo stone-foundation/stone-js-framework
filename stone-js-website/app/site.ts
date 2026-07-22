@@ -1,27 +1,20 @@
 /**
- * Site-wide constants: analytics and search credentials, carried over from the
- * previous documentation site. The Algolia API key is the search-only key and is
- * safe to ship to the client; the GA id is public by design.
+ * Site-wide values, re-exported from the single source of truth ({@link appConfig} in
+ * `AppConfig.ts`, published to the Blueprint by `@Configuration()`). These named exports keep
+ * non-component consumers (head builders, the RSS script) working without hook access; components
+ * should prefer reading from the Blueprint via `useBlueprint()`.
  */
+import { appConfig } from './AppConfig'
 import type { HeadContext } from '@stone-js/use-react'
 
-export const GA_MEASUREMENT_ID = 'G-F368Y4JRZR'
-
-export const ALGOLIA = {
-  appId: 'B8ZTXIHIAP',
-  apiKey: '65a6a180473de963344f97d15302da4d',
-  indexName: 'stonejs'
-} as const
-
-export const GITHUB_URL = 'https://github.com/stone-foundation'
-export const MANIFESTO_URL = 'https://evens-stone.github.io/continuum-manifesto/manifesto'
-
-/** Canonical site origin (see public/CNAME). Used for absolute share/OG/RSS URLs. */
-export const SITE_URL = 'https://stonejs.dev'
-
-export const SITE_NAME = 'Stone.js'
-export const SITE_TAGLINE = 'The Continuum framework'
-export const SITE_DESCRIPTION = 'Write your domain once; it runs in every context: server, edge, browser, agents.'
+export const GA_MEASUREMENT_ID = appConfig.analytics.ga
+export const ALGOLIA = appConfig.algolia
+export const GITHUB_URL = appConfig.githubUrl
+export const MANIFESTO_URL = appConfig.manifestoUrl
+export const SITE_URL = appConfig.siteUrl
+export const SITE_NAME = appConfig.name
+export const SITE_TAGLINE = appConfig.tagline
+export const SITE_DESCRIPTION = appConfig.description
 
 /** The brand social card shipped when a page declares none of its own. */
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og/default.jpg`

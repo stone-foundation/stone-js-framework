@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { Code } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { Lifecycle as LifecycleDiagram, APP_LIFECYCLE, REQUEST_LIFECYCLE } from '../../components/Lifecycle'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
@@ -72,7 +72,9 @@ export class Lifecycle implements IPage<ReactIncomingEvent> {
           around each event, without threading that code through your handlers. Mark a method with
           <code> @Hook(name)</code> and the kernel calls it at the right time.
         </p>
-        <Code file='app/Application.ts'>{`import { Hook, StoneApp } from '@stone-js/core'
+        <CodeTabs
+          file='app/Application.ts'
+          decl={`import { Hook, StoneApp } from '@stone-js/core'
 
 @StoneApp({ name: 'tasks' })
 export class Application {
@@ -81,7 +83,15 @@ export class Application {
 
   @Hook('onTerminate')
   async drain () { /* flush and close, once at shutdown */ }
-}`}</Code>
+}`}
+          imp={`import { defineHookListener } from '@stone-js/core'
+
+// The same two moments, registered imperatively as a list of hook listeners.
+export const hooks = [
+  defineHookListener('onStart', () => { /* open pools, prime caches, once at startup */ }),
+  defineHookListener('onTerminate', () => { /* flush and close, once at shutdown */ })
+]`}
+        />
 
         <H3>Two scopes, dimension-bound</H3>
         <p>

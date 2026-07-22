@@ -55,7 +55,7 @@ describe('JsonpResponse', () => {
     const response = new JsonpResponse({ content: { message: 'test' } })
     // @ts-expect-error - Testing private method
     response.setCallback('callback<script>').makeJson()
-    expect(response.content).toContain("/**/ typeof callback<script> === 'function' && callback<script>({\"message\":\"test\"});")
+    expect(response.content).toContain("/**/ typeof callbackscript === 'function' && callbackscript({\"message\":\"test\"});")
   })
 
   it('should correctly set the content when making JSONP', () => {
