@@ -2,7 +2,6 @@
 
 ## Modules
 
-- [banner](banner/README.md)
 - [blueprint/BlueprintUtils](blueprint/BlueprintUtils/README.md)
 - [command/CommandInput](command/CommandInput/README.md)
 - [command/CommandOutput](command/CommandOutput/README.md)
