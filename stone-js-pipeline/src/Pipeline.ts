@@ -35,7 +35,7 @@ export class Pipeline<T = unknown, R = T, Args extends any[] = any[]> {
   private passable?: T
 
   /** The method name to call on each pipe */
-  private method: string
+  private method: string = 'handle'
 
   /** Flag indicating whether the pipeline should run synchronously or asynchronously */
   private isSync: boolean = false
@@ -71,7 +71,6 @@ export class Pipeline<T = unknown, R = T, Args extends any[] = any[]> {
    * @param options - Optional Pipeline options.
    */
   protected constructor (options?: PipelineOptions<T, R, Args>) {
-    this.method = 'handle'
     this.rawPipes = []
     this.sortedMetaPipes = []
     this._defaultPriority = 10

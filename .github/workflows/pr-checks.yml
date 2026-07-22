@@ -28,7 +28,7 @@ jobs:
         run: |
           name="$BRANCH_NAME"
           echo "Branch: $name"
-          if ! printf '%s' "$name" | grep -qE '^(feat|fix|chore|docs|refactor|perf|test|build|ci|style|revert)/[a-z0-9][a-z0-9._/-]*$'; then
+          if ! printf '%s' "$name" | grep -qE '^(changeset-release|feat|fix|chore|docs|refactor|perf|test|build|ci|style|revert)/[a-z0-9][a-z0-9._/-]*$'; then
             echo "::error::Branch '$name' must be <type>/<slug> (types: feat, fix, chore, docs, refactor, perf, test, build, ci, style, revert), e.g. feat/mcp-dev."
             exit 1
           fi
