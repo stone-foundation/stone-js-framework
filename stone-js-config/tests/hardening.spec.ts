@@ -55,7 +55,7 @@ describe('Config — firstMatch fallback', () => {
   it('returns the fallback when no key matches', () => {
     const c = Config.create<any>({ a: 1 })
     expect(c.firstMatch(['x', 'y'], 'fallback')).toBe('fallback')
-    expect(c.firstMatch(['x', 'a'], 'fallback')).toBe(1)
+    expect(c.firstMatch<number | string>(['x', 'a'], 'fallback')).toBe(1)
   })
 })
 

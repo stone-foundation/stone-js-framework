@@ -8,12 +8,6 @@ on:
       - '.github/workflows/deploy-website.yml'
   workflow_dispatch:
 
-# Allow the workflow to publish to GitHub Pages.
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 # One deploy at a time; let a newer run supersede an in-flight one.
 concurrency:
   group: pages
@@ -23,6 +17,9 @@ jobs:
   build:
     name: Build (SSG + Pagefind index)
     runs-on: ubuntu-latest
+    # Least privilege: the build only reads the repo and uploads the Pages artifact.
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -58,6 +55,10 @@ jobs:
     name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
+    # Only the deploy job needs to mint the Pages token and publish.
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

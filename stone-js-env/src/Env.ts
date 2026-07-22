@@ -357,7 +357,7 @@ export function getEnum (key: string, enums: string[] | Options = [], defaultVal
   return custom(
     key,
     (key, value: string | undefined, opts) => {
-      if (opts.optional === false && (value === undefined || opts.enums === undefined || !(opts.enums?.includes(value)))) {
+      if (opts.optional === false && (value === undefined || opts.enums?.includes(value) !== true)) {
         throw new EnvError(`Value for ${key} must be one of: ${String(opts.enums)}. Received: ${maskValue(value)}`)
       }
 
@@ -534,9 +534,8 @@ export function custom<T = any> (key: string, validator: (key: string, value: st
  * @param value - The raw value.
  * @returns A masked representation exposing only a short hint and the length.
  */
-function maskValue (value: string | undefined): string {
-  /* v8 ignore next 2 -- defensive: custom() rejects absent values with a "required" error before maskValue runs, so at runtime `value` is always a present, non-empty string. */
-  const str = value ?? ''
+function maskValue (value: string = ''): string {
+  const str = value
   if (str.length === 0) { return '<empty>' }
   if (str.length <= 2) { return '**' }
   return `${str.slice(0, 1)}***(${str.length} chars)`

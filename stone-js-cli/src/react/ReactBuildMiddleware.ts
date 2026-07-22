@@ -489,9 +489,10 @@ async function waitForServer (child: ChildProcess, fallbackUrl: string, timeoutM
     // If the server exits before ever announcing a URL, it has no HTTP endpoint to crawl:
     // fail fast with a clear message instead of waiting out the timeout and hitting ECONNREFUSED.
     const onExit = (code: number | null): void => {
+      const stderrTail = stderr.length > 0 ? `\n${stderr.trim()}` : ''
       fail(new CliError(
         'SSG requires an HTTP server adapter (e.g. @stone-js/node-http-adapter): the built server ' +
-        `exited (code ${code ?? 'null'}) without exposing an HTTP endpoint.${stderr.length > 0 ? `\n${stderr.trim()}` : ''}`
+        `exited (code ${code ?? 'null'}) without exposing an HTTP endpoint.${stderrTail}`
       ))
     }
 

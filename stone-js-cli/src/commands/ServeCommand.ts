@@ -115,8 +115,9 @@ export class ServeCommand {
 
     try {
       await server.dev(event)
+      const elapsed = `(${Date.now() - startedAt}ms)`
       spinner.succeed(this.context.commandOutput.format.greenBright(
-        `Built ${this.context.commandOutput.format.gray(`(${Date.now() - startedAt}ms)`)}`
+        `Built ${this.context.commandOutput.format.gray(elapsed)}`
       ))
     } catch (error: any) {
       spinner.fail(this.context.commandOutput.format.redBright('Build failed'))

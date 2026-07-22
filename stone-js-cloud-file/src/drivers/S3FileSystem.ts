@@ -354,8 +354,8 @@ export class S3FileSystem implements FileSystem, SignedUrlCapable {
    */
   private isNotFound (error: any): boolean {
     const status = error?.$metadata?.httpStatusCode
-    const codes = [error?.name, error?.Code, error?.code].map((value) => String(value ?? ''))
-    return status === 404 || codes.includes('NotFound') || codes.includes('NoSuchKey')
+    const codes = new Set([error?.name, error?.Code, error?.code].map((value) => String(value ?? '')))
+    return status === 404 || codes.has('NotFound') || codes.has('NoSuchKey')
   }
 
   /**

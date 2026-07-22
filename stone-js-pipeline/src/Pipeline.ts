@@ -38,7 +38,7 @@ export class Pipeline<T = unknown, R = T, Args extends any[] = any[]> {
   private method: string
 
   /** Flag indicating whether the pipeline should run synchronously or asynchronously */
-  private isSync: boolean
+  private isSync: boolean = false
 
   /** The default priority for the pipes in the pipeline */
   private _defaultPriority: number
@@ -71,7 +71,6 @@ export class Pipeline<T = unknown, R = T, Args extends any[] = any[]> {
    * @param options - Optional Pipeline options.
    */
   protected constructor (options?: PipelineOptions<T, R, Args>) {
-    this.isSync = false
     this.method = 'handle'
     this.rawPipes = []
     this.sortedMetaPipes = []
@@ -158,10 +157,9 @@ export class Pipeline<T = unknown, R = T, Args extends any[] = any[]> {
 
     // Ascending stable sort then reverse — preserves the established ordering while
     // guaranteeing every priority is a number (no non-deterministic `undefined`).
-    return deduped
-      /* v8 ignore next -- priority is normalised to a number for every pipe just above, so the `?? priority` fallbacks are unreachable at runtime. */
-      .sort((a, b) => (a.priority ?? priority) - (b.priority ?? priority))
-      .reverse()
+    /* v8 ignore next -- priority is normalised to a number for every pipe just above, so the `?? priority` fallbacks are unreachable at runtime. */
+    deduped.sort((a, b) => (a.priority ?? priority) - (b.priority ?? priority))
+    return deduped.reverse()
   }
 
   /**

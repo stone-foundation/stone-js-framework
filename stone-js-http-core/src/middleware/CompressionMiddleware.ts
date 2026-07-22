@@ -43,13 +43,13 @@ export class CompressionMiddleware {
    * @returns The best compression format to use.
    */
   private getCompressionFormatFromEvent (event: IncomingHttpEvent): 'gzip' | 'deflate' | 'br' | undefined {
-    const acceptedEncodings = event
+    const acceptedEncodings = new Set(event
       .getHeader('accept-encoding', '')
       .split(',')
-      .map(enc => enc.trim().toLowerCase())
+      .map(enc => enc.trim().toLowerCase()))
 
     const priorities: Array<'br' | 'gzip' | 'deflate'> = ['br', 'gzip', 'deflate']
-    return priorities.find(encoding => acceptedEncodings.includes(encoding))
+    return priorities.find(encoding => acceptedEncodings.has(encoding))
   }
 
   /**

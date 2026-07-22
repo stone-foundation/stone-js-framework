@@ -34,6 +34,9 @@ export interface IncomingHttpEventOptions extends IncomingEventOptions {
  *
  * @author Mr. Stone <evensstone@gmail.com>
  */
+/** The result of an HTTP content-negotiation lookup: the best match, all matches, or false. */
+export type NegotiationResult = string | string[] | false
+
 export class IncomingHttpEvent extends IncomingEvent {
   static readonly INCOMING_HTTP_EVENT = 'stonejs@incoming_http_event'
 
@@ -401,7 +404,7 @@ export class IncomingHttpEvent extends IncomingEvent {
    * @param values - The content types to check.
    * @returns The first accepted type, or false if none are accepted.
    */
-  acceptsTypes (...values: string[]): string | string[] | false {
+  acceptsTypes (...values: string[]): NegotiationResult {
     return this.accepts.type(values.flat())
   }
 
@@ -411,7 +414,7 @@ export class IncomingHttpEvent extends IncomingEvent {
    * @param values - The encodings to check.
    * @returns The first accepted encoding, or false if none are accepted.
    */
-  acceptsEncodings (...values: string[]): string | string[] | false {
+  acceptsEncodings (...values: string[]): NegotiationResult {
     return this.accepts.encoding(values.flat())
   }
 
@@ -421,7 +424,7 @@ export class IncomingHttpEvent extends IncomingEvent {
    * @param values - The charsets to check.
    * @returns The first accepted charset, or false if none are accepted.
    */
-  acceptsCharsets (...values: string[]): string | string[] | false {
+  acceptsCharsets (...values: string[]): NegotiationResult {
     return this.accepts.charset(values.flat())
   }
 
@@ -431,7 +434,7 @@ export class IncomingHttpEvent extends IncomingEvent {
    * @param values - The languages to check.
    * @returns The first accepted language, or false if none are accepted.
    */
-  acceptsLanguages (...values: string[]): string | string[] | false {
+  acceptsLanguages (...values: string[]): NegotiationResult {
     return this.accepts.language(values.flat())
   }
 

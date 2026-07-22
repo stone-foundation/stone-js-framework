@@ -1,7 +1,6 @@
 import { Event } from './events/Event'
 import { Config } from '@stone-js/config'
 import { EventEmitter } from './events/EventEmitter'
-import { IContainer } from '@stone-js/service-container'
 import { IncomingEvent, IncomingEventOptions } from './events/IncomingEvent'
 import { OutgoingResponse, OutgoingResponseOptions } from './events/OutgoingResponse'
 import { FactoryPipe, FunctionalPipe, MetaPipe, MixedPipe, NextPipe, PipeAlias, PipeClass, PipelineHookContext, PipelineHookListener, PipeType } from '@stone-js/pipeline'
@@ -9,7 +8,7 @@ import { FactoryPipe, FunctionalPipe, MetaPipe, MixedPipe, NextPipe, PipeAlias, 
 /**
  * Export the Container interface
  */
-export { IContainer }
+export { IContainer } from '@stone-js/service-container'
 
 /**
  * The unique symbol type used as the metadata key on decorated classes.

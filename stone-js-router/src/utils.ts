@@ -231,9 +231,8 @@ export const getDomainConstraints = (options: RegexPatternOptions): Partial<Rout
 
   const keys = ['match', 'param', 'alias', 'rule', 'quantifier', 'default', 'suffix']
 
-  const domainConstraints = options
-    .domain
-    .match(domainConstraintRegex)
+  const domainConstraints = domainConstraintRegex
+    .exec(options.domain)
     ?.filter((_, i) => i < keys.length)
     .reduce<Partial<RouteSegmentConstraint>>((prev, curr, i) => ({ ...prev, [keys[i]]: curr }), {})
 
@@ -266,8 +265,8 @@ export const getSegmentsConstraints = (options: RegexPatternOptions): Array<Part
     .map((segment): Partial<RouteSegmentConstraint> | undefined => {
       if (/[:}]/.test(segment)) {
         const keys = ['match', 'prefix', 'param', 'alias', 'rule', 'quantifier', 'default']
-        return segment
-          .match(pathConstraintRegex)
+        return pathConstraintRegex
+          .exec(segment)
           ?.filter((_, i) => i < keys.length)
           ?.reduce((prev, curr, i) => ({ ...prev, [keys[i]]: curr }), {})
       } else {

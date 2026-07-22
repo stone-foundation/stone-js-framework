@@ -549,8 +549,7 @@ export class Router<
   hasRoute (name: string | string[]): boolean {
     return [name]
       .flat()
-      .filter((v) => this.routes.hasNamedRoute(v))
-      .length > 0
+      .some((v) => this.routes.hasNamedRoute(v))
   }
 
   /**

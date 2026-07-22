@@ -20,7 +20,7 @@ const NON_WORKSPACE = new Set([
   'stone-js-lab'
 ])
 
-export default (files) => {
+const lintStagedTasks = (files) => {
   const packages = new Set()
   for (const file of files) {
     const match = file.match(/(?:^|\/)(stone-js-[^/]+)\//)
@@ -31,3 +31,5 @@ export default (files) => {
   }
   return [...packages].map((dir) => `pnpm --filter ./${dir} run lint`)
 }
+
+export default lintStagedTasks
