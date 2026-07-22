@@ -7,75 +7,124 @@ import { ArticleTop, Lead, H2, H3, Callout, Aphorism, PropsTable, SeeAlso, Pager
 const PATH = '/docs/extensions/mcp'
 
 /**
- * Extensions: MCP server & llms.txt (the framework's agent tooling).
+ * Extensions: the MCP dev server (@stone-js/mcp-dev).
  */
 @Page(PATH, { layout: 'docs' })
 export class Mcp implements IPage<ReactIncomingEvent> {
   head (): HeadContext {
     return {
-      title: 'MCP server & llms.txt',
-      description: 'Teach the coding agent that builds with Stone.js: an MCP server over the framework’s knowledge, and generated llms.txt.'
+      title: 'MCP dev server',
+      description: 'One command, `stone mcp`, serves the framework’s knowledge, your app’s structure, and your own tools to a coding agent over MCP.'
     }
   }
 
   render (): JSX.Element {
     return (
       <>
-        <ArticleTop eyebrow='Extensions' title='MCP server & llms.txt' />
+        <ArticleTop eyebrow='Extensions' title='MCP dev server' />
         <Lead>
-          There are two agents in the room. One consumes your app at runtime (the MCP adapter). The
-          other builds <em>with</em> the framework, and needs to understand Stone.js itself.
-          <code> @stone-js/mcp</code> serves that second agent: the framework's knowledge, as tools and
-          as a machine-readable map.
+          A coding agent is only as good as its context. <code>@stone-js/mcp-dev</code> gives it three
+          things through one command, <code>stone mcp</code>: the framework’s knowledge, a read-only
+          view of <em>this</em> app, and any tools you add. The MCP SDK owns the protocol and runs the
+          handlers in-process, so these dev helpers never touch your domain or the kernel.
         </Lead>
 
         <H2>Install</H2>
-        <Code file='terminal' lang='bash'>{`npm i @stone-js/mcp`}</Code>
+        <Code file='terminal' lang='bash'>{`npm i -D @stone-js/mcp-dev`}</Code>
 
-        <H2>Knowledge as tools</H2>
+        <H2>Add the command</H2>
         <p>
-          The package exposes the framework's concepts, modules and best practices as MCP tools, so a
-          coding assistant queries them live instead of scanning packages or guessing from stale
-          training data.
+          Enable it with the <code>@McpDev()</code> decorator (or register <code>mcpDevBlueprint</code>),
+          then start the server from your project. It runs over stdio and stops on <code>Ctrl+C</code>,
+          exactly like <code>stone dev</code>.
         </p>
-        <Code file='app/mcp.ts'>{`import { stoneMcpTools, getConcept, searchKnowledge } from '@stone-js/mcp'
+        <Code file='app/Application.ts'>{`import { McpDev } from '@stone-js/mcp-dev'
+import { StoneApp } from '@stone-js/core'
 
-// Register the framework's tools with your MCP server.
-export const tools = stoneMcpTools
+@McpDev()
+@StoneApp({ name: 'my-app' })
+export class Application {}`}</Code>
+        <Code file='terminal' lang='bash'>{`stone mcp`}</Code>
 
-// Or query the knowledge base directly.
-const continuum = getConcept('continuum')
-const hits = searchKnowledge('how do adapters collapse')`}</Code>
-        <Aphorism>The coding agent gets the framework’s map, live, instead of guessing from stale training.</Aphorism>
+        <Callout kind='tip' title='Logs on stderr, protocol on stdout'>
+          Every tool call is logged to <strong>stderr</strong> so you watch the agent think in real
+          time, while stdout stays reserved for the JSON-RPC protocol. That single detail is what
+          breaks most hand-rolled stdio MCP servers; here it is handled for you.
+        </Callout>
 
-        <H2>Generating llms.txt</H2>
+        <H2>Register it for your agent</H2>
         <p>
-          The same knowledge produces the machine-readable docs map served at the site root. Generate
-          the short index or the full text and serve them so any model can load the whole mental model
-          at once.
+          Let <code>stone mcp</code> write <code>.mcp.json</code> for you. It creates or merges the
+          entry and never clobbers your own config, so a coding agent (Claude Code, Cursor, Claude
+          Desktop, …) discovers the server.
         </p>
-        <Code file='scripts/llms.ts'>{`import { generateLlmsTxt, generateLlmsFullTxt } from '@stone-js/mcp'
+        <Code file='terminal' lang='bash'>{`stone mcp --init`}</Code>
 
-await writeFile('public/llms.txt', generateLlmsTxt())
-await writeFile('public/llms-full.txt', generateLlmsFullTxt())`}</Code>
-
-        <H3>What it provides</H3>
-        <PropsTable nameHeader='Export' rows={[
-          { name: 'stoneMcpTools', type: 'tools', desc: 'The framework’s MCP tools, ready to register with a server.' },
-          { name: 'getConcept(id)', type: '(id) => concept', desc: 'Fetch a single concept from the knowledge base.' },
-          { name: 'searchKnowledge(query)', type: '(q) => hits', desc: 'Search concepts, modules and practices.' },
-          { name: 'generateLlmsTxt()', type: '() => string', desc: 'The short docs map (llms.txt).' },
-          { name: 'generateLlmsFullTxt()', type: '() => string', desc: 'The full docs text (llms-full.txt).' }
+        <H2>Framework-knowledge tools</H2>
+        <p>
+          The agent queries the framework live instead of guessing from stale training data.
+        </p>
+        <PropsTable nameHeader='Tool' rows={[
+          { name: 'stone_search', type: 'query', desc: 'Search concepts, modules, best-practices and gaps.' },
+          { name: 'stone_concept', type: 'id?', desc: 'Explain a core concept (omit id to list them).' },
+          { name: 'stone_docs', type: '()', desc: 'Links to the authoritative documentation.' },
+          { name: 'stone_modules', type: '()', desc: 'The ecosystem modules and what each does.' },
+          { name: 'stone_best_practices', type: '()', desc: 'Conventions and anti-patterns, with rationale.' },
+          { name: 'stone_gaps', type: '()', desc: 'What the framework does not (yet) provide.' },
+          { name: 'stone_brief', type: '()', desc: 'The full agent brief (llms-full.txt).' }
         ]} />
 
-        <Callout kind='future' title='Two packages, two agents'>
-          <code>@stone-js/mcp-adapter</code> exposes <em>your</em> domain to agents at runtime.
-          <code> @stone-js/mcp</code> exposes <em>the framework</em> to the agent building your app. Both
-          treat agents as first-class, which is the whole agent-native bet.
+        <H2>App-introspection tools</H2>
+        <p>
+          These read <em>your</em> app’s resolved blueprint, so the agent understands the app you are
+          building, not just the framework. They are read-only and redact secret-looking config.
+        </p>
+        <PropsTable nameHeader='Tool' rows={[
+          { name: 'stone_app', type: '()', desc: 'Name, env, active platform, and counts of routes/commands/providers/adapters.' },
+          { name: 'stone_routes', type: '()', desc: 'The route tree: path, methods, name, handler, middleware.' },
+          { name: 'stone_commands', type: '()', desc: 'The CLI commands (name, alias, args, description).' },
+          { name: 'stone_adapters', type: '()', desc: 'Registered adapters and the active platform.' },
+          { name: 'stone_providers', type: '()', desc: 'The service providers.' },
+          { name: 'stone_kernel', type: '()', desc: 'The kernel pipeline: event handler, middleware, error handlers.' },
+          { name: 'stone_key_routes', type: '()', desc: 'Key-routing definitions (event-bus / realtime).' },
+          { name: 'stone_config', type: 'key?', desc: 'A resolved stone.* value by dotted key (secrets redacted).' }
+        ]} />
+        <Aphorism>The agent reads the app the way the framework does: one blueprint, one source of truth.</Aphorism>
+
+        <H2>Your own tools</H2>
+        <p>
+          Add project-specific tools. They run in-process and receive their arguments directly. Set the
+          server name, instructions, or the GitHub report tools under <code>stone.mcpDev</code>.
+        </p>
+        <Code file='app/Application.ts'>{`import { McpDev } from '@stone-js/mcp-dev'
+
+@McpDev({
+  name: 'my-app-dev',
+  tools: [
+    { name: 'db_schema', description: 'Return the current DB schema', handler: () => readSchema() }
+  ]
+})
+@StoneApp({ name: 'my-app' })
+export class Application {}`}</Code>
+
+        <H2>Agent Skills</H2>
+        <p>
+          The package ships <a href='https://agentskills.io'>Agent Skills</a>
+          (<code>stone-js</code>, <code>stone-js-routing</code>, <code>stone-js-adapters</code>):
+          portable <code>SKILL.md</code> folders that teach a skills-compatible agent the framework’s
+          conventions on demand. The tools introspect the app; the skills say how to build it. Copy the
+          ones you want into your agent’s skills directory.
+        </p>
+        <Code file='terminal' lang='bash'>{`mkdir -p .claude/skills
+cp -R node_modules/@stone-js/mcp-dev/skills/stone-js* .claude/skills/`}</Code>
+
+        <Callout kind='future' title='Serving your domain to agents'>
+          <code>@stone-js/mcp-dev</code> serves the agent that <em>builds</em> your app. Exposing your
+          running domain to agents as tools (over MCP’s web transport) is a separate, upcoming
+          capability, not a bespoke adapter: the same domain, one more context.
         </Callout>
 
         <SeeAlso links={[
-          { title: 'MCP adapter', path: '/docs/adapters/mcp' },
           { title: 'Agent-native patterns', path: '/docs/frontier/agent-native' },
           { title: 'Agents context', path: '/docs/contexts/agents' }
         ]} />

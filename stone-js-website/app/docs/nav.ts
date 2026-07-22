@@ -154,7 +154,6 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Alibaba Cloud FC', path: '/docs/adapters/alibaba-fc' },
       { title: 'Tencent Cloud SCF', path: '/docs/adapters/tencent-scf' },
       { title: 'Browser', path: '/docs/adapters/browser' },
-      { title: 'MCP (agents)', path: '/docs/adapters/mcp' },
       { title: 'Mobile', path: '/docs/adapters/mobile' }
     ]
   },
@@ -175,7 +174,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Config Source', path: '/docs/extensions/config-source' },
       { title: 'OpenAPI', path: '/docs/extensions/openapi' },
       { title: 'Testing', path: '/docs/extensions/testing' },
-      { title: 'MCP server & llms.txt', path: '/docs/extensions/mcp' },
+      { title: 'MCP dev server', path: '/docs/extensions/mcp' },
       { title: 'Telemetry', path: '/docs/extensions/telemetry' }
     ]
   },

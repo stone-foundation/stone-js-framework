@@ -43,7 +43,6 @@ export class Overview implements IPage<ReactIncomingEvent> {
           { name: '@stone-js/aws-lambda-http-adapter', type: '@AwsLambdaHttp', desc: 'HTTP events from API Gateway / Lambda.' },
           { name: '@stone-js/aws-lambda-adapter', type: '@AwsLambda', desc: 'Generic (non-HTTP) Lambda invocations.' },
           { name: '@stone-js/browser-adapter', type: '@Browser', desc: 'Run in the browser (SPA, hydration).' },
-          { name: '@stone-js/mcp-adapter', type: '@Mcp', desc: 'Expose the domain as MCP tools for agents.' },
           { name: 'Mobile', type: 'coming', desc: 'React Native / Expo, planned.' }
         ]} />
 

@@ -62,7 +62,7 @@ create (event) { return this.store.add(event.get('body')) }
           builds with the framework. The second one needs to understand Stone.js itself.
         </p>
         <ul>
-          <li><strong>@stone-js/mcp</strong>: an MCP server for the framework, so an assistant queries concepts, modules and best practices live instead of scanning packages.</li>
+          <li><strong>@stone-js/mcp-dev</strong>: <code>stone mcp</code> serves the framework and your app to a coding assistant, so it queries concepts, modules, routes and config live instead of scanning packages.</li>
           <li><strong>llms.txt</strong>: a machine-readable map of these docs, served at the site root, so any model can load the whole mental model at once.</li>
         </ul>
         <Code file='terminal' lang='bash'>{`curl https://stonejs.dev/llms.txt   # the docs, as a map a model can read`}</Code>

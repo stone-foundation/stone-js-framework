@@ -43,7 +43,7 @@ export class Overview implements IPage<ReactIncomingEvent> {
           { name: '@stone-js/resources', type: 'output shaping', desc: 'Deliberate projections from model to public shape.' },
           { name: '@stone-js/openapi', type: 'contract', desc: 'A public OpenAPI document derived from your schemas.' },
           { name: '@stone-js/testing', type: 'testing', desc: 'Boot the real app in memory; dispatch real events.' },
-          { name: '@stone-js/mcp', type: 'agents / docs', desc: 'The framework’s MCP tooling and llms.txt generation.' },
+          { name: '@stone-js/mcp-dev', type: 'agents / dev', desc: 'Serve the framework + your app to a coding agent via `stone mcp`.' },
           { name: '@stone-js/telemetry', type: 'observability', desc: 'Spans and metrics with pluggable exporters.' }
         ]} />
 

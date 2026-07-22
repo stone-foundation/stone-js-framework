@@ -86,8 +86,8 @@ export class OpenApiController {
           <StoneLink to='/docs/extensions/openapi'> OpenAPI</StoneLink>. Because the schemas come from
           <StoneLink to='/docs/extensions/validation'> Validation</StoneLink>, the same objects that
           reject a bad request are the ones that describe a good one. Paired with the
-          <StoneLink to='/docs/adapters/mcp'> MCP adapter</StoneLink>, an agent can even discover your
-          endpoints from the contract you already generate.
+          <StoneLink to='/docs/contexts/agents'> agent-native tooling</StoneLink>, an agent can even
+          discover your endpoints from the contract you already generate.
         </p>
       </ArticleLayout>
     )

@@ -88,9 +88,9 @@ stone <- ✓ task #42 created`}</Code>
 
         <p>
           The transport options and tool naming are in
-          <StoneLink to='/docs/adapters/mcp'> the MCP adapter</StoneLink>. Note there are two agents in
-          the room: that adapter serves the agent that calls your app, while
-          <StoneLink to='/docs/extensions/mcp'> @stone-js/mcp</StoneLink> serves the coding agent that
+          <StoneLink to='/docs/contexts/agents'> the agents context</StoneLink>. Note there are two agents in
+          the room: one calls your app, while
+          <StoneLink to='/docs/extensions/mcp'> @stone-js/mcp-dev</StoneLink> serves the coding agent that
           builds with the framework.
         </p>
       </ArticleLayout>

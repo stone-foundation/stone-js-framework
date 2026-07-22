@@ -87,7 +87,7 @@ export class OpenApiController {
         <SeeAlso links={[
           { title: 'Resources', path: '/docs/extensions/resources' },
           { title: 'Validation', path: '/docs/extensions/validation' },
-          { title: 'MCP (agents)', path: '/docs/adapters/mcp' }
+          { title: 'MCP dev server', path: '/docs/extensions/mcp' }
         ]} />
         <Pager {...siblings(PATH)} />
       </>

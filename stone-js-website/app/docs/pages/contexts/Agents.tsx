@@ -88,7 +88,7 @@ stone ← ✓ task #42 created`}</Code>
           understand the framework itself.
         </p>
         <ul>
-          <li><strong>@stone-js/mcp</strong>: an MCP server for the framework. Your coding agent queries concepts, modules and best practices in real time, instead of scanning packages.</li>
+          <li><strong>@stone-js/mcp-dev</strong>: <code>stone mcp</code> serves the framework's knowledge and your app's structure to your coding agent, so it queries concepts, modules, routes and config in real time instead of scanning packages.</li>
           <li><strong>llms.txt</strong>: a machine-readable map of the docs, served at the site root, so any model can load the whole mental model at once.</li>
         </ul>
 
@@ -104,8 +104,7 @@ stone ← ✓ task #42 created`}</Code>
         </Callout>
 
         <SeeAlso links={[
-          { title: 'MCP adapter', path: '/docs/adapters/mcp' },
-          { title: 'MCP server & llms.txt', path: '/docs/extensions/mcp' },
+          { title: 'MCP dev server', path: '/docs/extensions/mcp' },
           { title: 'Agent-native patterns', path: '/docs/frontier/agent-native' }
         ]} />
         <Pager {...siblings(PATH)} />
