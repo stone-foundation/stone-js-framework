@@ -48,7 +48,7 @@ jobs:
           # A PAT (not the default GITHUB_TOKEN) so changesets can open the "Version Packages" PR:
           # the org disables "Allow GitHub Actions to create and approve pull requests", which a PAT
           # bypasses (it acts as the user). Rename the secret here if yours is not RELEASE_TOKEN.
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true' # Signed npm provenance (needs id-token: write, above).
