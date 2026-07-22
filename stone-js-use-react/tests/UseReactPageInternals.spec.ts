@@ -4,7 +4,7 @@ import { StonePage } from '../src/components/StonePage'
 import { StoneError } from '../src/components/StoneError'
 import { UseReactError } from '../src/errors/UseReactError'
 import { applyHeadToHtml } from '@stone-js/use-view'
-import { buildAdapterErrorComponent, buildAppComponent, buildLayoutComponent, buildPageComponent, executeHandler, executeHooks, getAppRootElement, getBrowserContent, getResponseSnapshot, getServerContent, htmlTemplate, hydrateReactApp, isClient, isServer, isSSR, renderReactApp, renderStoneSnapshot, resolveComponent, resolveLazyComponent, snapshotResponse } from '../src/UseReactPageInternals'
+import { buildAdapterErrorComponent, buildAppComponent, buildLayoutComponent, buildPageComponent, executeHandler, executeHooks, getAppRootElement, getBrowserContent, getResponseSnapshot, getServerContent, htmlTemplate, hydrateReactApp, isClient, isServer, isSSR, mergeHead, renderReactApp, renderStoneSnapshot, resolveComponent, resolveLayoutHead, resolveLazyComponent, snapshotResponse } from '../src/UseReactPageInternals'
 
 /* eslint-disable @typescript-eslint/no-extraneous-class */
 
@@ -106,6 +106,62 @@ describe('buildLayoutComponent', () => {
   //   expect(layout?.props.children).toBe('CHILDREN')
   //   expect(layout?.props['data-layout']).toBe('main')
   // })
+})
+
+describe('resolveLayoutHead', () => {
+  it('returns undefined when no layout is registered or it defines no head', async () => {
+    const container: any = {
+      make: vi.fn().mockReturnValue({ get: vi.fn().mockReturnValue(undefined) }),
+      resolve: vi.fn()
+    }
+
+    await expect(resolveLayoutHead(container, 'unknown')).resolves.toBeUndefined()
+  })
+
+  it('reads the layout from stone.useReact.layouts.<name> and returns its head()', async () => {
+    const layoutHead = { metas: [{ property: 'og:image', content: 'https://x/default.png' }] }
+    const get = vi.fn().mockReturnValue({
+      isFactory: true,
+      module: () => ({ head: () => layoutHead, render: () => null })
+    })
+    const container: any = { make: vi.fn().mockReturnValue({ get }), resolve: vi.fn() }
+
+    const result = await resolveLayoutHead(container, 'site')
+
+    expect(get).toHaveBeenCalledWith('stone.useReact.layouts.site')
+    expect(result).toEqual(layoutHead)
+  })
+})
+
+describe('mergeHead', () => {
+  it('returns whichever side is defined when only one is provided', () => {
+    const page = { title: 'P' }
+    const layout = { title: 'L' }
+    expect(mergeHead(undefined, page)).toBe(page)
+    expect(mergeHead(layout, undefined)).toBe(layout)
+    expect(mergeHead(undefined, undefined)).toBeUndefined()
+  })
+
+  it('merges the layout head under the page head, the page winning on conflicts', () => {
+    const layoutHead = {
+      metas: [
+        { property: 'og:image', content: 'default.png' },
+        { property: 'og:site_name', content: 'Stone.js' }
+      ]
+    }
+    const pageHead = {
+      title: 'Article',
+      metas: [{ property: 'og:image', content: 'article.png' }]
+    }
+
+    const merged = mergeHead(layoutHead, pageHead)
+
+    expect(merged?.title).toBe('Article')
+    // The page's og:image replaces the layout default; the layout-only og:site_name survives.
+    expect(merged?.metas).toContainEqual({ property: 'og:image', content: 'article.png' })
+    expect(merged?.metas).toContainEqual({ property: 'og:site_name', content: 'Stone.js' })
+    expect(merged?.metas?.filter((m: any) => m.property === 'og:image')).toHaveLength(1)
+  })
 })
 
 describe('buildPageComponent', () => {

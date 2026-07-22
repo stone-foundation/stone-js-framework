@@ -49,7 +49,7 @@ describe('definePageLayout', () => {
     const layoutFactory = (): any => ({ render: () => 'Layout' })
     const result = definePageLayout(layoutFactory)
 
-    expect(result.stone.useReact.layout?.default).toEqual({
+    expect(result.stone.useReact.layouts?.default).toEqual({
       module: layoutFactory,
       isClass: undefined,
       isFactory: true
@@ -64,7 +64,7 @@ describe('definePageLayout', () => {
     }
     const result = definePageLayout(Layout, { name: 'main', isClass: true })
 
-    expect(result.stone.useReact.layout?.main).toEqual({
+    expect(result.stone.useReact.layouts?.main).toEqual({
       module: Layout,
       isClass: true,
       isFactory: false

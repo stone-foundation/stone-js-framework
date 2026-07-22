@@ -2,7 +2,7 @@ import { StoneError } from './components/StoneError'
 import { IContainer, IBlueprint } from '@stone-js/core'
 import { IncomingBrowserEvent } from '@stone-js/browser-core'
 import { ReactOutgoingResponse, ResponseSnapshotType, IPage, ReactIncomingEvent, IErrorPage, MetaErrorPage } from './declarations'
-import { resolveComponent, executeHandler, executeHooks, buildPageComponent, buildAppComponent, isSSR, getServerContent, getBrowserContent } from './UseReactPageInternals'
+import { resolveComponent, executeHandler, executeHooks, buildPageComponent, buildAppComponent, isSSR, getServerContent, getBrowserContent, resolveLayoutHead, mergeHead } from './UseReactPageInternals'
 
 /**
  * Prepare the page to render.
@@ -25,7 +25,9 @@ export async function preparePage (
   const page = await resolveComponent<IPage<ReactIncomingEvent>>(container, response.content)
   const data = await executeHandler(event, response, snapshot, page)
   const componentType = page?.render.bind(page)
-  const head = await page?.head?.({ event, data, statusCode: response.statusCode })
+  const pageHead = await page?.head?.({ event, data, statusCode: response.statusCode })
+  const layoutHead = await resolveLayoutHead(container, layout)
+  const head = mergeHead(layoutHead, pageHead)
 
   await executeHooks('onPreparingPage', { event, response, container, snapshot, data, componentType, head })
 
@@ -61,7 +63,9 @@ export async function prepareErrorPage (
   const errorPage = await resolveComponent<IErrorPage<ReactIncomingEvent>>(container, response.content)
   const data = await executeHandler(event, response, snapshot, errorPage, error)
   const componentType = errorPage?.render.bind(errorPage) ?? StoneError
-  const head = await errorPage?.head?.({ event, data, statusCode: response.statusCode, error })
+  const pageHead = await errorPage?.head?.({ event, data, statusCode: response.statusCode, error })
+  const layoutHead = await resolveLayoutHead(container, layout)
+  const head = mergeHead(layoutHead, pageHead)
 
   await executeHooks('onPreparingPage', { event, response, container, snapshot, data, componentType, head, error })
 

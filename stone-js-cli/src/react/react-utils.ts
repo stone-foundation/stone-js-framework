@@ -223,8 +223,8 @@ export const generateImperativeLazyPages = (
   const errorPages: Record<string, MetaErrorPage<ReactIncomingEvent>> = {}
   const adapterErrorPages: Record<string, MetaAdapterErrorPage<unknown, unknown, unknown>> = {}
 
-  if (isObjectLikeModule<MetaPageLayout>(module.stone.useReact?.layout)) {
-    Object.entries(module.stone.useReact.layout).forEach(([name, layout]) => {
+  if (isObjectLikeModule<MetaPageLayout>(module.stone.useReact?.layouts)) {
+    Object.entries(module.stone.useReact.layouts).forEach(([name, layout]) => {
       if (isNotEmpty<MetaPageLayout>(layout)) {
         layouts[name] = { ...layout, module: lazyModule, lazy: true }
       }

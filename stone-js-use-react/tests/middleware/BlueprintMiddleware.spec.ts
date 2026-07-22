@@ -175,7 +175,7 @@ describe('BlueprintMiddleware', () => {
       modules: [fakeModule]
     })
 
-    expect(blueprint.set).toHaveBeenCalledWith('stone.useReact.layout.default', { isClass: true, module: fakeModule })
+    expect(blueprint.set).toHaveBeenCalledWith('stone.useReact.layouts.default', { isClass: true, module: fakeModule })
   })
 
   it('SetReactViewProvidersMiddleware registers @ViewProvider classes into stone.useReact.providers', async () => {

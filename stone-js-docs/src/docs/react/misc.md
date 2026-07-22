@@ -189,7 +189,7 @@ This file will be used by the server during SSR, and it must include the `<!--ap
 If you don’t use decorators and prefer full control over your layout registration, you can do this imperatively:
 
 ```ts
-blueprint.set('stone.useReact.layout', {
+blueprint.set('stone.useReact.layouts', {
   default: DefaultLayout,
   admin: AdminLayout,
   auth: AuthLayout
@@ -213,7 +213,7 @@ export const AppBlueprint = defineBlueprintConfig((blueprint) => {
   blueprint.set('stone.useReact.rootElementId', '#root')
   blueprint.set('stone.useReact.htmlTemplatePath', './template.html')
 
-  blueprint.set('stone.useReact.layout', {
+  blueprint.set('stone.useReact.layouts', {
     default: DefaultLayout,
     error: ErrorLayout,
   })
@@ -238,7 +238,7 @@ Here’s what you now know how to do:
 
   * The root DOM element (`rootElementId`)
   * The path to the HTML template (`htmlTemplatePath`)
-  * Custom layouts via `stone.useReact.layout`
+  * Custom layouts via `stone.useReact.layouts`
 * **Integrate third-party libraries** cleanly, thanks to the architectural boundaries Stone.js provides. From `react-query` and `react-router`, to UI libraries like `react-helmet`, you remain fully in control.
 * Work seamlessly across **server-side, client-side, or hybrid modes**, always with contextual awareness and clean separation of concerns.
 

@@ -23,7 +23,7 @@ export interface UseReactConfig {
   /**
    * A map of layout components with their respective event handlers.
    */
-  layout?: Record<string, MetaPageLayout>
+  layouts?: Record<string, MetaPageLayout>
 
   /**
    * A list of platforms to ignore for React rendering.

@@ -146,7 +146,7 @@ export const SetReactPageLayoutMiddleware = (
     .filter(module => hasMetadata(module, REACT_PAGE_LAYOUT_KEY))
     .forEach(module => {
       const { name = 'default' } = getMetadata<ClassType, PageLayoutOptions>(module, REACT_PAGE_LAYOUT_KEY, { name: 'default' })
-      context.blueprint.set(`stone.useReact.layout.${name}`, { isClass: true, module })
+      context.blueprint.set(`stone.useReact.layouts.${name}`, { isClass: true, module })
     })
 
   return next(context)

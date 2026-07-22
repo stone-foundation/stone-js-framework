@@ -114,7 +114,7 @@ export function definePageLayout (
   return {
     stone: {
       useReact: {
-        layout: {
+        layouts: {
           [name]: {
             module,
             isClass: options?.isClass,
