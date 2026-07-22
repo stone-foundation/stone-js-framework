@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/tencent-scf-adapter",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "General-purpose Tencent Cloud SCF adapter for Stone.js, run any app on event-driven Serverless Cloud Function triggers, beyond HTTP. Supports COS, CMQ/TDMQ, Timer and CKafka.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

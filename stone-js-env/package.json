@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/env",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Fluent and simple API to deal with .env file and env variables for both browser and node.js.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

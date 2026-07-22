@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/http-core",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Stone.js HTTP Core offers a simple, consistent API for handling HTTP requests and responses across any JavaScript runtime.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

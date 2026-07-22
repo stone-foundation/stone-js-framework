@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/azure-functions-http-adapter",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Azure Functions v4 HTTP adapter for Stone.js. Run your app on Azure Functions HTTP triggers (Web-standard HttpRequest → HttpResponseInit) using the Continuum Architecture.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

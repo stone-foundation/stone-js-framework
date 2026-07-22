@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/queue",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Agnostic job queue for Stone.js: dispatch/process with delay, retries and backoff on a connection contract, memory and Redis drivers, a Worker, and @Queue/@JobHandler decorators.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
