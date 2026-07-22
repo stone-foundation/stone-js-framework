@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/aws-lambda-http-adapter",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Official AWS Lambda HTTP adapter for Stone.js. Run your Stone.js apps on AWS Lambda behind API Gateway with full Continuum lifecycle support.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

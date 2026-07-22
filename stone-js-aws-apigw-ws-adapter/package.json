@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/aws-apigw-ws-adapter",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "AWS API Gateway WebSocket adapter for Stone.js: maps $connect/$disconnect/messages onto @stone-js/realtime, with a DynamoDB presence store and Management API fan-out.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

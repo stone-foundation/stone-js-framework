@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/gcp-cloud-functions-http-adapter",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "GCP Cloud Functions HTTP adapter for Stone.js. Run your app on Google Cloud Functions (HTTP trigger) using the Continuum Architecture.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

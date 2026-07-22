@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/openapi",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Framework-agnostic OpenAPI 3.1 for Stone.js. Derive a public contract from your Zod schemas and routes, serve it (JSON + Swagger UI), and generate typed frontend clients from it.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

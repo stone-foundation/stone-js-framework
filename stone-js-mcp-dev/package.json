@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/mcp-dev",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Serve Stone.js's knowledge to your coding agent. A single `stone mcp` command starts an MCP server (stdio) exposing the framework's concepts, modules and best-practices plus your own tools, so the LLM masters the context while you master the domain.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

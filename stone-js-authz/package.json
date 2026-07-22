@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/authz",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Framework-agnostic, isomorphic authorization for Stone.js built on CASL. RBAC + ABAC with the same rules on the backend and the frontend — define abilities once, guard routes and shape the UI.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

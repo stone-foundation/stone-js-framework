@@ -1,5 +1,12 @@
 # @stone-js/mcp-dev
 
+## 0.8.2
+
+### Patch Changes
+
+- Updated dependencies [d7f213c]
+  - @stone-js/core@0.8.2
+
 ## 0.8.1
 
 ### Patch Changes

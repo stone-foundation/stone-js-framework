@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/gcp-cloud-functions-adapter",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "General-purpose GCP Cloud Functions adapter for Stone.js, run any app on event-driven Cloud Functions, beyond HTTP. Supports Pub/Sub, Cloud Storage, Eventarc and schedulers (CloudEvents).",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

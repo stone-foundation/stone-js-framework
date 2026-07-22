@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/config-source",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Agnostic configuration sources for Stone.js: load and merge config from env, files (json/yaml), AWS SSM, Secrets Manager, HTTP/GitHub and KMS-decrypted values into the blueprint before boot, with optional live reload.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

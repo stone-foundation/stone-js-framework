@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/use-react",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "React integration for Stone.js, universal rendering, SSR hydration, layouts, pages, snapshots, head management, and more.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
