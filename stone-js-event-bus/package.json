@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/event-bus",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Agnostic cloud event bus for Stone.js: emit domain events to local and/or cloud targets, and route incoming bus events to @OnBusEvent handlers via the key-router on any simple cloud adapter. EventBridge driver.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

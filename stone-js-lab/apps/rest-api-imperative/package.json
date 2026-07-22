@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-rest-api-imperative",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Lab app (imperative TypeScript): the same REST API as lab-rest-api, written with the define* meta-module API instead of decorators. Proves both paradigms are at parity.",
   "type": "module",
   "engines": {

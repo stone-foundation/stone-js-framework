@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/browser-core",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Stone.js Browser core provides essential utilities for browser-based applications, including event handling, response management, and cookie operations.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

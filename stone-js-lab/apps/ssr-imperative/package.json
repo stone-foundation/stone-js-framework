@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-ssr-imperative",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Lab app: React SSR built with the imperative define* API. 1:1 counterpart of apps/ssr.",
   "type": "module",
   "engines": {

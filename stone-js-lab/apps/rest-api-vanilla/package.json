@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-rest-api-vanilla",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Lab app (vanilla JavaScript): the same REST API as lab-rest-api, derived from TypeScript — stage-3 decorators preserved, types stripped. Proof that Stone.js is a TS AND JS framework 1:1.",
   "type": "module",
   "engines": {

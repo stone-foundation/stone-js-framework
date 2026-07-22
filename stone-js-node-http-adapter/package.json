@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/node-http-adapter",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Node HTTP adapter for Stone.js. Run your app on any Node.js HTTP server using the Continuum Architecture.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

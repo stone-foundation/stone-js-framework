@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-security-dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Lab app: a live security & runtime metrics dashboard consuming @stone-js/telemetry — spans every request, aggregates in a shared exporter, renders a live HTML dashboard.",
   "type": "module",
   "engines": {

@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/tencent-scf-http-adapter",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Tencent Cloud SCF HTTP adapter for Stone.js. Run your app on Serverless Cloud Function HTTP triggers (API Gateway proxy integration) using the Continuum Architecture.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

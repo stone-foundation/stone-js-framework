@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/cli",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "The official CLI tool for building, running, and managing Stone.js applications.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

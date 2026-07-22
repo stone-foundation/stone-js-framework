@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-rest-api",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Lab app: a real REST API validating routing, params, JSON responses and error handling.",
   "type": "module",
   "engines": {

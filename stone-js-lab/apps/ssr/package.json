@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-ssr",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Lab app: React server-side rendering with client hydration (isomorphic). Same pages as spa/ssg — only the rendering strategy differs.",
   "type": "module",
   "engines": {

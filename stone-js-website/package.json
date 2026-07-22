@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/website",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The Stone.js website and documentation. Built with Stone.js itself (use-react, SSG): the site is the proof.",
   "type": "module",
   "engines": {

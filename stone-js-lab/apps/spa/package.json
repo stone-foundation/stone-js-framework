@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-spa",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Lab app: a React SPA (client-side rendering) with multi-page routing and StoneLink navigation. Same pages as ssr/ssg — only the rendering strategy differs.",
   "type": "module",
   "engines": {

@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-spa-imperative",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Lab app: React SPA (CSR) built with the imperative define* API instead of decorators. 1:1 counterpart of apps/spa.",
   "type": "module",
   "engines": {

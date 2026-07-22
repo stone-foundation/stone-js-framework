@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/router",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Stone.js router for both Node.js and browser environments, designed for serverless applications.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/lab-ssg-imperative",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "React SSG built with the imperative define* API. 1:1 counterpart of apps/ssg.",
   "type": "module",
   "engines": {
