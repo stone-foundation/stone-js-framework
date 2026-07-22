@@ -17,7 +17,7 @@ const TARGETS: Target[] = [
   { key: 'lambda', label: 'aws-lambda', dec: '@AwsLambdaHttp()', decImport: 'AwsLambdaHttp', bp: 'awsLambdaHttpAdapterBlueprint', pkg: '@stone-js/aws-lambda-http-adapter', kind: 'server' },
   { key: 'edge', label: 'cloudflare·edge', dec: '@Fetch()', decImport: 'Fetch', bp: 'fetchAdapterBlueprint', pkg: '@stone-js/fetch-adapter', kind: 'server' },
   { key: 'browser', label: 'browser', dec: '@Browser()', decImport: 'Browser', bp: 'browserAdapterBlueprint', pkg: '@stone-js/browser-adapter', kind: 'front' },
-  { key: 'mcp', label: 'mcp·agents', dec: '@Mcp()', decImport: 'Mcp', bp: 'mcpAdapterBlueprint', pkg: '@stone-js/mcp-adapter', kind: 'agent' }
+  { key: 'mcp', label: 'mcp·dev', dec: '@McpDev()', decImport: 'McpDev', bp: 'mcpDevBlueprint', pkg: '@stone-js/mcp-dev', kind: 'agent' }
 ]
 
 /** Reads the superposed state as an application shape. */
