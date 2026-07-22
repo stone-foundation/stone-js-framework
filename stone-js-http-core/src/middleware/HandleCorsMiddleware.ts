@@ -144,12 +144,14 @@ export class HandleCorsMiddleware {
    * @returns The middleware instance for method chaining.
    */
   private configureMethods ({ methods }: Partial<HttpCorsConfig>): this {
-    return this.setHeader(
-      'Access-Control-Allow-Methods',
-      Array.isArray(methods)
-        ? (isNotEmpty(methods) ? methods.join(',') : '*')
-        : (methods ?? '*')
-    )
+    let allowMethods: string
+    if (Array.isArray(methods)) {
+      allowMethods = isNotEmpty(methods) ? methods.join(',') : '*'
+    } else {
+      allowMethods = methods ?? '*'
+    }
+
+    return this.setHeader('Access-Control-Allow-Methods', allowMethods)
   }
 
   /**

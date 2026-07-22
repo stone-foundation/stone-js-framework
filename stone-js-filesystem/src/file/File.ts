@@ -400,7 +400,7 @@ export class File {
     try {
       accessSync(this.path, constants.W_OK)
       return true
-    } catch (_) {
+    } catch {
       return false
     }
   }
@@ -414,7 +414,7 @@ export class File {
     try {
       accessSync(this.path, constants.R_OK)
       return true
-    } catch (e) {
+    } catch {
       return false
     }
   }
@@ -428,7 +428,7 @@ export class File {
     try {
       accessSync(this.path, constants.X_OK)
       return true
-    } catch (_) {
+    } catch {
       return false
     }
   }
@@ -482,13 +482,13 @@ export class File {
     if (!existsSync(directory)) {
       try {
         mkdirSync(directory, { recursive: true })
-      } catch (_) {
+      } catch {
         throw new FilesystemError(`Unable to create the "${directory}" directory.`)
       }
     } else {
       try {
         accessSync(directory, constants.W_OK)
-      } catch (_) {
+      } catch {
         throw new FilesystemError(`Unable to write in the "${directory}" directory.`)
       }
     }

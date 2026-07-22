@@ -24,7 +24,7 @@ export interface OutgoingHttpResponseOptions extends OutgoingResponseOptions {
  * such as setting headers, cookies, and interacting with IncomingHttpEvent.
  */
 export class OutgoingHttpResponse extends OutgoingResponse implements IOutgoingHttpResponse {
-  static readonly OUTGOING_HTTP_RESPONSE = 'stonejs@outgoing_http_response'
+  static OUTGOING_HTTP_RESPONSE = 'stonejs@outgoing_http_response'
 
   protected _charset?: Encoding
   protected _formats?: Record<string, () => unknown>

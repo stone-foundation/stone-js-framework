@@ -353,7 +353,12 @@ export class Pipeline<T = unknown, R = T, Args extends any[] = any[]> {
    */
   private validatePipeMethod (instance: PipeCustomInstance<T, R>, currentPipe: MetaPipe<T, R, Args>): void {
     if (!isFunction(instance[this.method])) {
-      const name = isFunction(currentPipe.module) ? (currentPipe.module.name.length > 0 ? currentPipe.module.name : 'anonymous') : String(currentPipe.module)
+      let name: string
+      if (isFunction(currentPipe.module)) {
+        name = currentPipe.module.name.length > 0 ? currentPipe.module.name : 'anonymous'
+      } else {
+        name = String(currentPipe.module)
+      }
       throw new PipelineError(
         `No method "${this.method}" exists on pipe "${name}".`
       )

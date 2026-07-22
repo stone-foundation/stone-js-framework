@@ -495,7 +495,10 @@ export class Route<IncomingEventType extends IIncomingEvent = IIncomingEvent, Ou
    */
   generate ({ params = {}, query = {}, hash = '', withDomain = false, protocol }: Omit<GenerateOptions, 'name'>): string {
     // Helper to construct hash value
-    const formatHash = (hash: string): string => hash.length > 0 ? (hash.startsWith('#') ? hash : `#${hash}`) : ''
+    const formatHash = (hash: string): string => {
+      if (hash.length === 0) { return '' }
+      return hash.startsWith('#') ? hash : `#${hash}`
+    }
 
     // Build query parameters (params that are not route constraints + explicit query).
     // Values are stringified so falsy values (0, false, '') survive.
