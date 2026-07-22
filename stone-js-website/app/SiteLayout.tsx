@@ -1,4 +1,5 @@
 import { Header, Footer } from './components/Header'
+import { BetaBanner } from './components/BetaBanner'
 import { Analytics } from './components/Analytics'
 import { ScrollToHash } from './components/ScrollToHash'
 import { ReactNode } from 'react'
@@ -20,6 +21,7 @@ export class SiteLayout implements IPageLayout {
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH }} />
         <ScrollToHash />
         <Analytics />
+        <BetaBanner />
         <Header />
         <main className='site-main'>
           <StoneOutlet>{children}</StoneOutlet>
