@@ -22,7 +22,7 @@
     "audit:ci": "pnpm audit --audit-level=high",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm run clean && pnpm run build && changeset publish",
+    "release": "pnpm run clean && pnpm run build:ci && changeset publish",
     "prepare": "husky"
   },
   "devDependencies": {
