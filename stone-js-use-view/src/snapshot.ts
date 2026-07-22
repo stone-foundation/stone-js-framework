@@ -25,11 +25,11 @@ export const STONE_SNAPSHOT_ID = '__STONE_SNAPSHOT__'
  * - U+2028 / U+2029 : valid in JSON but terminate a JavaScript string literal.
  */
 const ESCAPE_LOOKUP: Record<number, string> = {
-  0x3c: '\\u003C', // <
-  0x3e: '\\u003E', // >
-  0x26: '\\u0026', // &
-  0x2028: '\\u2028',
-  0x2029: '\\u2029'
+  0x3c: String.raw`\u003C`, // <
+  0x3e: String.raw`\u003E`, // >
+  0x26: String.raw`\u0026`, // &
+  0x2028: String.raw`\u2028`,
+  0x2029: String.raw`\u2029`
 }
 
 // Matches `<`, `>`, `&`, U+2028 and U+2029 (the latter two via explicit escapes).
@@ -51,7 +51,7 @@ const ESCAPE_REGEX = /[<>&\u2028\u2029]/g
  * ```
  */
 export function escapeSnapshotJson (json: string): string {
-  return json.replace(ESCAPE_REGEX, (char) => ESCAPE_LOOKUP[char.charCodeAt(0)])
+  return json.replace(ESCAPE_REGEX, (char) => ESCAPE_LOOKUP[char.codePointAt(0) ?? 0])
 }
 
 /**
@@ -77,7 +77,7 @@ export function serializeSnapshot (value: unknown): string {
  */
 export function renderSnapshotScript (value: unknown, id: string = STONE_SNAPSHOT_ID): string {
   const json = typeof value === 'string' ? escapeSnapshotJson(value) : serializeSnapshot(value)
-  const safeId = escapeSnapshotJson(id).replace(/"/g, '&quot;')
+  const safeId = escapeSnapshotJson(id).replaceAll('"', '&quot;')
   return `<script id="${safeId}" type="application/json">${json}</script>`
 }
 

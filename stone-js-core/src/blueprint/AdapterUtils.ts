@@ -96,7 +96,7 @@ export function defineAdapterErrorHandler<
     const blueprint = await next(context)
 
     if (isMatchedAdapter(blueprint, options.platform, options.adapterAlias)) {
-      for (const error of Array(options.error).flat()) {
+      for (const error of new Array(options.error).flat()) {
         blueprint.set(`stone.adapter.errorHandlers.${error}`, {
           ...options,
           error,

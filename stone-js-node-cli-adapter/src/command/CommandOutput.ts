@@ -82,7 +82,7 @@ export class CommandOutput {
    * @returns The current instance for chaining.
    */
   breakLine (value: number): this {
-    this.stdConsole.log(Array(value).join('\n'))
+    this.stdConsole.log(new Array(value).join('\n'))
     return this
   }
 

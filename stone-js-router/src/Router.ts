@@ -347,7 +347,7 @@ export class Router<
     | MixedPipe<IncomingEventType, OutgoingResponseType>
     | Array<MixedPipe<IncomingEventType, OutgoingResponseType>>
   ): this {
-    Array(name).flat().forEach((name) => {
+    new Array(name).flat().forEach((name) => {
       this
         .routerOptions
         .definitions

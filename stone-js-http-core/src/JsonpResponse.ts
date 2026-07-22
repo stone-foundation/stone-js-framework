@@ -58,7 +58,7 @@ export class JsonpResponse extends JsonResponse {
       const sanitizedCallback = callback.replace(/[^\\[\\]\w$.]/g, '')
 
       if (typeof this.content === 'string') {
-        this.setContent(this.content.replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'))
+        this.setContent(this.content.replaceAll(/\u2028/g, String.raw`\u2028`).replaceAll(/\u2029/g, String.raw`\u2029`))
       }
 
       // the /**/ is a specific security mitigation for "Rosetta Flash JSONP abuse"

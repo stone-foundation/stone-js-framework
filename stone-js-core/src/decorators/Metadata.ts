@@ -121,7 +121,7 @@ export function removeMetadata<T extends ClassType> (Class: T, key: PropertyKey)
   // Only mutate metadata the class OWNS. An undecorated subclass reaches its parent's
   // metadata object through the prototype chain; mutating it there would corrupt the
   // parent (and every sibling). In that case there is nothing of this class's own to remove.
-  if (!Object.prototype.hasOwnProperty.call(Class, MetadataSymbol)) { return }
+  if (!Object.hasOwn(Class, MetadataSymbol)) { return }
 
   const metadata = Class[MetadataSymbol]
   if (metadata?.[key] !== undefined) {

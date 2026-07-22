@@ -99,7 +99,7 @@ export function hasPath (obj: unknown, key: PropertyKey | PropertyKey[]): boolea
   let current: any = obj
   for (const seg of toSegments(key)) {
     if (current === null || current === undefined || typeof current !== 'object') { return false }
-    if (!Object.prototype.hasOwnProperty.call(current, seg)) { return false }
+    if (!Object.hasOwn(current, seg)) { return false }
     current = current[seg]
   }
   return true

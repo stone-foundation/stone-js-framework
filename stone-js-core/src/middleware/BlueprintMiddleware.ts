@@ -177,7 +177,7 @@ export const ErrorHandlerMiddleware = async (
     .filter(module => hasMetadata(module, ERROR_HANDLER_KEY))
     .forEach(module => {
       const options: ErrorHandlerOptions = getMetadata(module, ERROR_HANDLER_KEY, { error: 'default' })
-      Array(options.error)
+      new Array(options.error)
         .flat()
         .forEach(error => blueprint.set(`stone.kernel.errorHandlers.${error}`, { ...options, error, module }))
     })
@@ -213,7 +213,7 @@ export const AdapterErrorHandlerMiddleware = async (
     .forEach(module => {
       const options: AdapterErrorHandlerOptions = getMetadata(module, ADAPTER_ERROR_HANDLER_KEY, { error: 'default' })
       if (isMatchedAdapter(blueprint, options.platform, options.adapterAlias)) {
-        Array(options.error)
+        new Array(options.error)
           .flat()
           .forEach(error => blueprint.set(`stone.adapter.errorHandlers.${error}`, { ...options, error, module }))
       }

@@ -29,7 +29,7 @@ export function setUseReactAdapterErrorHandler (
         module, REACT_ADAPTER_ERROR_PAGE_KEY, { error: 'default' }
       )
       if (isMatchedAdapter(context.blueprint, platform, adapterAlias)) {
-        Array(error).flat().forEach(name => {
+        new Array(error).flat().forEach(name => {
           context
             .blueprint
             .set(`stone.useReact.adapterErrorPages.${name}`, { isClass: true, layout, module })

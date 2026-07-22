@@ -36,7 +36,7 @@ export const isFunction = <ClassType = Function>(value: unknown): value is Class
  * @returns True if the value is a constructor function, false otherwise.
  */
 export const isConstructor = <ClassType = any>(value: unknown): value is new (...args: any[]) => ClassType => {
-  return isFunction(value) && Object.prototype.hasOwnProperty.call(value, 'prototype')
+  return isFunction(value) && Object.hasOwn(value, 'prototype')
 }
 
 /**

@@ -904,7 +904,7 @@ export class OutgoingHttpResponse extends OutgoingResponse implements IOutgoingH
     const json = JSON.stringify(value, replacer, spaces)
 
     if (escape === true) {
-      return json.replace(/[<>&]/g, (c) => ({ '<': '\\u003c', '>': '\\u003e', '&': '\\u0026' }[c]) as string)
+      return json.replace(/[<>&]/g, (c) => ({ '<': String.raw`\u003c`, '>': String.raw`\u003e`, '&': String.raw`\u0026` }[c]) as string)
     }
 
     return json

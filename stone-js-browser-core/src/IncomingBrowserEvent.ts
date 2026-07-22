@@ -368,7 +368,7 @@ export class IncomingBrowserEvent extends IncomingEvent {
     /* v8 ignore next 3 */ // The browser btoa branch can't run under the Node test runtime (Buffer always defined).
     return typeof Buffer !== 'undefined'
       ? Buffer.from(raw, 'utf-8').toString('base64')
-      : btoa(String.fromCharCode(...new TextEncoder().encode(raw)))
+      : btoa(String.fromCodePoint(...new TextEncoder().encode(raw)))
   }
 
   /**

@@ -1,4 +1,4 @@
-import builtins from 'module'
+import builtins from 'node:module'
 import { defineConfig } from 'vite'
 import babel from 'vite-plugin-babel'
 import browserslist from 'browserslist'
