@@ -39,10 +39,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Turbo builds the workspace dependencies first, then the website.
+      # Build the framework packages first, in dependency order, with `pnpm -r` (NOT turbo: turbo
+      # races the per-file .d.ts emit, so a dependent builds before @stone-js/core's dist exists —
+      # "Cannot find module '@stone-js/core'"). Then build the website against the built dist.
+      - name: Build framework packages
+        run: pnpm run build:ci
+
       # The website's build script runs `stone build && pagefind --site dist`.
       - name: Build website
-        run: pnpm turbo run build --filter=@stone-js/website
+        run: pnpm --filter @stone-js/website run build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
