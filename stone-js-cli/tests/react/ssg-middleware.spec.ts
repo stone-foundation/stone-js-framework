@@ -106,7 +106,9 @@ describe('GenerateStaticSiteMiddleware (SSG)', () => {
     const context = makeContext()
     await GenerateStaticSiteMiddleware(context, vi.fn().mockResolvedValue(context.blueprint))
 
-    expect(fetchMock).toHaveBeenCalledWith(new URL('/', 'http://127.0.0.1:4000'))
+    // The crawl uses the configured host (localhost:8080) with the port the server announced (4000),
+    // so it matches whatever the server actually bound (no forced 127.0.0.1 vs localhost mismatch).
+    expect(fetchMock).toHaveBeenCalledWith(new URL('/', 'http://localhost:4000'))
   })
 
   it('fails with a clear error when the server exits without an HTTP endpoint', async () => {
