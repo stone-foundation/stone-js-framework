@@ -1,9 +1,16 @@
 # Stone.js · OpenAPI
 
-[![npm](https://img.shields.io/npm/v/@stone-js/openapi)](https://www.npmjs.com/package/@stone-js/openapi)
+[![npm license](https://img.shields.io/npm/l/@stone-js/openapi)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/openapi)](https://www.npmjs.com/package/@stone-js/openapi)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/openapi)](https://www.npmjs.com/package/@stone-js/openapi)
+![Maintenance](https://img.shields.io/maintenance/yes/2026)
 [![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 > Framework-agnostic OpenAPI 3.1 for Stone.js. Derive a public contract from your Zod schemas and routes, serve it (JSON + Swagger UI), and generate typed frontend clients from it.

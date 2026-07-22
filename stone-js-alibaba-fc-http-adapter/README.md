@@ -1,11 +1,16 @@
 # Stone.js - Alibaba FC HTTP Adapter
 
-[![npm](https://img.shields.io/npm/l/@stone-js/alibaba-fc-http-adapter)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/alibaba-fc-http-adapter)](https://www.npmjs.com/package/@stone-js/alibaba-fc-http-adapter)
-[![npm](https://img.shields.io/npm/dm/@stone-js/alibaba-fc-http-adapter)](https://www.npmjs.com/package/@stone-js/alibaba-fc-http-adapter)
+[![npm license](https://img.shields.io/npm/l/@stone-js/alibaba-fc-http-adapter)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/alibaba-fc-http-adapter)](https://www.npmjs.com/package/@stone-js/alibaba-fc-http-adapter)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/alibaba-fc-http-adapter)](https://www.npmjs.com/package/@stone-js/alibaba-fc-http-adapter)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-alibaba-fc-http-adapter/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-alibaba-fc-http-adapter/actions/workflows/main.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-alibaba-fc-http-adapter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-alibaba-fc-http-adapter)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 The **Alibaba FC HTTP Adapter** lets your Stone.js application run on Alibaba Cloud Function Compute HTTP triggers, unchanged. It bridges FC's `(req, resp, context)` HTTP handler to the Stone.js event system, fully aligned with the Continuum Architecture.

@@ -1,16 +1,16 @@
 # Stone.js - Pipeline
 
-[![npm](https://img.shields.io/npm/l/@stone-js/pipeline)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/pipeline)](https://www.npmjs.com/package/@stone-js/pipeline)
-[![npm](https://img.shields.io/npm/dm/@stone-js/pipeline)](https://www.npmjs.com/package/@stone-js/pipeline)
+[![npm license](https://img.shields.io/npm/l/@stone-js/pipeline)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/pipeline)](https://www.npmjs.com/package/@stone-js/pipeline)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/pipeline)](https://www.npmjs.com/package/@stone-js/pipeline)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-pipeline/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-pipeline/actions/workflows/main.yml)
-[![Publish Package to npmjs](https://github.com/stone-foundation/stone-js-pipeline/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-pipeline/actions/workflows/release.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-pipeline&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-pipeline)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-pipeline&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-pipeline)
-[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](./SECURITY.md)
-[![CodeQL](https://github.com/stone-foundation/stone-js-pipeline/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-pipeline/security/code-scanning)
-[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-pipeline/network/updates)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 An implementation of the Chain of Responsibility (CoR) pattern tailored for modern JavaScript and TypeScript apps using the Continuum Architecture philosophy.

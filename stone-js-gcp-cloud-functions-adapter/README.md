@@ -1,11 +1,16 @@
 # Stone.js - GCP Cloud Functions Adapter
 
-[![npm](https://img.shields.io/npm/l/@stone-js/gcp-cloud-functions-adapter)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/gcp-cloud-functions-adapter)](https://www.npmjs.com/package/@stone-js/gcp-cloud-functions-adapter)
-[![npm](https://img.shields.io/npm/dm/@stone-js/gcp-cloud-functions-adapter)](https://www.npmjs.com/package/@stone-js/gcp-cloud-functions-adapter)
+[![npm license](https://img.shields.io/npm/l/@stone-js/gcp-cloud-functions-adapter)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/gcp-cloud-functions-adapter)](https://www.npmjs.com/package/@stone-js/gcp-cloud-functions-adapter)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/gcp-cloud-functions-adapter)](https://www.npmjs.com/package/@stone-js/gcp-cloud-functions-adapter)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-gcp-cloud-functions-adapter/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-gcp-cloud-functions-adapter/actions/workflows/main.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-gcp-cloud-functions-adapter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-gcp-cloud-functions-adapter)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 The **GCP Cloud Functions Adapter** lets your Stone.js application run on **event-driven** Google Cloud Functions, beyond HTTP. It normalizes any CloudEvent trigger (Pub/Sub, Cloud Storage, Eventarc, Firestore, schedulers) into a Stone.js `IncomingEvent`, fully aligned with the Continuum Architecture.

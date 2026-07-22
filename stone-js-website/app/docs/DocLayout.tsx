@@ -2,6 +2,7 @@ import { Toc } from './components/Toc'
 import { Search } from './components/Search'
 import { Breadcrumbs } from './components/Breadcrumbs'
 import { Footer } from '../components/Header'
+import { BetaBanner } from '../components/BetaBanner'
 import { ScrollToHash } from '../components/ScrollToHash'
 import { Analytics, trackPageView } from '../components/Analytics'
 import { Portal } from '../components/brand/Portal'
@@ -85,6 +86,7 @@ function DocShell ({ children }: { children: ReactNode }): JSX.Element {
       <script dangerouslySetInnerHTML={{ __html: NO_FLASH }} />
       <Analytics />
       <ScrollToHash />
+      <BetaBanner />
       <header className='docs-header'>
         <div className='dh-inner'>
           <button className='icon-btn menu-btn' aria-label='Toggle menu' aria-expanded={drawer} onClick={() => setDrawer((v) => !v)}>

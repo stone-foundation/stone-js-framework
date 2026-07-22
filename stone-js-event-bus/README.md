@@ -1,11 +1,16 @@
 # Stone.js - Event Bus
 
-[![npm](https://img.shields.io/npm/l/@stone-js/event-bus)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/event-bus)](https://www.npmjs.com/package/@stone-js/event-bus)
-[![npm](https://img.shields.io/npm/dm/@stone-js/event-bus)](https://www.npmjs.com/package/@stone-js/event-bus)
+[![npm license](https://img.shields.io/npm/l/@stone-js/event-bus)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/event-bus)](https://www.npmjs.com/package/@stone-js/event-bus)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/event-bus)](https://www.npmjs.com/package/@stone-js/event-bus)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-event-bus/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-event-bus/actions/workflows/main.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-event-bus&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-event-bus)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 **Agnostic cloud event bus for Stone.js.** `emit` on one side, `@OnBusEvent` on the other. The core `EventEmitter` already handles in-process events; this module handles the cloud: publish domain events to `local` and/or `cloud` targets, and route incoming bus events to their handlers via the `key-router`, on **any** simple cloud adapter (AWS Lambda, GCP, Azure...). No dedicated adapter: the listener side injects itself as the kernel event handler, exactly like `@stone-js/router`. The core is never touched.
