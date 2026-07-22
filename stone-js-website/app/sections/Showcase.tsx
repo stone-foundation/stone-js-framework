@@ -5,8 +5,11 @@ import { publishedArticles } from '../blog/registry.mjs'
 
 interface Article { slug: string, title: string, excerpt: string, tags: string[], date: string, author: string }
 
+// Format in UTC so SSR (server, UTC) and hydration (browser, local TZ) produce the SAME text.
+// Without `timeZone: 'UTC'`, a `YYYY-MM-DD` date shifts a day in negative offsets and React
+// throws a hydration mismatch (#418), which then breaks client-side navigation.
 const fmtDate = (iso: string): string =>
-  new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  new Date(iso).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })
 
 const OFFICIAL_STARTERS = STARTERS.filter((s) => s.official)
 // Three core starters, then the agent-native one as the fourth card.
