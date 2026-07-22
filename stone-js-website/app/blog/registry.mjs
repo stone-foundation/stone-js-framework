@@ -31,7 +31,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'Verify a token at the boundary instead of holding a session, and the same auth guard runs on Node, serverless, the edge and agents, with nothing to store.',
     tags: ['auth', 'edge', 'security'],
-    ogImage: '/og/stateless-auth-at-the-edge.png',
+    ogImage: '/og/stateless-auth-at-the-edge.jpg',
     starter: 'stateless-auth',
     locale: 'en'
   },
@@ -42,7 +42,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'One codebase, unchanged, running on Node, AWS Lambda and the edge. Not three apps: three runtimes. The thing a single-target framework cannot do.',
     tags: ['architecture', 'adapters', 'cloud-native'],
-    ogImage: '/og/one-domain-three-runtimes.png',
+    ogImage: '/og/one-domain-three-runtimes.jpg',
     starter: 'continuum-showcase',
     locale: 'en'
   },
@@ -53,7 +53,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'An application is an act, not an object. Write the domain once; the context applies to it at run time. This is the Continuum, and this is Stone.js.',
     tags: ['architecture', 'continuum'],
-    ogImage: '/og/introducing-stone-js.png',
+    ogImage: '/og/introducing-stone-js.jpg',
     starter: null,
     locale: 'en'
   },
@@ -64,7 +64,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'Validation duplicated between the API and the UI always drifts. Write the shape once, enforce it at the boundary with a 422, and validate the same schema in the form.',
     tags: ['validation', 'dx'],
-    ogImage: '/og/isomorphic-validation.png',
+    ogImage: '/og/isomorphic-validation.jpg',
     starter: 'isomorphic-validation',
     locale: 'en'
   },
@@ -75,7 +75,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'A hand-written OpenAPI spec drifts the day after you write it. Derive the document from your validation schemas instead, and serve it with Swagger UI.',
     tags: ['openapi', 'api'],
-    ogImage: '/og/openapi-from-your-schemas.png',
+    ogImage: '/og/openapi-from-your-schemas.jpg',
     starter: 'openapi-contract',
     locale: 'en'
   },
@@ -86,7 +86,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'One command, `stone mcp`, serves your coding agent the framework’s knowledge and a live, read-only view of your own app: its routes, commands and config, plus any tools you add.',
     tags: ['agents', 'mcp', 'ai'],
-    ogImage: '/og/agent-superpowers.png',
+    ogImage: '/og/agent-superpowers.jpg',
     starter: 'agent-superpowers',
     locale: 'en'
   },
@@ -97,7 +97,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'Tenant-per-subdomain without header-parsing plumbing. A subdomain parameter turns multi-tenancy into routing: capture the tenant from the host and read it on the event.',
     tags: ['routing', 'saas', 'multi-tenancy'],
-    ogImage: '/og/multi-tenant-subdomains.png',
+    ogImage: '/og/multi-tenant-subdomains.jpg',
     starter: 'multi-tenant',
     locale: 'en'
   },
@@ -108,7 +108,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'Uploading large files without proxying the bytes through your API. Issue a short-lived signed URL, let the client upload straight to storage, then save only the metadata.',
     tags: ['architecture', 'storage', 'cloud-native'],
-    ogImage: '/og/signed-url-file-uploads.png',
+    ogImage: '/og/signed-url-file-uploads.jpg',
     starter: 'signed-url-uploads',
     locale: 'en'
   },
@@ -119,7 +119,7 @@ export const ARTICLES = [
     author: 'Evens Pierre',
     excerpt: 'Live dashboards, presence and notifications, framed by their architecture: the SSE and WebSocket flow, how a held-open connection fits the per-event model, and where it runs on the edge.',
     tags: ['realtime', 'cloud-native'],
-    ogImage: '/og/real-time-features.png',
+    ogImage: '/og/real-time-features.jpg',
     starter: 'realtime-chat',
     locale: 'en'
   }

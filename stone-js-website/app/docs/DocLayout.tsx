@@ -9,7 +9,8 @@ import { Portal } from '../components/brand/Portal'
 import { ParadigmSwitch, Paradigm, readParadigm } from './components/ParadigmSwitch'
 import { Sidebar, useCurrentPath } from './components/Sidebar'
 import { JSX, ReactNode, useEffect, useState } from 'react'
-import { IPageLayout, PageLayout, PageLayoutRenderContext, StoneLink, StoneOutlet } from '@stone-js/use-react'
+import { defaultSocialHead } from '../site'
+import { HeadContext, IPageLayout, PageLayout, PageLayoutRenderContext, StoneLink, StoneOutlet } from '@stone-js/use-react'
 
 const GITHUB_URL = 'https://github.com/stone-foundation'
 
@@ -148,6 +149,11 @@ function DocShell ({ children }: { children: ReactNode }): JSX.Element {
  */
 @PageLayout({ name: 'docs' })
 export class DocLayout implements IPageLayout {
+  /** Brand-default social card. Each docs page's own `head()` is merged on top (page wins). */
+  head (): HeadContext {
+    return defaultSocialHead()
+  }
+
   render ({ children }: PageLayoutRenderContext): ReactNode {
     return <DocShell>{children}</DocShell>
   }

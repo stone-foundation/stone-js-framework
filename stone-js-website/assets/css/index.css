@@ -5,31 +5,21 @@
    ========================================================================== */
 
 /* ---------- 1. Tokens ---------- */
+/* Dark is the brand default: the bare :root holds the dark palette so a first
+   visit collapses to « Obsidienne » with no JS and no OS hint (private browsing,
+   light-OS machines, pages without the NO_FLASH script all land dark). Light is
+   a deliberate opt-in via [data-theme="light"] set by the header toggle. */
 :root {
-  --bg: #F4EFE6; --surface: #FBF7EF; --surface-2: #EAE3D6;
-  --encre: #1B1613; --gres: #6E6459; --trait: #DDD4C5;
-  --braise: #E04E10; --braise-txt: #A83A08;
+  --bg: #14110F; --surface: #1D1815; --surface-2: #26201B;
+  --encre: #EFE8DC; --gres: #A69A8C; --trait: #2F2822;
+  --braise: #FF6B2B; --braise-txt: #FF8A4D;
   --braise-grad: linear-gradient(135deg, #FFC46B, #FF5A1F);
-  --cuivre: #A9653B;
-  --hl-comment: #8A7F70; --hl-punc: #6E6459; --hl-kw: #A83A08; --hl-str: #5F7A3A; --hl-fn: #9A5B2B; --hl-num: #B5480F; --hl-prop: #6E5A3E;
+  --cuivre: #D89468;
+  --hl-comment: #7C7060; --hl-punc: #A69A8C; --hl-kw: #FF8A4D; --hl-str: #B7C48A; --hl-fn: #E0B080; --hl-num: #E58C5A; --hl-prop: #D9C7B3;
   --display: "Clash Display", "Futura", "Avenir Next", ui-sans-serif, sans-serif;
   --body: "Archivo", "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --ease: cubic-bezier(.2, 0, .2, 1);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14110F; --surface: #1D1815; --surface-2: #26201B;
-    --encre: #EFE8DC; --gres: #A69A8C; --trait: #2F2822;
-    --braise: #FF6B2B; --braise-txt: #FF8A4D; --cuivre: #D89468;
-    --hl-comment: #7C7060; --hl-punc: #A69A8C; --hl-kw: #FF8A4D; --hl-str: #B7C48A; --hl-fn: #E0B080; --hl-num: #E58C5A; --hl-prop: #D9C7B3;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #14110F; --surface: #1D1815; --surface-2: #26201B;
-  --encre: #EFE8DC; --gres: #A69A8C; --trait: #2F2822;
-  --braise: #FF6B2B; --braise-txt: #FF8A4D; --cuivre: #D89468;
-  --hl-comment: #7C7060; --hl-punc: #A69A8C; --hl-kw: #FF8A4D; --hl-str: #B7C48A; --hl-fn: #E0B080; --hl-num: #E58C5A; --hl-prop: #D9C7B3;
 }
 :root[data-theme="light"] {
   --bg: #F4EFE6; --surface: #FBF7EF; --surface-2: #EAE3D6;
