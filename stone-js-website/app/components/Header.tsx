@@ -1,9 +1,7 @@
 import { Portal } from './brand/Portal'
-import { StoneLink } from '@stone-js/use-react'
+import { GITHUB_URL, MANIFESTO_URL } from '../site'
+import { StoneLink, useBlueprint } from '@stone-js/use-react'
 import { JSX, useEffect, useState } from 'react'
-
-const GITHUB_URL = 'https://github.com/stone-foundation'
-const MANIFESTO_URL = 'https://evens-stone.github.io/continuum-manifesto/manifesto'
 
 /** Toggles the color theme and persists the choice. */
 function toggleTheme (): void {
@@ -28,6 +26,7 @@ const NAV_LINKS: Array<{ to: string, label: string, external?: boolean }> = [
 
 export function Header (): JSX.Element {
   const [open, setOpen] = useState(false)
+  const version = useBlueprint().get<string>('app.version', '')
 
   useEffect(() => {
     try {
@@ -64,7 +63,7 @@ export function Header (): JSX.Element {
                 : <path d='M3 6h18M3 12h18M3 18h18' />}
             </svg>
           </button>
-          <span className='ver'>v0.8.1</span>
+          <span className='ver'>v{version}</span>
           <button className='icon-btn' onClick={toggleTheme} aria-label='Toggle theme' title='Toggle theme'>
             <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
               <path d='M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z' />
