@@ -41,7 +41,7 @@ describe('Cookie', () => {
     expect(serialized).toContain('test=value')
   })
 
-  it('should serialize the cookie value', () => {
+  it('should serialize the cookie value with URL-encoding', () => {
     const cookie = Cookie.create('test', 'value')
     const serialized = cookie.serialize()
     expect(serialized).toBe(`test=${encodeURIComponent('value')}`)

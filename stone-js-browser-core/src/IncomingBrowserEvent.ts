@@ -20,7 +20,7 @@ export interface IncomingBrowserEventOptions extends IncomingEventOptions {
  * @author Mr. Stone <evensstone@gmail.com>
  */
 export class IncomingBrowserEvent extends IncomingEvent {
-  static INCOMING_BROWSER_EVENT = 'stonejs@incoming_browser_event'
+  static readonly INCOMING_BROWSER_EVENT = 'stonejs@incoming_browser_event'
 
   /** The URL of the request. */
   public readonly url: URL

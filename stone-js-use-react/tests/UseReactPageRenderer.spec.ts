@@ -120,7 +120,7 @@ describe('UseReactPageRenderer', () => {
       expect(response.setContent).toHaveBeenCalledWith('<html>SSR</html>')
     })
 
-    it('should render and set browser content with error handler on ssr', async () => {
+    it('should render the error page from a resolved error-handler component on ssr', async () => {
       vi.mocked(isSSR).mockReturnValue(true)
       vi.mocked(resolveComponent).mockResolvedValue({
         render: vi.fn().mockReturnValue(() => {}),

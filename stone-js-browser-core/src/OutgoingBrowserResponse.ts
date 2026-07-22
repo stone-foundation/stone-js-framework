@@ -6,7 +6,7 @@ import { OutgoingResponse, OutgoingResponseOptions } from '@stone-js/core'
 export interface OutgoingBrowserResponseOptions extends OutgoingResponseOptions {}
 
 export class OutgoingBrowserResponse extends OutgoingResponse {
-  static OUTGOING_BROWSER_RESPONSE = 'stonejs@outgoing_browser_response'
+  static readonly OUTGOING_BROWSER_RESPONSE = 'stonejs@outgoing_browser_response'
 
   /**
    * Create an instance of OutgoingBrowserResponse.

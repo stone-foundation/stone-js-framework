@@ -156,7 +156,7 @@ describe('Adapter', () => {
       }).toThrow(IntegrationError)
     })
 
-    it('validateContextAndEventHandler throws for missing incomingEventBuilder', () => {
+    it('validateContextAndEventHandler throws when incomingEventBuilder.build is missing', () => {
       // @ts-expect-error - missing type
       context.rawResponseBuilder = { build: () => {} }
       // @ts-expect-error - missing type
