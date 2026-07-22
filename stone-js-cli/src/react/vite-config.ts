@@ -90,6 +90,10 @@ export const viteConfig = defineConfig(() => {
 
     build: {
       target: DEFAULT_CLIENT_BUILD_TARGET,
+      // React + the framework's browser runtime legitimately land around ~170 kB gzip in one
+      // vendor chunk, which trips Vite's default 500 kB (pre-gzip) warning without being a real
+      // problem. Raise the threshold rather than over-splitting a bundle the browser caches once.
+      chunkSizeWarningLimit: 900,
       rollupOptions: {
         external: [...builtins.builtinModules, /node:/],
         output: {
