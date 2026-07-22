@@ -3,7 +3,7 @@ import { QueueError } from './errors/QueueError'
 import { KeyRouter, KeyRouteHandler } from '@stone-js/router'
 
 /** A normalized handler function. */
-export type JobHandlerFn = (payload: any, job: Job) => unknown | Promise<unknown>
+export type JobHandlerFn = (payload: any, job: Job) => unknown
 
 /**
  * Registry mapping job names to their handlers.

@@ -205,7 +205,7 @@ export function normalizeHttpEvent (event: AwsLambdaHttpEvent): NormalizedHttpEv
  * @param event - The raw Lambda event.
  * @returns The raw body as a Buffer, string, the original value, or undefined.
  */
-export function getRawBody (event: AwsLambdaHttpEvent): Buffer | string | unknown {
+export function getRawBody (event: AwsLambdaHttpEvent): unknown {
   if (typeof event.body === 'string') {
     return event.isBase64Encoded === true ? Buffer.from(event.body, 'base64') : event.body
   }

@@ -21,7 +21,7 @@ export interface DiskConfig extends FileSystemOptions {
   /** The disk name, used to resolve it via `storage.disk(name)`. */
   name: string
   /** Which driver backs this disk. */
-  driver: CloudFileDriver | string
+  driver: CloudFileDriver | (string & {})
   /** Driver-specific options (see {@link S3DriverOptions}). */
   [key: string]: unknown
 }

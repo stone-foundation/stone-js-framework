@@ -57,7 +57,7 @@ export interface ICommandHandler<
 export type FactoryCommandHandler<
   W extends IncomingEvent = IncomingEvent,
   X = unknown
-> = (container: IContainer | any) => ICommandHandler<W, X> | FunctionalCommandHandler<W, X>
+> = (container: IContainer) => ICommandHandler<W, X> | FunctionalCommandHandler<W, X>
 
 /**
  * Represents FunctionalCommandHandler.

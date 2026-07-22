@@ -22,7 +22,7 @@ export function get<T> (key: string): T | undefined
  * @param options - Options for retrieving the value.
  * @returns The value of the environment variable.
  */
-export function get<T> (key: string, options: Options | any): T
+export function get<T> (key: string, options: any): T
 
 /**
  * Get the specified env variable value.
@@ -31,7 +31,7 @@ export function get<T> (key: string, options: Options | any): T
  * @param options - Options for retrieving the value.
  * @returns The value of the environment variable.
  */
-export function get<T> (key: string, options?: Options | any): T | undefined {
+export function get<T> (key: string, options?: any): T | undefined {
   if (options === undefined) return getString(key) as T
   if (typeof options === 'function') return custom(key, options)
 
@@ -295,7 +295,7 @@ export function getJson<R = unknown> (key: string, options: Options | R): R
  * @param options - Options for retrieving the value.
  * @returns The value as a JSON object.
  */
-export function getJson<R = unknown | undefined> (key: string, options?: Options | R): R {
+export function getJson<R = unknown> (key: string, options?: Options | R): R {
   return custom(
     key,
     (key, value, opts) => {
@@ -633,7 +633,7 @@ function isBrowser (): boolean {
  * @param options - The options to normalize.
  * @returns The normalized options.
  */
-function normalizeOptions (options?: Options | any): Options {
+function normalizeOptions (options?: any): Options {
   // Never mutate the caller's object: build a fresh, normalized copy.
   const base = (options === undefined || Array.isArray(options) || typeof options !== 'object')
     ? { default: options }

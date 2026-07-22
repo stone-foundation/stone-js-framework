@@ -77,8 +77,8 @@ export interface QueueConnection {
  * A job handler: a function, or an object/instance exposing `handle`.
  */
 export type JobHandler<T = any> =
-  | ((payload: T, job: Job<T>) => unknown | Promise<unknown>)
-  | { handle: (payload: T, job: Job<T>) => unknown | Promise<unknown> }
+  | ((payload: T, job: Job<T>) => unknown)
+  | { handle: (payload: T, job: Job<T>) => unknown }
 
 /**
  * A factory that builds a {@link QueueConnection} from its options.
@@ -86,7 +86,7 @@ export type JobHandler<T = any> =
 export type QueueConnectionFactory = (config: ConnectionConfig) => QueueConnection
 
 /** Built-in driver identifiers. `memory` and `redis` ship now; provider queues follow. */
-export type QueueDriver = 'memory' | 'redis' | string
+export type QueueDriver = 'memory' | 'redis' | (string & {})
 
 /**
  * Options common to every connection, plus the driver selector.

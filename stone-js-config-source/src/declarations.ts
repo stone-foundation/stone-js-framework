@@ -17,7 +17,7 @@ export interface ConfigSource {
  * @param key - The dotted key path of the value.
  * @returns The transformed value.
  */
-export type ConfigTransform = (value: unknown, key: string) => unknown | Promise<unknown>
+export type ConfigTransform = (value: unknown, key: string) => unknown
 
 /** The supported config file formats. */
 export type ConfigFileFormat = 'json' | 'yaml'

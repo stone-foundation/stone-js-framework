@@ -28,13 +28,13 @@ UResponse extends OutgoingResponse = OutgoingResponse
    * The main event handler for the application.
    * Every Stone.js application must have a main event handler.
    */
-  eventHandler?: MixedEventHandler<TEvent, UResponse | unknown>
+  eventHandler?: MixedEventHandler<TEvent, unknown>
 
   /**
    * Error handlers used to manage and report errors that occur within the kernel.
    * These handlers can be used to customize error handling behavior and logging.
    */
-  errorHandlers?: Record<string, MetaErrorHandler<TEvent, UResponse | unknown>>
+  errorHandlers?: Record<string, MetaErrorHandler<TEvent, unknown>>
 
   /**
    * The response resolver, used to create instances of the response object.

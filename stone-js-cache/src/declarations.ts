@@ -64,7 +64,7 @@ export type CacheStoreFactory = (config: StoreConfig) => CacheStore
 /**
  * Built-in driver identifiers. `memory` and `redis` ship now; provider KV follows.
  */
-export type CacheDriver = 'memory' | 'redis' | string
+export type CacheDriver = 'memory' | 'redis' | (string & {})
 
 /**
  * Options common to every store, plus the driver selector. Driver-specific options live alongside.

@@ -302,7 +302,7 @@ export function propertyDecoratorLegacyWrapper (
   return (
     _target: Object,
     potentialContext: string | symbol | ClassFieldDecoratorContext
-  ): (initialValue: unknown) => unknown | undefined => {
+  ): (initialValue: unknown) => unknown => {
     if (potentialContext !== undefined) {
       if ((potentialContext as ClassFieldDecoratorContext).kind === 'field') {
         return decorator(undefined, potentialContext as ClassFieldDecoratorContext)

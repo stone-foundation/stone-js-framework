@@ -49,7 +49,7 @@ export interface OpenApiOperation {
 
 /** A route to derive an operation from (generic — decoupled from the router). */
 export interface OpenApiRoute {
-  method: HttpMethod | string
+  method: HttpMethod | (string & {})
   path: string
   openapi?: OpenApiOperation
 }

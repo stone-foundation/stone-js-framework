@@ -226,7 +226,7 @@ export interface IEventHandler<
 export type FactoryEventHandler<
   IncomingEventType extends IIncomingEvent,
   OutgoingResponseType = unknown
-> = (resolver?: DependencyResolver | IContainer | any) => FunctionalEventHandler<IncomingEventType, OutgoingResponseType>
+> = (resolver?: DependencyResolver | IContainer) => FunctionalEventHandler<IncomingEventType, OutgoingResponseType>
 
 /**
  * Represents a functional event handler.
@@ -317,7 +317,7 @@ export interface IComponentEventHandler<
 export type FactoryComponentEventHandler<
   IncomingEventType extends IIncomingEvent,
   OutgoingResponseType = unknown
-> = (resolver?: DependencyResolver | IContainer | any) => IComponentEventHandler<IncomingEventType, OutgoingResponseType>
+> = (resolver?: DependencyResolver | IContainer) => IComponentEventHandler<IncomingEventType, OutgoingResponseType>
 
 /**
  * Represents a component event handler type.
