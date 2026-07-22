@@ -10,24 +10,27 @@ import { CommandOutput } from '@stone-js/node-cli-adapter'
  */
 
 /**
- * The Stone.js signature mark (diamond motif — "Stone" as a cut gem).
+ * The Stone.js signature mark used as a step bullet.
  */
 export const STONE_MARK = '◆'
 
 /**
- * The Stone.js gem logo: a faceted diamond built from the signature mark, drawn above the wordmark.
- * Pure ASCII (mark + spaces) so it stays testable and terminal-safe.
+ * The brand primary accent: the "braise" ember of « Obsidienne & Braise ».
  */
-export const STONE_LOGO: string[] = [
-  '        ◆',
-  '      ◆ ◆ ◆',
-  '    ◆ ◆ ◆ ◆ ◆',
-  '      ◆ ◆ ◆',
-  '        ◆'
-]
+export const STONE_EMBER = '#FF5A1F'
 
 /**
- * Build the signature banner as plain text (no ANSI): the gem logo, the wordmark with version, a
+ * The Stone.js logo, "Le Portail": a circle drawn from arcs. The top arc carries the ember accent;
+ * the lower arcs are ink. Rendered here with quadrant-arc glyphs so it stays terminal-safe.
+ * `TOP` and `BOTTOM` are separated so {@link StoneReporter.banner} can colour the top arc.
+ */
+export const STONE_LOGO = {
+  top: '  ◜ ◝',
+  bottom: '  ◟ ◞'
+} as const
+
+/**
+ * Build the signature banner as plain text (no ANSI): the portal logo, the wordmark with version, a
  * rule, and the subtitle. The {@link StoneReporter.banner} method applies the brand colour on top.
  *
  * @param version - The CLI/app version to display.
@@ -39,9 +42,10 @@ export function stoneBanner (version = '', subtitle = 'The continuum framework')
   const v = hasVersion ? `   ${version.startsWith('v') ? version : `v${version}`}` : ''
   return [
     '',
-    ...STONE_LOGO,
+    STONE_LOGO.top,
+    STONE_LOGO.bottom,
     '',
-    `  ${STONE_MARK} Stone.js${v}`,
+    `  Stone.js${v}`,
     `  ${'─'.repeat(Math.max(subtitle.length, 20) + 4)}`,
     `  ${subtitle}`,
     ''
@@ -116,13 +120,16 @@ export class StoneReporter {
     for (const line of stoneBanner(this.version, subtitle).split('\n')) {
       if (line.trim().length === 0) {
         this.output.show('')
+      } else if (line === STONE_LOGO.top) {
+        // The portal's top arc, in the brand ember.
+        this.output.show(f.hex(STONE_EMBER).bold(line))
+      } else if (line === STONE_LOGO.bottom) {
+        // The lower arcs, in ink.
+        this.output.show(f.whiteBright.bold(line))
       } else if (line.includes('Stone.js')) {
-        // The wordmark: accent mark, bold white wordmark, dim version.
+        // The wordmark: bold white, dim version.
         const [, rest = ''] = line.split('Stone.js')
-        this.output.show(`  ${f.cyanBright(STONE_MARK)} ${f.whiteBright.bold('Stone.js')}${f.gray(rest)}`)
-      } else if (/^[\s◆]+$/.test(line)) {
-        // The gem logo, in the CLI accent.
-        this.output.show(f.cyanBright.bold(line))
+        this.output.show(`  ${f.whiteBright.bold('Stone.js')}${f.gray(rest)}`)
       } else {
         // The rule and subtitle.
         this.output.show(f.gray(line))
