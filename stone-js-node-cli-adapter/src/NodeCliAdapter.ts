@@ -17,6 +17,7 @@ import {
 import process, { argv } from 'node:process'
 import { hideBin } from 'yargs/helpers'
 import yargs, { BuilderCallback } from 'yargs'
+import { renderStoneBanner } from './banner'
 import { CommandOptions } from './decorators/Command'
 import { RawResponseWrapper } from './RawResponseWrapper'
 import { NodeCliAdapterError } from './errors/NodeCliAdapterError'
@@ -105,6 +106,9 @@ NodeCliAdapterContext
    */
   public async run<ExecutionResultType = RawResponse>(): Promise<ExecutionResultType> {
     await this.onStart()
+
+    // The Stone.js CLI signature, on stderr so it never pollutes a command's stdout.
+    process.stderr.write(`${renderStoneBanner()}\n`)
 
     const version = this.blueprint.get<string>('stone.adapter.version', DEFAULT_VERSION)
     const scriptName = this.blueprint.get<string>('stone.adapter.scriptName', 'stone')
