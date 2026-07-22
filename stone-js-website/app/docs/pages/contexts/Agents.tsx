@@ -9,9 +9,9 @@ const PATH = '/docs/contexts/agents'
 const DECL = `
 import { StoneApp } from '@stone-js/core'
 import { Routing } from '@stone-js/router'
-import { Mcp } from '@stone-js/mcp-adapter'
+import { McpDev } from '@stone-js/mcp-dev'
 
-@Mcp()      // expose the domain as MCP tools for AI agents
+@McpDev()   // 'stone mcp' serves the framework + this app to your coding agent
 @Routing()
 @StoneApp()
 export class Application {}
@@ -20,11 +20,11 @@ export class Application {}
 const IMP = `
 import { defineStoneApp } from '@stone-js/core'
 import { routerBlueprint } from '@stone-js/router'
-import { mcpAdapterBlueprint } from '@stone-js/mcp-adapter'
+import { mcpDevBlueprint } from '@stone-js/mcp-dev'
 
 export const App = defineStoneApp(
   { name: 'tasks' },
-  [routerBlueprint, mcpAdapterBlueprint]
+  [routerBlueprint, mcpDevBlueprint]
 )
 `
 
@@ -36,7 +36,7 @@ export class Agents implements IPage<ReactIncomingEvent> {
   head (): HeadContext {
     return {
       title: 'Agents',
-      description: 'The next execution context. Expose the same Tasks domain as MCP tools an AI agent can call, without touching a handler.'
+      description: 'The next execution context. Serve your coding agent the framework and your app with `stone mcp`; exposing the running domain as tools is coming.'
     }
   }
 
@@ -62,45 +62,47 @@ export class Agents implements IPage<ReactIncomingEvent> {
           }
           incarnation={
             <p>
-              <code>@stone-js/mcp-adapter</code> turns your existing handlers into MCP tools. The
-              same <code>Tasks</code> methods that served HTTP become <code>task.list</code>,
-              <code> task.show</code>, <code>task.create</code>, callable by any MCP client.
+              There are two agents here: the one that <em>calls</em> your app at run time, and the
+              coding agent that <em>builds</em> it with you. Both are contexts. The one that ships
+              today is the builder: <code>@stone-js/mcp-dev</code> serves it the framework and your
+              app; exposing the running domain as tools is the next context, coming.
             </p>
           }
         />
 
-        <H2>Collapse it into tools</H2>
+        <H2>Serve the agent that builds with you</H2>
         <p>
-          The Tasks domain is, once again, untouched. The manifest is the whole change.
+          Add <code>@McpDev()</code> and the manifest gains one command, <code>stone mcp</code>. It
+          starts an MCP server (stdio) that gives your coding agent the framework's knowledge and a
+          live, read-only view of <em>this</em> app: its routes, commands, providers and config.
         </p>
         <CodeTabs file='app/Application.ts' decl={DECL} imp={IMP} />
         <Code file='agent session' lang='text'>{`agent → tools/list
-stone ← task.list · task.show · task.create
-agent → task.create { title: "Ship the docs" }
-stone ← ✓ task #42 created`}</Code>
+stone ← stone_routes · stone_app · stone_search · stone_docs
+agent → stone_routes
+stone ← GET /tasks (Tasks.list) · POST /tasks (Tasks.create)
+agent → stone_search { query: "how do adapters collapse at runtime" }`}</Code>
 
-        <Aphorism>Your REST API and your agent tools are the same domain, resolved by two contexts.</Aphorism>
+        <Aphorism>The agent reads your app the way the framework does: one blueprint, one source of truth.</Aphorism>
 
-        <H2>Teaching the agents that build with you</H2>
         <p>
-          There are two audiences here. One is the agent that consumes your app at runtime, above.
-          The other is the coding agent building <em>with</em> Stone.js. That one needs to
-          understand the framework itself.
+          The full tool list, the <code>--init</code> flow that writes <code>.mcp.json</code>, and
+          the bundled Agent Skills are in the <strong>MCP dev server</strong> docs. A machine-readable
+          <code> llms.txt</code> map of the docs is served at the site root, so any model can load the
+          whole mental model at once.
         </p>
-        <ul>
-          <li><strong>@stone-js/mcp-dev</strong>: <code>stone mcp</code> serves the framework's knowledge and your app's structure to your coding agent, so it queries concepts, modules, routes and config in real time instead of scanning packages.</li>
-          <li><strong>llms.txt</strong>: a machine-readable map of the docs, served at the site root, so any model can load the whole mental model at once.</li>
-        </ul>
 
-        <Callout kind='future' title='Agent-native, not agent-bolted-on'>
-          Most stacks are now wrapping an MCP layer around an app that never expected one. Because
-          Stone.js already modelled every runtime as a context, agents fell into place as one more
-          dimension, not a retrofit. This is the frontier the whole framework was aimed at.
+        <Callout kind='future' title='Your running domain as tools'>
+          The next agent context: exposing your live domain to agents as MCP tools, the same handlers
+          your REST API serves, resolved by the same kernel over MCP's web transport. Not a bespoke
+          adapter, one more context over the domain you already wrote. Because Stone.js already
+          modelled every runtime as a context, agents fall into place as one more dimension, not a
+          retrofit.
         </Callout>
 
         <Callout kind='note' title='The division of labour'>
           The LLM masters the context. You master the domain. Together, you ship. That is the same
-          sentence as the whole framework, now with a model on the other side of the adapter.
+          sentence as the whole framework, now with a model on the other side of the context.
         </Callout>
 
         <SeeAlso links={[

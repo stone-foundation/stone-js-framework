@@ -6,9 +6,9 @@ interface ConsoleLine { who: 'agent' | 'stone', msg: string }
 /** The looping agent ⟷ app exchange shown in the console. */
 const SCRIPT: ConsoleLine[] = [
   { who: 'agent', msg: 'tools/list' },
-  { who: 'stone', msg: 'task.create · task.list · metrics.snapshot' },
-  { who: 'agent', msg: 'task.create { title: "Ship the landing" }' },
-  { who: 'stone', msg: '✓ task #42 created in 4ms' },
+  { who: 'stone', msg: 'stone_routes · stone_app · stone_search · stone_docs' },
+  { who: 'agent', msg: 'stone_routes' },
+  { who: 'stone', msg: 'GET /tasks (Tasks.list) · POST /tasks (Tasks.create)' },
   { who: 'agent', msg: 'stone_concept { id: "continuum" }' },
   { who: 'stone', msg: '"An application is not an object. It is an act."' }
 ]
@@ -66,17 +66,18 @@ export function Agents (): JSX.Element {
             <p className='eyebrow'><span className='psi'>ψ</span>Agent-native</p>
             <h2>Your domain, observable by machines.</h2>
             <p className='muted' style={{ marginTop: 16, fontSize: 18 }}>
-              Agents are the next execution context, and Stone.js treats them like any other:
-              a cause, an intention, a resolution. No other framework is built this way.
+              Agents are the next execution context, and Stone.js treats them as first-class:
+              the agent that builds your app, and the agent that calls it. No other framework is
+              built this way.
             </p>
             <div className='agent-offer'>
               <div className='offer'>
-                <p className='t'>@stone-js/mcp-adapter</p>
-                <p>Expose your domain to AI agents as MCP tools, without touching a handler. The MCP equivalent of your REST API.</p>
+                <p className='t'>@stone-js/mcp-dev</p>
+                <p>One command, <code>stone mcp</code>, serves your coding agent the framework's map and a live, read-only view of your app: concepts, modules, routes, config, plus Agent Skills. Consulted in real time, no package scanning, no guessing.</p>
               </div>
               <div className='offer'>
-                <p className='t'>@stone-js/mcp + llms.txt</p>
-                <p>Your coding agent gets the framework's full map: concepts, modules, best practices. Consulted in real time, no package scanning.</p>
+                <p className='t'>@stone-js/mcp <span style={{ fontSize: 11, fontWeight: 400, letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.6 }}>coming</span></p>
+                <p>Expose your running domain to AI agents as MCP tools, the same domain your REST API serves, without touching a handler. The MCP equivalent of your REST API.</p>
               </div>
             </div>
             <p className='quote'>

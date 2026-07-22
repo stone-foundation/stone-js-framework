@@ -1,8 +1,8 @@
 {
-  "name": "api-as-tools",
+  "name": "agent-superpowers",
   "private": true,
   "version": "1.0.0",
-  "description": "Stone.js starter: the same domain served over HTTP is exposed to AI agents as MCP tools by stacking the MCP adapter.",
+  "description": "Stone.js starter: give your coding agent superpowers with `stone mcp` (@stone-js/mcp-dev), serving the framework's knowledge and this app's own structure.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "type": "module",
@@ -11,6 +11,7 @@
   },
   "scripts": {
     "dev": "stone dev",
+    "mcp": "stone mcp",
     "build": "stone build",
     "preview": "stone preview dist/server.mjs",
     "typings": "stone typings",
@@ -20,7 +21,7 @@
   "dependencies": {
     "@stone-js/core": "^0.8.0",
     "@stone-js/http-core": "^0.8.0",
-    "@stone-js/mcp-adapter": "^0.8.0",
+    "@stone-js/mcp-dev": "^0.8.0",
     "@stone-js/node-cli-adapter": "^0.8.0",
     "@stone-js/node-http-adapter": "^0.8.0",
     "@stone-js/router": "^0.8.0"

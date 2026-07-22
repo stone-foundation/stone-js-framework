@@ -8,7 +8,12 @@ interface Article { slug: string, title: string, excerpt: string, tags: string[]
 const fmtDate = (iso: string): string =>
   new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
-const FEATURED_STARTERS = STARTERS.filter((s) => s.official).slice(0, 3)
+const OFFICIAL_STARTERS = STARTERS.filter((s) => s.official)
+// Three core starters, then the agent-native one as the fourth card.
+const FEATURED_STARTERS = [
+  ...OFFICIAL_STARTERS.filter((s) => s.id !== 'agent-superpowers').slice(0, 3),
+  ...OFFICIAL_STARTERS.filter((s) => s.id === 'agent-superpowers')
+]
 const FEATURED_ARTICLES = (publishedArticles('en') as Article[]).slice(0, 4)
 
 /**

@@ -39,9 +39,9 @@ export class AgentNative implements IPage<ReactIncomingEvent> {
           }
           incarnation={
             <p>
-              <code>@stone-js/mcp-adapter</code> maps handlers to MCP tools. The work is naming and
-              scoping them well: <code>task.create</code> beats <code>doStuff</code>, and a tight
-              schema tells the model exactly what to pass.
+              When the runtime agent context ships, well-named handlers become MCP tools directly, no
+              rewrite. The work is naming and scoping them now: <code>task.create</code> beats
+              <code> doStuff</code>, and a tight schema tells the model exactly what to pass.
             </p>
           }
         />
