@@ -6,6 +6,8 @@
 
 ## Modules
 
+- [browser/decorators/McpDev](browser/decorators/McpDev/README.md)
+- [browser/options/McpDevBlueprint](browser/options/McpDevBlueprint/README.md)
 - [commands/McpCommand](commands/McpCommand/README.md)
 - [constants](constants/README.md)
 - [declarations](declarations/README.md)

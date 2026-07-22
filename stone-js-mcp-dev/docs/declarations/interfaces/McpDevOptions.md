@@ -15,6 +15,7 @@ tools merged with yours, and logs every tool call to stderr so you watch the age
 
 - [`McpDevDecoratorOptions`](../../decorators/McpDev/interfaces/McpDevDecoratorOptions.md)
 - [`McpDevConfig`](../../options/McpDevBlueprint/interfaces/McpDevConfig.md)
+- [`McpDevDecoratorOptions`](../../browser/decorators/McpDev/interfaces/McpDevDecoratorOptions.md)
 
 ## Properties
 
