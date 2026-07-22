@@ -18,19 +18,37 @@ domain once, and the context (runtime, protocol, caller) applies to it at run ti
 npm i @stone-js/mcp-adapter
 ```
 
+## A tools adapter, not an HTTP-domain adapter
+
+This adapter exposes **explicitly declared tools**, each a curated domain operation. It does **not**
+auto-expose an existing HTTP-route app (turning routes into tools is a separate router-to-MCP
+bridge). The adapter owns no routing: it turns a tool call into an `IncomingEvent` and the
+**kernel's key-router** (`@KeyRouting()`) dispatches it to the tool's handler, through the same
+middleware / DI / hooks as any other Stone.js event.
+
 ## Usage
 
 ```ts
 import { Mcp } from '@stone-js/mcp-adapter'
-import { Routing } from '@stone-js/router'
+import { KeyRouting } from '@stone-js/router'
 import { StoneApp } from '@stone-js/core'
 
-// Expose your existing router handlers to AI agents as MCP tools, unchanged.
-// One domain, two contexts: your REST API and your agent tools are the same code.
+// A tool is dispatched by the key-router (its name is the routing key), exactly like a bus event
+// or a realtime gateway method — one dispatch model across every Stone.js adapter.
 @Mcp()
-@Routing()
+@KeyRouting()
 @StoneApp({ name: 'my-app' })
 export class Application {}
+```
+
+Declare the tools (name → handler) with `defineMcpTools`; each handler runs through the kernel:
+
+```ts
+import { defineMcpTools } from '@stone-js/mcp-adapter'
+
+export const Tools = defineMcpTools([
+  { name: 'create_task', description: 'Create a task', handler: (args, event) => /* domain */ ({ id: 1 }) }
+])
 ```
 
 The server advertises an `instructions` string to the agent (the Continuum contract: the tools are

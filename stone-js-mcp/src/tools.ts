@@ -14,11 +14,36 @@ import { getConcept, knowledgeBase, searchKnowledge } from './knowledge'
  * Point your coding agent at the resulting MCP server and it can query the framework in real time
  * — concepts, modules, best-practices, gaps — instead of scanning every package.
  */
+/**
+ * Authoritative documentation entry points. The knowledge base is a fast index; when the agent
+ * needs full detail it should fetch these URLs (the docs are the single source of truth).
+ */
+export const stoneDocs: Record<string, string> = {
+  overview: 'https://stonejs.dev/docs',
+  install: 'https://stonejs.dev/docs/start/install',
+  firstDomain: 'https://stonejs.dev/docs/start/first-domain',
+  troubleshooting: 'https://stonejs.dev/docs/start/troubleshooting',
+  continuum: 'https://stonejs.dev/docs/foundations/continuum',
+  adapters: 'https://stonejs.dev/docs/foundations/adapters',
+  lifecycle: 'https://stonejs.dev/docs/foundations/lifecycle',
+  routing: 'https://stonejs.dev/docs/routing/matching',
+  validation: 'https://stonejs.dev/docs/extensions/validation',
+  auth: 'https://stonejs.dev/docs/extensions/auth',
+  openapi: 'https://stonejs.dev/docs/extensions/openapi',
+  mcp: 'https://stonejs.dev/docs/adapters/mcp',
+  apiReference: 'https://stonejs.dev/api'
+}
+
 export const stoneMcpTools: McpToolDef[] = [
   {
     name: 'stone_search',
     description: 'Search the Stone.js knowledge base (concepts, modules, best-practices, gaps).',
     handler: (args) => searchKnowledge(String(args.query ?? ''))
+  },
+  {
+    name: 'stone_docs',
+    description: 'Return links to the authoritative Stone.js documentation. Fetch these for full detail beyond the knowledge base.',
+    handler: () => stoneDocs
   },
   {
     name: 'stone_concept',

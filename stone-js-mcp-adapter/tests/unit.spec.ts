@@ -1,7 +1,6 @@
 import { MCP_PLATFORM } from '../src/declarations'
 import { Mcp } from '../src/decorators/Mcp'
 import { toContent } from '../src/toContent'
-import { McpDispatcher } from '../src/McpDispatcher'
 import { defineMcp, defineMcpTool, defineMcpTools } from '../src/defineMcpTool'
 import { mcpAdapterBlueprint } from '../src/options/McpAdapterBlueprint'
 import { SetMcpKernelMiddleware } from '../src/middleware/BlueprintMiddleware'
@@ -21,43 +20,29 @@ describe('toContent', () => {
   })
 })
 
-describe('McpDispatcher', () => {
-  const event = (tool: string, args: Record<string, unknown> = {}): any => ({
-    get: (k: string, fb?: unknown) => ({ _mcpTool: tool, _mcpArgs: args }[k] ?? fb)
-  })
-  const blueprint = (tools: unknown[]): any => ({ get: (_k: string, fb: unknown) => ({ tools, ...(fb as object) }) })
-
-  it('routes a call to the matching tool handler', async () => {
-    const handler = vi.fn(async () => ({ ok: true }))
-    const dispatcher = new McpDispatcher({ blueprint: blueprint([{ name: 'ping', handler }]) })
-    const result = await dispatcher.handle(event('ping', { n: 1 }))
-    expect(handler).toHaveBeenCalledWith({ n: 1 }, expect.anything())
-    expect(result).toEqual({ ok: true })
-  })
-
-  it('throws on an unknown tool', async () => {
-    const dispatcher = new McpDispatcher({ blueprint: blueprint([]) })
-    await expect(dispatcher.handle(event('nope'))).rejects.toThrow('Unknown MCP tool: nope')
-  })
-})
-
 describe('SetMcpKernelMiddleware', () => {
-  const blueprint = (platform: string): any => {
-    const store: Record<string, unknown> = { 'stone.adapter.platform': platform }
+  const blueprint = (platform: string, tools: unknown[] = []): any => {
+    const store: Record<string, unknown> = { 'stone.adapter.platform': platform, 'stone.mcp': { tools } }
     return { store, get: (k: string, fb?: unknown) => store[k] ?? fb, set (k: string, v: unknown) { store[k] = v; return this } }
   }
 
-  it('wires the dispatcher and response resolver for the MCP platform', async () => {
-    const bp = blueprint(MCP_PLATFORM)
+  it('maps each tool to a key-route and sets a response resolver, owning no routing itself', async () => {
+    const handler = async (): Promise<string> => 'pong'
+    const bp = blueprint(MCP_PLATFORM, [{ name: 'ping', handler }])
     await SetMcpKernelMiddleware({ blueprint: bp } as any, (async () => bp) as any)
-    expect(bp.store['stone.kernel.eventHandler']).toEqual({ module: McpDispatcher, isClass: true })
+
+    // Each tool becomes a key-route (name -> handler); the app's @KeyRouting owns the dispatch.
+    expect(bp.store['stone.keyRouting.definitions']).toEqual([{ key: 'ping', module: handler }])
     expect(typeof bp.store['stone.kernel.responseResolver']).toBe('function')
+    // The adapter does NOT seize the kernel event handler (no custom dispatcher).
+    expect(bp.store['stone.kernel.eventHandler']).toBeUndefined()
   })
 
   it('does nothing for another platform', async () => {
     const bp = blueprint('node_http')
     await SetMcpKernelMiddleware({ blueprint: bp } as any, (async () => bp) as any)
-    expect(bp.store['stone.kernel.eventHandler']).toBeUndefined()
+    expect(bp.store['stone.keyRouting.definitions']).toBeUndefined()
+    expect(bp.store['stone.kernel.responseResolver']).toBeUndefined()
   })
 })
 
@@ -89,16 +74,11 @@ describe('helpers, blueprint, decorator', () => {
   })
 })
 
-describe('mcpAdapterResolver + dispatcher defaults', () => {
+describe('mcpAdapterResolver', () => {
   it('resolver creates a McpAdapter', async () => {
     const { mcpAdapterResolver } = await import('../src/resolvers')
     const { McpAdapter } = await import('../src/McpAdapter')
     const bp: any = { get: (_k: string, fb?: unknown) => fb, set: () => {}, has: () => false, getAll: () => ({}) }
     expect(mcpAdapterResolver(bp)).toBeInstanceOf(McpAdapter)
-  })
-
-  it('dispatcher tolerates a missing tools list', async () => {
-    const dispatcher = new McpDispatcher({ blueprint: { get: (_k: string, fb: unknown) => fb } as any })
-    await expect(dispatcher.handle({ get: (_k: string, fb?: unknown) => fb } as any)).rejects.toThrow('Unknown MCP tool')
   })
 })

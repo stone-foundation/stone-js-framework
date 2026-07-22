@@ -16,10 +16,13 @@ import {
  * Model Context Protocol adapter for Stone.js.
  *
  * MCP is just another Continuum context: a tool call is a *cause* that becomes an `IncomingEvent`,
- * flows through the kernel (middleware, DI, hooks) via the {@link McpDispatcher}, and its result
- * is returned as MCP content. `run()` starts an MCP server (stdio by default) advertising every
- * configured tool — so an AI agent consumes your domain exactly like a REST client would, with no
- * changes to your handlers.
+ * flows through the kernel (middleware, DI, hooks) and is routed by the framework's key-router to
+ * the tool's handler, and its result is returned as MCP content. `run()` starts an MCP server
+ * (stdio by default) advertising every configured tool.
+ *
+ * This is a TOOLS adapter: it exposes the tools you declare in `stone.mcp.tools` (each backed by a
+ * key-routed handler), not an arbitrary HTTP-route app. Turning an existing routed HTTP API into
+ * MCP tools is a separate concern (a router-to-MCP bridge), not this adapter.
  */
 export class McpAdapter extends Adapter<
 IncomingEvent,
@@ -81,14 +84,21 @@ McpAdapterContext
    * @returns The MCP tool result.
    */
   protected async dispatch (name: string, args: Record<string, unknown>): Promise<ReturnType<typeof toContent>> {
+    // Normalise the tool call into an IncomingEvent keyed by the tool name, exactly like every
+    // other Stone.js event adapter (`detail-type` = key, `detail` = payload). The kernel's
+    // key-router then routes it to the tool's handler — the adapter owns no routing itself.
+    const rawEvent = { 'detail-type': name, detail: args }
     const event = IncomingEvent.create({
-      source: { rawEvent: { name, args }, platform: MCP_PLATFORM, rawContext: {} },
-      metadata: { _mcpTool: name, _mcpArgs: args, ...args }
+      source: { rawEvent, platform: MCP_PLATFORM, rawContext: {} },
+      // The key-router reads the raw event under the `metadata` key (event.get('metadata')),
+      // exactly like node-ws: `detail-type` is the routing key, `detail` the payload.
+      metadata: { metadata: rawEvent }
     })
 
     const incomingEventBuilder = AdapterEventBuilder.create<IncomingEventOptions, IncomingEvent>({ resolver: () => event })
     const rawResponseBuilder = AdapterEventBuilder.create<Record<PropertyKey, unknown>, IRawResponseWrapper<OutgoingResponse>>({
       // Never invoked: buildRawResponse is overridden to return the outgoing response directly.
+      /* v8 ignore next */
       resolver: () => ({ respond: () => undefined as unknown as OutgoingResponse })
     })
 

@@ -31,15 +31,20 @@ export type McpToolHandler = (args: Record<string, unknown>, event: IncomingEven
 
 /**
  * A tool exposed to AI agents over MCP.
+ *
+ * This is a TOOLS adapter, not an HTTP-domain adapter: a tool is an explicitly declared operation,
+ * not an auto-derived route. Its `handler` is registered as a key-route (`name` -> `handler`) and
+ * is invoked BY THE KERNEL's key-router (`@KeyRouting()`), so a tool call flows through the same
+ * middleware/DI/hooks as any other Stone.js event. The adapter itself performs no dispatch.
  */
 export interface McpTool {
-  /** Unique tool name (what the agent calls). */
+  /** Unique tool name (what the agent calls); also the routing key. */
   name: string
   /** Human/agent-readable description. */
   description?: string
-  /** Zod raw shape validating the arguments (MCP validates against it before your handler runs). */
+  /** Zod raw shape validating the arguments (MCP validates against it before the handler runs). */
   inputSchema?: ZodRawShape
-  /** The domain logic to run — the same code you'd call from an HTTP handler. */
+  /** The domain logic to run, invoked by the key-router with `(args, event)`. */
   handler: McpToolHandler
 }
 

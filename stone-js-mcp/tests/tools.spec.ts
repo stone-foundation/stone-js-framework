@@ -8,6 +8,12 @@ describe('stoneMcpTools', () => {
     expect(result.some((r: any) => r.title.includes('auth'))).toBe(true)
   })
 
+  it('stone_docs returns authoritative documentation links', async () => {
+    const result: any = await tool('stone_docs').handler({})
+    expect(result.overview).toBe('https://stonejs.dev/docs')
+    expect(result.mcp).toContain('/docs/adapters/mcp')
+  })
+
   it('stone_concept returns one concept, the list, or an error', async () => {
     expect((await tool('stone_concept').handler({ id: 'kernel' })).title).toBe('Kernel (Initialization)')
     expect(Array.isArray(await tool('stone_concept').handler({}))).toBe(true)

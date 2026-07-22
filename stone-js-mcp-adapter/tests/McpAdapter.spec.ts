@@ -13,7 +13,7 @@ vi.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({ StdioServerTranspo
 // A fake kernel that echoes the tool call as an OutgoingResponse-like object.
 const fakeKernel = {
   onInit: vi.fn(async () => {}),
-  handle: vi.fn(async (event: any) => ({ statusCode: 200, content: `handled:${String(event.get('_mcpTool'))}` }))
+  handle: vi.fn(async (event: any) => ({ statusCode: 200, content: `handled:${String(event.get('metadata')?.['detail-type'])}` }))
 }
 
 const blueprintStub = (tools: unknown[]): any => {
@@ -60,10 +60,17 @@ describe('McpAdapter', () => {
     // Invoke the registered tool callback (what the MCP client would trigger).
     const toolCallback = registerTool.mock.calls[0][2]
     const result = await toolCallback({})
+    await toolCallback() // no args: covers the `args ?? {}` fallback
 
     expect(fakeKernel.onInit).toHaveBeenCalled()
     expect(fakeKernel.handle).toHaveBeenCalled()
     expect(result).toEqual({ content: [{ type: 'text', text: 'handled:ping' }] })
+  })
+
+  it('buildRawResponse returns the kernel outgoing response as-is', async () => {
+    const adapter: any = McpAdapter.create(blueprintStub([]))
+    const outgoingResponse = { statusCode: 200, content: 'ok' }
+    expect(await adapter.buildRawResponse({ outgoingResponse })).toBe(outgoingResponse)
   })
 
   it('uses a transport provided via config', async () => {

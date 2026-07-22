@@ -33,8 +33,9 @@ export interface McpAdapterBlueprint extends StoneBlueprint {
  * Default blueprint for the MCP adapter.
  *
  * Registers the adapter and wires the kernel (via the blueprint middleware) to route tool calls
- * through the {@link McpDispatcher}. Not `default` — opt in with `@Mcp({ default: true })` or by
- * making it the only adapter. Declare tools under `stone.mcp.tools` (see `defineMcpTools`).
+ * through the framework's standard key-router: each `stone.mcp.tools` entry becomes a key-route.
+ * Not `default` — opt in with `@Mcp({ default: true })` or by making it the only adapter. Declare
+ * tools under `stone.mcp.tools` (see `defineMcpTools` / `defineMcp`).
  */
 export const mcpAdapterBlueprint: McpAdapterBlueprint = {
   stone: {
