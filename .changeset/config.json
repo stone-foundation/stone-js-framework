@@ -54,5 +54,8 @@
     ]
   ],
   "linked": [],
-  "ignore": []
+  "ignore": [
+    "@stone-js/website",
+    "@stone-js/lab-*"
+  ]
 }
