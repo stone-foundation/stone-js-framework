@@ -15,7 +15,20 @@ import { CommandOutput } from '@stone-js/node-cli-adapter'
 export const STONE_MARK = '◆'
 
 /**
- * Build the signature banner as plain text (no ANSI), given a version and optional subtitle.
+ * The Stone.js gem logo: a faceted diamond built from the signature mark, drawn above the wordmark.
+ * Pure ASCII (mark + spaces) so it stays testable and terminal-safe.
+ */
+export const STONE_LOGO: string[] = [
+  '        ◆',
+  '      ◆ ◆ ◆',
+  '    ◆ ◆ ◆ ◆ ◆',
+  '      ◆ ◆ ◆',
+  '        ◆'
+]
+
+/**
+ * Build the signature banner as plain text (no ANSI): the gem logo, the wordmark with version, a
+ * rule, and the subtitle. The {@link StoneReporter.banner} method applies the brand colour on top.
  *
  * @param version - The CLI/app version to display.
  * @param subtitle - An optional subtitle line.
@@ -23,11 +36,13 @@ export const STONE_MARK = '◆'
  */
 export function stoneBanner (version = '', subtitle = 'The continuum framework'): string {
   const hasVersion = version.length > 0 && version !== '0.0.0'
-  const v = hasVersion ? `  ${version.startsWith('v') ? version : `v${version}`}` : ''
+  const v = hasVersion ? `   ${version.startsWith('v') ? version : `v${version}`}` : ''
   return [
     '',
+    ...STONE_LOGO,
+    '',
     `  ${STONE_MARK} Stone.js${v}`,
-    `  ${'─'.repeat(Math.max(subtitle.length, 10) + 4)}`,
+    `  ${'─'.repeat(Math.max(subtitle.length, 20) + 4)}`,
     `  ${subtitle}`,
     ''
   ].join('\n')
@@ -96,11 +111,24 @@ export class StoneReporter {
    * @param subtitle - An optional subtitle.
    */
   banner (subtitle?: string): this {
-    const text = stoneBanner(this.version, subtitle)
-    const [, brand, rule, sub] = text.split('\n')
-    this.output.show(this.output.format.cyanBright.bold(brand))
-    this.output.show(this.output.format.gray(rule))
-    this.output.show(this.output.format.gray(sub))
+    const f = this.output.format
+
+    for (const line of stoneBanner(this.version, subtitle).split('\n')) {
+      if (line.trim().length === 0) {
+        this.output.show('')
+      } else if (line.includes('Stone.js')) {
+        // The wordmark: accent mark, bold white wordmark, dim version.
+        const [, rest = ''] = line.split('Stone.js')
+        this.output.show(`  ${f.cyanBright(STONE_MARK)} ${f.whiteBright.bold('Stone.js')}${f.gray(rest)}`)
+      } else if (/^[\s◆]+$/.test(line)) {
+        // The gem logo, in the CLI accent.
+        this.output.show(f.cyanBright.bold(line))
+      } else {
+        // The rule and subtitle.
+        this.output.show(f.gray(line))
+      }
+    }
+
     this.output.breakLine(1)
     return this
   }

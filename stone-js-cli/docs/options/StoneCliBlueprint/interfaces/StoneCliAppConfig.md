@@ -68,7 +68,7 @@ Partial.aliases
 ### blueprint?
 
 ```ts
-optional blueprint?: BlueprintConfig<IBlueprint<any>, any>;
+optional blueprint?: BlueprintConfig<IBlueprint, any>;
 ```
 
 Configuration options for building the application blueprint, including middleware and pipe priorities.
@@ -170,7 +170,7 @@ Partial.kernel
 ### lifecycleHooks?
 
 ```ts
-optional lifecycleHooks?: LifecycleHookType<IBlueprint<any>, any, any, IncomingEvent, OutgoingResponse>;
+optional lifecycleHooks?: LifecycleHookType<IBlueprint, any, any, IncomingEvent, OutgoingResponse>;
 ```
 
 Lifecycle hooks for the application.
@@ -204,7 +204,7 @@ Partial.listeners
 ### liveConfigurations?
 
 ```ts
-optional liveConfigurations?: MixedConfiguration<any>[];
+optional liveConfigurations?: MixedConfiguration[];
 ```
 
 Live configurations are loaded at each request.

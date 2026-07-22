@@ -6,6 +6,7 @@
 
 ## Variables
 
+- [STONE\_LOGO](variables/STONE_LOGO.md)
 - [STONE\_MARK](variables/STONE_MARK.md)
 
 ## Functions

@@ -4,7 +4,8 @@
 function stoneBanner(version?, subtitle?): string;
 ```
 
-Build the signature banner as plain text (no ANSI), given a version and optional subtitle.
+Build the signature banner as plain text (no ANSI): the gem logo, the wordmark with version, a
+rule, and the subtitle. The [StoneReporter.banner](../classes/StoneReporter.md#banner) method applies the brand colour on top.
 
 ## Parameters
 

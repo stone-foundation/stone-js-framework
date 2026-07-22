@@ -29,6 +29,12 @@ describe('stoneBanner', () => {
     expect(banner).toContain('v2.0.0')
     expect(banner).not.toContain('vv2.0.0')
   })
+
+  it('draws the gem logo above the wordmark', () => {
+    const banner = stoneBanner('1.0.0')
+    expect(banner).toContain('◆ ◆ ◆ ◆ ◆')
+    expect(banner.indexOf('◆ ◆ ◆ ◆ ◆')).toBeLessThan(banner.indexOf('◆ Stone.js'))
+  })
 })
 
 describe('formatElapsed', () => {
