@@ -1,0 +1,53 @@
+name: PR checks
+
+# Repository governance, enforced from the pipeline (local hooks can be bypassed). Mark this job as
+# a required status check in branch protection to actually block merges.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, reopened, synchronize, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  governance:
+    name: Governance (title · branch · label)
+    runs-on: ubuntu-latest
+    steps:
+      # Cheap checks first (no install), so a bad branch/label fails fast.
+      - name: Branch name follows <type>/<slug>
+        run: |
+          name='${{ github.head_ref }}'
+          echo "Branch: $name"
+          if ! printf '%s' "$name" | grep -qE '^(feat|fix|chore|docs|refactor|perf|test|build|ci|style|revert)/[a-z0-9][a-z0-9._/-]*$'; then
+            echo "::error::Branch '$name' must be <type>/<slug> (types: feat, fix, chore, docs, refactor, perf, test, build, ci, style, revert), e.g. feat/mcp-dev."
+            exit 1
+          fi
+
+      - name: PR has at least one label
+        run: |
+          count=$(jq '.pull_request.labels | length' "$GITHUB_EVENT_PATH")
+          echo "Label count: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::Add at least one label to this PR (needed for triage and release notes)."
+            exit 1
+          fi
+
+      # The PR title becomes the squash-merge commit on main, so it must pass the same commitlint
+      # rules as any commit. Reuse the repo's commitlint config for a single source of truth.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: PR title is a Conventional Commit
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s' "$PR_TITLE" | pnpm exec commitlint
