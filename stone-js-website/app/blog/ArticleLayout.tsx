@@ -11,7 +11,7 @@ export function articleHead (slug: string): HeadContext {
   const url = `${SITE_URL}/blog/${slug}`
   const title = `${a?.title ?? 'Article'} · Stone.js`
   const description = a?.excerpt ?? ''
-  const image = a?.ogImage !== undefined ? `${SITE_URL}${a.ogImage}` : `${SITE_URL}/favicon.svg`
+  const image = `${SITE_URL}${a?.ogImage ?? '/og/default.jpg'}`
   return {
     title,
     description,

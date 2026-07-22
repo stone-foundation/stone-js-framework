@@ -39,7 +39,7 @@ import {
 } from './declarations'
 import { jsx } from 'react/jsx-runtime'
 import { STONE_SNAPSHOT } from './constants'
-import { renderSnapshotScript, composeProviders, MetaViewProvider, applyHeadToHtml } from '@stone-js/use-view'
+import { renderSnapshotScript, composeProviders, MetaViewProvider, applyHeadToHtml, createHead } from '@stone-js/use-view'
 import { ElementType, ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
 import { StonePage } from './components/StonePage'
@@ -119,7 +119,7 @@ export const buildLayoutComponent = async (
   const metavalue = container
     .make<IBlueprint>('blueprint')
     .get<MetaPageLayout>(
-      `stone.useReact.layout.${String(layoutName)}`
+      `stone.useReact.layouts.${String(layoutName)}`
   )
 
   const handler = await resolveComponent<IPageLayout>(container, metavalue)
@@ -128,6 +128,51 @@ export const buildLayoutComponent = async (
   if (componentType !== undefined) {
     return jsx(componentType, { container, children, 'data-layout': layoutName })
   }
+}
+
+/**
+ * Resolve the head declared by a page's layout, if any.
+ *
+ * A layout may expose an optional `head()` returning a {@link HeadContext} (brand-level
+ * defaults: canonical social card, site name, theme color, …). It is resolved from the same
+ * `stone.useReact.layouts.<name>` entry the layout component comes from, so declarative and
+ * lazily code-split layouts are covered identically.
+ *
+ * @param container - Service Container.
+ * @param layoutName - The layout name.
+ * @returns The layout head context, or undefined when the layout defines none.
+ */
+export const resolveLayoutHead = async (
+  container: IContainer,
+  layoutName?: unknown
+): Promise<HeadContext | undefined> => {
+  const metavalue = container
+    .make<IBlueprint>('blueprint')
+    .get<MetaPageLayout>(`stone.useReact.layouts.${String(layoutName)}`)
+
+  const handler = await resolveComponent<IPageLayout>(container, metavalue)
+
+  return await handler?.head?.()
+}
+
+/**
+ * Merge a layout head with a page head, the page winning on every conflict.
+ *
+ * The layout head is the base (brand defaults); the page head is merged on top, so same-key
+ * metas/links (deduped by `property`/`name`/`rel`) and title/description from the page replace
+ * the layout's. This is the hierarchical "layout head + page head" contract of {@link HeadManager}.
+ *
+ * @param layoutHead - The layout-provided base head (optional).
+ * @param pageHead - The page-provided head (optional, wins on conflict).
+ * @returns The merged head, or whichever side is defined when only one is.
+ */
+export const mergeHead = (
+  layoutHead?: HeadContext,
+  pageHead?: HeadContext
+): HeadContext | undefined => {
+  if (layoutHead === undefined) { return pageHead }
+  if (pageHead === undefined) { return layoutHead }
+  return createHead(layoutHead).merge(pageHead).toContext()
 }
 
 /**
@@ -179,7 +224,7 @@ export const buildAdapterErrorComponent = async <RawEventType, RawResponseType, 
   )
   const handlerMetavalue = await resolveLazyComponent(handlerMeta)
   const layoutMetavalue = await resolveLazyComponent(blueprint.get<MetaPageLayout>(
-    `stone.useReact.layout.${String(handlerMeta?.layout)}`
+    `stone.useReact.layouts.${String(handlerMeta?.layout)}`
   ))
 
   let layoutHandler: (IPageLayout | undefined)

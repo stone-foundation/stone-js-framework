@@ -240,7 +240,7 @@ describe('generateImperativeLazyPages', () => {
   })
 
   it('handles layout modules', () => {
-    const blueprint: any = { stone: { useReact: { layout: { default: { test: true } } } } }
+    const blueprint: any = { stone: { useReact: { layouts: { default: { test: true } } } } }
     const result = generateImperativeLazyPages(blueprint, 'lazy/path', 'Layout')
     expect(result.layouts.default.lazy).toBe(true)
   })

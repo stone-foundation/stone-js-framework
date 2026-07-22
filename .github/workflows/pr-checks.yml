@@ -21,8 +21,12 @@ jobs:
     steps:
       # Cheap checks first (no install), so a bad branch/label fails fast.
       - name: Branch name follows <type>/<slug>
+        env:
+          # Pass through env, never interpolate ${{ }} into the script: github.head_ref is
+          # attacker-controlled (branch name) and would otherwise allow shell injection.
+          BRANCH_NAME: ${{ github.head_ref }}
         run: |
-          name='${{ github.head_ref }}'
+          name="$BRANCH_NAME"
           echo "Branch: $name"
           if ! printf '%s' "$name" | grep -qE '^(feat|fix|chore|docs|refactor|perf|test|build|ci|style|revert)/[a-z0-9][a-z0-9._/-]*$'; then
             echo "::error::Branch '$name' must be <type>/<slug> (types: feat, fix, chore, docs, refactor, perf, test, build, ci, style, revert), e.g. feat/mcp-dev."

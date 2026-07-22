@@ -156,6 +156,10 @@ export const GenerateLazyPageMiddleware = async (
         definitions
       },
       useReact: {
+        // The runtime reads each layout at `stone.useReact.layouts.<name>`
+        // (SetReactPageLayoutMiddleware / buildLayoutComponent), mirroring the
+        // errorPages/adapterErrorPages maps. Writing the record here registers
+        // lazily code-split layouts client-side exactly like eager ones.
         layouts,
         errorPages,
         adapterErrorPages
