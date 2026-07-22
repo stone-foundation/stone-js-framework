@@ -2,6 +2,7 @@ import mime from 'mime'
 import type { Readable } from 'node:stream'
 import { CloudFileError } from '../errors/CloudFileError'
 import type { GcsDriverOptions } from '../declarations'
+import { trimSlashes, trimTrailingSlashes } from '../utils'
 import type {
   FileSystem,
   StorageStat,
@@ -54,7 +55,7 @@ export class GcsFileSystem implements FileSystem, SignedUrlCapable {
     this.bucketName = options.bucket
     this.baseUrl = options.baseUrl
     this.expiresIn = options.signedUrlExpiresIn ?? DEFAULT_EXPIRES_IN
-    this.prefix = (options.root ?? '').replace(/^\/+|\/+$/g, '')
+    this.prefix = trimSlashes(options.root ?? '')
   }
 
   /** @inheritdoc */
@@ -153,14 +154,14 @@ export class GcsFileSystem implements FileSystem, SignedUrlCapable {
   /** @inheritdoc */
   async url (path: string): Promise<string> {
     if (typeof this.baseUrl === 'string' && this.baseUrl.length > 0) {
-      return `${this.baseUrl.replace(/\/+$/, '')}/${this.key(path)}`
+      return `${trimTrailingSlashes(this.baseUrl)}/${this.key(path)}`
     }
     return `https://storage.googleapis.com/${this.bucketName}/${this.key(path)}`
   }
 
   /** @inheritdoc */
   async files (directory: string = '', recursive: boolean = true): Promise<string[]> {
-    const prefix = this.key(directory).replace(/\/+$/, '')
+    const prefix = trimTrailingSlashes(this.key(directory))
     const listPrefix = prefix.length > 0 ? `${prefix}/` : ''
     try {
       const [files] = await (await this.bucket()).getFiles({
