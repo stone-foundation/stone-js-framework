@@ -1,11 +1,16 @@
 # Stone.js - AWS API Gateway WebSocket Adapter
 
-[![npm](https://img.shields.io/npm/l/@stone-js/aws-apigw-ws-adapter)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/aws-apigw-ws-adapter)](https://www.npmjs.com/package/@stone-js/aws-apigw-ws-adapter)
-[![npm](https://img.shields.io/npm/dm/@stone-js/aws-apigw-ws-adapter)](https://www.npmjs.com/package/@stone-js/aws-apigw-ws-adapter)
+[![npm license](https://img.shields.io/npm/l/@stone-js/aws-apigw-ws-adapter)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/aws-apigw-ws-adapter)](https://www.npmjs.com/package/@stone-js/aws-apigw-ws-adapter)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/aws-apigw-ws-adapter)](https://www.npmjs.com/package/@stone-js/aws-apigw-ws-adapter)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-aws-apigw-ws-adapter/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-aws-apigw-ws-adapter/actions/workflows/main.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-aws-apigw-ws-adapter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-aws-apigw-ws-adapter)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 **AWS API Gateway WebSocket adapter for Stone.js.** Runs your realtime app serverlessly: each socket event (`$connect`, `$disconnect`, a message) is a Lambda invocation, mapped onto [`@stone-js/realtime`](https://www.npmjs.com/package/@stone-js/realtime). The adapter keeps presence in DynamoDB (shared across the ephemeral invocations), fires your `@On*` gateways, and pushes messages back through the API Gateway Management API. The same gateway code runs here and on the Node `ws` adapter, no change.

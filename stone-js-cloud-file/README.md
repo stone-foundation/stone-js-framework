@@ -1,11 +1,16 @@
 # Stone.js - Cloud File
 
-[![npm](https://img.shields.io/npm/l/@stone-js/cloud-file)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/cloud-file)](https://www.npmjs.com/package/@stone-js/cloud-file)
-[![npm](https://img.shields.io/npm/dm/@stone-js/cloud-file)](https://www.npmjs.com/package/@stone-js/cloud-file)
+[![npm license](https://img.shields.io/npm/l/@stone-js/cloud-file)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/cloud-file)](https://www.npmjs.com/package/@stone-js/cloud-file)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/cloud-file)](https://www.npmjs.com/package/@stone-js/cloud-file)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-cloud-file/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-cloud-file/actions/workflows/main.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-cloud-file&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-cloud-file)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 **Cloud storage for Stone.js.** Drivers for the agnostic `@stone-js/filesystem` contract, plus a signed-URL contract for direct-to-storage uploads and private downloads. Ships drivers for **S3** (and every S3-compatible store: Cloudflare R2, MinIO, DigitalOcean Spaces, Alibaba OSS, Tencent COS), **Google Cloud Storage** and **Azure Blob**.

@@ -1,16 +1,16 @@
 # Stone.js - Core
 
-[![npm](https://img.shields.io/npm/l/@stone-js/core)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/core)](https://www.npmjs.com/package/@stone-js/core)
-[![npm](https://img.shields.io/npm/dm/@stone-js/core)](https://www.npmjs.com/package/@stone-js/core)
+[![npm license](https://img.shields.io/npm/l/@stone-js/core)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/core)](https://www.npmjs.com/package/@stone-js/core)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/core)](https://www.npmjs.com/package/@stone-js/core)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-core/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-core/actions/workflows/main.yml)
-[![Publish Package to npmjs](https://github.com/stone-foundation/stone-js-core/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-core/actions/workflows/release.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-core&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-core)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-core&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-core)
-[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](./SECURITY.md)
-[![CodeQL](https://github.com/stone-foundation/stone-js-core/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-core/security/code-scanning)
-[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-core/network/updates)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 A universal JavaScript/TypeScript core for building scalable, context-adaptive applications with reusable business logic, independent of runtime environments.

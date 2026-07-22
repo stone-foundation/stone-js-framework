@@ -1,11 +1,16 @@
 # Stone.js - Node WebSocket Adapter
 
-[![npm](https://img.shields.io/npm/l/@stone-js/node-ws-adapter)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/node-ws-adapter)](https://www.npmjs.com/package/@stone-js/node-ws-adapter)
-[![npm](https://img.shields.io/npm/dm/@stone-js/node-ws-adapter)](https://www.npmjs.com/package/@stone-js/node-ws-adapter)
+[![npm license](https://img.shields.io/npm/l/@stone-js/node-ws-adapter)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/node-ws-adapter)](https://www.npmjs.com/package/@stone-js/node-ws-adapter)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/node-ws-adapter)](https://www.npmjs.com/package/@stone-js/node-ws-adapter)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-node-ws-adapter/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-node-ws-adapter/actions/workflows/main.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-node-ws-adapter&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-node-ws-adapter)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 **Node.js WebSocket adapter for Stone.js.** Runs a [`ws`](https://github.com/websockets/ws) server and bridges every socket to [`@stone-js/realtime`](https://www.npmjs.com/package/@stone-js/realtime): each connection is added to the shared connection store (so `broadcast` reaches it) and its lifecycle (connect, subscribe, unsubscribe, message, error, disconnect) is dispatched into the realtime router, firing your `@On*` gateways. Data frames can optionally run through the Stone.js kernel too. The core is never touched: this adapter is pure Integration.

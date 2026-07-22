@@ -1,16 +1,16 @@
 # Stone.js - Filesystem
 
-[![npm](https://img.shields.io/npm/l/@stone-js/filesystem)](https://opensource.org/licenses/MIT)
-[![npm](https://img.shields.io/npm/v/@stone-js/filesystem)](https://www.npmjs.com/package/@stone-js/filesystem)
-[![npm](https://img.shields.io/npm/dm/@stone-js/filesystem)](https://www.npmjs.com/package/@stone-js/filesystem)
+[![npm license](https://img.shields.io/npm/l/@stone-js/filesystem)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@stone-js/filesystem)](https://www.npmjs.com/package/@stone-js/filesystem)
+[![npm downloads](https://img.shields.io/npm/dm/@stone-js/filesystem)](https://www.npmjs.com/package/@stone-js/filesystem)
 ![Maintenance](https://img.shields.io/maintenance/yes/2026)
-[![Build Status](https://github.com/stone-foundation/stone-js-filesystem/actions/workflows/main.yml/badge.svg)](https://github.com/stone-foundation/stone-js-filesystem/actions/workflows/main.yml)
-[![Publish Package to npmjs](https://github.com/stone-foundation/stone-js-filesystem/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-filesystem/actions/workflows/release.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-filesystem&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-filesystem)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-filesystem&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-filesystem)
-[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](./SECURITY.md)
-[![CodeQL](https://github.com/stone-foundation/stone-js-filesystem/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-filesystem/security/code-scanning)
-[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-filesystem/network/updates)
+[![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
+[![Release](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/release.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](https://github.com/stone-foundation/stone-js-framework/blob/main/SECURITY.md)
+[![CodeQL](https://github.com/stone-foundation/stone-js-framework/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/stone-foundation/stone-js-framework/security/code-scanning)
+[![Dependabot Status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/stone-foundation/stone-js-framework/network/updates)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
 A robust, strongly typed ESM utility for safe, contextual file and path management in Stone.js applications.
