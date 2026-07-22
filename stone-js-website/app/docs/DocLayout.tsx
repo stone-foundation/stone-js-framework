@@ -23,7 +23,7 @@ function GitHubIcon (): JSX.Element {
 }
 
 /** Restores theme and paradigm before first paint, so there is no flash. */
-const NO_FLASH = `(function(){try{var d=document.documentElement,t=localStorage.getItem('stone-theme'),p=localStorage.getItem('stone-paradigm');if(t)d.setAttribute('data-theme',t);if(p)d.setAttribute('data-paradigm',p);}catch(e){}})();`
+const NO_FLASH = `(function(){try{var d=document.documentElement,t=localStorage.getItem('stone-theme'),p=localStorage.getItem('stone-paradigm');d.setAttribute('data-theme',t||'dark');if(p)d.setAttribute('data-paradigm',p);}catch(e){d.setAttribute('data-theme','dark');}})();`
 
 /** Toggles the color theme and persists it. */
 function toggleTheme (): void {

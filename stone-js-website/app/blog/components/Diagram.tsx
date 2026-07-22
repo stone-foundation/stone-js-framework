@@ -44,7 +44,10 @@ const PILL_H = 46
 const CORE_H = 58
 
 function widthFor (n: DiagramNode): number {
-  const base = Math.max((n.label?.length ?? 0) * CH + 46, 116)
+  // Size to the LONGER of label/sub (a long sub used to overflow the pill), plus the 34px
+  // left inset for the dot and ~18px right padding.
+  const chars = Math.max(n.label?.length ?? 0, n.sub?.length ?? 0)
+  const base = Math.max(chars * CH + 52, 116)
   return n.kind === 'core' ? Math.max(base, 168) : base
 }
 
@@ -57,6 +60,22 @@ function control (ax: number, ay: number, bx: number, by: number, curve: number)
   const dy = by - ay
   const len = Math.hypot(dx, dy) || 1
   return [mx + (-dy / len) * curve, my + (dx / len) * curve]
+}
+
+/**
+ * The point on a node's pill boundary, from its center toward (tx, ty). Connectors start/end here
+ * (not at the center) so they stay visible between the pills instead of being hidden under them,
+ * and arrow tips land on the box edge.
+ */
+function boundaryPoint (n: Placed, tx: number, ty: number): [number, number] {
+  const h = n.kind === 'core' ? CORE_H : PILL_H
+  const dx = tx - n.x
+  const dy = ty - n.y
+  const len = Math.hypot(dx, dy) || 1
+  const ux = dx / len
+  const uy = dy / len
+  const dist = Math.min((n.w / 2) / (Math.abs(ux) || 1e-6), (h / 2) / (Math.abs(uy) || 1e-6))
+  return [n.x + ux * dist, n.y + uy * dist]
 }
 
 function place (nodes: DiagramNode[], layout: 'flow' | 'hub', W: number, H: number): Placed[] {
@@ -128,11 +147,15 @@ export function Diagram ({ layout = 'flow', nodes, edges, caption, height }: Dia
             if (a === undefined || b === undefined) return null
             const curve = e.curve ?? 0
             const [cx, cy] = control(a.x, a.y, b.x, b.y, curve)
-            const d = curve === 0 ? `M ${a.x} ${a.y} L ${b.x} ${b.y}` : `M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}`
+            // Trim the endpoints to the pill boundaries (toward the control point) so the connector
+            // is visible between the boxes and the arrow tip lands on the edge, not under the pill.
+            const [sx, sy] = boundaryPoint(a, cx, cy)
+            const [ex, ey] = boundaryPoint(b, cx, cy)
+            const d = curve === 0 ? `M ${sx} ${sy} L ${ex} ${ey}` : `M ${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey}`
             const dir = e.dir ?? 'to'
             // Label rides the curve at its apex (t = 0.5 of the quadratic).
-            const lx = 0.25 * a.x + 0.5 * cx + 0.25 * b.x
-            const ly = 0.25 * a.y + 0.5 * cy + 0.25 * b.y - 6
+            const lx = 0.25 * sx + 0.5 * cx + 0.25 * ex
+            const ly = 0.25 * sy + 0.5 * cy + 0.25 * ey - 6
             return (
               <g key={i}>
                 <path
