@@ -51,7 +51,7 @@ const ESCAPE_REGEX = /[<>&\u2028\u2029]/g
  * ```
  */
 export function escapeSnapshotJson (json: string): string {
-  return json.replace(ESCAPE_REGEX, (char) => ESCAPE_LOOKUP[char.codePointAt(0) ?? 0])
+  return json.replace(ESCAPE_REGEX, (char) => ESCAPE_LOOKUP[char.codePointAt(0) as number])
 }
 
 /**
@@ -77,7 +77,7 @@ export function serializeSnapshot (value: unknown): string {
  */
 export function renderSnapshotScript (value: unknown, id: string = STONE_SNAPSHOT_ID): string {
   const json = typeof value === 'string' ? escapeSnapshotJson(value) : serializeSnapshot(value)
-  const safeId = escapeSnapshotJson(id).replaceAll('"', '&quot;')
+  const safeId = escapeSnapshotJson(id).replace(/"/g, '&quot;')
   return `<script id="${safeId}" type="application/json">${json}</script>`
 }
 

@@ -32,7 +32,7 @@ export async function singleFlight<T> (inflight: Map<string, Promise<any>>, key:
 export function hash (input: string): string {
   let h = 0x811c9dc5
   for (let i = 0; i < input.length; i++) {
-    h ^= input.codePointAt(i) ?? 0
+    h ^= input.codePointAt(i) as number
     h = Math.imul(h, 0x01000193)
   }
   return (h >>> 0).toString(16).padStart(8, '0')
