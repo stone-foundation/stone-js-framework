@@ -50,7 +50,9 @@
       "@stone-js/alibaba-fc-http-adapter",
       "@stone-js/tencent-scf-adapter",
       "@stone-js/tencent-scf-http-adapter",
-      "@stone-js/create"
+      "@stone-js/create",
+      "@stone-js/starters",
+      "@stone-js/blog-starters"
     ]
   ],
   "linked": [],

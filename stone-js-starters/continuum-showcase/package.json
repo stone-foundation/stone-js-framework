@@ -10,16 +10,16 @@
     "preview": "stone preview"
   },
   "dependencies": {
-    "@stone-js/browser-adapter": "workspace:*",
-    "@stone-js/core": "workspace:*",
-    "@stone-js/node-http-adapter": "workspace:*",
-    "@stone-js/router": "workspace:*",
-    "@stone-js/use-react": "workspace:*",
-    "@stone-js/use-view": "workspace:*",
+    "@stone-js/browser-adapter": "^0.8.3",
+    "@stone-js/core": "^0.8.3",
+    "@stone-js/node-http-adapter": "^0.8.3",
+    "@stone-js/router": "^0.8.3",
+    "@stone-js/use-react": "^0.8.3",
+    "@stone-js/use-view": "^0.8.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@stone-js/cli": "workspace:*"
+    "@stone-js/cli": "^0.8.3"
   }
 }

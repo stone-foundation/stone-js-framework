@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/node-cli-adapter",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "CLI adapter for Stone.js. Enables command-line execution and custom commands using the Continuum Architecture.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

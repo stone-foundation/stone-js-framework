@@ -149,6 +149,17 @@ describe('InstallDependenciesMiddleware', () => {
     expect(result).toBe('next-called')
   })
 
+  it('re-reads package.json after install so the chosen modules survive finalize', async () => {
+    const installed = { name: 'app', dependencies: { '@stone-js/core': '^0.8.3', '@stone-js/router': '^0.8.3' } }
+    vi.mocked(fsExtra.readJsonSync).mockReturnValue(installed)
+
+    await InstallDependenciesMiddleware(mockContext, next)
+
+    // The freshly-installed manifest (with the modules) must be pushed back onto the blueprint,
+    // otherwise FinalizeMiddleware would rewrite the stale pre-install copy and drop the modules.
+    expect(mockContext.blueprint.add).toHaveBeenCalledWith('stone.createApp', { packageJson: installed })
+  })
+
   it('uses yarn if selected as package manager', async () => {
     mockContext.blueprint.get.mockReturnValue({
       testing: 'jest',

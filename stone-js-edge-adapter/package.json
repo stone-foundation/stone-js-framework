@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/edge-adapter",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Deploy a Stone.js app to any WinterCG/edge or JS runtime — Cloudflare Workers, Vercel Edge, Netlify Edge, Deno and Bun — with one-line serve helpers on top of @stone-js/fetch-adapter. Build once, deploy anywhere.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

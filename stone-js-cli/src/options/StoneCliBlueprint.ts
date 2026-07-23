@@ -2,6 +2,7 @@ import { BuilderConfig, builder } from './BuilderConfig'
 import { ConsoleErrorHandler } from '../ConsoleErrorHandler'
 import { CreateAppConfig, createApp } from './CreateAppConfig'
 import { NODE_CONSOLE_PLATFORM } from '@stone-js/node-cli-adapter'
+import { PrintBannerHook } from '../PrintBannerHook'
 import { EnsureStoneProjectHook } from '../EnsureStoneProjectHook'
 import { metaCLIBlueprintMiddleware } from '../middleware/BlueprintMiddleware'
 import { AppConfig, IncomingEvent, OutgoingResponse, StoneBlueprint } from '@stone-js/core'
@@ -47,7 +48,9 @@ export const stoneCliBlueprint: StoneCliBlueprint = {
       }
     },
     lifecycleHooks: {
-      onExecutingEventHandler: [EnsureStoneProjectHook]
+      // The banner (signature) runs first so every command shows it, even before the
+      // not-a-Stone-project guard can reject.
+      onExecutingEventHandler: [PrintBannerHook, EnsureStoneProjectHook]
     }
   }
 }

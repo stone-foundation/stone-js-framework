@@ -66,11 +66,36 @@ export class Questionnaire {
    */
   private get stoneModules (): Array<Record<'value' | 'title', string>> {
     return [
-      { value: '@stone-js/env', title: 'Stone.js Dotenv' },
-      { value: '@stone-js/router', title: 'Stone.js Router' },
-      { value: '@stone-js/node-cli-adapter', title: 'Node Console Adapter' },
-      { value: '@stone-js/aws-lambda-adapter', title: 'AWS Lambda Adapter' },
-      { value: '@stone-js/aws-lambda-http-adapter', title: 'AWS Lambda HTTP Adapter' }
+      // Core
+      { value: '@stone-js/router', title: 'Router (universal routing)' },
+      { value: '@stone-js/env', title: 'Dotenv (environment variables)' },
+      // Frontend
+      { value: '@stone-js/use-react', title: 'React (SSR / SSG / SPA)' },
+      { value: '@stone-js/use-view', title: 'View engine (framework-agnostic)' },
+      { value: '@stone-js/browser-adapter', title: 'Browser Adapter (SPA)' },
+      // Node runtimes
+      { value: '@stone-js/node-http-adapter', title: 'Node HTTP Adapter (server)' },
+      { value: '@stone-js/node-cli-adapter', title: 'Node Console Adapter (CLI)' },
+      { value: '@stone-js/node-ws-adapter', title: 'Node WebSocket Adapter' },
+      // Edge / Web-standard
+      { value: '@stone-js/fetch-adapter', title: 'Fetch Adapter (Web-standard Request)' },
+      { value: '@stone-js/edge-adapter', title: 'Edge Adapter (edge runtimes)' },
+      // AWS
+      { value: '@stone-js/aws-lambda-http-adapter', title: 'AWS Lambda HTTP Adapter' },
+      { value: '@stone-js/aws-lambda-adapter', title: 'AWS Lambda Adapter (generic events)' },
+      { value: '@stone-js/aws-apigw-ws-adapter', title: 'AWS API Gateway WebSocket Adapter' },
+      // Azure
+      { value: '@stone-js/azure-functions-http-adapter', title: 'Azure Functions HTTP Adapter' },
+      { value: '@stone-js/azure-functions-adapter', title: 'Azure Functions Adapter (generic)' },
+      // GCP
+      { value: '@stone-js/gcp-cloud-functions-http-adapter', title: 'GCP Cloud Functions HTTP Adapter' },
+      { value: '@stone-js/gcp-cloud-functions-adapter', title: 'GCP Cloud Functions Adapter (generic)' },
+      // Tencent
+      { value: '@stone-js/tencent-scf-http-adapter', title: 'Tencent SCF HTTP Adapter' },
+      { value: '@stone-js/tencent-scf-adapter', title: 'Tencent SCF Adapter (generic)' },
+      // Alibaba
+      { value: '@stone-js/alibaba-fc-http-adapter', title: 'Alibaba FC HTTP Adapter' },
+      { value: '@stone-js/alibaba-fc-adapter', title: 'Alibaba FC Adapter (generic)' }
     ]
   }
 

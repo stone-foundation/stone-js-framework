@@ -100,6 +100,13 @@ export const InstallDependenciesMiddleware = async (
     stdio: 'inherit'
   })
 
+  // The package manager just rewrote package.json on disk with the chosen modules in
+  // `dependencies`. Re-read it so the finalize step writes THAT manifest, not the stale copy
+  // captured before install (which would silently drop every module the user selected).
+  if (destDir !== undefined) {
+    context.blueprint.add('stone.createApp', { packageJson: readJsonSync(join(destDir, 'package.json')) })
+  }
+
   return await next(context)
 }
 

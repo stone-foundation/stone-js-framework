@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/create",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Scaffold a new Stone.js app in seconds using your terminal.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
