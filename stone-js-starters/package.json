@@ -24,18 +24,163 @@
   },
   "stone": {
     "starters": [
-      { "value": "basic-service-declarative", "title": "Basic · service · declarative", "description": "Minimal HTTP/service API, decorator API.", "tags": ["api", "service", "basic", "declarative"], "path": "basic-service-declarative" },
-      { "value": "basic-service-imperative", "title": "Basic · service · imperative", "description": "Minimal HTTP/service API, imperative API.", "tags": ["api", "service", "basic", "imperative"], "path": "basic-service-imperative" },
-      { "value": "basic-react-declarative", "title": "Basic · React · declarative", "description": "Minimal React SPA, decorator API.", "tags": ["react", "spa", "basic", "declarative"], "path": "basic-react-declarative" },
-      { "value": "basic-react-imperative", "title": "Basic · React · imperative", "description": "Minimal React SPA, imperative API.", "tags": ["react", "spa", "basic", "imperative"], "path": "basic-react-imperative" },
-      { "value": "standard-service-declarative", "title": "Standard · service · declarative", "description": "Common service setup, decorator API.", "tags": ["api", "service", "standard", "declarative"], "path": "standard-service-declarative" },
-      { "value": "standard-service-imperative", "title": "Standard · service · imperative", "description": "Common service setup, imperative API.", "tags": ["api", "service", "standard", "imperative"], "path": "standard-service-imperative" },
-      { "value": "standard-react-declarative", "title": "Standard · React · declarative (SSR)", "description": "React with SSR, decorator API.", "tags": ["react", "ssr", "standard", "declarative"], "path": "standard-react-declarative" },
-      { "value": "standard-react-imperative", "title": "Standard · React · imperative (SSR)", "description": "React with SSR, imperative API.", "tags": ["react", "ssr", "standard", "imperative"], "path": "standard-react-imperative" },
-      { "value": "full-service-declarative", "title": "Full · service · declarative", "description": "Full-featured service, decorator API.", "tags": ["api", "service", "full", "declarative"], "path": "full-service-declarative" },
-      { "value": "full-service-imperative", "title": "Full · service · imperative", "description": "Full-featured service, imperative API.", "tags": ["api", "service", "full", "imperative"], "path": "full-service-imperative" },
-      { "value": "full-react-declarative", "title": "Full · React · declarative (SSR/SSG)", "description": "Full React with SSR & SSG, decorator API.", "tags": ["react", "ssr", "ssg", "full", "declarative"], "path": "full-react-declarative" },
-      { "value": "full-react-imperative", "title": "Full · React · imperative (SSR/SSG)", "description": "Full React with SSR & SSG, imperative API.", "tags": ["react", "ssr", "ssg", "full", "imperative"], "path": "full-react-imperative" }
+      {
+        "value": "basic-service-declarative",
+        "title": "Basic · service · declarative",
+        "description": "Minimal HTTP/service API, decorator API.",
+        "tags": [
+          "api",
+          "service",
+          "basic",
+          "declarative"
+        ],
+        "path": "basic-service-declarative"
+      },
+      {
+        "value": "basic-service-imperative",
+        "title": "Basic · service · imperative",
+        "description": "Minimal HTTP/service API, imperative API.",
+        "tags": [
+          "api",
+          "service",
+          "basic",
+          "imperative"
+        ],
+        "path": "basic-service-imperative"
+      },
+      {
+        "value": "basic-react-declarative",
+        "title": "Basic · React · declarative",
+        "description": "Minimal React SPA, decorator API.",
+        "tags": [
+          "react",
+          "spa",
+          "basic",
+          "declarative"
+        ],
+        "path": "basic-react-declarative"
+      },
+      {
+        "value": "basic-react-imperative",
+        "title": "Basic · React · imperative",
+        "description": "Minimal React SPA, imperative API.",
+        "tags": [
+          "react",
+          "spa",
+          "basic",
+          "imperative"
+        ],
+        "path": "basic-react-imperative"
+      },
+      {
+        "value": "standard-service-declarative",
+        "title": "Standard · service · declarative",
+        "description": "Common service setup, decorator API.",
+        "tags": [
+          "api",
+          "service",
+          "standard",
+          "declarative"
+        ],
+        "path": "standard-service-declarative"
+      },
+      {
+        "value": "standard-service-imperative",
+        "title": "Standard · service · imperative",
+        "description": "Common service setup, imperative API.",
+        "tags": [
+          "api",
+          "service",
+          "standard",
+          "imperative"
+        ],
+        "path": "standard-service-imperative"
+      },
+      {
+        "value": "standard-react-declarative",
+        "title": "Standard · React · declarative (SSR)",
+        "description": "React with SSR, decorator API.",
+        "tags": [
+          "react",
+          "ssr",
+          "standard",
+          "declarative"
+        ],
+        "path": "standard-react-declarative"
+      },
+      {
+        "value": "standard-react-imperative",
+        "title": "Standard · React · imperative (SSR)",
+        "description": "React with SSR, imperative API.",
+        "tags": [
+          "react",
+          "ssr",
+          "standard",
+          "imperative"
+        ],
+        "path": "standard-react-imperative"
+      },
+      {
+        "value": "full-service-declarative",
+        "title": "Full · service · declarative",
+        "description": "Full-featured service, decorator API.",
+        "tags": [
+          "api",
+          "service",
+          "full",
+          "declarative"
+        ],
+        "path": "full-service-declarative"
+      },
+      {
+        "value": "full-service-imperative",
+        "title": "Full · service · imperative",
+        "description": "Full-featured service, imperative API.",
+        "tags": [
+          "api",
+          "service",
+          "full",
+          "imperative"
+        ],
+        "path": "full-service-imperative"
+      },
+      {
+        "value": "full-react-declarative",
+        "title": "Full · React · declarative (SSR/SSG)",
+        "description": "Full React with SSR & SSG, decorator API.",
+        "tags": [
+          "react",
+          "ssr",
+          "ssg",
+          "full",
+          "declarative"
+        ],
+        "path": "full-react-declarative"
+      },
+      {
+        "value": "full-react-imperative",
+        "title": "Full · React · imperative (SSR/SSG)",
+        "description": "Full React with SSR & SSG, imperative API.",
+        "tags": [
+          "react",
+          "ssr",
+          "ssg",
+          "full",
+          "imperative"
+        ],
+        "path": "full-react-imperative"
+      },
+      {
+        "value": "continuum-showcase",
+        "title": "Continuum showcase",
+        "description": "One domain served over HTTP, edge, CLI and agent tools, both paradigms side by side.",
+        "tags": [
+          "showcase",
+          "continuum",
+          "full"
+        ],
+        "path": "continuum-showcase"
+      }
     ]
   },
   "scripts": {
