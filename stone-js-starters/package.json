@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/starters",
-  "version": "0.0.1",
+  "version": "0.8.3",
   "description": "This repository contains official **starter templates** for Stone.js applications.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
@@ -203,5 +203,14 @@
       "describe",
       "beforeEach"
     ]
+  },
+  "files": [
+    "basic-*",
+    "standard-*",
+    "full-*",
+    "continuum-showcase"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

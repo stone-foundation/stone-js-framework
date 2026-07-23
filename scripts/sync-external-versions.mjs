@@ -67,10 +67,26 @@ function syncManifest (file, version) {
   return changed
 }
 
+/** Set a package's own `version` field (used for the published `@stone-js/starters` collection). */
+function setOwnVersion (file, version) {
+  if (!existsSync(file)) { return false }
+  const pkg = JSON.parse(readFileSync(file, 'utf-8'))
+  if (pkg.version === version) { return false }
+  pkg.version = version
+  writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n')
+  return true
+}
+
 function main () {
   const version = targetVersion()
   let total = 0
   let touched = 0
+
+  // The published starter collection tracks the framework version, so `@stone-js/starters@x`
+  // always ships the templates that install `@stone-js/*@x`.
+  if (setOwnVersion(join(ROOT, 'stone-js-starters', 'package.json'), version)) {
+    console.log(`  stone-js-starters/package.json: version -> ${version}`)
+  }
 
   for (const file of externalManifests()) {
     const changed = syncManifest(file, version)
