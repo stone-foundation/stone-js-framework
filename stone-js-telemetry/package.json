@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/telemetry",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Framework-agnostic telemetry for Stone.js: spans, counters and gauges wired through the kernel hooks and middleware, with pluggable exporters (console by default, OpenTelemetry-friendly).",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

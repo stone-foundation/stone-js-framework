@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/browser-adapter",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Browser adapter for Stone.js. Enables SPA runtime support, unified event handling, and cookie management in the browser, part of the Continuum Architecture.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

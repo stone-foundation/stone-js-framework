@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/cache",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Agnostic cache for Stone.js: get/set/ttl/tags/remember on a store contract, with memory and Redis drivers, decorators (@Cache, @Cacheable, @CacheEvict, @CachePut), and a cacheManager injected in the container.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/config",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Fluent and simple API with deep dot access to manage configurations in JavaScript/TypeScript any project",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
