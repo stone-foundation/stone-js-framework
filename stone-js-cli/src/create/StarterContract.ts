@@ -55,7 +55,7 @@ export interface StarterFetchContext {
  * The built-in default starter link. It is just a LINK — the CLI stays agnostic; the actual
  * starter set is declared by that package's own `stone.starters` manifest.
  */
-export const DEFAULT_STARTER_LINK = 'github:stone-foundation/stone-js-starters'
+export const DEFAULT_STARTER_LINK = 'github:stone-foundation/stone-js-framework'
 
 /**
  * Resolves the starter links to use: those given via `--starters` / `stone.createApp.starters`,

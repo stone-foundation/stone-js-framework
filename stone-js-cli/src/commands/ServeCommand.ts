@@ -74,8 +74,6 @@ export class ServeCommand {
    * @param event - The incoming event.
    */
   async handle (event: IncomingEvent): Promise<void> {
-    this.reporter.banner()
-
     if (isReactApp(this.context.blueprint, event)) {
       await this.startReactServer(event)
     } else {

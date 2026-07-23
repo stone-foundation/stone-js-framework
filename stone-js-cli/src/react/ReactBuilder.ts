@@ -37,7 +37,6 @@ export class ReactBuilder {
     const [rendering, buildMiddleware] = this.getBuildMiddleware(event)
     const startedAt = Date.now()
 
-    reporter.banner()
     reporter.step(`Building React application (${rendering})…`)
 
     await this.executeThroughPipeline(buildMiddleware)
