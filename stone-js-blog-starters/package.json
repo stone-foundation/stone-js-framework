@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/blog-starters",
-  "version": "0.0.1",
-  "description": "Opt-in starter templates that ship with the Stone.js blog recipes. Kept separate from the default starters so `npm create @stone-js` stays uncluttered; request them with `--starters github:stone-foundation/stone-js-blog-starters`.",
+  "version": "0.8.3",
+  "description": "Opt-in starter templates that ship with the Stone.js blog recipes. Kept separate from the default starters so `npm create @stone-js` stays uncluttered; request them with `--starters @stone-js/blog-starters`.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -26,13 +26,85 @@
   },
   "stone": {
     "starters": [
-      { "value": "realtime-chat", "title": "Realtime chat", "description": "Channels, presence and broadcast over WebSockets with @stone-js/realtime.", "tags": ["realtime", "websocket", "node-ws"], "path": "realtime-chat" },
-      { "value": "multi-tenant", "title": "Multi-tenant (subdomain routing)", "description": "Capture the tenant from the subdomain and scope every request to it, with the universal router.", "tags": ["routing", "multi-tenant", "subdomain"], "path": "multi-tenant" },
-      { "value": "isomorphic-validation", "title": "Isomorphic validation", "description": "One schema, enforced at the API boundary (422) and reusable on the frontend form, with @stone-js/validation + Zod.", "tags": ["validation", "zod", "dx"], "path": "isomorphic-validation" },
-      { "value": "stateless-auth", "title": "Stateless auth", "description": "Verify a JWT at the boundary and guard routes with requireAuth/requireScopes, no session store, with @stone-js/auth.", "tags": ["auth", "jwt", "edge", "security"], "path": "stateless-auth" },
-      { "value": "api-as-tools", "title": "API as agent tools", "description": "Expose the same domain served over HTTP to AI agents as MCP tools by stacking the MCP adapter.", "tags": ["mcp", "agents", "ai"], "path": "api-as-tools" },
-      { "value": "openapi-contract", "title": "OpenAPI contract from your schemas", "description": "Generate a public OpenAPI document from the Zod schemas you already validate with, and serve it with Swagger UI.", "tags": ["openapi", "validation", "api"], "path": "openapi-contract" },
-      { "value": "signed-url-uploads", "title": "Direct-to-cloud uploads", "description": "Direct-to-cloud file uploads with short-lived signed URLs, the bytes never touch your function, with @stone-js/cloud-file.", "tags": ["storage", "s3", "uploads"], "path": "signed-url-uploads" }
+      {
+        "value": "realtime-chat",
+        "title": "Realtime chat",
+        "description": "Channels, presence and broadcast over WebSockets with @stone-js/realtime.",
+        "tags": [
+          "realtime",
+          "websocket",
+          "node-ws"
+        ],
+        "path": "realtime-chat"
+      },
+      {
+        "value": "multi-tenant",
+        "title": "Multi-tenant (subdomain routing)",
+        "description": "Capture the tenant from the subdomain and scope every request to it, with the universal router.",
+        "tags": [
+          "routing",
+          "multi-tenant",
+          "subdomain"
+        ],
+        "path": "multi-tenant"
+      },
+      {
+        "value": "isomorphic-validation",
+        "title": "Isomorphic validation",
+        "description": "One schema, enforced at the API boundary (422) and reusable on the frontend form, with @stone-js/validation + Zod.",
+        "tags": [
+          "validation",
+          "zod",
+          "dx"
+        ],
+        "path": "isomorphic-validation"
+      },
+      {
+        "value": "stateless-auth",
+        "title": "Stateless auth",
+        "description": "Verify a JWT at the boundary and guard routes with requireAuth/requireScopes, no session store, with @stone-js/auth.",
+        "tags": [
+          "auth",
+          "jwt",
+          "edge",
+          "security"
+        ],
+        "path": "stateless-auth"
+      },
+      {
+        "value": "agent-superpowers",
+        "title": "Agent superpowers (MCP dev)",
+        "description": "Give your coding agent superpowers with `stone mcp` (@stone-js/mcp-dev): serve the framework's knowledge and this app's own structure as tools.",
+        "tags": [
+          "mcp",
+          "mcp-dev",
+          "agents",
+          "dx"
+        ],
+        "path": "agent-superpowers"
+      },
+      {
+        "value": "openapi-contract",
+        "title": "OpenAPI contract from your schemas",
+        "description": "Generate a public OpenAPI document from the Zod schemas you already validate with, and serve it with Swagger UI.",
+        "tags": [
+          "openapi",
+          "validation",
+          "api"
+        ],
+        "path": "openapi-contract"
+      },
+      {
+        "value": "signed-url-uploads",
+        "title": "Direct-to-cloud uploads",
+        "description": "Direct-to-cloud file uploads with short-lived signed URLs, the bytes never touch your function, with @stone-js/cloud-file.",
+        "tags": [
+          "storage",
+          "s3",
+          "uploads"
+        ],
+        "path": "signed-url-uploads"
+      }
     ]
   },
   "scripts": {
@@ -47,5 +119,17 @@
     "ts-standard": "^12.0.2",
     "tslib": "^2.8.1",
     "typescript": "^5.6.3"
+  },
+  "files": [
+    "agent-superpowers",
+    "isomorphic-validation",
+    "multi-tenant",
+    "openapi-contract",
+    "realtime-chat",
+    "signed-url-uploads",
+    "stateless-auth"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

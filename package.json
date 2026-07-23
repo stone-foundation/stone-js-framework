@@ -22,7 +22,7 @@
     "audit:ci": "pnpm audit --audit-level=high",
     "changeset": "changeset",
     "version-packages": "changeset version && node scripts/sync-external-versions.mjs",
-    "release": "pnpm run clean && pnpm run build:ci && changeset publish && node scripts/publish-starters.mjs",
+    "release": "pnpm run clean && pnpm run build:ci && changeset publish",
     "prepare": "husky",
     "sync:versions": "node scripts/sync-external-versions.mjs"
   },

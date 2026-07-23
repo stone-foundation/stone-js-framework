@@ -3,12 +3,13 @@
  * Keep the version-pinned `@stone-js/*` dependencies of the NON auto-versioned packages aligned
  * with the monorepo's current version.
  *
- * Workspace packages (core, router, adapters, cli, ...) reference each other with `workspace:*`
- * and are bumped together by changesets, so they never drift. But the packages that are excluded
- * from the workspace and from the release, the starters, the blog starters and the docs site,
- * pin concrete ranges like `^0.8.0`. Left alone, those go stale every release. This script rewrites
- * every concrete `@stone-js/*` range in those packages to `^<monorepo version>`, so a fresh app
- * scaffolded from a starter always installs the version that was just published.
+ * Workspace packages (core, router, adapters, cli, the `@stone-js/starters` and
+ * `@stone-js/blog-starters` collections, ...) reference each other with `workspace:*` and are
+ * versioned/published together by changesets, so they never drift. But the template files SHIPPED
+ * inside the two collections, plus the docs site, are not workspace packages: they pin concrete
+ * ranges like `^0.8.0` and go stale every release. This script rewrites every concrete `@stone-js/*`
+ * range in them to `^<monorepo version>`, so a fresh app scaffolded from a starter always installs
+ * the version that was just published.
  *
  * `workspace:*` deps (e.g. the lab apps) are left untouched: pnpm already links them to the local
  * packages, so they are always current by construction.
@@ -27,18 +28,26 @@ function targetVersion () {
   return core.version
 }
 
-/** package.json files of the non auto-versioned packages: starters, blog starters, docs. */
-function externalManifests () {
-  const files = []
-  for (const group of ['stone-js-starters', 'stone-js-blog-starters']) {
-    const dir = join(ROOT, group)
-    if (!existsSync(dir)) { continue }
-    files.push(join(dir, 'package.json')) // the collection manifest itself
-    for (const name of readdirSync(dir)) {
-      const pkg = join(dir, name, 'package.json')
-      if (statSync(join(dir, name)).isDirectory() && existsSync(pkg)) { files.push(pkg) }
-    }
+/** Every `package.json` under `dir` (its own manifest + one level of sub-folders). */
+function manifestsUnder (dir, { includeRoot }) {
+  if (!existsSync(dir)) { return [] }
+  const files = includeRoot ? [join(dir, 'package.json')] : []
+  for (const name of readdirSync(dir)) {
+    const pkg = join(dir, name, 'package.json')
+    if (statSync(join(dir, name)).isDirectory() && existsSync(pkg)) { files.push(pkg) }
   }
+  return files
+}
+
+/** package.json files whose `@stone-js/*` ranges changesets does not maintain. */
+function externalManifests () {
+  const files = [
+    // The `@stone-js/starters` and `@stone-js/blog-starters` collections are workspace packages
+    // (changesets owns their versions); only the templates they SHIP pin concrete ranges, so sync
+    // the sub-folders and skip the collection roots.
+    ...manifestsUnder(join(ROOT, 'stone-js-starters'), { includeRoot: false }),
+    ...manifestsUnder(join(ROOT, 'stone-js-blog-starters'), { includeRoot: false })
+  ]
   const docs = join(ROOT, 'stone-js-docs', 'package.json')
   if (existsSync(docs)) { files.push(docs) }
   return files
@@ -67,26 +76,10 @@ function syncManifest (file, version) {
   return changed
 }
 
-/** Set a package's own `version` field (used for the published `@stone-js/starters` collection). */
-function setOwnVersion (file, version) {
-  if (!existsSync(file)) { return false }
-  const pkg = JSON.parse(readFileSync(file, 'utf-8'))
-  if (pkg.version === version) { return false }
-  pkg.version = version
-  writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n')
-  return true
-}
-
 function main () {
   const version = targetVersion()
   let total = 0
   let touched = 0
-
-  // The published starter collection tracks the framework version, so `@stone-js/starters@x`
-  // always ships the templates that install `@stone-js/*@x`.
-  if (setOwnVersion(join(ROOT, 'stone-js-starters', 'package.json'), version)) {
-    console.log(`  stone-js-starters/package.json: version -> ${version}`)
-  }
 
   for (const file of externalManifests()) {
     const changed = syncManifest(file, version)

@@ -205,9 +205,18 @@
     ]
   },
   "files": [
-    "basic-*",
-    "standard-*",
-    "full-*",
+    "basic-service-declarative",
+    "basic-service-imperative",
+    "basic-react-declarative",
+    "basic-react-imperative",
+    "standard-service-declarative",
+    "standard-service-imperative",
+    "standard-react-declarative",
+    "standard-react-imperative",
+    "full-service-declarative",
+    "full-service-imperative",
+    "full-react-declarative",
+    "full-react-imperative",
     "continuum-showcase"
   ],
   "publishConfig": {
