@@ -30,8 +30,7 @@
     "axios": "^1.7.9",
     "dayjs": "^1.11.13",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-pull-to-refresh": "^2.0.1"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.25.9",

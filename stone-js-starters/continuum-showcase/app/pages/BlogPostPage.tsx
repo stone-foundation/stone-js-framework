@@ -1,6 +1,6 @@
 import React from 'react'
-import { Page } from '@stone-js/router'
 import {
+  Page,
   createHead,
   IPage,
   PageRenderContext,

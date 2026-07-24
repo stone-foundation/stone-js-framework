@@ -50,6 +50,7 @@ export class WelcomePage implements IPage<ReactIncomingEvent> {
   render ({ data }: PageRenderContext<ResponseData>): JSX.Element {
     return (
       <section className='container'>
+        <img src='/logo.svg' alt='Stone.js' width={96} height={96} />
         <h1 className='h1 text-center mt-64'>{data?.message}</h1>
       </section>
     )

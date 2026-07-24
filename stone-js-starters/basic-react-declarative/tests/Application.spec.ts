@@ -83,7 +83,7 @@ describe('Application', () => {
     expect(mockedLogger.info).toHaveBeenCalledWith(expectedMessage)
   })
 
-  it('should render component', () => {
+  it('should render the message', () => {
     // Arrange
     const message = 'Hello World!'
 
@@ -91,6 +91,15 @@ describe('Application', () => {
     const response = renderToString(app.render({ data: { message } } as any))
 
     // Assert
-    expect(response).toMatchSnapshot()
+    expect(response).toContain(message)
+  })
+
+  it('should render the Stone.js logo', () => {
+    // Act
+    const response = renderToString(app.render({ data: { message: 'Hello World!' } } as any))
+
+    // Assert
+    expect(response).toContain('/logo.svg')
+    expect(response).toContain('alt="Stone.js"')
   })
 })

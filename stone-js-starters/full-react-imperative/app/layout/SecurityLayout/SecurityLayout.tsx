@@ -18,7 +18,7 @@ export const SecurityLayout = (): IPageLayout => ({
         <header className='mt-64'>
           <div className='container'>
             <p className='pa-24'>
-              <img src='/logo.png' className='logo' alt='Stone.js Logo' />
+              <img src='/logo.svg' className='logo' alt='Stone.js' />
             </p>
           </div>
         </header>

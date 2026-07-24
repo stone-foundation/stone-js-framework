@@ -6,7 +6,7 @@ At the heart of the Continuum Architecture lies a simple equation:
 
 > **Application = Domain × Context → Resolution**
 
-In this vision, **an application is not an object**, but an **event**: the act of applying structured domain logic to a real-world context in order to resolve an intention.  
+In this vision, **an application is not an artefact**, but an **event**: the act of applying structured domain logic to a real-world context in order to resolve an intention.  
 This architecture treats both **domain** and **context** as first-class citizens, separated in design, inseparable in execution.
 
 ## Stone.js: The Runtime Context for Your Domain

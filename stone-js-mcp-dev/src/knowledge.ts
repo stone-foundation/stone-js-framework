@@ -1,7 +1,7 @@
 import { BestPractice, Concept, Gap, KnowledgeBase, ModuleInfo } from './declarations'
 
 const concepts: Concept[] = [
-  { id: 'continuum', title: 'Continuum Architecture', summary: 'An application is not an object but an act: Application = Domain × Context → Resolution. Stone.js IS the context: you write your domain once and the context applies to it at runtime. Focus on your domain during development; choose where to deploy at the end.' },
+  { id: 'continuum', title: 'Continuum Architecture', summary: 'An application is not an artefact but an act: Application = Domain × Context → Resolution. Stone.js IS the context: you write your domain once and the context applies to it at runtime. Focus on your domain during development; choose where to deploy at the end.' },
   { id: 'domain-vs-context', title: 'Domain vs Context', summary: 'The domain is your business logic (handlers, services). The context is the execution environment (HTTP, CLI, browser, edge, MCP). Stone.js owns the context so a single domain runs in any of them — backend, frontend, and mobile later.' },
   { id: 'blueprint', title: 'Blueprint (Setup)', summary: 'A single configuration manifest built once before any event, by introspecting decorators or via imperative meta-modules. All configuration lives under dotted `stone.*` keys.' },
   { id: 'kernel', title: 'Kernel (Initialization)', summary: 'Applies the container (an ephemeral per-event execution context) and the domain to the intention; runs middleware, hooks and error handlers. The micro-kernel depends only on pipeline, service-container and config.' },

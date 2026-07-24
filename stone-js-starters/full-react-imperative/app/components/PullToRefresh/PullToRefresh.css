@@ -1,0 +1,10 @@
+.pull-to-refresh {
+  will-change: transform;
+}
+
+.pull-to-refresh__indicator {
+  text-align: center;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
