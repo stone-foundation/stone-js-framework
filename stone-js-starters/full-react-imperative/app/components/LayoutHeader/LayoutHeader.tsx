@@ -27,7 +27,7 @@ export const LayoutHeader: FC<LayoutHeaderOptions> = ({ container }) => {
     <nav className='app-navbar'>
       <div className='header-left'>
         <StoneLink to='/' className='logo'>
-          <img src='/logo.png' alt='Stone.js Logo' />
+          <img src='/logo.svg' alt='Stone.js' width={96} height={96} />
           <span>Stone.js</span>
         </StoneLink>
       </div>

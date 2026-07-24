@@ -1,3 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`Application > should render component 1`] = `"<section class="container"><h1 class="h1 text-center mt-64">Hello World!</h1></section>"`;

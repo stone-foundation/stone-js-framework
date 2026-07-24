@@ -1,7 +1,7 @@
 import React from 'react'
-import { Page } from '@stone-js/router'
-import logo from '@img/logo.png'
+import logo from '@img/logo.svg'
 import {
+  Page,
   createHead,
   IPage,
   PageRenderContext,

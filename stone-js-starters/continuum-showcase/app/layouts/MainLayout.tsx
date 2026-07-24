@@ -1,6 +1,5 @@
 import React from 'react'
-import { PageLayout } from '@stone-js/router'
-import { IPageLayout, PageLayoutRenderContext } from '@stone-js/use-react'
+import { PageLayout, IPageLayout, PageLayoutRenderContext } from '@stone-js/use-react'
 
 /**
  * The default layout. In a future iteration (hierarchical heads), a layout may also
