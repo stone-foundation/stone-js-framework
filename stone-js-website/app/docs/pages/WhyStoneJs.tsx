@@ -108,7 +108,7 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
 
         <H2>The claim</H2>
         <p>
-          An application is not an object you build for one place. It is an act:
+          An application is not an artefact you build for one place. It is an act:
           a domain, meeting a context, resolving into a response. Stone.js is the context.
           You keep the part that is yours, the <em>what</em>, and defer the part that is the
           platform's, the <em>where</em>, until the last responsible moment: run time.

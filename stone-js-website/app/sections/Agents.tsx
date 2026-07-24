@@ -10,7 +10,7 @@ const SCRIPT: ConsoleLine[] = [
   { who: 'agent', msg: 'stone_routes' },
   { who: 'stone', msg: 'GET /tasks (Tasks.list) · POST /tasks (Tasks.create)' },
   { who: 'agent', msg: 'stone_concept { id: "continuum" }' },
-  { who: 'stone', msg: '"An application is not an object. It is an act."' }
+  { who: 'stone', msg: '"An application is not an artefact. It is an act."' }
 ]
 
 /**
@@ -67,8 +67,7 @@ export function Agents (): JSX.Element {
             <h2>Your domain, observable by machines.</h2>
             <p className='muted' style={{ marginTop: 16, fontSize: 18 }}>
               Agents are the next execution context, and Stone.js treats them as first-class:
-              the agent that builds your app, and the agent that calls it. No other framework is
-              built this way.
+              the agent that builds your app, and the agent that calls it.
             </p>
             <div className='agent-offer'>
               <div className='offer'>

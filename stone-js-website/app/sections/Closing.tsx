@@ -13,7 +13,7 @@ export function Manifesto (): JSX.Element {
       <div className='wrap'>
         <Reveal>
           <p className='eyebrow' style={{ textAlign: 'center' }}><span className='psi'>ψ</span>Before the framework</p>
-          <blockquote>“An application is not an object.<br />It is <em>an act</em>.”</blockquote>
+          <blockquote>“An application is not an artefact.<br />It is <em>an act</em>.”</blockquote>
           <p className='src'>The Continuum Architecture manifesto</p>
           <a className='btn btn-ghost' href={MANIFESTO_URL} target='_blank' rel='noopener noreferrer'>Read the manifesto →</a>
         </Reveal>

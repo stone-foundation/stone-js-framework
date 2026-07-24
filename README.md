@@ -15,7 +15,7 @@
 
 > **Your app exists in every runtime. Until you run it.** A universal, cloud-native micro-kernel framework: one codebase for backend **and** frontend, running on Node, serverless (FaaS), the browser, the CLI, the edge and AI agents.
 
-Stone.js is the reference implementation of the [**Continuum Architecture**](https://evens-stone.github.io/continuum-manifesto/manifesto): an application is not an object but an *act*, `Application = Domain × Context → Resolution`. You write your **domain** once; Stone.js **is the context** that applies to it at run time.
+Stone.js is the reference implementation of the [**Continuum Architecture**](https://evens-stone.github.io/continuum-manifesto/manifesto): an application is not an artefact but an *act*, `Application = Domain × Context → Resolution`. You write your **domain** once; Stone.js **is the context** that applies to it at run time.
 
 This repository is the **monorepo** for the whole framework: every `@stone-js/*` package lives here and is released together (lockstep) with [changesets](https://github.com/changesets/changesets).
 

@@ -19,9 +19,9 @@ export class IntroducingStoneJs implements IPage<ReactIncomingEvent> {
     return (
       <ArticleLayout slug={SLUG}>
         <p className='doc-lead'>
-          Most frameworks treat an application as an object: a thing bound to a runtime, wired to HTTP,
+          Most frameworks treat an application as an artefact: a thing bound to a runtime, wired to HTTP,
           to a server, to one place it can live. Change the place and you rewrite the thing. Stone.js
-          starts from the opposite idea. An application is not an object. It is an <strong>act</strong>.
+          starts from the opposite idea. An application is not an artefact. It is an <strong>act</strong>.
         </p>
 
         <h2>An application is an act</h2>

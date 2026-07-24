@@ -39,7 +39,7 @@ That’s not developer freedom, that’s architectural debt.
 
 We do not create applications, 
 we create systems that allow them to emerge,
-because an application is not an object, it’s an action: the act of applying your domain to a real context, to meet a need.  
+because an application is not an artefact, it’s an action: the act of applying your domain to a real context, to meet a need.  
 Most frameworks ask you to choose your context up front, are you building for Node? The browser? Serverless? CLI? React? Vue?  
 You end up adapting the same logic again and again, just to fit into different runtimes or APIs.
 
