@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/cloud-file",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Cloud storage for Stone.js: drivers for the agnostic filesystem contract (S3 and S3-compatible: R2, MinIO, Spaces, OSS, COS) with signed upload/download URLs. GCS and Azure Blob to follow.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

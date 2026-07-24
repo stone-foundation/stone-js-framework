@@ -1,5 +1,11 @@
 # @stone-js/telemetry
 
+## 0.8.4
+
+### Patch Changes
+
+- @stone-js/core@0.8.4
+
 ## 0.8.3
 
 ### Patch Changes
