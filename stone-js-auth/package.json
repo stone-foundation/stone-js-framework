@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/auth",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Framework-agnostic, edge-native authentication for Stone.js. Stateless JWT/OAuth (access, id, refresh) built on jose — sign and verify tokens on Node, browser, Deno, Bun and the edge, with remote JWKS and scopes.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

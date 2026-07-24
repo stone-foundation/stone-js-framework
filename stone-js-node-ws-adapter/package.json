@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/node-ws-adapter",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Node.js WebSocket adapter for Stone.js: runs a `ws` server and bridges sockets to @stone-js/realtime (channels, presence, gateways), with optional per-message kernel dispatch.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

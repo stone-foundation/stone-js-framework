@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/use-view",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Framework-agnostic view engine layer for Stone.js: page/head contracts, rendering modes, XSS-safe SSR snapshot serialization, and the ViewEngine interface shared by use-react (and future use-vue).",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

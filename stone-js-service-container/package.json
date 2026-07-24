@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/service-container",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Javascript/Typescript IoC Service Container with proxy resolver and destructuring injection",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

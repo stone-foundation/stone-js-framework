@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/alibaba-fc-http-adapter",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Alibaba Cloud Function Compute HTTP adapter for Stone.js. Run your app on FC HTTP triggers (req, resp, context) using the Continuum Architecture.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
