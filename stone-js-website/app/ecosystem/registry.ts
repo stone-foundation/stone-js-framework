@@ -78,6 +78,7 @@ export const CATALOG: CatalogTier[] = [
       { name: '@stone-js/auth', desc: 'Stateless JWT / OAuth, edge-native, no session.', href: '/docs/extensions/auth' },
       { name: '@stone-js/authz', desc: 'Isomorphic RBAC + ABAC: one rule set, API and UI.', href: '/docs/extensions/authorization' },
       { name: '@stone-js/resources', desc: 'Deliberate projections from model to public shape.', href: '/docs/extensions/resources' },
+      { name: '@stone-js/i18n', desc: 'Isomorphic i18n: zero-config catalogs, per-request locale, native Intl, lazy by default.', href: '/docs/extensions/i18n' },
       { name: '@stone-js/cloud-file', desc: 'File storage over S3, GCS and Azure Blob, with signed URLs.', href: '/docs/extensions/cloud-file' },
       { name: '@stone-js/cache', desc: 'Memory and Redis caching with a single API.', href: '/docs/extensions/cache' },
       { name: '@stone-js/queue', desc: 'Dispatch now or later, process with a worker, retry with backoff.', href: '/docs/extensions/queue' },
@@ -86,7 +87,8 @@ export const CATALOG: CatalogTier[] = [
       { name: '@stone-js/config-source', desc: 'Load config from env, files, SSM, Secrets Manager, HTTP and KMS.', href: '/docs/extensions/config-source' },
       { name: '@stone-js/openapi', desc: 'A public contract derived from your schemas.', href: '/docs/extensions/openapi' },
       { name: '@stone-js/testing', desc: 'Boot the real app in memory; dispatch real events.', href: '/docs/extensions/testing' },
-      { name: '@stone-js/mcp-dev', desc: 'Serve the framework knowledge + your app to a coding agent via `stone mcp`.', href: '/docs/extensions/mcp' }
+      { name: '@stone-js/mcp-dev', desc: 'Serve the framework knowledge + your app to a coding agent via `stone mcp`.', href: '/docs/extensions/mcp' },
+      { name: '@stone-js/telemetry', desc: 'Observability: metrics, traces and structured logs behind one agnostic API.', href: '/docs/extensions/telemetry' }
     ]
   },
   {

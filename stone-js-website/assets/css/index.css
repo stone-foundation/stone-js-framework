@@ -634,8 +634,8 @@ html[data-paradigm="imperative"] .code-para .cp-imp { display: inline; }
 .mc-desc { font-size: 13.5px; color: var(--gres); margin: 0; line-height: 1.5; }
 @media (max-width: 620px) { .market-grid { grid-template-columns: 1fr; } }
 .eco-wrap { padding-bottom: 48px; }
-.eco-wrap .market-group { margin: 0 0 20px; }
-.eco-wrap .market-tier { font-family: var(--display); font-size: 22px; color: var(--encre); margin: 40px 0 4px; }
+.eco-wrap .market-group { margin: 0 0 14px; }
+.eco-wrap .market-tier { font-family: var(--display); font-size: 22px; color: var(--encre); margin: 26px 0 4px; }
 .eco-wrap .market-grid { grid-template-columns: repeat(3, 1fr); }
 a.market-card.is-link { text-decoration: none; color: inherit; display: block; }
 .mc-more { display: inline-block; margin-top: 12px; font-family: var(--mono); font-size: 11px; color: var(--braise); }

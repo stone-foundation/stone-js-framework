@@ -8,11 +8,12 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "stone dev",
-    "build": "stone build --ssg && node scripts/build-api.mjs && node scripts/build-feed.mjs",
-    "build:app": "stone build",
-    "api": "node scripts/build-api.mjs",
-    "preview": "stone preview"
+    "sync:version": "node scripts/sync-version.mjs",
+    "dev": "node scripts/sync-version.mjs && stone dev",
+    "build": "node scripts/sync-version.mjs && stone build --ssg && node scripts/build-api.mjs && node scripts/build-feed.mjs",
+    "build:app": "node scripts/sync-version.mjs && stone build",
+    "api": "node scripts/sync-version.mjs && node scripts/build-api.mjs",
+    "preview": "node scripts/sync-version.mjs && stone preview"
   },
   "dependencies": {
     "@docsearch/js": "^3.9.0",

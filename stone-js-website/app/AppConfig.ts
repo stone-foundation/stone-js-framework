@@ -1,3 +1,4 @@
+import { APP_VERSION } from './version'
 import { Configuration, IBlueprint } from '@stone-js/core'
 
 /**
@@ -11,8 +12,8 @@ import { Configuration, IBlueprint } from '@stone-js/core'
  * The Algolia key is the search-only key and is safe to ship to the client; the GA id is public.
  */
 export const appConfig = {
-  /** The published `@stone-js/*` version. Bump this one line per release. */
-  version: '0.8.2',
+  /** The published `@stone-js/*` version, synced from `@stone-js/core` at build (see scripts/sync-version.mjs). */
+  version: APP_VERSION,
   name: 'Stone.js',
   tagline: 'The Continuum framework',
   description: 'Write your domain once; it runs in every context: server, edge, browser, agents.',
