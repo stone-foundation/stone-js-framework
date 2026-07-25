@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.5
+
+### Patch Changes
+
+- @stone-js/core@0.8.5
+- @stone-js/pipeline@0.8.5
+
 ## 0.8.4
 
 ### Patch Changes
