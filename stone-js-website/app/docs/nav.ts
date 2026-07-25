@@ -166,6 +166,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Auth', path: '/docs/extensions/auth' },
       { title: 'Authorization', path: '/docs/extensions/authorization' },
       { title: 'Resources', path: '/docs/extensions/resources' },
+      { title: 'i18n', path: '/docs/extensions/i18n' },
       { title: 'Cloud File (storage)', path: '/docs/extensions/cloud-file' },
       { title: 'Cache', path: '/docs/extensions/cache' },
       { title: 'Queue', path: '/docs/extensions/queue' },

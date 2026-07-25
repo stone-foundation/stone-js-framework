@@ -1,119 +1,138 @@
-import { loadTranslationsFromDir, mergeResources, createAutoloadMiddleware, i18nCliPlugin } from '../src/cli'
-import defaultPlugin from '../src/cli'
+import defaultPlugin, {
+  i18nCliPlugin,
+  toImportSpecifier,
+  generateI18nModule,
+  scanTranslationFiles,
+  GENERATED_MODULE,
+  DEFAULT_I18N_DIR
+} from '../src/cli'
 
 vi.mock('node:fs', () => ({
   existsSync: vi.fn(),
   readdirSync: vi.fn(),
-  statSync: vi.fn(),
-  readFileSync: vi.fn()
+  statSync: vi.fn()
 }))
 
-import { existsSync, readdirSync, statSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, statSync } from 'node:fs'
 
-const ROOT = '/proj/app/i18n'
-const DIRS = new Set([ROOT, `${ROOT}/en`, `${ROOT}/fr`, `${ROOT}/de`])
-const FILES: Record<string, string> = {
-  [`${ROOT}/en/common.json`]: '{"hello":"Hello"}',
-  [`${ROOT}/en/auth.json`]: '{"login":"Login"}',
-  [`${ROOT}/fr/common.json`]: '{"hello":"Bonjour"}'
-}
+const ROOT = `/proj/${DEFAULT_I18N_DIR}`
+const DIRS = new Set([ROOT, `${ROOT}/en`, `${ROOT}/fr`])
 const ENTRIES: Record<string, string[]> = {
-  [ROOT]: ['en', 'fr', 'de', 'README.md'], // README.md at the locale level is skipped (not a dir)
-  [`${ROOT}/en`]: ['common.json', 'auth.json', 'notes.txt', 'weird.json'], // notes.txt (not json) + weird.json (not a file) skipped
-  [`${ROOT}/fr`]: ['common.json'],
-  [`${ROOT}/de`]: ['notes.txt'] // only non-json → de contributes nothing
+  [ROOT]: ['en', 'fr', 'README.md'], // README.md at locale level is skipped (not a dir)
+  [`${ROOT}/en`]: ['common.json', 'auth.json', 'notes.txt'], // notes.txt (unlisted ext) skipped
+  [`${ROOT}/fr`]: ['common.json']
 }
+const FILES = new Set([
+  `${ROOT}/en/common.json`, `${ROOT}/en/auth.json`, `${ROOT}/fr/common.json`, `${ROOT}/en/notes.txt`
+])
 
 function mountFs (): void {
   vi.mocked(existsSync).mockImplementation((p) => p === ROOT)
   vi.mocked(readdirSync).mockImplementation((p) => (ENTRIES[p as string] ?? []) as any)
   vi.mocked(statSync).mockImplementation((p) => ({
     isDirectory: () => DIRS.has(p as string),
-    isFile: () => (p as string) in FILES
+    isFile: () => FILES.has(p as string)
   }) as any)
-  vi.mocked(readFileSync).mockImplementation((p) => FILES[p as string])
 }
 
-describe('loadTranslationsFromDir', () => {
+describe('scanTranslationFiles', () => {
   beforeEach(() => { vi.clearAllMocks(); mountFs() })
 
-  it('scans <locale>/<namespace>.json into a resource map', () => {
-    expect(loadTranslationsFromDir(ROOT)).toEqual({
-      en: { common: { hello: 'Hello' }, auth: { login: 'Login' } },
-      fr: { common: { hello: 'Bonjour' } }
-    })
+  it('returns matching files sorted, skipping non-dir locales and unlisted extensions', () => {
+    expect(scanTranslationFiles(ROOT, ['json'])).toEqual([
+      `${ROOT}/en/auth.json`,
+      `${ROOT}/en/common.json`,
+      `${ROOT}/fr/common.json`
+    ])
   })
 
-  it('skips non-directory locales, non-json files, non-file .json and empty locales', () => {
-    const resources = loadTranslationsFromDir(ROOT)
-    expect(resources).not.toHaveProperty('README.md')
-    expect(resources.en).not.toHaveProperty('notes')
-    expect(resources.en).not.toHaveProperty('weird')
-    expect(resources).not.toHaveProperty('de')
-  })
-
-  it('returns an empty map when the directory is absent', () => {
+  it('returns an empty list when the directory is absent', () => {
     vi.mocked(existsSync).mockReturnValue(false)
-    expect(loadTranslationsFromDir('/nope')).toEqual({})
+    expect(scanTranslationFiles('/nope', ['json'])).toEqual([])
   })
 })
 
-describe('mergeResources', () => {
-  it('merges by locale/namespace, config winning, including config-only locales', () => {
-    const scanned = { en: { common: { a: 1 } }, fr: { common: { b: 2 } } }
-    const override = { en: { common: { a: 9 }, extra: { c: 3 } }, de: { common: { d: 4 } } }
-    expect(mergeResources(scanned, override)).toEqual({
-      en: { common: { a: 9 }, extra: { c: 3 } },
-      fr: { common: { b: 2 } },
-      de: { common: { d: 4 } }
-    })
+describe('toImportSpecifier', () => {
+  it('builds a relative POSIX specifier keeping the locale/namespace tail', () => {
+    expect(toImportSpecifier('/proj/.stone/tmp/plugins', `${ROOT}/en/common.json`))
+      .toBe('../../../app/i18n/en/common.json')
+  })
+
+  it('prefixes ./ when the file sits under the module directory', () => {
+    expect(toImportSpecifier('/proj/.stone/tmp', '/proj/.stone/tmp/x/en/common.json'))
+      .toBe('./x/en/common.json')
   })
 })
 
-describe('createAutoloadMiddleware', () => {
-  const cwd = vi.spyOn(process, 'cwd').mockReturnValue('/proj')
-  beforeEach(() => { vi.clearAllMocks(); cwd.mockReturnValue('/proj'); mountFs() })
+describe('generateI18nModule', () => {
+  const moduleDir = '/proj/.stone/tmp/plugins'
+  const files = [`${ROOT}/en/common.json`, `${ROOT}/fr/common.json`]
 
-  async function run (config: object): Promise<{ store: Record<string, unknown>, result: unknown }> {
-    const store: Record<string, unknown> = {}
-    const blueprint = { get: vi.fn().mockReturnValue(config), set: vi.fn((k: string, v: unknown) => { store[k] = v }) }
-    const next = vi.fn((ctx: unknown) => ctx)
-    const result = await createAutoloadMiddleware('app/i18n')({ blueprint } as any, next as any)
-    return { store, result }
-  }
-
-  it('autoloads app/i18n by default and merges config over it', async () => {
-    const { store } = await run({ resources: { fr: { common: { hello: 'Salut' } } } })
-    expect(store['stone.i18n.resources']).toEqual({
-      en: { common: { hello: 'Hello' }, auth: { login: 'Login' } },
-      fr: { common: { hello: 'Salut' } }
-    })
+  it('emits eager static imports handed to loadTranslations', () => {
+    const source = generateI18nModule(moduleDir, files, false)
+    expect(source).toContain("import { defineI18n, loadTranslations } from '@stone-js/i18n'")
+    expect(source).toContain('import * as __i18n0 from "../../../app/i18n/en/common.json"')
+    expect(source).toContain('loadTranslations({')
+    expect(source).toContain('"../../../app/i18n/en/common.json": __i18n0')
+    expect(source).not.toContain('import.meta.glob')
   })
 
-  it('honours a custom directory', async () => {
-    vi.mocked(existsSync).mockReturnValue(false)
-    await createAutoloadMiddleware('app/i18n')({ blueprint: { get: () => ({ dir: 'translations' }), set: vi.fn() } } as any, ((c: unknown) => c) as any)
-    expect(existsSync).toHaveBeenCalledWith('/proj/translations')
-  })
-
-  it('is disabled by dir: false', async () => {
-    const { store } = await run({ dir: false })
-    expect(store['stone.i18n.resources']).toBeUndefined()
-    expect(existsSync).not.toHaveBeenCalled()
+  it('emits lazy per-file dynamic importers as loaders', () => {
+    const source = generateI18nModule(moduleDir, files, true)
+    expect(source).toContain("import { defineI18n } from '@stone-js/i18n'")
+    expect(source).toContain('loaders: {')
+    expect(source).toContain('"../../../app/i18n/en/common.json": () => import("../../../app/i18n/en/common.json")')
+    expect(source).not.toContain('loadTranslations')
   })
 })
 
 describe('i18nCliPlugin', () => {
-  it('describes a Stone CLI plugin with a build-phase blueprint middleware', () => {
+  const cwd = vi.spyOn(process, 'cwd').mockReturnValue('/proj')
+
+  const makeContext = (): { writeFile: any, addModule: any, buildPath: any } => ({
+    writeFile: vi.fn(),
+    addModule: vi.fn(),
+    buildPath: (rel: string) => `/proj/.stone/tmp/${rel}`
+  })
+
+  beforeEach(() => { vi.clearAllMocks(); cwd.mockReturnValue('/proj'); mountFs() })
+
+  it('is a Stone CLI plugin with an onPrepare hook and no legacy blueprint middleware', () => {
     const plugin = i18nCliPlugin()
     expect(plugin.name).toBe('@stone-js/i18n')
-    expect(plugin.description).toContain('stone.i18n.resources')
-    expect(plugin.blueprintMiddleware).toHaveLength(1)
-    expect(plugin.blueprintMiddleware?.[0]).toMatchObject({ priority: 5, module: expect.any(Function) })
+    expect(plugin.description).toContain(DEFAULT_I18N_DIR)
+    expect(typeof plugin.onPrepare).toBe('function')
+    expect(plugin.blueprintMiddleware).toBeUndefined()
+  })
+
+  it('scans and generates the eager module, then contributes it to the app', () => {
+    const context = makeContext()
+    i18nCliPlugin().onPrepare?.(context as any)
+
+    expect(context.writeFile).toHaveBeenCalledWith(GENERATED_MODULE, expect.stringContaining('loadTranslations({'))
+    expect(context.writeFile).toHaveBeenCalledWith(GENERATED_MODULE, expect.stringContaining('en/common.json'))
+    expect(context.addModule).toHaveBeenCalledWith(`./${GENERATED_MODULE}`)
+  })
+
+  it('generates lazy loaders when lazy is enabled', () => {
+    const context = makeContext()
+    const plugin = i18nCliPlugin({ lazy: true })
+    plugin.onPrepare?.(context as any)
+
+    expect(plugin.description).toContain('(lazy)')
+    expect(context.writeFile).toHaveBeenCalledWith(GENERATED_MODULE, expect.stringContaining('() => import('))
+  })
+
+  it('honours a custom dir and extensions', () => {
+    const context = makeContext()
+    vi.mocked(existsSync).mockReturnValue(false) // custom dir absent -> empty scan, still writes an (empty) module
+    i18nCliPlugin({ dir: 'translations', extensions: 'json' }).onPrepare?.(context as any)
+    expect(existsSync).toHaveBeenCalledWith('/proj/translations')
+    expect(context.addModule).toHaveBeenCalledWith(`./${GENERATED_MODULE}`)
   })
 
   it('exposes a ready default plugin instance for package.json auto-discovery', () => {
     expect(defaultPlugin.name).toBe('@stone-js/i18n')
-    expect(defaultPlugin.blueprintMiddleware).toHaveLength(1)
+    expect(typeof defaultPlugin.onPrepare).toBe('function')
   })
 })

@@ -55,6 +55,9 @@ export interface II18n {
   /** Register/merge a namespace bundle at runtime. */
   addResources: (locale: Locale, namespace: string, resources: Translations) => void
 
+  /** Lazily load a locale's catalog (and the fallback's) into the shared instance; no-op unless lazy loaders were configured. */
+  loadLocale: (locale: Locale) => Promiseable<void>
+
   /** Format a number with `Intl.NumberFormat` for the active locale. */
   number: (value: number, options?: Intl.NumberFormatOptions) => string
 
@@ -139,6 +142,11 @@ export interface I18nOptions extends Omit<LocaleResolutionOptions, 'fallbackLoca
   timeZone?: string
   /** Eager resources; merged over the zero-config `app/i18n` scan. */
   resources?: Resources
+  /**
+   * Lazy catalog loaders: a `path -> () => import(...)` map (a non-eager `import.meta.glob`).
+   * Only the active locale's catalog is imported, on demand, awaited before render (no FOUC).
+   */
+  loaders?: Record<string, () => Promise<unknown>>
   /** The directory scanned for zero-config translations (Node). Default `'app/i18n'`. */
   dir?: string | false
   /** Interpolation delimiters. Default `{ prefix: '{{', suffix: '}}' }`. */

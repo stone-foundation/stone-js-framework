@@ -57,6 +57,10 @@ export class SetLocaleMiddleware {
       resolveLocale(event as LocaleAwareEvent, this.options) ??
       this.i18n.getLocale()
 
+    // Lazy catalogs: import the active locale before the handler renders, so there is no flash of
+    // untranslated keys. A no-op unless `stone.i18n.loaders` were configured.
+    await this.i18n.loadLocale(locale)
+
     event.setMetadataValue('locale', locale)
     event.setMetadataValue('i18n', this.i18n.forLocale(locale))
     return await next(event)

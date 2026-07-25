@@ -89,8 +89,8 @@ describe('SetLocaleMiddleware', () => {
 
   it('falls back to the service locale when nothing resolves', async () => {
     const event: any = { getHeader: () => undefined, locale: undefined }
-    const { meta } = run({ locales: ['en', 'fr'] }, event)
-    await Promise.resolve()
+    const { meta, result } = run({ locales: ['en', 'fr'] }, event)
+    await result
     expect(meta.locale).toBe('en')
   })
 

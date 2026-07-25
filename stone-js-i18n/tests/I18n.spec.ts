@@ -161,6 +161,45 @@ describe('I18n', () => {
     })
   })
 
+  describe('lazy loadLocale', () => {
+    const makeLoaders = (calls: Record<string, number>): Record<string, () => Promise<unknown>> => ({
+      '/app/i18n/en/translation.json': async () => { calls.en = (calls.en ?? 0) + 1; return { default: { hi: 'Hi' } } },
+      '/app/i18n/fr/translation.json': async () => { calls.fr = (calls.fr ?? 0) + 1; return { hi: 'Salut' } } // no default export
+    })
+
+    it('loads the active locale and the fallback on demand, then translates both', async () => {
+      const i18n = I18n.create({ locale: 'fr', fallbackLocale: 'en', loaders: makeLoaders({}) })
+      await i18n.loadLocale('fr')
+      expect(i18n.t('hi', { locale: 'fr' })).toBe('Salut')
+      expect(i18n.t('hi', { locale: 'en' })).toBe('Hi') // fallback catalog loaded alongside
+    })
+
+    it('is idempotent and shares the loaded set across forLocale clones', async () => {
+      const calls: Record<string, number> = {}
+      const i18n = I18n.create({ locale: 'en', fallbackLocale: 'en', loaders: makeLoaders(calls) })
+      await i18n.loadLocale('fr')
+      await i18n.forLocale('fr').loadLocale('fr') // clone shares `loaded` → no reimport
+      expect(calls.fr).toBe(1)
+    })
+
+    it('does not load the fallback twice when it is the active locale', async () => {
+      const calls: Record<string, number> = {}
+      const i18n = I18n.create({ locale: 'en', fallbackLocale: 'en', loaders: makeLoaders(calls) })
+      await i18n.loadLocale('en')
+      expect(calls.en).toBe(1)
+    })
+
+    it('uses the first entry of an array fallbackLocale', async () => {
+      const i18n = I18n.create({ locale: 'fr', fallbackLocale: ['en', 'de'], loaders: makeLoaders({}) })
+      await i18n.loadLocale('fr')
+      expect(i18n.t('hi', { locale: 'en' })).toBe('Hi') // 'en' (first of the array) loaded as fallback
+    })
+
+    it('is a no-op when no loaders are configured', async () => {
+      await expect(create().loadLocale('fr')).resolves.toBeUndefined()
+    })
+  })
+
   describe('collectNamespaces', () => {
     it('collects every namespace across locales, including the default', () => {
       expect(collectNamespaces(resources, 'translation').sort()).toEqual(['cart', 'translation'])

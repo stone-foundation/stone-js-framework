@@ -1,6 +1,10 @@
 import { createInstance, type i18n as I18nextInstance } from 'i18next'
 import { I18nError } from './errors/I18nError'
+import { normalizeTranslations, parseResourcePath } from './loadTranslations'
 import { II18n, I18nOptions, Locale, Resources, TranslateOptions, Translations } from './declarations'
+
+/** A lazy catalog loader map: `path -> () => import(...)`. */
+type LocaleLoaders = Record<string, () => Promise<unknown>>
 
 /**
  * The i18n service: a thin, platform-agnostic Stone.js API over [i18next](https://www.i18next.com).
@@ -16,16 +20,32 @@ export class I18n implements II18n {
   private readonly i18next: I18nextInstance
   private readonly boundLocale?: Locale
   private readonly timeZone?: string
+  private readonly loaders?: LocaleLoaders
+  private readonly loaded: Set<Locale>
+  private readonly fallbackLocale?: Locale
 
   /**
    * @param i18next - The underlying i18next instance.
    * @param boundLocale - When set, this translator is locked to that locale (request scope).
    * @param timeZone - Default IANA time zone for date formatting.
+   * @param loaders - Lazy catalog loaders (a non-eager `import.meta.glob` map), shared across clones.
+   * @param loaded - The set of locales already loaded, shared across clones so a catalog loads once.
+   * @param fallbackLocale - The fallback locale, loaded alongside the active one for cross-locale fallback.
    */
-  private constructor (i18next: I18nextInstance, boundLocale?: Locale, timeZone?: string) {
+  private constructor (
+    i18next: I18nextInstance,
+    boundLocale?: Locale,
+    timeZone?: string,
+    loaders?: LocaleLoaders,
+    loaded?: Set<Locale>,
+    fallbackLocale?: Locale
+  ) {
     this.i18next = i18next
     this.boundLocale = boundLocale
     this.timeZone = timeZone
+    this.loaders = loaders
+    this.loaded = loaded ?? new Set<Locale>()
+    this.fallbackLocale = fallbackLocale
   }
 
   /**
@@ -40,6 +60,8 @@ export class I18n implements II18n {
     const defaultNS = options.defaultNamespace ?? 'translation'
     const missing = options.missing
     const onMissingKey = options.onMissingKey
+
+    const fallback = Array.isArray(options.fallbackLocale) ? options.fallbackLocale[0] : options.fallbackLocale
 
     let parseMissingKeyHandler: ((key: string) => string) | undefined
     if (missing === 'empty') {
@@ -70,7 +92,7 @@ export class I18n implements II18n {
         : undefined
     })
 
-    return new I18n(instance, undefined, options.timeZone)
+    return new I18n(instance, undefined, options.timeZone, options.loaders, undefined, fallback)
   }
 
   /**
@@ -155,7 +177,46 @@ export class I18n implements II18n {
    * @returns A locale-bound translator.
    */
   forLocale (locale: Locale): I18n {
-    return new I18n(this.i18next, locale, this.timeZone)
+    return new I18n(this.i18next, locale, this.timeZone, this.loaders, this.loaded, this.fallbackLocale)
+  }
+
+  /**
+   * Lazily load a locale's catalog (and the fallback locale's) into the shared instance.
+   *
+   * A no-op unless lazy {@link I18nOptions.loaders} were configured. It imports only the files that
+   * belong to `locale` (and, once, the fallback locale), on demand, and merges them via
+   * {@link addResources}. Because {@link SetLocaleMiddleware} awaits it before the handler runs, the
+   * active catalog is present at first render, so there is no flash of untranslated keys. Idempotent:
+   * a locale is loaded at most once, and dynamic imports are memoised by the runtime.
+   *
+   * @param locale - The locale to load.
+   */
+  async loadLocale (locale: Locale): Promise<void> {
+    if (this.loaders === undefined) { return }
+    await this.loadCatalog(locale)
+    if (this.fallbackLocale !== undefined && this.fallbackLocale !== locale) {
+      await this.loadCatalog(this.fallbackLocale)
+    }
+  }
+
+  /**
+   * Import and merge every lazy loader that belongs to a single locale, once.
+   *
+   * @param locale - The locale to load.
+   */
+  private async loadCatalog (locale: Locale): Promise<void> {
+    if (this.loaders === undefined || this.loaded.has(locale)) { return }
+
+    const matched = Object.entries(this.loaders)
+      .map(([path, load]) => ({ parsed: parseResourcePath(path), load }))
+      .filter((entry): entry is { parsed: { locale: Locale, namespace: string }, load: () => Promise<unknown> } =>
+        entry.parsed?.locale === locale)
+
+    await Promise.all(matched.map(async ({ parsed, load }) => {
+      this.addResources(locale, parsed.namespace, normalizeTranslations(await load()))
+    }))
+
+    this.loaded.add(locale)
   }
 
   /**

@@ -12,9 +12,9 @@ export default createRollupConfig({
   nodeResolve,
   nodeExternals,
   builds: [
-    // The agnostic runtime (`.`) — never includes the Node-only build plugin.
+    // The agnostic runtime (`.`) — never includes the build-time CLI plugin.
     { input: ['src/**/*.ts', '!src/cli.ts'], file: 'dist/index.js', barrel: { exclude: ['cli'] } },
-    // The Node-only build plugin (`./cli`) — uses `node:fs`, kept out of the runtime bundle.
+    // The build-time CLI plugin (`./cli`) — build-only, kept out of the runtime bundle.
     { input: ['src/cli.ts'], file: 'dist/cli.js' }
   ]
 })

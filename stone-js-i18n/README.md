@@ -40,10 +40,31 @@ app/i18n/
 └─ fr/common.json   → { "hello": "Bonjour {{name}} !", "items_one": "{{count}} article", "items_other": "{{count}} articles" }
 ```
 
-## Loading translations, three ways
+## Loading translations
 
-**1. By hand (any format, isomorphic).** `loadTranslations` normalises a bundler glob into resources;
-it works the same on the backend (Rollup) and the frontend (Vite), and tree-shakes.
+**1. The CLI plugin (recommended, true zero-config).** It scans `app/i18n` at build time and generates
+the wiring for you with plain imports, so it works on every target: a backend service (Rollup), a
+browser SPA and SSR (Vite) alike. No `loadTranslations(...)` line is needed. Add it to `stone.config`:
+
+```ts
+import { i18nCliPlugin } from '@stone-js/i18n/cli'
+
+export default defineConfig({ plugins: [i18nCliPlugin()] })
+```
+
+`@stone-js/i18n` also declares a `stone.cliPlugin` contract, so the CLI can **auto-discover** it from
+your direct dependencies (announced on every build). Opt out with `autoDiscoverPlugins: false`.
+
+**Lazy catalogs, no FOUC.** Pass `lazy: true` to import only the active locale's catalog on demand
+(code-split per file). The kernel middleware awaits it before the handler renders, so there is never a
+flash of untranslated keys:
+
+```ts
+export default defineConfig({ plugins: [i18nCliPlugin({ lazy: true })] })
+```
+
+**2. By hand.** Set `stone.i18n.resources` yourself. On Vite targets (SPA, SSR), `import.meta.glob`
+autoloads them, isomorphic and tree-shaking:
 
 ```ts
 import { defineI18n, loadTranslations } from '@stone-js/i18n'
@@ -54,18 +75,8 @@ export const AppConfig = defineConfig(defineI18n({
 }))
 ```
 
-**2. The CLI plugin (true zero-config).** It scans `app/i18n` at build time and injects the resources
-for you, so no `loadTranslations(...)` line is needed. Add it to your `stone.config`:
-
-```ts
-import { i18nCliPlugin } from '@stone-js/i18n/cli'
-
-export default defineConfig({ plugins: [i18nCliPlugin()] }) // once the CLI supports plugins
-```
-
-**3. Auto-discovery (opt-in).** `@stone-js/i18n` declares a `stone.cliPlugin` contract in its
-`package.json`; when enabled, the CLI discovers and loads it from your project's direct dependencies
-(logged for transparency). Nothing runs unless you opt in.
+(For a plain backend service, prefer the plugin: it emits static imports rather than `import.meta.glob`,
+which only Vite understands.)
 
 ## Usage
 

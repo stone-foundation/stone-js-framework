@@ -1,119 +1,169 @@
-import { existsSync, readdirSync, statSync, readFileSync } from 'node:fs'
-import { join, extname, basename } from 'node:path'
-import { I18nOptions, LocaleResources, Resources } from './declarations'
-import { BlueprintContext, ClassType, IBlueprint, MetaMiddleware, NextMiddleware, Promiseable } from '@stone-js/core'
+import { existsSync, readdirSync, statSync } from 'node:fs'
+import { join, extname, relative, dirname, sep } from 'node:path'
+import type { StoneCliPlugin, StonePluginContext } from '@stone-js/cli'
 
 /**
- * The contract a Stone CLI plugin implements to participate in the build/bundle of an app.
- *
- * A plugin is plain data (no `@stone-js/cli` dependency): a name, an optional description, and
- * blueprint middleware that run during the CLI's config/build phase (they receive the app blueprint
- * and can read/augment it, e.g. inject generated config). The CLI loads plugins from `stone.config`
- * (explicit) or, opt-in, from a dependency's `package.json` `stone.cliPlugin` field (auto-discovery).
+ * The default directory scanned for translations, relative to the project root.
  */
-export interface StoneCliPlugin {
-  /** Unique plugin name (shown when the CLI loads it). */
-  name: string
-  /** One-line description. */
-  description?: string
-  /** Blueprint middleware run during the CLI build/config phase. */
-  blueprintMiddleware?: Array<MetaMiddleware<BlueprintContext<IBlueprint, ClassType>, IBlueprint>>
-}
+export const DEFAULT_I18N_DIR = 'app/i18n'
 
-/** Options for the i18n CLI plugin. */
+/**
+ * The file extensions autoloaded from the translations directory.
+ *
+ * These are the formats the bundler can import directly on every target (JSON via the JSON plugin,
+ * the JS family via Babel), so the generated module builds identically on Rollup and Vite.
+ */
+export const DEFAULT_I18N_EXTENSIONS = 'json,js,mjs,ts'
+
+/**
+ * Where the plugin writes its generated module, relative to the build's `.stone/tmp` directory.
+ */
+export const GENERATED_MODULE = 'plugins/i18n.mjs'
+
+/**
+ * Options for the i18n CLI plugin.
+ */
 export interface I18nCliPluginOptions {
-  /** The directory scanned for translations (relative to the project root). Default `'app/i18n'`. */
+  /**
+   * The directory scanned for translations, relative to the project root. Default `'app/i18n'`.
+   */
   dir?: string
+
+  /**
+   * The comma-separated file extensions to autoload. Default `'json,js,mjs,ts'`.
+   */
+  extensions?: string
+
+  /**
+   * Lazy-load catalogs: import only the active locale's catalog on demand (code-split per file),
+   * instead of bundling every locale eagerly. Default `false`. See {@link I18nOptions.loaders}.
+   */
+  lazy?: boolean
 }
 
 /**
- * Scan a directory for translations laid out as `<dir>/<locale>/<namespace>.json` (build-time,
- * Node). Returns an empty map when the directory is absent, so it is always safe to call.
+ * Scan `<dir>/<locale>/<namespace>.<ext>` and return the matching files, as absolute paths.
+ *
+ * Build-time only (Node). Returns an empty list when the directory is absent, so it is always safe
+ * to call. Results are sorted for deterministic, reproducible output.
  *
  * @param dir - The absolute directory to scan.
- * @returns The resource map.
+ * @param extensions - The lowercase extensions (without the dot) to include.
+ * @returns The matched files, sorted.
  */
-export function loadTranslationsFromDir (dir: string): Resources {
-  if (!existsSync(dir)) { return {} }
+export function scanTranslationFiles (dir: string, extensions: string[]): string[] {
+  if (!existsSync(dir)) { return [] }
 
-  const resources: Resources = {}
+  const files: string[] = []
 
   for (const locale of readdirSync(dir)) {
     const localeDir = join(dir, locale)
     if (!statSync(localeDir).isDirectory()) { continue }
 
-    const namespaces: LocaleResources = {}
     for (const entry of readdirSync(localeDir)) {
       const file = join(localeDir, entry)
-      if (extname(entry).toLowerCase() !== '.json' || !statSync(file).isFile()) { continue }
-      namespaces[basename(entry, extname(entry))] = JSON.parse(readFileSync(file, 'utf-8'))
+      if (extensions.includes(extname(entry).slice(1).toLowerCase()) && statSync(file).isFile()) {
+        files.push(file)
+      }
     }
-
-    if (Object.keys(namespaces).length > 0) { resources[locale] = namespaces }
   }
 
-  return resources
+  return files.sort((a, b) => a.localeCompare(b))
 }
 
 /**
- * Merge scanned resources with the config ones (config wins at the namespace level).
+ * Build a POSIX import specifier from the generated module to a translation file.
  *
- * @param scanned - Resources discovered on disk.
- * @param override - Resources declared in `stone.i18n.resources`.
- * @returns The merged resources.
- */
-export function mergeResources (scanned: Resources, override: Resources): Resources {
-  const result: Resources = {}
-  for (const [locale, namespaces] of Object.entries(scanned)) {
-    result[locale] = { ...namespaces }
-  }
-  for (const [locale, namespaces] of Object.entries(override)) {
-    result[locale] ??= {}
-    Object.assign(result[locale], namespaces)
-  }
-  return result
-}
-
-/**
- * Build the zero-config autoload blueprint middleware for a given directory. It scans the directory
- * and merges the result into `stone.i18n.resources` (config wins). Disabled by `stone.i18n.dir: false`.
+ * The specifier keeps the `<locale>/<namespace>.<ext>` tail intact, so the runtime can read the
+ * locale and namespace from it, and is always explicitly relative (`./` or `../`) and POSIX, so it
+ * resolves the same on every OS and bundler.
  *
- * @param dir - The default directory (relative to the project root).
- * @returns A blueprint middleware.
+ * @param moduleDir - The directory the generated module lives in.
+ * @param file - The absolute path of the translation file.
+ * @returns The relative POSIX import specifier.
  */
-export function createAutoloadMiddleware (dir: string): (
-  context: BlueprintContext<IBlueprint, ClassType>,
-  next: NextMiddleware<BlueprintContext<IBlueprint, ClassType>, IBlueprint>
-) => Promiseable<IBlueprint> {
-  return async (context, next) => {
-    const config = context.blueprint.get<I18nOptions>('stone.i18n', {})
-    if (config.dir !== false) {
-      const target = join(process.cwd(), typeof config.dir === 'string' ? config.dir : dir)
-      context.blueprint.set('stone.i18n.resources', mergeResources(loadTranslationsFromDir(target), config.resources ?? {}))
-    }
-    return await next(context)
-  }
+export function toImportSpecifier (moduleDir: string, file: string): string {
+  const rel = relative(moduleDir, file).split(sep).join('/')
+  return rel.startsWith('.') ? rel : `./${rel}`
 }
 
 /**
- * The i18n Stone CLI plugin: true zero-config. At build time it scans `app/i18n/<locale>/*.json` and
- * injects the resources into `stone.i18n.resources`, so no manual `loadTranslations(...)` line is
- * needed. Add it to your `stone.config` (`plugins: [i18nCliPlugin()]`) once the CLI supports plugins,
- * or rely on `package.json` auto-discovery.
+ * Generate the source of the module the plugin injects into the build.
+ *
+ * The generated module contributes the resources through real imports, so it builds on every target
+ * (no `import.meta.glob`, which only Vite understands). In eager mode it statically imports each
+ * catalog and hands them to {@link loadTranslations}; in lazy mode it exposes per-file dynamic
+ * importers as {@link I18nOptions.loaders}, so only the active locale's catalog is fetched at runtime.
+ * Wrapping it in `defineConfig(defineI18n(...))` makes it a meta-module the built app collects.
+ *
+ * @param moduleDir - The directory the generated module lives in.
+ * @param files - The absolute translation file paths.
+ * @param lazy - Whether to emit lazy per-file loaders instead of eager imports.
+ * @returns The generated module source.
+ */
+export function generateI18nModule (moduleDir: string, files: string[], lazy: boolean): string {
+  const specifiers = files.map((file) => toImportSpecifier(moduleDir, file))
+  const header = "// Generated by @stone-js/i18n/cli. Do not edit.\nimport { defineConfig } from '@stone-js/core'"
+
+  if (lazy) {
+    const entries = specifiers.map((spec) => `    ${JSON.stringify(spec)}: () => import(${JSON.stringify(spec)})`)
+    return `${header}
+import { defineI18n } from '@stone-js/i18n'
+
+export const stoneI18nResources = defineConfig(defineI18n({
+  loaders: {
+${entries.join(',\n')}
+  }
+}))
+`
+  }
+
+  const imports = specifiers.map((spec, index) => `import * as __i18n${index} from ${JSON.stringify(spec)}`)
+  const entries = specifiers.map((spec, index) => `    ${JSON.stringify(spec)}: __i18n${index}`)
+  return `${header}
+import { defineI18n, loadTranslations } from '@stone-js/i18n'
+${imports.join('\n')}
+
+export const stoneI18nResources = defineConfig(defineI18n({
+  resources: loadTranslations({
+${entries.join(',\n')}
+  })
+}))
+`
+}
+
+/**
+ * The i18n Stone CLI plugin: true zero-config translations.
+ *
+ * At build time (and in dev) it scans `app/i18n/<locale>/<namespace>.*` and generates a module that
+ * contributes the catalogs to the built app, so no manual `loadTranslations(...)` line is needed.
+ * It emits plain imports (never `import.meta.glob`), so the same plugin works for a backend service
+ * (Rollup), a browser SPA and SSR (Vite) alike. With `lazy: true`, only the active locale's catalog
+ * is fetched on demand, awaited before render so there is no flash of untranslated keys. Add it to
+ * `stone.config` (`plugins: [i18nCliPlugin()]`), or rely on first-party auto-discovery.
  *
  * @param options - The plugin options.
  * @returns The Stone CLI plugin.
  */
 export function i18nCliPlugin (options: I18nCliPluginOptions = {}): StoneCliPlugin {
+  const dir = options.dir ?? DEFAULT_I18N_DIR
+  const extensions = (options.extensions ?? DEFAULT_I18N_EXTENSIONS).split(',').map((ext) => ext.trim().toLowerCase())
+  const lazy = options.lazy ?? false
+
   return {
     name: '@stone-js/i18n',
-    description: 'Autoloads app/i18n/<locale>/<namespace>.json into stone.i18n.resources at build time.',
-    blueprintMiddleware: [
-      { module: createAutoloadMiddleware(options.dir ?? 'app/i18n'), priority: 5 }
-    ]
+    description: `Autoloads ${dir}/<locale>/<namespace> translations into the app at build time${lazy ? ' (lazy)' : ''}.`,
+    onPrepare (context: StonePluginContext): void {
+      const moduleDir = dirname(context.buildPath(GENERATED_MODULE))
+      const files = scanTranslationFiles(join(process.cwd(), dir), extensions)
+      context.writeFile(GENERATED_MODULE, generateI18nModule(moduleDir, files, lazy))
+      context.addModule(`./${GENERATED_MODULE}`)
+    }
   }
 }
 
-/** A ready-to-use plugin instance (used by `package.json` auto-discovery). */
+/**
+ * A ready-to-use plugin instance, used by first-party `package.json` auto-discovery.
+ */
 const plugin: StoneCliPlugin = i18nCliPlugin()
 export default plugin
