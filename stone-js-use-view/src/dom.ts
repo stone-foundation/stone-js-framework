@@ -241,7 +241,9 @@ export function applyHeadToHtml (head: HeadContext, html: string): string {
 
   const title = resolveTitle(head)
   if (typeof title === 'string') {
-    html = html.replace(/<title>.*?<\/title>/i, () => `<title>${escapeHtml(title)}</title>`)
+    // Linear, backtracking-free match ([^<]* instead of .*?) so a large/adversarial template
+    // cannot trigger super-linear (ReDoS) scanning. Title text never legitimately contains '<'.
+    html = html.replace(/<title>[^<]*<\/title>/i, () => `<title>${escapeHtml(title)}</title>`)
   }
 
   // Title is handled above; exclude it (and html/body attrs) so serializeHead does not duplicate it.

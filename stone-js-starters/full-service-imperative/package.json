@@ -31,7 +31,7 @@
     "@stone-js/pipeline": "^0.8.5",
     "@stone-js/router": "^0.8.5",
     "bcryptjs": "^3.0.2",
-    "drizzle-orm": "^0.44.2",
+    "drizzle-orm": "^0.44.7",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
