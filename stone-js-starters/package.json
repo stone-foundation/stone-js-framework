@@ -188,6 +188,9 @@
     "lint:fix": "ts-standard --fix **/app",
     "prepare": "husky"
   },
+  "overrides": {
+    "brace-expansion": ">=5.0.8"
+  },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
