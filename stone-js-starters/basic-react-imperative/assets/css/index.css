@@ -1,26 +1,171 @@
+/**
+ * Stone.js starter — brand welcome screen.
+ * Identity: "Obsidienne & Braise" — obsidian ground, ember (braise) accent, the Portal mark.
+ * Theme-aware: dark by default, light under prefers-color-scheme: light.
+ */
+:root {
+  --ink: #14100E;
+  --ink-2: #1E1815;
+  --cream: #F4EFE6;
+  --cream-dim: #B8AE9E;
+  --ember-1: #FFC46B;
+  --ember-2: #FF5A1F;
+  --line: rgba(244, 239, 230, 0.10);
+  --card: rgba(244, 239, 230, 0.04);
+  --bg: radial-gradient(1200px 600px at 50% -10%, #241C17 0%, var(--ink) 55%);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --ink: #F4EFE6;
+    --ink-2: #ffffff;
+    --cream: #1B1613;
+    --cream-dim: #6B6154;
+    --line: rgba(27, 22, 19, 0.10);
+    --card: rgba(27, 22, 19, 0.03);
+    --bg: radial-gradient(1200px 600px at 50% -10%, #FFFFFF 0%, #F1E9DC 60%);
+  }
+}
+
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  padding: 0;
-  color: #333;
-  font-size: 14px;
-  line-height: 1.5;
-  background-color: #fff;
-  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  color: var(--cream);
+  background: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-.h1 {
-  margin: 0;
-  font-size: 3rem;
-  font-weight: 500;
-  font-weight: bold;
-}
-.container {
-  width: 100vw;
+
+.stone-welcome {
+  position: relative;
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* Ember glow behind the mark. */
+.stone-welcome .glow {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  width: 520px;
+  height: 520px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(255, 90, 31, 0.22) 0%, rgba(255, 90, 31, 0) 68%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stone-welcome .hero {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 680px;
+  text-align: center;
+  animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.stone-welcome .mark {
+  width: 104px;
+  height: 104px;
+  filter: drop-shadow(0 8px 28px rgba(255, 90, 31, 0.35));
+}
+
+.stone-welcome .eyebrow {
+  margin: 22px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+}
+
+.stone-welcome .title {
+  margin: 8px 0 0;
+  font-size: clamp(44px, 8vw, 76px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  background: linear-gradient(92deg, var(--ember-1), var(--ember-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stone-welcome .lead {
+  margin: 18px auto 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--cream);
+}
+
+.stone-welcome .tagline {
+  margin: 10px auto 0;
+  max-width: 46ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--cream-dim);
+}
+
+.stone-welcome .links {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   justify-content: center;
 }
-.text-center {
-  text-align: center;
+
+.stone-welcome .links a,
+.stone-welcome .links .edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--cream);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.2s, background 0.2s;
 }
-.mt-64 {
-  margin-top: 64px;
+
+.stone-welcome .links a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 90, 31, 0.6);
+  background: rgba(255, 90, 31, 0.08);
+}
+
+.stone-welcome .links .edit {
+  font-family: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  color: var(--cream-dim);
+}
+.stone-welcome .links .edit b { color: var(--ember-1); font-weight: 700; }
+
+.stone-welcome .brand {
+  position: relative;
+  z-index: 1;
+  margin-top: 56px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--cream-dim);
+}
+.stone-welcome .brand .dot { color: var(--ember-2); }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stone-welcome .hero { animation: none; }
 }

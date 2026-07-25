@@ -18,7 +18,7 @@ export interface AuthMiddlewareOptions {
  */
 @Middleware({
   global: true,
-  params: [['/login', '/register']]
+  params: [['/', '/login', '/register']]
 })
 export class AuthMiddleware implements IMiddleware<ReactIncomingEvent, ReactOutgoingResponse> {
   private readonly snapshot: ISnapshot

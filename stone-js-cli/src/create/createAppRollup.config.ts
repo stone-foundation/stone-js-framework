@@ -1,6 +1,6 @@
 import { defineConfig } from 'rollup'
 import babel from '@rollup/plugin-babel'
-import multi from '@rollup/plugin-multi-entry'
+import { multiEntry } from '../server/multiEntry'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 
 /**
@@ -16,7 +16,7 @@ export const createAppRollupConfig = defineConfig({
     entryFileNames: '[name].js'
   },
   plugins: [
-    multi(),
+    multiEntry(),
     nodeResolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs']
     }),

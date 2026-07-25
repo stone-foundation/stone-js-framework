@@ -52,5 +52,5 @@ export const AuthMiddleware = ({
  */
 export const AuthMiddlewareBlueprint = defineMiddleware(
   AuthMiddleware,
-  { global: true, params: [['/login', '/register']], isFactory: true }
+  { global: true, params: [['/', '/login', '/register']], isFactory: true }
 )

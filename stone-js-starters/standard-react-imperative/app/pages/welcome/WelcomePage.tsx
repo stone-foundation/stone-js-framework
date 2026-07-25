@@ -1,6 +1,7 @@
 import { JSX } from 'react'
+import { Promiseable } from '@stone-js/core'
 import { WelcomeService } from '../../services/WelcomeService'
-import { definePage, IPage, PageRenderContext, ReactIncomingEvent } from '@stone-js/use-react'
+import { definePage, IPage, PageRenderContext, PageHeadContext, HeadContext, ReactIncomingEvent } from '@stone-js/use-react'
 
 /**
  * WelcomePage Options
@@ -31,16 +32,47 @@ export const WelcomePage = ({ welcomeService }: WelcomePageOptions): IPage<React
   },
 
   /**
+   * Set the page head tags, like title, meta, link, script, style.
+   *
+   * @returns The head context.
+   */
+  head ({ event }: PageHeadContext): Promiseable<HeadContext> {
+    return {
+      title: `${String(event.get<string>('name', 'World'))} · Welcome to Stone.js`,
+      description: 'A universal Stone.js application. Write your domain once; Stone.js is the context that runs it anywhere.',
+      metas: [
+        { name: 'author', content: 'Stone.js' },
+        { name: 'keywords', content: 'stonejs,continuum,react,universal,framework' }
+      ]
+    }
+  },
+
+  /**
    * Render the component.
    *
    * @returns The rendered component.
    */
   render ({ data }: PageRenderContext<ResponseData>): JSX.Element {
     return (
-      <section className='container'>
-        <img src='/logo.svg' alt='Stone.js' width={96} height={96} />
-        <h1 className='h1 text-center mt-64'>{data?.message}</h1>
-      </section>
+      <main className='stone-welcome'>
+        <div className='glow' aria-hidden='true' />
+        <section className='hero'>
+          <img className='mark' src='/logo.svg' alt='Stone.js' width={104} height={104} />
+          <p className='eyebrow'>Welcome to</p>
+          <h1 className='title'>Stone.js</h1>
+          <p className='lead'>{data?.message}</p>
+          <p className='tagline'>
+            Your app is running. Write your domain once, Stone.js is the context that runs it
+            anywhere: server, serverless, browser, CLI and the edge.
+          </p>
+          <nav className='links'>
+            <a href='https://stonejs.dev/docs' target='_blank' rel='noreferrer noopener'>Documentation</a>
+            <a href='https://github.com/stone-foundation/stone-js-framework' target='_blank' rel='noreferrer noopener'>GitHub</a>
+            <span className='edit'>Edit <b>app/pages/welcome/WelcomePage.tsx</b></span>
+          </nav>
+        </section>
+        <footer className='brand'><span className='dot'>●</span> Stone.js — the continuum framework</footer>
+      </main>
     )
   }
 })

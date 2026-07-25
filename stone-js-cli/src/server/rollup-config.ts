@@ -1,6 +1,6 @@
 import json from '@rollup/plugin-json'
 import babel from '@rollup/plugin-babel'
-import multi from '@rollup/plugin-multi-entry'
+import { multiEntry } from './multiEntry'
 import commonjs from '@rollup/plugin-commonjs'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import nodeExternals from 'rollup-plugin-node-externals'
@@ -17,7 +17,7 @@ const rollupBuildConfig = defineConfig({
     file: 'dist/app.mjs'
   },
   plugins: [
-    multi(),
+    multiEntry(),
     nodeExternals(), // Must always be before `nodeResolve()`.
     nodeResolve({
       extensions: ['.js', '.mjs', '.ts', '.json'],

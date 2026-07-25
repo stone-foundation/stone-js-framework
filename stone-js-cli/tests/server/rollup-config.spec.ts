@@ -13,7 +13,7 @@ describe('rollupBuildConfig', () => {
   it('should include necessary plugins in correct order', () => {
     const pluginNames = (rollupBuildConfig.plugins as any[]).map(p => p.name)
 
-    expect(pluginNames[0]).toBe('multi-entry')
+    expect(pluginNames[0]).toBe('stone-multi-entry')
     expect(pluginNames[1]).toBe('node-externals')
     expect(pluginNames[2]).toBe('node-resolve')
     expect(pluginNames).toContain('json')
@@ -40,7 +40,7 @@ describe('rollupBundleConfig', () => {
     expect(pluginNames).toContain('json')
     expect(pluginNames).toContain('commonjs')
     expect(pluginNames).not.toContain('babel')
-    expect(pluginNames).not.toContain('multi-entry')
+    expect(pluginNames).not.toContain('stone-multi-entry')
   })
 
   it('should suppress circular dependency warning', () => {

@@ -29,12 +29,13 @@ describe('HomePage', () => {
     // Act
     const html = renderToString(page.render({ data: page.handle() } as any))
 
-    // Assert: the Stone.js logo is rendered (Vite inlines the small SVG as a data URI),
-    // alongside the title and the domain message.
+    // Assert: the premium welcome hero renders the Stone.js logo (Vite inlines the small SVG
+    // as a data URI), the brand title and the domain message.
+    expect(html).toContain('stone-welcome')
     expect(html).toContain('<img')
     expect(html).toContain('image/svg+xml')
     expect(html).toContain('alt="Stone.js"')
-    expect(html).toContain('Stone.js Showcase')
+    expect(html).toContain('Stone.js')
     expect(html).toContain('Write your domain once')
   })
 })

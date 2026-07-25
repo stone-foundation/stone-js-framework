@@ -299,3 +299,170 @@ h1, h2, h3, h4, h5, h6 {
   background: #FEE2E2;
   border-left: 4px solid #EF4444;
 }
+
+/**
+ * Stone.js brand welcome hero — "Obsidienne & Braise".
+ * Fully scoped under .stone-welcome so it never clashes with the app's styles.
+ * Theme-aware: dark by default, light under prefers-color-scheme: light.
+ */
+:root {
+  --sw-ink: #14100E;
+  --sw-ink-2: #1E1815;
+  --sw-cream: #F4EFE6;
+  --sw-cream-dim: #B8AE9E;
+  --sw-ember-1: #FFC46B;
+  --sw-ember-2: #FF5A1F;
+  --sw-line: rgba(244, 239, 230, 0.10);
+  --sw-card: rgba(244, 239, 230, 0.04);
+  --sw-bg: radial-gradient(1200px 600px at 50% -10%, #241C17 0%, var(--sw-ink) 55%);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --sw-ink: #F4EFE6;
+    --sw-ink-2: #ffffff;
+    --sw-cream: #1B1613;
+    --sw-cream-dim: #6B6154;
+    --sw-line: rgba(27, 22, 19, 0.10);
+    --sw-card: rgba(27, 22, 19, 0.03);
+    --sw-bg: radial-gradient(1200px 600px at 50% -10%, #FFFFFF 0%, #F1E9DC 60%);
+  }
+}
+
+.stone-welcome,
+.stone-welcome * { box-sizing: border-box; }
+
+.stone-welcome {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: var(--sw-cream);
+  background: var(--sw-bg);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Ember glow behind the mark. */
+.stone-welcome .glow {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  width: 520px;
+  height: 520px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(255, 90, 31, 0.22) 0%, rgba(255, 90, 31, 0) 68%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stone-welcome .hero {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 680px;
+  text-align: center;
+  animation: sw-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.stone-welcome .mark {
+  width: 104px;
+  height: 104px;
+  filter: drop-shadow(0 8px 28px rgba(255, 90, 31, 0.35));
+}
+
+.stone-welcome .eyebrow {
+  margin: 22px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sw-cream-dim);
+}
+
+.stone-welcome .title {
+  margin: 8px 0 0;
+  font-size: clamp(44px, 8vw, 76px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  background: linear-gradient(92deg, var(--sw-ember-1), var(--sw-ember-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stone-welcome .lead {
+  margin: 18px auto 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--sw-cream);
+}
+
+.stone-welcome .tagline {
+  margin: 10px auto 0;
+  max-width: 46ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--sw-cream-dim);
+}
+
+.stone-welcome .links {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.stone-welcome .links a,
+.stone-welcome .links .edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: 1px solid var(--sw-line);
+  border-radius: 12px;
+  background: var(--sw-card);
+  color: var(--sw-cream);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.2s, background 0.2s;
+}
+
+.stone-welcome .links a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 90, 31, 0.6);
+  background: rgba(255, 90, 31, 0.08);
+}
+
+.stone-welcome .links .edit {
+  font-family: ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  color: var(--sw-cream-dim);
+}
+.stone-welcome .links .edit b { color: var(--sw-ember-1); font-weight: 700; }
+
+.stone-welcome .brand {
+  position: relative;
+  z-index: 1;
+  margin-top: 56px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--sw-cream-dim);
+}
+.stone-welcome .brand .dot { color: var(--sw-ember-2); }
+
+@keyframes sw-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stone-welcome .hero { animation: none; }
+}

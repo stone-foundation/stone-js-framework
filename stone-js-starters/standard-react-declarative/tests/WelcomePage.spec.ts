@@ -65,5 +65,7 @@ describe('WelcomePage', () => {
     // Assert
     expect(response).toContain('/logo.svg')
     expect(response).toContain('alt="Stone.js"')
+    expect(response).toContain('Welcome')
+    expect(response).toContain('Stone.js')
   })
 })

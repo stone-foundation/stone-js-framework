@@ -1,5 +1,5 @@
 import { IncomingHttpEvent } from '@stone-js/http-core'
-import { WelcomeService } from '../services/welcomeService'
+import { WelcomeService, WelcomeResponse } from '../services/welcomeService'
 import { defineRoute, FactoryEventHandler, FunctionalEventHandler } from '@stone-js/router'
 
 /**
@@ -12,9 +12,7 @@ export interface WelcomeEventHandlerOptions {
 /**
  * Response data
  */
-export interface ResponseData {
-  message: string
-}
+export type ResponseData = WelcomeResponse
 
 /**
  * Welcome

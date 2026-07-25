@@ -1,29 +1,23 @@
 import { JSX } from 'react'
-import { createPost } from '../utils'
 import { Post } from '../../models/Post'
-import { ILogger } from '@stone-js/core'
-import { PostForm } from '../../components/PostForm/PostForm'
-import { PostWidget } from '../../components/PostWidget/PostWidget'
 import { IPostService } from '../../services/contracts/IPostService'
-import { IPage, ReactIncomingEvent, HeadContext, definePage, IRouter, PageRenderContext } from '@stone-js/use-react'
+import { IPage, ReactIncomingEvent, HeadContext, definePage, StoneLink, PageRenderContext } from '@stone-js/use-react'
 
 /**
  * HomePage options.
  */
 export interface HomePageOptions {
-  router: IRouter
-  logger: ILogger
   postService: IPostService
 }
 
 /**
  * Home Page.
  */
-export const HomePage = ({ router, logger, postService }: HomePageOptions): IPage<ReactIncomingEvent> => ({
+export const HomePage = ({ postService }: HomePageOptions): IPage<ReactIncomingEvent> => ({
   head (): HeadContext {
     return {
-      title: 'Home',
-      description: 'Welcome to the Stone.js timeline'
+      title: 'Welcome to Stone.js',
+      description: 'Stone.js timeline — write your domain once, Stone.js is the context that runs it anywhere.'
     }
   },
 
@@ -34,7 +28,12 @@ export const HomePage = ({ router, logger, postService }: HomePageOptions): IPag
    * @returns List of posts.
    */
   async handle (event: ReactIncomingEvent): Promise<Post[]> {
-    return await postService.list(event.get<number>('limit', 10))
+    try {
+      return await postService.list(event.get<number>('limit', 10))
+    } catch {
+      // The welcome hero is public: render gracefully even when the API is unreachable.
+      return []
+    }
   },
 
   /**
@@ -42,12 +41,29 @@ export const HomePage = ({ router, logger, postService }: HomePageOptions): IPag
    *
    * @returns The rendered component.
    */
-  render ({ data = [], event, container }: PageRenderContext<Post[]>): JSX.Element {
+  render ({ data = [] }: PageRenderContext<Post[]>): JSX.Element {
+    const count = data.length
+    const lead = `Your timeline is live — ${count} ${count === 1 ? 'post' : 'posts'} published.`
     return (
-      <section>
-        <PostForm onSubmit={createPost.bind(this, router, logger, postService)} />
-        <PostWidget items={data} event={event} container={container} />
-      </section>
+      <main className='stone-welcome'>
+        <div className='glow' aria-hidden='true' />
+        <section className='hero'>
+          <img className='mark' src='/logo.svg' alt='Stone.js' width={104} height={104} />
+          <p className='eyebrow'>Welcome to</p>
+          <h1 className='title'>Stone.js</h1>
+          <p className='lead'>{lead}</p>
+          <p className='tagline'>
+            Write your domain once, Stone.js is the context that runs it anywhere:
+            server, serverless, browser, CLI and the edge.
+          </p>
+          <nav className='links'>
+            <StoneLink to='/users'>Browse Users</StoneLink>
+            <a href='https://stonejs.dev/docs' target='_blank' rel='noreferrer noopener'>Documentation</a>
+            <a href='https://github.com/stone-foundation/stone-js-framework' target='_blank' rel='noreferrer noopener'>GitHub</a>
+          </nav>
+        </section>
+        <footer className='brand'><span className='dot'>●</span> Stone.js — the continuum framework</footer>
+      </main>
     )
   }
 })

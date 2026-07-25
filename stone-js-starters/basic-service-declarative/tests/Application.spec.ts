@@ -47,14 +47,15 @@ describe('Application', () => {
 
   it('should handle incoming events', () => {
     // Arrange
-    const expectedMessage = 'Hello World!'
+    const expectedMessage = 'Hello World! Welcome to Stone.js.'
     const event = { get: () => 'World' } as unknown as IncomingEvent
 
     // Act
-    const response = app.handle(event) as { message: string }
+    const response = app.handle(event)
 
     // Assert
     expect(response.message).toBe(expectedMessage)
+    expect(response.framework.name).toBe('Stone.js')
     expect(mockedLogger.info).toHaveBeenCalledWith(expectedMessage)
   })
 })

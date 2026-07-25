@@ -38,13 +38,22 @@ export class Application implements IEventHandler<IncomingEvent> {
   */
   handle (event: IncomingEvent): ResponseData {
     // Get the name from the event
-    const message = `Hello ${String(event.get<string>('name', 'World'))}!`
+    const name = String(event.get<string>('name', 'World'))
+    const message = `Hello ${name}! Welcome to Stone.js.`
 
     // Log a message
     this.logger.info(message)
 
-    // Return a JSON response
-    return { message }
+    // Return a branded JSON response
+    return {
+      message,
+      framework: {
+        name: 'Stone.js',
+        tagline: 'The continuum framework',
+        docs: 'https://stonejs.dev',
+        github: 'https://github.com/stone-foundation/stone-js-framework'
+      }
+    }
   }
 }
 
@@ -53,4 +62,10 @@ export class Application implements IEventHandler<IncomingEvent> {
  */
 export interface ResponseData {
   message: string
+  framework: {
+    name: string
+    tagline: string
+    docs: string
+    github: string
+  }
 }

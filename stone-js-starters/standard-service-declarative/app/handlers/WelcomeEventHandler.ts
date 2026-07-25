@@ -1,5 +1,5 @@
 import { EventHandler, Get } from '@stone-js/router'
-import { WelcomeService } from '../services/WelcomeService'
+import { WelcomeService, WelcomeResponse } from '../services/WelcomeService'
 import { IncomingHttpEvent, JsonHttpResponse } from '@stone-js/http-core'
 
 /**
@@ -39,7 +39,7 @@ export class WelcomeEventHandler {
   */
   @Get('/:name?')
   @JsonHttpResponse(200)
-  welcome (event: IncomingHttpEvent): { message: string } {
+  welcome (event: IncomingHttpEvent): WelcomeResponse {
     return this.welcomeService.welcome(event.get<string>('name', 'World'))
   }
 }
