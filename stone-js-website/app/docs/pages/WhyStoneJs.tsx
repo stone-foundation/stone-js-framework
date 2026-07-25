@@ -49,6 +49,7 @@ export const services = [defineService(TaskService, { alias: 'tasks' }, true)]
 `
 
 const CONTROLLER_DECL = `
+
 import { IncomingHttpEvent } from '@stone-js/http-core'
 import { Get, Post, EventHandler } from '@stone-js/router'
 
@@ -130,7 +131,7 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
           </p>
         </Define>
         <Define term='Context'>
-          <p>Everything your app does <em>not</em> control: the runtime, the protocol, the shape of
+          <p>Everything your domain does <em>not</em> control: the runtime, the protocol, the shape of
             the input and output. The part the platform decides.</p>
           <p>
             <strong>Everyday example.</strong> The same to-do task might be created by an

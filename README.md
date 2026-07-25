@@ -120,7 +120,7 @@ This repository is the **monorepo** for the whole framework: every `@stone-js/*`
 ```bash
 # Scaffold a new app
 npm create @stone-js@latest my-app
-cd my-app && npm install && npm run dev
+cd my-app && npm run dev
 ```
 
 See [stonejs.dev](https://stonejs.dev) for full documentation.
