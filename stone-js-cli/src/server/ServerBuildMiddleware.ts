@@ -5,6 +5,7 @@ import { IBlueprint } from '@stone-js/core'
 import { ConsoleContext } from '../declarations'
 import { getRollupConfig } from './server-utils'
 import { applyPluginInjections } from '../plugins/applyPluginInjections'
+import { RunStonePluginsBundleMiddleware } from '../plugins/RunStonePluginsMiddleware'
 import { existsSync, readFileSync } from 'node:fs'
 import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 import { basePath, buildPath, distPath } from '@stone-js/filesystem'
@@ -118,6 +119,7 @@ export const BuildTerminatingMiddleware = async (
  * Middleware for building Server applications.
  */
 export const ServerBuildMiddleware: Array<MetaPipe<ConsoleContext, IBlueprint>> = [
+  { module: RunStonePluginsBundleMiddleware, priority: -1 },
   { module: BuildServerAppMiddleware, priority: 0 },
   { module: GenerateServerFileMiddleware, priority: 1 },
   { module: BundleServerAppMiddleware, priority: 2 },
