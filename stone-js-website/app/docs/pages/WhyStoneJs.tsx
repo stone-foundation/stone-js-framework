@@ -49,7 +49,6 @@ export const services = [defineService(TaskService, { alias: 'tasks' }, true)]
 `
 
 const CONTROLLER_DECL = `
-
 import { IncomingHttpEvent } from '@stone-js/http-core'
 import { Get, Post, EventHandler } from '@stone-js/router'
 
@@ -165,8 +164,9 @@ export class WhyStoneJs implements IPage<ReactIncomingEvent> {
         <H2>Where this goes next</H2>
         <p>
           Foundations is the architecture itself, the part that holds no matter where the code runs.
-          Contexts follows the same domain as it collapses into backend, frontend, edge and agents.
-          Build has the recipes for real applications. Frontier is where the model goes from here.
+          Contexts follows a single domain as it collapses into backend, frontend, edge and agents.
+          Build turns those ideas into real applications, one recipe at a time. Frontier is where the
+          framework goes next.
         </p>
 
         <Pager {...siblings(PATH)} />

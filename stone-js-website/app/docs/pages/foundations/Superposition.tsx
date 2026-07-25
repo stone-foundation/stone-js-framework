@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Principle, Aphorism, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, Pager } from '../../components/content'
 
 const PATH = '/docs/foundations/superposition'
 

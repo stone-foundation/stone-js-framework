@@ -1,33 +1,3 @@
-import { resolve } from 'node:path';
-import { defineConfig } from 'vitest/config';
+import { createVitestConfig } from '../vitest.config.base.mjs'
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'node',
-    include: ['./tests/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
-    coverage: {
-      provider: 'v8',
-      include: ['src/**/*.ts', 'bin/**/*.mjs'],
-      reporter: ['text', 'html', 'lcov'],
-      reportsDirectory: './coverage',
-      thresholds: {
-        statements: 90,
-        branches: 90,
-        functions: 90,
-        lines: 90
-      },
-      watermarks: {
-        statements: [80, 100],
-        functions: [80, 100],
-        branches: [80, 100],
-        lines: [80, 100]
-      }
-    },
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-    },
-  },
-});
+export default createVitestConfig(import.meta.url, { coverageInclude: ['src/**/*.ts', 'bin/**/*.mjs'] })

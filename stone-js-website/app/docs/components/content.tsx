@@ -1,6 +1,14 @@
 import { StoneLink } from '@stone-js/use-react'
-import { JSX, ReactNode } from 'react'
+import { JSX, ReactNode, isValidElement } from 'react'
 import { DocLink } from '../nav'
+
+/** Flatten any React children (strings, numbers, nested elements) into plain text, for slugs and labels. */
+export function toText (node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') { return String(node) }
+  if (Array.isArray(node)) { return node.map(toText).join('') }
+  if (isValidElement(node)) { return toText((node.props as { children?: ReactNode }).children) }
+  return ''
+}
 
 /** Turns heading text into a stable slug id, so the TOC can link to it. */
 export function slug (text: string): string {
@@ -39,16 +47,18 @@ export function Lead ({ children }: { children: ReactNode }): JSX.Element {
   return <p className='doc-lead'>{children}</p>
 }
 
-/** A section heading that carries an anchor id (consumed by the TOC). */
-export function H2 ({ children }: { children: string }): JSX.Element {
-  const id = slug(children)
-  return <h2 id={id} className='doc-h2'><a className='anchor' href={`#${id}`} aria-label={children} onClick={(e) => scrollToId(e, id)}>#</a>{children}</h2>
+/** A section heading that carries an anchor id (consumed by the TOC). Accepts rich children (e.g. `<code>`). */
+export function H2 ({ children }: { children: ReactNode }): JSX.Element {
+  const text = toText(children)
+  const id = slug(text)
+  return <h2 id={id} className='doc-h2'><a className='anchor' href={`#${id}`} aria-label={text} onClick={(e) => scrollToId(e, id)}>#</a>{children}</h2>
 }
 
-/** A sub-heading that carries an anchor id. */
-export function H3 ({ children }: { children: string }): JSX.Element {
-  const id = slug(children)
-  return <h3 id={id} className='doc-h3'><a className='anchor' href={`#${id}`} aria-label={children} onClick={(e) => scrollToId(e, id)}>#</a>{children}</h3>
+/** A sub-heading that carries an anchor id. Accepts rich children (e.g. `<code>`). */
+export function H3 ({ children }: { children: ReactNode }): JSX.Element {
+  const text = toText(children)
+  const id = slug(text)
+  return <h3 id={id} className='doc-h3'><a className='anchor' href={`#${id}`} aria-label={text} onClick={(e) => scrollToId(e, id)}>#</a>{children}</h3>
 }
 
 type CalloutKind = 'note' | 'important' | 'future'
