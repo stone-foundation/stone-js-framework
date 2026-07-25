@@ -1,5 +1,0 @@
-# Variable: HTTP\_INTERNAL\_SERVER\_ERROR
-
-```ts
-const HTTP_INTERNAL_SERVER_ERROR: 500 = 500;
-```

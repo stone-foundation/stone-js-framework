@@ -1,5 +1,0 @@
-# Variable: HTTP\_LENGTH\_REQUIRED
-
-```ts
-const HTTP_LENGTH_REQUIRED: 411 = 411;
-```

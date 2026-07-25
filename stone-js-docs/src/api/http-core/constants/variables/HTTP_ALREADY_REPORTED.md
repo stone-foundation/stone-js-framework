@@ -1,5 +1,0 @@
-# Variable: HTTP\_ALREADY\_REPORTED
-
-```ts
-const HTTP_ALREADY_REPORTED: 208 = 208;
-```

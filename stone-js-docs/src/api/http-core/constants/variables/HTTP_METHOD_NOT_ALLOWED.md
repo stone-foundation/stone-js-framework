@@ -1,5 +1,0 @@
-# Variable: HTTP\_METHOD\_NOT\_ALLOWED
-
-```ts
-const HTTP_METHOD_NOT_ALLOWED: 405 = 405;
-```

@@ -1,5 +1,0 @@
-# Variable: HTTP\_GATEWAY\_TIMEOUT
-
-```ts
-const HTTP_GATEWAY_TIMEOUT: 504 = 504;
-```
