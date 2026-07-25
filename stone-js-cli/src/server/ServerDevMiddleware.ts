@@ -8,6 +8,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 import { basePath, buildPath } from '@stone-js/filesystem'
 import { consoleIndexFile, serverIndexFile } from './stubs'
+import { applyPluginInjections } from '../plugins/applyPluginInjections'
 
 const { outputFileSync } = fsExtra
 
@@ -53,9 +54,10 @@ export const GenerateDevServerFileMiddleware = async (
   next: NextPipe<ConsoleContext, IBlueprint>
 ): Promise<IBlueprint> => {
   const printUrls = context.blueprint.get('stone.builder.server.printUrls', false)
-  const content = existsSync(basePath('server.mjs'))
+  const raw = existsSync(basePath('server.mjs'))
     ? readFileSync(basePath('server.mjs'), 'utf-8').replace("'%printUrls%'", String(printUrls))
     : serverIndexFile(printUrls)
+  const content = applyPluginInjections(raw, context.blueprint)
 
   outputFileSync(buildPath('server.mjs'), content, 'utf-8')
 
@@ -77,9 +79,10 @@ export const GenerateConsoleFileMiddleware = async (
     'stone.builder.input.all',
     'app/**/*.**'
   )
-  const content = existsSync(basePath('console.mjs'))
+  const raw = existsSync(basePath('console.mjs'))
     ? readFileSync(basePath('console.mjs'), 'utf-8')
     : consoleIndexFile()
+  const content = applyPluginInjections(raw, context.blueprint)
 
   setCache(pattern)
   outputFileSync(buildPath('console.mjs'), content, 'utf-8')

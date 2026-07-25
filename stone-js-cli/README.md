@@ -32,6 +32,43 @@ Whether you're developing a backend microservice, a frontend SPA, a fullstack SS
 - Export third-party toolchain configs (e.g., Rollup, Vite)
 - Type checking and cache clearing
 - Discover and run custom commands defined in your app or installed libraries
+- Let any package participate in the build with an agnostic plugin system
+
+## Plugins: participate in the build
+
+The CLI is itself a Stone.js app, and it lets any package take part in the build and bundle
+through an agnostic `StoneCliPlugin` contract. A plugin can run config-phase middleware, generate
+code into `.stone/` and contribute modules or configuration to the built app, all without knowing
+anything about the CLI internals.
+
+```ts
+// @acme/stone-acme/cli
+export function acmeCliPlugin (options = {}) {
+  return {
+    name: '@acme/stone-acme',
+    onPrepare (ctx) {
+      ctx.writeFile('plugins/acme.mjs', "export const acme = defineConfig({ stone: { acme: {} } })")
+      ctx.addModule('./plugins/acme.mjs') // its exports join the app modules
+    }
+  }
+}
+```
+
+Load a plugin explicitly from `stone.config` (open to any package):
+
+```ts
+import { defineConfig } from '@stone-js/cli'
+import { acmeCliPlugin } from '@acme/stone-acme/cli'
+
+export default defineConfig({ plugins: [acmeCliPlugin()] })
+```
+
+First-party `@stone-js/*` packages that advertise a `stone.cliPlugin` contract in their
+`package.json` are auto-discovered from your direct dependencies, so they stay truly zero-config.
+Third-party plugins always go through `stone.config`, and every auto-discovered plugin is announced
+on each build. Opt out with `autoDiscoverPlugins: false`.
+
+Full guide: [Participate in the build](https://stonejs.dev/docs/extending/cli-plugins).
 
 ## Installation
 

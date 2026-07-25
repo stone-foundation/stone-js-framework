@@ -1,5 +1,6 @@
 import { NODE_CONSOLE_PLATFORM } from '@stone-js/node-cli-adapter'
 import { getStoneBuilderConfig, getEnvVariables } from '../../src/utils'
+import { LoadStonePluginsMiddleware } from '../../src/plugins/LoadStonePluginsMiddleware'
 import { LoadStoneConfigMiddleware, LoadDotenvVariablesMiddleware, SetCliCommandsMiddleware, metaCLIBlueprintMiddleware } from '../../src/middleware/BlueprintMiddleware'
 
 vi.mock('../../src/utils', async () => {
@@ -87,7 +88,8 @@ describe('BlueprintMiddleware', () => {
     expect(metaCLIBlueprintMiddleware).toEqual([
       { priority: 1, module: SetCliCommandsMiddleware },
       { priority: 2, module: LoadStoneConfigMiddleware },
-      { priority: 3, module: LoadDotenvVariablesMiddleware }
+      { priority: 3, module: LoadDotenvVariablesMiddleware },
+      { priority: 4, module: LoadStonePluginsMiddleware }
     ])
   })
 })

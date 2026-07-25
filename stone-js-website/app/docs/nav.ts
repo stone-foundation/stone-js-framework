@@ -204,7 +204,8 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Write your own adapter', path: '/docs/extending/adapter' },
       { title: 'Create a package or plugin', path: '/docs/extending/package' },
       { title: 'Create a decorator', path: '/docs/extending/decorator' },
-      { title: 'Create CLI commands', path: '/docs/extending/commands' }
+      { title: 'Create CLI commands', path: '/docs/extending/commands' },
+      { title: 'Participate in the build', path: '/docs/extending/cli-plugins' }
     ]
   },
   {

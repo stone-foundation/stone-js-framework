@@ -4,6 +4,7 @@ import { serverIndexFile } from './stubs'
 import { IBlueprint } from '@stone-js/core'
 import { ConsoleContext } from '../declarations'
 import { getRollupConfig } from './server-utils'
+import { applyPluginInjections } from '../plugins/applyPluginInjections'
 import { existsSync, readFileSync } from 'node:fs'
 import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 import { basePath, buildPath, distPath } from '@stone-js/filesystem'
@@ -56,9 +57,10 @@ export const GenerateServerFileMiddleware = async (
   next: NextPipe<ConsoleContext, IBlueprint>
 ): Promise<IBlueprint> => {
   const printUrls = context.blueprint.get('stone.builder.server.printUrls', true)
-  const content = existsSync(basePath('server.mjs'))
+  const raw = existsSync(basePath('server.mjs'))
     ? readFileSync(basePath('server.mjs'), 'utf-8').replace("'%printUrls%'", String(printUrls))
     : serverIndexFile(printUrls)
+  const content = applyPluginInjections(raw, context.blueprint)
 
   outputFileSync(buildPath('tmp/server.mjs'), content, 'utf-8')
 

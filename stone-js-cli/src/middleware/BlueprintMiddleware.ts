@@ -1,6 +1,7 @@
 import { DotenvConfig } from '../options/DotenvConfig'
 import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 import { getEnvVariables, getStoneBuilderConfig } from '../utils'
+import { LoadStonePluginsMiddleware } from '../plugins/LoadStonePluginsMiddleware'
 import { NODE_CONSOLE_PLATFORM } from '@stone-js/node-cli-adapter'
 import { BlueprintContext, ClassType, IBlueprint } from '@stone-js/core'
 import { ListCommand, listCommandOptions } from '../commands/ListCommand'
@@ -103,5 +104,6 @@ export const SetCliCommandsMiddleware = async (
 export const metaCLIBlueprintMiddleware: Array<MetaPipe<BlueprintContext<IBlueprint, ClassType>, IBlueprint>> = [
   { priority: 1, module: SetCliCommandsMiddleware },
   { priority: 2, module: LoadStoneConfigMiddleware },
-  { priority: 3, module: LoadDotenvVariablesMiddleware }
+  { priority: 3, module: LoadDotenvVariablesMiddleware },
+  { priority: 4, module: LoadStonePluginsMiddleware }
 ]
