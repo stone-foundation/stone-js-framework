@@ -41,6 +41,13 @@ export class I18n implements II18n {
     const missing = options.missing
     const onMissingKey = options.onMissingKey
 
+    let parseMissingKeyHandler: ((key: string) => string) | undefined
+    if (missing === 'empty') {
+      parseMissingKeyHandler = () => ''
+    } else if (typeof missing === 'function') {
+      parseMissingKeyHandler = (key: string): string => missing(key, instance.language, defaultNS)
+    }
+
     void instance.init({
       lng: options.locale ?? 'en',
       fallbackLng: options.fallbackLocale ?? 'en',
@@ -55,11 +62,7 @@ export class I18n implements II18n {
         suffix: options.interpolation?.suffix ?? '}}',
         escapeValue: options.interpolation?.escapeValue ?? false
       },
-      parseMissingKeyHandler: missing === 'empty'
-        ? () => ''
-        : typeof missing === 'function'
-          ? (key: string): string => missing(key, instance.language, defaultNS)
-          : undefined,
+      parseMissingKeyHandler,
       // Dev aid: notify on missing keys so untranslated strings surface during development.
       saveMissing: onMissingKey !== undefined,
       missingKeyHandler: onMissingKey !== undefined

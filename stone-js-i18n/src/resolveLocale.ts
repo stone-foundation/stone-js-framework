@@ -18,11 +18,25 @@ export const DEFAULT_LOCALE_HEADERS: string[] = ['x-locale', 'x-lang', 'x-langua
 export function resolveLocale (event: LocaleAwareEvent, options: LocaleResolutionOptions = {}): Locale | undefined {
   const locales = options.locales
 
-  if (options.resolver !== undefined) {
-    const resolved = negotiate(options.resolver(event, options), locales)
+  const fromResolver = options.resolver !== undefined ? negotiate(options.resolver(event, options), locales) : undefined
+  if (fromResolver !== undefined) { return fromResolver }
+
+  for (const candidate of collectCandidates(event, options)) {
+    const resolved = negotiate(candidate, locales)
     if (resolved !== undefined) { return resolved }
   }
 
+  return fromAcceptLanguage(event, options) ?? negotiate(event.locale, locales) ?? options.fallbackLocale
+}
+
+/**
+ * Gather the ordered explicit candidates: route param → custom headers → query → cookie.
+ *
+ * @param event - The incoming event.
+ * @param options - The resolution options.
+ * @returns The raw candidates, in priority order.
+ */
+function collectCandidates (event: LocaleAwareEvent, options: LocaleResolutionOptions): Array<string | undefined> {
   const candidates: Array<string | undefined> = []
 
   if (options.param !== undefined) {
@@ -38,18 +52,25 @@ export function resolveLocale (event: LocaleAwareEvent, options: LocaleResolutio
     candidates.push(event.getCookie?.<string>(options.cookie ?? 'locale'))
   }
 
-  for (const candidate of candidates) {
-    const resolved = negotiate(candidate, locales)
-    if (resolved !== undefined) { return resolved }
+  return candidates
+}
+
+/**
+ * Negotiate the standard `Accept-Language` header against the supported locales.
+ *
+ * @param event - The incoming event.
+ * @param options - The resolution options.
+ * @returns The negotiated locale, or `undefined`.
+ */
+function fromAcceptLanguage (event: LocaleAwareEvent, options: LocaleResolutionOptions): Locale | undefined {
+  const locales = options.locales
+  if (options.acceptLanguage === false || event.acceptsLanguages === undefined || locales === undefined || locales.length === 0) {
+    return undefined
   }
 
-  if (options.acceptLanguage !== false && event.acceptsLanguages !== undefined && locales !== undefined && locales.length > 0) {
-    const negotiated = event.acceptsLanguages(...locales)
-    const value = typeof negotiated === 'string' ? negotiated : negotiated?.value
-    if (value !== undefined && value !== '') { return value }
-  }
-
-  return negotiate(event.locale, locales) ?? options.fallbackLocale
+  const negotiated = event.acceptsLanguages(...locales)
+  const value = typeof negotiated === 'string' ? negotiated : negotiated?.value
+  return value !== undefined && value !== '' ? value : undefined
 }
 
 /**

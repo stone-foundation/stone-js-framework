@@ -36,7 +36,8 @@ export function loadTranslations (modules: GlobModules): Resources {
 
     const namespace = file.replace(/\.[^.]+$/, '')
     const translations = (isRecord(mod) && 'default' in mod ? mod.default : mod) as Translations
-    resources[locale] = { ...(resources[locale] ?? {}), [namespace]: translations }
+    resources[locale] ??= {}
+    resources[locale][namespace] = translations
   }
 
   return resources
