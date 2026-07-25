@@ -147,7 +147,7 @@ export class StoneReporter {
    * @param message - The step message.
    */
   step (message: string): this {
-    const tag = this.output.format.cyanBright(`${STONE_MARK} [stone]`)
+    const tag = this.output.format.hex(STONE_EMBER)(`${STONE_MARK} [stone]`)
     this.output.show(`${tag} ${message}`)
     return this
   }

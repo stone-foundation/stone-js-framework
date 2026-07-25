@@ -4,6 +4,7 @@ import {
   reactConsoleEntryPointTemplate,
   reactClientEntryPointTemplate
 } from './stubs'
+import { applyPluginInjections } from '../plugins/applyPluginInjections'
 import fsExtra from 'fs-extra'
 import { relative } from 'node:path'
 import { build, mergeConfig } from 'vite'
@@ -43,7 +44,7 @@ export const GenerateEntryPointFileMiddleware = async (
     ? readFileSync(basePath(userFilename), 'utf-8')
     : reactClientEntryPointTemplate(pattern)
 
-  content = content.replace('%pattern%', pattern)
+  content = applyPluginInjections(content, context.blueprint).replace('%pattern%', pattern)
 
   outputFileSync(buildPath(filename), content, 'utf-8')
 
@@ -152,7 +153,7 @@ export const GenerateReactConsoleFileMiddleware = async (
     ? readFileSync(basePath(userFilename), 'utf-8')
     : reactConsoleEntryPointTemplate(pattern)
 
-  content = content.replace('%pattern%', pattern)
+  content = applyPluginInjections(content, context.blueprint).replace('%pattern%', pattern)
 
   outputFileSync(buildPath(filename), content, 'utf-8')
 

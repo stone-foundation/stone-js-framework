@@ -7,6 +7,7 @@ import { basePath, distPath } from '@stone-js/filesystem'
 import { IBlueprint, IncomingEvent } from '@stone-js/core'
 import { consoleIndexFile, serverIndexFile } from './stubs'
 import { ServerBuildMiddleware } from './ServerBuildMiddleware'
+import { RunStonePluginsMiddleware } from '../plugins/RunStonePluginsMiddleware'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { ConsoleDevMiddleware, ServerDevMiddleware } from './ServerDevMiddleware'
 
@@ -228,7 +229,7 @@ export class ServerBuilder {
     await Pipeline
       .create<ConsoleContext, IBlueprint>()
       .send(this.context)
-      .through(...pipes)
+      .through({ module: RunStonePluginsMiddleware, priority: -1 }, ...pipes)
       .then(context => context.blueprint)
   }
 }

@@ -7,6 +7,7 @@ import {
 import { CliError } from '../errors/CliError'
 import { basePath } from '@stone-js/filesystem'
 import { StoneReporter } from '../StoneReporter'
+import { RunStonePluginsMiddleware } from '../plugins/RunStonePluginsMiddleware'
 import { ConsoleContext } from '../declarations'
 import { MetaPipe, Pipeline } from '@stone-js/pipeline'
 import { IBlueprint, IncomingEvent } from '@stone-js/core'
@@ -238,7 +239,7 @@ export class ReactBuilder {
     await Pipeline
       .create<ConsoleContext, IBlueprint>()
       .send(this.context)
-      .through(...pipes)
+      .through({ module: RunStonePluginsMiddleware, priority: -1 }, ...pipes)
       .then(context => context.blueprint)
   }
 

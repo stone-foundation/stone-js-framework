@@ -1,6 +1,7 @@
 import { UserConfig } from 'vite'
 import { RollupOptions } from 'rollup'
 import { dotenv, DotenvConfig } from './DotenvConfig'
+import { StoneCliPlugin } from '../plugins/declarations'
 import { rollupBuildConfig, rollupBundleConfig } from '../server/rollup-config'
 
 /**
@@ -177,6 +178,26 @@ export interface BuilderConfig {
    * The Vite configuration for the application.
    */
   vite?: Partial<UserConfig>
+
+  /**
+   * CLI plugins that participate in the build/bundle lifecycle.
+   *
+   * This is the explicit, primary path, open to any package: list the plugins a module exposes
+   * (e.g. `plugins: [i18nCliPlugin()]`). First-party `@stone-js/*` plugins are additionally
+   * auto-discovered from their `package.json` contract (see {@link autoDiscoverPlugins}); a plugin
+   * listed here always wins over the same plugin auto-discovered.
+   */
+  plugins?: StoneCliPlugin[]
+
+  /**
+   * Whether to auto-discover first-party (`@stone-js/*`) CLI plugins (default `true`).
+   *
+   * When enabled, `@stone-js/*` packages in the project's direct dependencies that advertise a
+   * `stone.cliPlugin` contract are loaded automatically, so first-party modules stay truly
+   * zero-config. Third-party plugins are never auto-discovered: they must be declared in
+   * {@link plugins}. Set to `false` to opt out entirely and load every plugin explicitly.
+   */
+  autoDiscoverPlugins?: boolean
 }
 
 /**
@@ -184,8 +205,10 @@ export interface BuilderConfig {
  */
 export const builder: BuilderConfig = {
   dotenv,
+  plugins: [],
   lazy: true, // Lazy pages by default: per-route code splitting, and the scanned route definitions feed zero-config SSG.
   public: 'public',
+  autoDiscoverPlugins: true, // First-party `@stone-js/*` plugins are zero-config; third-party plugins go through `plugins`.
   assets: {
     dir: 'assets',
     aliases: {

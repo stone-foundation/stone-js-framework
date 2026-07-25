@@ -51,6 +51,7 @@ const modules = Object
   .values(rawModules)
   // @ts-ignore
   .flatMap(Object.values)
+  // %concat%
 
 /**
  * Create and run the Stone app.
@@ -87,6 +88,7 @@ const modules = Object
   .values(rawModules)
   // @ts-ignore
   .flatMap(Object.values)
+  // %concat%
 
 /**
  * Create and run the Stone app.
@@ -96,6 +98,7 @@ export const stone = await stoneApp({
 })
 .configure((blueprint) => {
   blueprint.set('stone.adapter.platform', '${platform}')
+  // %blueprint%
 })
 .run()
 `
