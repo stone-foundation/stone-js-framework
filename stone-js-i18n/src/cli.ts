@@ -89,20 +89,32 @@ export function toImportSpecifier (moduleDir: string, file: string): string {
   return rel.startsWith('.') ? rel : `./${rel}`
 }
 
-/** The U+2028 line separator and U+2029 paragraph separator, built without embedding them literally. */
-const LINE_SEP = String.fromCharCode(0x2028)
-const PARA_SEP = String.fromCharCode(0x2029)
+/** The U+2028 and U+2029 line separators, and the backslash, built by code point (no literals here). */
+const LINE_SEP = String.fromCodePoint(0x2028)
+const PARA_SEP = String.fromCodePoint(0x2029)
+const BACKSLASH = String.fromCodePoint(0x5C)
 
 /**
- * Characters `JSON.stringify` leaves intact but that are unsafe to embed verbatim in generated
- * source (they can terminate a `<script>` context or, historically, a JS string literal).
+ * Build a unicode escape sequence (as plain text) for a code point, without writing a backslash
+ * escape or the raw character in this source.
+ *
+ * @param code - The code point.
+ * @returns The escape sequence, e.g. the six characters that render the less-than sign.
+ */
+function unicodeEscape (code: number): string {
+  return BACKSLASH + 'u' + code.toString(16).padStart(4, '0').toUpperCase()
+}
+
+/**
+ * Characters JSON.stringify leaves intact but that are unsafe to embed verbatim in generated
+ * source (they can terminate a script context or, historically, a JS string literal).
  */
 const UNSAFE_SOURCE_CHARS: Record<string, string> = {
-  '<': '\\u003C',
-  '>': '\\u003E',
-  '/': '\\u002F',
-  [LINE_SEP]: '\\u2028',
-  [PARA_SEP]: '\\u2029'
+  '<': unicodeEscape(0x3C),
+  '>': unicodeEscape(0x3E),
+  '/': unicodeEscape(0x2F),
+  [LINE_SEP]: unicodeEscape(0x2028),
+  [PARA_SEP]: unicodeEscape(0x2029)
 }
 
 const UNSAFE_SOURCE_RE = new RegExp('[<>/' + LINE_SEP + PARA_SEP + ']', 'g')
