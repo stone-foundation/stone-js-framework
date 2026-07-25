@@ -15,14 +15,17 @@ export class I18n implements II18n {
 
   private readonly i18next: I18nextInstance
   private readonly boundLocale?: Locale
+  private readonly timeZone?: string
 
   /**
    * @param i18next - The underlying i18next instance.
    * @param boundLocale - When set, this translator is locked to that locale (request scope).
+   * @param timeZone - Default IANA time zone for date formatting.
    */
-  private constructor (i18next: I18nextInstance, boundLocale?: Locale) {
+  private constructor (i18next: I18nextInstance, boundLocale?: Locale, timeZone?: string) {
     this.i18next = i18next
     this.boundLocale = boundLocale
+    this.timeZone = timeZone
   }
 
   /**
@@ -36,6 +39,7 @@ export class I18n implements II18n {
     const resources: Resources = options.resources ?? {}
     const defaultNS = options.defaultNamespace ?? 'translation'
     const missing = options.missing
+    const onMissingKey = options.onMissingKey
 
     void instance.init({
       lng: options.locale ?? 'en',
@@ -55,10 +59,15 @@ export class I18n implements II18n {
         ? () => ''
         : typeof missing === 'function'
           ? (key: string): string => missing(key, instance.language, defaultNS)
-          : undefined
+          : undefined,
+      // Dev aid: notify on missing keys so untranslated strings surface during development.
+      saveMissing: onMissingKey !== undefined,
+      missingKeyHandler: onMissingKey !== undefined
+        ? (lngs: readonly string[], ns: string, key: string): void => onMissingKey(key, lngs[0], ns)
+        : undefined
     })
 
-    return new I18n(instance)
+    return new I18n(instance, undefined, options.timeZone)
   }
 
   /**
@@ -87,6 +96,11 @@ export class I18n implements II18n {
   /** The locale this translator resolves against. */
   get locale (): Locale {
     return this.getLocale()
+  }
+
+  /** The underlying i18next instance, for direct/advanced use (also bound in the container as `i18next`). */
+  get raw (): I18nextInstance {
+    return this.i18next
   }
 
   /**
@@ -138,7 +152,7 @@ export class I18n implements II18n {
    * @returns A locale-bound translator.
    */
   forLocale (locale: Locale): I18n {
-    return new I18n(this.i18next, locale)
+    return new I18n(this.i18next, locale, this.timeZone)
   }
 
   /**
@@ -164,6 +178,51 @@ export class I18n implements II18n {
   }
 
   /**
+   * Format a number in compact notation (1000 → "1K", 1.5e6 → "1.5M"), locale-aware.
+   *
+   * @param value - The number.
+   * @param options - `Intl.NumberFormat` options.
+   * @returns The compact number.
+   */
+  compact (value: number, options?: Intl.NumberFormatOptions): string {
+    return this.number(value, { notation: 'compact', ...options })
+  }
+
+  /**
+   * Format a monetary amount for the active locale.
+   *
+   * @param value - The amount.
+   * @param currency - The ISO 4217 currency code (e.g. `'EUR'`).
+   * @param options - `Intl.NumberFormat` options.
+   * @returns The formatted amount.
+   */
+  currency (value: number, currency: string, options?: Intl.NumberFormatOptions): string {
+    return this.number(value, { style: 'currency', currency, ...options })
+  }
+
+  /**
+   * Format a ratio as a percentage (e.g. `percent(0.25)` → "25%").
+   *
+   * @param value - The ratio (0–1).
+   * @param options - `Intl.NumberFormat` options.
+   * @returns The formatted percentage.
+   */
+  percent (value: number, options?: Intl.NumberFormatOptions): string {
+    return this.number(value, { style: 'percent', ...options })
+  }
+
+  /**
+   * The writing direction of a locale — `'rtl'` for Arabic/Hebrew/Farsi/Urdu/…, otherwise `'ltr'`.
+   * Use it for the document's `dir` attribute.
+   *
+   * @param locale - The locale (defaults to the active one).
+   * @returns The direction.
+   */
+  dir (locale: Locale = this.getLocale()): 'ltr' | 'rtl' {
+    return RTL_LANGUAGES.has(locale.split('-')[0].toLowerCase()) ? 'rtl' : 'ltr'
+  }
+
+  /**
    * Format a date for the active locale.
    *
    * @param value - A `Date`, timestamp or date string.
@@ -171,7 +230,7 @@ export class I18n implements II18n {
    * @returns The formatted date.
    */
   date (value: Date | number | string, options?: Intl.DateTimeFormatOptions): string {
-    return new Intl.DateTimeFormat(this.getLocale(), options).format(new Date(value))
+    return new Intl.DateTimeFormat(this.getLocale(), { timeZone: this.timeZone, ...options }).format(new Date(value))
   }
 
   /**
@@ -197,6 +256,9 @@ export class I18n implements II18n {
     return new Intl.ListFormat(this.getLocale(), options).format(values)
   }
 }
+
+/** Base languages written right-to-left. */
+const RTL_LANGUAGES = new Set(['ar', 'he', 'fa', 'ur', 'ps', 'sd', 'ug', 'yi', 'dv', 'ckb'])
 
 /**
  * Collect every namespace present across all locales, always including the default one.

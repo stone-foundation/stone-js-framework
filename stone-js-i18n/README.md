@@ -27,22 +27,27 @@ npm i @stone-js/i18n
 
 ## Zero-config
 
-Drop your translations under `app/i18n/<locale>/<namespace>.json` — they load automatically:
+Lay your translations out as `app/i18n/<locale>/<namespace>.<ext>`:
 
 ```
 app/i18n/
-├─ en/
-│  └─ common.json   → { "hello": "Hello {{name}}!", "items_one": "{{count}} item", "items_other": "{{count}} items" }
-└─ fr/
-   └─ common.json   → { "hello": "Bonjour {{name}} !", "items_one": "{{count}} article", "items_other": "{{count}} articles" }
+├─ en/common.json   → { "hello": "Hello {{name}}!", "items_one": "{{count}} item", "items_other": "{{count}} items" }
+└─ fr/common.json   → { "hello": "Bonjour {{name}} !", "items_one": "{{count}} article", "items_other": "{{count}} articles" }
 ```
 
-Register the blueprint (opt-in), and inject `i18n` anywhere:
+Load them with one bundler-driven line — **the same on the backend and the frontend** (all formats,
+tree-shakeable, no `node:fs`):
 
 ```ts
-import { i18nBlueprint } from '@stone-js/i18n'
-// stone.config.mjs / your app blueprint → include i18nBlueprint
+import { defineI18n, loadTranslations } from '@stone-js/i18n'
+
+export const AppConfig = defineConfig(defineI18n({
+  locales: ['en', 'fr'],
+  resources: loadTranslations(import.meta.glob('/app/i18n/**/*.{json,ts,js,yaml,yml}', { eager: true }))
+}))
 ```
+
+Then register the blueprint (opt-in): `import { i18nBlueprint } from '@stone-js/i18n'`.
 
 ## Usage
 
@@ -81,14 +86,18 @@ export const AppConfig = defineConfig(defineI18n({
   locale: 'en',
   locales: ['en', 'fr', 'pt-BR'],   // negotiated (fr-CA → fr)
   fallbackLocale: 'en',
+  timeZone: 'America/New_York',      // default IANA time zone for date formatting (per-call overridable)
   // Locale resolution order is configurable:
-  headers: ['x-locale', 'x-lang', 'x-language'], // custom headers, checked first
-  query: 'lang',                                  // ?lang=fr   (false to disable)
-  cookie: 'locale',                               // (false to disable)
-  acceptLanguage: true,                           // standard Accept-Language negotiation
-  dir: 'app/i18n'                                 // zero-config scan dir (false to disable)
+  param: 'lang',                     // a `:lang` route param (path-based locale), checked first
+  headers: ['x-locale', 'x-lang', 'x-language'], // custom headers
+  query: 'lang',                     // ?lang=fr   (false to disable)
+  cookie: 'locale',                  // (false to disable)
+  acceptLanguage: true               // standard Accept-Language negotiation
 }))
 ```
+
+The underlying i18next instance is also bound in the container (`constructor ({ i18next })`) and
+available as `i18n.raw`, so you can wire `react-i18next`, plugins or backends directly if you need to.
 
 ## License
 

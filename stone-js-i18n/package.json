@@ -34,7 +34,6 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "browser": "./dist/browser.js",
       "default": "./dist/index.js"
     }
   },

@@ -25,6 +25,9 @@ export function resolveLocale (event: LocaleAwareEvent, options: LocaleResolutio
 
   const candidates: Array<string | undefined> = []
 
+  if (options.param !== undefined) {
+    candidates.push(event.getParam?.<string>(options.param))
+  }
   for (const header of options.headers ?? DEFAULT_LOCALE_HEADERS) {
     candidates.push(event.getHeader?.<string>(header))
   }
@@ -50,13 +53,14 @@ export function resolveLocale (event: LocaleAwareEvent, options: LocaleResolutio
 }
 
 /**
- * Validate/normalise a candidate against the supported locales.
+ * Validate/normalise a candidate against the supported locales (exact tag, then base language,
+ * e.g. `fr-CA` → `fr`). Returns the raw candidate when no locales restrict it.
  *
  * @param candidate - The raw candidate.
  * @param locales - The supported locales (unrestricted when omitted/empty).
  * @returns The accepted locale, or `undefined`.
  */
-function negotiate (candidate: string | undefined, locales?: Locale[]): Locale | undefined {
+export function negotiate (candidate: string | undefined, locales?: Locale[]): Locale | undefined {
   if (candidate === undefined || candidate.trim() === '') { return undefined }
 
   const normalized = candidate.trim()

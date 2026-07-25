@@ -4,10 +4,7 @@ import { I18nError } from '../src/errors/I18nError'
 import { IntegrationError } from '@stone-js/core'
 import { I18nServiceProvider } from '../src/I18nServiceProvider'
 import { SetLocaleMiddleware, MetaSetLocaleMiddleware } from '../src/middleware/SetLocaleMiddleware'
-import { baseI18nBlueprint, defineI18n } from '../src/options/I18nBlueprint'
-import { i18nBlueprint as serverI18nBlueprint } from '../src/server/i18nBlueprint'
-import { i18nBlueprint as browserI18nBlueprint } from '../src/browser/i18nBlueprint'
-import { metaServerI18nBlueprintMiddleware } from '../src/server/BlueprintMiddleware'
+import { i18nBlueprint, defineI18n } from '../src/options/I18nBlueprint'
 
 const resources = {
   en: { translation: { hello: 'Hello {{name}}!' } },
@@ -33,6 +30,7 @@ describe('I18nServiceProvider', () => {
     expect(blueprint.get).toHaveBeenCalledWith('stone.i18n', {})
     expect(container.instanceIf).toHaveBeenCalledWith(I18n, expect.any(I18n))
     expect(container.alias).toHaveBeenCalledWith(I18n, ['i18n', 'I18n'])
+    expect(container.instanceIf).toHaveBeenCalledWith('i18next', expect.objectContaining({ t: expect.any(Function) }))
     expect(I18n.getInstance().getLocale()).toBe('fr')
   })
 })
@@ -70,10 +68,12 @@ describe('helpers', () => {
 describe('SetLocaleMiddleware', () => {
   const i18n = I18n.create({ locale: 'en', locales: ['en', 'fr'], resources })
 
-  function run (config: object, event: any): { meta: Record<string, any>, result: Promise<unknown> } {
+  const noRouter = { bound: () => false, make: () => undefined }
+
+  function run (config: object, event: any, container: any = noRouter): { meta: Record<string, any>, result: Promise<unknown> } {
     const meta: Record<string, any> = {}
     event.setMetadataValue = (key: string, value: unknown) => { meta[key] = value }
-    const middleware = new SetLocaleMiddleware({ i18n, blueprint: { get: () => config } } as any)
+    const middleware = new SetLocaleMiddleware({ i18n, blueprint: { get: () => config }, container } as any)
     const next = vi.fn().mockResolvedValue('RESPONSE')
     return { meta, result: middleware.handle(event, next as any) }
   }
@@ -106,26 +106,51 @@ describe('SetLocaleMiddleware', () => {
     expect(b.meta.locale).toBe('fr')
   })
 
+  it('resolves a path-based locale via the router when a param is configured', async () => {
+    const route = { bind: vi.fn().mockResolvedValue(undefined), getParam: () => 'fr' }
+    const router = { findRoute: vi.fn().mockResolvedValue(route) }
+    const container = { bound: (k: string) => k === 'router', make: () => router }
+    const event: any = { getHeader: () => 'en' } // header says en, but the path wins
+    const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang' }, event, container)
+    await result
+    expect(meta.locale).toBe('fr')
+    expect(route.bind).toHaveBeenCalledWith(event)
+  })
+
+  it('falls back to event sources when the router is not available', async () => {
+    const event: any = { getHeader: (n: string) => (n.toLowerCase() === 'x-locale' ? 'fr' : undefined) }
+    const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang' }, event) // no router
+    await result
+    expect(meta.locale).toBe('fr')
+  })
+
+  it('is best-effort: a router error falls back to event sources', async () => {
+    const container = { bound: () => true, make: () => ({ findRoute: vi.fn().mockRejectedValue(new Error('boom')) }) }
+    const event: any = { getHeader: (n: string) => (n.toLowerCase() === 'x-locale' ? 'fr' : undefined) }
+    const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang' }, event, container)
+    await result
+    expect(meta.locale).toBe('fr')
+  })
+
+  it('falls back when the router finds no route', async () => {
+    const container = { bound: () => true, make: () => ({ findRoute: vi.fn().mockResolvedValue(undefined) }) }
+    const event: any = { getHeader: () => undefined, locale: 'en' }
+    const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang', fallbackLocale: 'en' }, event, container)
+    await result
+    expect(meta.locale).toBe('en')
+  })
+
   it('is exported as a class meta middleware', () => {
     expect(MetaSetLocaleMiddleware).toEqual({ module: SetLocaleMiddleware, isClass: true })
   })
 })
 
 describe('i18nBlueprint', () => {
-  it('shares the provider and the kernel middleware', () => {
-    expect(baseI18nBlueprint.stone.providers).toContain(I18nServiceProvider)
-    expect(baseI18nBlueprint.stone.kernel?.middleware).toContain(MetaSetLocaleMiddleware)
-    expect(baseI18nBlueprint.stone.i18n).toEqual({})
-  })
-
-  it('the backend blueprint adds the zero-config autoloader', () => {
-    expect(serverI18nBlueprint.stone.providers).toContain(I18nServiceProvider)
-    expect(serverI18nBlueprint.stone.blueprint?.middleware).toBe(metaServerI18nBlueprintMiddleware)
-  })
-
-  it('the browser blueprint has no filesystem autoloader', () => {
-    expect(browserI18nBlueprint).toBe(baseI18nBlueprint)
-    expect(browserI18nBlueprint.stone.blueprint).toBeUndefined()
+  it('contributes the provider and the kernel middleware, isomorphically (no filesystem)', () => {
+    expect(i18nBlueprint.stone.providers).toContain(I18nServiceProvider)
+    expect(i18nBlueprint.stone.kernel?.middleware).toContain(MetaSetLocaleMiddleware)
+    expect(i18nBlueprint.stone.i18n).toEqual({})
+    expect(i18nBlueprint.stone.blueprint).toBeUndefined()
   })
 
   it('defineI18n wraps a config fragment', () => {

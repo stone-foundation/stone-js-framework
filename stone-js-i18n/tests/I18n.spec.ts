@@ -101,6 +101,50 @@ describe('I18n', () => {
       expect(fr.relativeTime(-3, 'day')).toBe('il y a 3 jours')
       expect(fr.list(['a', 'b', 'c'])).toBe('a, b et c')
     })
+
+    it('formats dates in a configured time zone (and per-call override)', () => {
+      const instant = '2026-01-15T00:00:00Z' // midnight UTC
+      const nyc = create({ timeZone: 'America/New_York' }) // UTC-5 in January
+      const tokyo = create({ timeZone: 'Asia/Tokyo' }) // UTC+9
+      expect(nyc.date(instant, { day: 'numeric' })).toBe('14') // still the 14th in New York
+      expect(tokyo.date(instant, { day: 'numeric' })).toBe('15') // already the 15th in Tokyo
+      expect(nyc.date(instant, { day: 'numeric', timeZone: 'Asia/Tokyo' })).toBe('15') // per-call wins
+      expect(nyc.forLocale('fr').date(instant, { day: 'numeric' })).toBe('14') // propagates to forLocale
+    })
+  })
+
+  it('exposes the raw i18next instance (shared across bound translators)', () => {
+    const i18n = create()
+    expect(typeof i18n.raw.t).toBe('function')
+    expect(i18n.forLocale('fr').raw).toBe(i18n.raw)
+  })
+
+  describe('everyday utilities', () => {
+    it('formats compact, currency and percent (locale-aware)', () => {
+      const en = create()
+      expect(en.compact(1000)).toBe('1K')
+      expect(en.compact(1_500_000, { maximumFractionDigits: 1 })).toBe('1.5M')
+      expect(en.currency(19.9, 'EUR')).toContain('€')
+      expect(en.percent(0.25)).toBe('25%')
+      const fr = en.forLocale('fr')
+      expect(fr.compact(1_000_000)).toContain('M')
+      expect(fr.percent(0.25)).toContain('25')
+    })
+
+    it('reports the writing direction for <html dir>', () => {
+      const i18n = create()
+      expect(i18n.dir()).toBe('ltr')
+      expect(i18n.dir('ar')).toBe('rtl')
+      expect(i18n.dir('he-IL')).toBe('rtl')
+      expect(i18n.forLocale('fr').dir()).toBe('ltr')
+    })
+
+    it('notifies onMissingKey for untranslated keys (dev aid)', () => {
+      const missing: string[] = []
+      const i18n = I18n.create({ locale: 'en', resources: structuredClone(resources), onMissingKey: (key, locale, ns) => missing.push(`${ns}:${locale}:${key}`) })
+      i18n.t('nope.here')
+      expect(missing).toContain('translation:en:nope.here')
+    })
   })
 
   describe('process-wide instance', () => {

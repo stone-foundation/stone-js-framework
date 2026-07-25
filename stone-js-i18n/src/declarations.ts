@@ -58,6 +58,18 @@ export interface II18n {
   /** Format a number with `Intl.NumberFormat` for the active locale. */
   number: (value: number, options?: Intl.NumberFormatOptions) => string
 
+  /** Format a number in compact notation (1000 → "1K", 1.5e6 → "1.5M"), locale-aware. */
+  compact: (value: number, options?: Intl.NumberFormatOptions) => string
+
+  /** Format a monetary amount (e.g. `currency(19.9, 'EUR')` → "19,90 €" in fr). */
+  currency: (value: number, currency: string, options?: Intl.NumberFormatOptions) => string
+
+  /** Format a ratio as a percentage (e.g. `percent(0.25)` → "25%"). */
+  percent: (value: number, options?: Intl.NumberFormatOptions) => string
+
+  /** The writing direction of a locale (`'rtl'` for Arabic/Hebrew/…, else `'ltr'`) — for `<html dir>`. */
+  dir: (locale?: Locale) => 'ltr' | 'rtl'
+
   /** Format a date with `Intl.DateTimeFormat` for the active locale. */
   date: (value: Date | number | string, options?: Intl.DateTimeFormatOptions) => string
 
@@ -75,8 +87,10 @@ export interface II18n {
 export interface LocaleAwareEvent {
   /** The event's own locale (the core `IncomingEvent` carries one). */
   locale?: Locale
-  /** Generic accessor (query/body/params). */
+  /** Generic accessor (route params → body → query → metadata). */
   get?: <T = unknown>(key: string, fallback?: T) => T
+  /** Route parameter accessor (kernel-trusted; available once routing has run). */
+  getParam?: <T = string>(name: string, fallback?: T) => T | undefined
   /** HTTP header accessor. */
   getHeader?: <T = string>(name: string, fallback?: T) => T | undefined
   /** HTTP cookie accessor. */
@@ -97,7 +111,9 @@ export interface LocaleResolutionOptions {
   locales?: Locale[]
   /** The fallback locale when nothing resolves. */
   fallbackLocale?: Locale
-  /** Custom request headers checked first, in order. Default `['x-locale', 'x-lang', 'x-language']`. */
+  /** Route parameter checked first (e.g. `'lang'` for a `:lang` path prefix). Opt-in; needs routing. */
+  param?: string
+  /** Custom request headers checked next, in order. Default `['x-locale', 'x-lang', 'x-language']`. */
   headers?: string[]
   /** Query-string parameter checked next. Default `'lang'`. `false` disables it. */
   query?: string | false
@@ -119,6 +135,8 @@ export interface I18nOptions extends Omit<LocaleResolutionOptions, 'fallbackLoca
   fallbackLocale?: Locale | Locale[]
   /** The default namespace. Default `'translation'`. */
   defaultNamespace?: string
+  /** Default IANA time zone for date formatting (e.g. `'America/New_York'`). Per-call overridable. */
+  timeZone?: string
   /** Eager resources; merged over the zero-config `app/i18n` scan. */
   resources?: Resources
   /** The directory scanned for zero-config translations (Node). Default `'app/i18n'`. */
@@ -127,4 +145,6 @@ export interface I18nOptions extends Omit<LocaleResolutionOptions, 'fallbackLoca
   interpolation?: { prefix?: string, suffix?: string, escapeValue?: boolean }
   /** What to return for a missing key: `'key'` (the key), `'empty'`, or a custom renderer. */
   missing?: 'key' | 'empty' | ((key: string, locale: Locale, ns: string) => string)
+  /** Dev aid: called whenever a key is missing, so you can log/collect untranslated keys. */
+  onMissingKey?: (key: string, locale: Locale, ns: string) => void
 }

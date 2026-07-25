@@ -25,6 +25,16 @@ describe('resolveLocale', () => {
     expect(DEFAULT_LOCALE_HEADERS).toEqual(['x-locale', 'x-lang', 'x-language'])
   })
 
+  it('resolves from a route param first when configured (path-based locale)', () => {
+    const event = { ...makeEvent({ headers: { 'x-locale': 'en' } }), getParam: (name: string) => (name === 'lang' ? 'fr' : undefined) }
+    expect(resolveLocale(event, { locales, param: 'lang' })).toBe('fr')
+  })
+
+  it('falls through when the configured route param is absent', () => {
+    const event = { ...makeEvent({ headers: { 'x-locale': 'fr' } }), getParam: () => undefined }
+    expect(resolveLocale(event, { locales, param: 'lang' })).toBe('fr')
+  })
+
   it('prefers a custom resolver when it returns a value', () => {
     const event = makeEvent({ headers: { 'x-locale': 'fr' } })
     expect(resolveLocale(event, { locales, resolver: () => 'en' })).toBe('en')

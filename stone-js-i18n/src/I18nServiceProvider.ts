@@ -26,5 +26,6 @@ export class I18nServiceProvider implements IServiceProvider {
     this.container
       .instanceIf(I18n, i18n)
       .alias(I18n, ['i18n', 'I18n'])
+      .instanceIf('i18next', i18n.raw) // the raw i18next instance, for direct use
   }
 }
