@@ -1,5 +1,12 @@
 # @stone-js/testing
 
+## 0.8.6
+
+### Patch Changes
+
+- @stone-js/core@0.8.6
+- @stone-js/http-core@0.8.6
+
 ## 0.8.5
 
 ### Patch Changes

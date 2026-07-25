@@ -1,5 +1,14 @@
 # @stone-js/fetch-adapter
 
+## 0.8.6
+
+### Patch Changes
+
+- @stone-js/core@0.8.6
+- @stone-js/config@0.8.6
+- @stone-js/filesystem@0.8.6
+- @stone-js/http-core@0.8.6
+
 ## 0.8.5
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @stone-js/use-view
 
+## 0.8.6
+
+### Patch Changes
+
+- @stone-js/core@0.8.6
+- @stone-js/router@0.8.6
+
 ## 0.8.5
 
 ### Patch Changes
