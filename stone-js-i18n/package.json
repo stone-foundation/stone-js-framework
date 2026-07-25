@@ -35,6 +35,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "default": "./dist/cli.js"
     }
   },
   "engines": {
@@ -91,5 +95,8 @@
       "beforeEach",
       "afterEach"
     ]
+  },
+  "stone": {
+    "cliPlugin": "./dist/cli.js"
   }
 }
