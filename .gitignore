@@ -18,3 +18,7 @@ coverage/
 # root for now to avoid nested gitlinks.
 # stone-js/ (consolidated into monorepo)
 # stone-js-*/ (consolidated into monorepo)
+
+# pnpm monorepo: npm lockfiles are redundant (pnpm-lock.yaml is the source of truth) and pin
+# vulnerable transitive dev-tooling that Dependabot flags. Keep them out of the tree.
+package-lock.json
