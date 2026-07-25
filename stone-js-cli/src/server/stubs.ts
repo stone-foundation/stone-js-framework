@@ -12,14 +12,18 @@ const PrintUrlsMiddleware = (context, next) => {
   return next(context)
 }
 
+const modules = Object.values(rawModules)
+  // %concat%
+
 /**
  * Build and run the Stone app.
  */
 export const stone = await stoneApp({
-  modules: Object.values(rawModules),
+  modules,
 })
 .configure((blueprint) => {
   blueprint.add('stone.blueprint.middleware', [{ module: PrintUrlsMiddleware }])
+  // %blueprint%
 })
 .run()
 `
@@ -28,14 +32,18 @@ export const consoleIndexFile = (platform: string = NODE_CONSOLE_PLATFORM): stri
 import { stoneApp } from '@stone-js/core'
 import * as rawModules from './modules.mjs'
 
+const modules = Object.values(rawModules)
+  // %concat%
+
 /**
  * Build and run the Stone app.
  */
 await stoneApp({
-  modules: Object.values(rawModules),
+  modules,
 })
 .configure((blueprint) => {
   blueprint.set('stone.adapter.platform', '${platform}')
+  // %blueprint%
 })
 .run()
 `

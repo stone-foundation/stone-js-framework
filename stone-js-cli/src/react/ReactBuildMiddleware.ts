@@ -15,6 +15,7 @@ import { isNotEmpty, IBlueprint, ClassType, isStoneBlueprint } from '@stone-js/c
 import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp } from '../utils'
 import { generateDeclarativeLazyPages, generateImperativeLazyPages, getViteConfig } from './react-utils'
 import { reactHtmlEntryPointTemplate, reactClientEntryPointTemplate, reactServerEntryPointTemplate } from './stubs'
+import { applyPluginInjections } from '../plugins/applyPluginInjections'
 import { MetaAdapterErrorPage, MetaErrorPage, MetaPageLayout, ReactIncomingEvent, UseReactBlueprint } from '@stone-js/use-react'
 
 const { outputFileSync, moveSync, removeSync, readFileSync } = fsExtra
@@ -212,6 +213,9 @@ export const GenerateClientFileMiddleware = async (
     ? readFileSync(basePath(userFilename), 'utf-8')
     : reactClientEntryPointTemplate(pattern)
 
+  // Weave in plugin-contributed modules before the lazy pages consume the concat marker.
+  content = applyPluginInjections(content, context.blueprint)
+
   // Add the lazy pages to the client file.
   const pagesExt = isTypescript ? '' : '.mjs'
   content = !isLazy
@@ -250,6 +254,10 @@ export const GenerateReactServerFileMiddleware = async (
   let content = existsSync(basePath(userFilename))
     ? readFileSync(basePath(userFilename), 'utf-8')
     : reactServerEntryPointTemplate(pattern, printUrls)
+
+  // Weave in plugin-contributed modules and blueprint statements before the html-template
+  // injection consumes the blueprint marker.
+  content = applyPluginInjections(content, context.blueprint)
 
   content = content
     .replace('%pattern%', pattern)
