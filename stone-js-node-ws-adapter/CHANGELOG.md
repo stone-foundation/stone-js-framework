@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.5
+
+### Patch Changes
+
+- @stone-js/core@0.8.5
+- @stone-js/config@0.8.5
+- @stone-js/realtime@0.8.5
+
 ## 0.8.4
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.5
+
+### Patch Changes
+
+- @stone-js/core@0.8.5
+- @stone-js/config@0.8.5
+- @stone-js/http-core@0.8.5
+- @stone-js/router@0.8.5
+- @stone-js/browser-core@0.8.5
+- @stone-js/browser-adapter@0.8.5
+- @stone-js/use-view@0.8.5
+
 ## 0.8.4
 
 ### Patch Changes
