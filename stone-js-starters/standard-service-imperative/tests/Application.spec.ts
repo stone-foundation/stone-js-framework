@@ -20,7 +20,14 @@ describe('WelcomeService', () => {
     const response = service.welcome('Stone')
 
     // Assert
-    expect(response).toHaveProperty('message', 'Hello Stone!')
+    expect(response.message).toBe('Hello Stone! Welcome to Stone.js.')
+    expect(response.framework.name).toBe('Stone.js')
+    expect(response.framework).toMatchObject({
+      name: 'Stone.js',
+      tagline: 'The continuum framework',
+      docs: 'https://stonejs.dev',
+      github: 'https://github.com/stone-foundation/stone-js-framework'
+    })
     expect(mockedLogger.info).toHaveBeenCalledWith('Welcome Stone')
   })
 })
@@ -55,7 +62,8 @@ describe('WelcomeEventHandler', () => {
     const response = handler(event)
 
     // Assert
-    expect(response.message).toBe('Hello World!')
+    expect(response.message).toBe('Hello World! Welcome to Stone.js.')
+    expect(response.framework.name).toBe('Stone.js')
     expect(mockedLogger.info).toHaveBeenCalledWith('Welcome World')
   })
 
@@ -69,7 +77,8 @@ describe('WelcomeEventHandler', () => {
     const response = handler(event)
 
     // Assert
-    expect(response.message).toBe('Hello World!')
+    expect(response.message).toBe('Hello World! Welcome to Stone.js.')
+    expect(response.framework.name).toBe('Stone.js')
     expect(mockedLogger.info).toHaveBeenCalledWith('Welcome World')
   })
 })

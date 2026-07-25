@@ -58,7 +58,6 @@ describe('Application', () => {
 
   it('get head values', async () => {
     // Arrange
-    const expectedMessage = 'Hello World!'
     const event = { get: () => 'World' } as unknown as ReactIncomingEvent
 
     // Act
@@ -66,7 +65,8 @@ describe('Application', () => {
 
     // Assert
     expect(head).toHaveProperty('metas')
-    expect(head.title).toBe(expectedMessage)
+    expect(head.title).toContain('Welcome to Stone.js')
+    expect(head.title).toContain('World')
     expect(head).toHaveProperty('description')
   })
 

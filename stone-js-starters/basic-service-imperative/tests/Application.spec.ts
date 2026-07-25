@@ -34,8 +34,9 @@ describe('Application', () => {
     // Act
     const response = await app(event)
     // Assert
-    expect(response.message).toBe('Hello World!')
-    expect(mockedLogger.info).toHaveBeenCalledWith('Hello World!')
+    expect(response.message).toBe('Hello World! Welcome to Stone.js.')
+    expect(response.framework.name).toBe('Stone.js')
+    expect(mockedLogger.info).toHaveBeenCalledWith('Hello World! Welcome to Stone.js.')
   })
 
   it('should get config', () => {

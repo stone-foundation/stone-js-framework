@@ -18,7 +18,7 @@ interface HomeData {
  *    Twitter card and JSON-LD structured data), all from `head()`;
  *  - importing a static asset via the `@img` alias (resolved by the CLI's Vite config).
  */
-@Page({ path: '/' })
+@Page('/')
 export class HomePage implements IPage<ReactIncomingEvent> {
   handle (): HomeData {
     return { message: 'Write your domain once. Stone.js applies the context.' }
@@ -48,11 +48,24 @@ export class HomePage implements IPage<ReactIncomingEvent> {
 
   render ({ data }: PageRenderContext<HomeData>) {
     return (
-      <main>
-        <img src={logo} alt="Stone.js" width={96} height={96} />
-        <h1>Stone.js Showcase</h1>
-        <p>{data?.message}</p>
-      </main>
+      <section className='stone-welcome'>
+        <div className='glow' aria-hidden='true' />
+        <div className='hero'>
+          <img className='mark' src={logo} alt='Stone.js' width={104} height={104} />
+          <p className='eyebrow'>The continuum showcase</p>
+          <h1 className='title'>Stone.js</h1>
+          <p className='lead'>{data?.message}</p>
+          <p className='tagline'>
+            One domain, rendered on the server and hydrated in the browser, with a fluent
+            head / OpenGraph API and static-asset aliases.
+          </p>
+          <nav className='links'>
+            <a href='/blog/hello-world'>Read the blog demo</a>
+            <a href='https://stonejs.dev/docs' target='_blank' rel='noreferrer noopener'>Documentation</a>
+            <span className='edit'>Edit <b>app/pages/HomePage.tsx</b></span>
+          </nav>
+        </div>
+      </section>
     )
   }
 }

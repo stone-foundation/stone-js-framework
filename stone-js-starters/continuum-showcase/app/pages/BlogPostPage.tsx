@@ -20,7 +20,7 @@ interface Post {
  * Blog post page — demonstrates a fully dynamic, data-driven head built from the
  * loader (`handle`) output, including an `article` Open Graph type and per-post JSON-LD.
  */
-@Page({ path: '/blog/:slug' })
+@Page('/blog/:slug')
 export class BlogPostPage implements IPage<ReactIncomingEvent> {
   handle (event: ReactIncomingEvent): Post {
     const slug = event.get<string>('slug', 'hello-world')
@@ -53,8 +53,11 @@ export class BlogPostPage implements IPage<ReactIncomingEvent> {
 
   render ({ data }: PageRenderContext<Post>) {
     return (
-      <article>
+      <article className='cx-article'>
+        <a className='cx-back' href='/'>← Back</a>
+        <p className='cx-kicker'>Stone.js Blog</p>
         <h1>{data?.title}</h1>
+        <p className='cx-excerpt'>{data?.excerpt}</p>
         <p>{data?.body}</p>
       </article>
     )

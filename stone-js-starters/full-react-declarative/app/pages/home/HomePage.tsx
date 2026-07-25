@@ -8,8 +8,8 @@ import { IPage, Page, ReactIncomingEvent, StoneLink, HeadContext } from '@stone-
 export class HomePage implements IPage<ReactIncomingEvent> {
   head (): HeadContext {
     return {
-      title: 'Home',
-      description: 'Welcome to the Stone.js Blog Dashboard'
+      title: 'Welcome to Stone.js',
+      description: 'Stone.js Blog Dashboard — write your domain once, Stone.js is the context that runs it anywhere.'
     }
   }
 
@@ -20,25 +20,26 @@ export class HomePage implements IPage<ReactIncomingEvent> {
    */
   render (): JSX.Element {
     return (
-      <div>
-        <h1>Stone.js Blog Dashboard</h1>
-        <p>Welcome to the Stone.js Blog Dashboard.</p>
-        <div>
-          <h2>Posts</h2>
-          <p>View the latest posts from the Stone.js Blog.</p>
-          <StoneLink to='/posts'>View Posts</StoneLink>
-        </div>
-        <div>
-          <h2>Users</h2>
-          <p>View the latest users from the Stone.js Blog.</p>
-          <StoneLink to='/users'>View Users</StoneLink>
-        </div>
-        <div>
-          <h2>Manage</h2>
-          <p>Manage your profile</p>
-          <StoneLink to='/manage'>Manage</StoneLink>
-        </div>
-      </div>
+      <main className='stone-welcome'>
+        <div className='glow' aria-hidden='true' />
+        <section className='hero'>
+          <img className='mark' src='/logo.svg' alt='Stone.js' width={104} height={104} />
+          <p className='eyebrow'>Welcome to</p>
+          <h1 className='title'>Stone.js</h1>
+          <p className='lead'>Your Blog Dashboard is running.</p>
+          <p className='tagline'>
+            Write your domain once, Stone.js is the context that runs it anywhere:
+            server, serverless, browser, CLI and the edge.
+          </p>
+          <nav className='links'>
+            <StoneLink to='/posts'>Browse Posts</StoneLink>
+            <StoneLink to='/users'>Browse Users</StoneLink>
+            <a href='https://stonejs.dev/docs' target='_blank' rel='noreferrer noopener'>Documentation</a>
+            <a href='https://github.com/stone-foundation/stone-js-framework' target='_blank' rel='noreferrer noopener'>GitHub</a>
+          </nav>
+        </section>
+        <footer className='brand'><span className='dot'>●</span> Stone.js — the continuum framework</footer>
+      </main>
     )
   }
 }

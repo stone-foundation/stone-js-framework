@@ -8,6 +8,24 @@ export interface WelcomeServiceOptions {
 }
 
 /**
+ * Framework information carried by the welcome payload.
+*/
+export interface FrameworkInfo {
+  name: string
+  tagline: string
+  docs: string
+  github: string
+}
+
+/**
+ * The branded welcome payload returned to the client.
+*/
+export interface WelcomeResponse {
+  message: string
+  framework: FrameworkInfo
+}
+
+/**
  * Welcome Service
  *
  * @Service() decorator is used to define a new service
@@ -31,8 +49,16 @@ export class WelcomeService {
    * @param name - The name
    * @returns A welcome message
    */
-  welcome (name: string): { message: string } {
+  welcome (name: string): WelcomeResponse {
     this.logger.info(`Welcome ${name}`)
-    return { message: `Hello ${name}!` }
+    return {
+      message: `Hello ${name}! Welcome to Stone.js.`,
+      framework: {
+        name: 'Stone.js',
+        tagline: 'The continuum framework',
+        docs: 'https://stonejs.dev',
+        github: 'https://github.com/stone-foundation/stone-js-framework'
+      }
+    }
   }
 }

@@ -41,4 +41,4 @@ export function factoryAuthMiddleware ({ securityService }: AuthMiddlewareOption
 /**
  * Auth middleware
  */
-export const AuthMiddleware = defineMiddleware(factoryAuthMiddleware, { isFactory: true, global: true, params: [['/login', '/register']] })
+export const AuthMiddleware = defineMiddleware(factoryAuthMiddleware, { isFactory: true, global: true, params: [['/', '/login', '/register']] })

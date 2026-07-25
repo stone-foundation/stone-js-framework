@@ -14,7 +14,7 @@ export interface AuthMiddlewareOptions {
  */
 @Middleware({
   global: true,
-  params: [['/login', '/register']]
+  params: [['/', '/login', '/register']]
 })
 export class AuthMiddleware implements IMiddleware<IncomingHttpEvent, OutgoingHttpResponse> {
   private readonly securityService: SecurityService
