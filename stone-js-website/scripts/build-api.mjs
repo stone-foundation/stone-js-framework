@@ -20,7 +20,7 @@ const repoRoot = path.resolve(websiteDir, '..')
 const outDir = path.join(websiteDir, 'dist', 'api')
 
 // Packages that are apps or tooling, not library surface to document.
-const DENY = new Set(['stone-js-website', 'stone-js-docs', 'stone-js-lab', 'stone-js-starters'])
+const DENY = new Set(['stone-js-website', 'stone-js-lab', 'stone-js-starters'])
 
 /** Every @stone-js library package with source and a TypeDoc config. */
 function libraryPackages () {

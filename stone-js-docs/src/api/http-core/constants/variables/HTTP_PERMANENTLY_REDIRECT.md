@@ -1,5 +1,0 @@
-# Variable: HTTP\_PERMANENTLY\_REDIRECT
-
-```ts
-const HTTP_PERMANENTLY_REDIRECT: 308 = 308;
-```

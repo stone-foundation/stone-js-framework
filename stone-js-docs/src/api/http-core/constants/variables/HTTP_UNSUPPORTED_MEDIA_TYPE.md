@@ -1,5 +1,0 @@
-# Variable: HTTP\_UNSUPPORTED\_MEDIA\_TYPE
-
-```ts
-const HTTP_UNSUPPORTED_MEDIA_TYPE: 415 = 415;
-```

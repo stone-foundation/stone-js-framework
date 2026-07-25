@@ -1,5 +1,0 @@
-# Variable: HTTP\_REQUEST\_ENTITY\_TOO\_LARGE
-
-```ts
-const HTTP_REQUEST_ENTITY_TOO_LARGE: 413 = 413;
-```

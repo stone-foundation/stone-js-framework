@@ -13,13 +13,13 @@
     "preview": "stone preview"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "@stone-js/browser-adapter": "workspace:*",
     "@stone-js/core": "workspace:*",
+    "@stone-js/node-cli-adapter": "workspace:*",
     "@stone-js/router": "workspace:*",
     "@stone-js/use-react": "workspace:*",
-    "@stone-js/browser-adapter": "workspace:*",
-    "@stone-js/node-cli-adapter": "workspace:*"
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.25.9",

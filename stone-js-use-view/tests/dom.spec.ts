@@ -166,9 +166,8 @@ describe('dom head application', () => {
     it('omits script boolean attributes that are false', () => {
       const html = '<html><head><!--app-head--></head></html>'
       const result = applyHeadToHtml({ scripts: [{ src: '/skip.js', async: false }] }, html)
-      const scriptTag = /<script([^>]*)><\/script>/.exec(result)?.[1] ?? ''
-      expect(scriptTag).toContain('src="/skip.js"')
-      expect(scriptTag).not.toContain('async')
+      expect(result).toContain('src="/skip.js"')
+      expect(result).not.toContain('async')
     })
 
     it('inserts a title containing $ replacement patterns literally', () => {

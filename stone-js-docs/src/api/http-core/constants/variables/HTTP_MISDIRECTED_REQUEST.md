@@ -1,5 +1,0 @@
-# Variable: HTTP\_MISDIRECTED\_REQUEST
-
-```ts
-const HTTP_MISDIRECTED_REQUEST: 421 = 421;
-```
