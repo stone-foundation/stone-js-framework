@@ -1,6 +1,7 @@
 import chalk from 'chalk'
 import ora, { Ora } from 'ora'
 import ProgressBar from 'progress'
+import { STONE_BRAND_COLOR } from '../../src/constants'
 import { CommandOutput } from '../../src/command/CommandOutput'
 
 describe('CommandOutput', () => {
@@ -56,7 +57,7 @@ describe('CommandOutput', () => {
 
   it('should display info-colored text with info()', () => {
     commandOutput.info('Information', true)
-    expect(mockSmartConsole).toHaveBeenCalledWith(chalk.blueBright('Information'))
+    expect(mockSmartConsole).toHaveBeenCalledWith(chalk.hex(STONE_BRAND_COLOR)('Information'))
     expect(mockSpinner.info).toHaveBeenCalled()
   })
 

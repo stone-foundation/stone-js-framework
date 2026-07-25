@@ -8,6 +8,12 @@
 export const NODE_CONSOLE_PLATFORM = 'node_console'
 
 /**
+ * The Stone.js brand accent ("braise"/ember) used for informational console output, so the CLI's
+ * neutral messages carry the brand rather than a generic blue.
+ */
+export const STONE_BRAND_COLOR = '#FF5A1F'
+
+/**
  * A constant representing the default command not found code.
  *
  * This constant is used to indicate that a command was not found or does not exist.

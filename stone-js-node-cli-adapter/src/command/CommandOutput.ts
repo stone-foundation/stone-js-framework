@@ -1,6 +1,7 @@
 import chalk from 'chalk'
 import ora, { Ora } from 'ora'
 import ProgressBar from 'progress'
+import { STONE_BRAND_COLOR } from '../constants'
 
 /**
  * CommandOutputOptions
@@ -94,7 +95,7 @@ export class CommandOutput {
    * @returns The current instance for chaining.
    */
   info (value: string, color: boolean = true): this {
-    this.smartConsole(color ? this.format.blueBright(value) : value).info()
+    this.smartConsole(color ? this.format.hex(STONE_BRAND_COLOR)(value) : value).info()
     return this
   }
 
