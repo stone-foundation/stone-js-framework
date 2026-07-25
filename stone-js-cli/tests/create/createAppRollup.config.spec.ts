@@ -1,5 +1,5 @@
 import babel from '@rollup/plugin-babel'
-import multi from '@rollup/plugin-multi-entry'
+import { multiEntry } from '../../src/server/multiEntry'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import { createAppRollupConfig } from '../../src/create/createAppRollup.config'
 
@@ -19,7 +19,7 @@ describe('createAppRollupConfig', () => {
     const plugins: any = createAppRollupConfig.plugins ?? []
     expect(plugins).toHaveLength(3)
 
-    expect(plugins[0].name).toBe(multi().name)
+    expect(plugins[0].name).toBe(multiEntry().name)
     expect(plugins[1].name).toBe(nodeResolve().name)
     expect(plugins[2].name).toBe(babel({
       babelrc: false,
