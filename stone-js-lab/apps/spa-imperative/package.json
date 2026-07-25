@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.2.8",
     "@stone-js/core": "workspace:*",
     "@stone-js/router": "workspace:*",
     "@stone-js/use-react": "workspace:*",
