@@ -13,7 +13,7 @@
     "preview": "stone preview"
   },
   "dependencies": {
-    "react": "^19.0.0",
+    "react": "^19.2.8",
     "react-dom": "^19.0.0",
     "@stone-js/core": "workspace:*",
     "@stone-js/router": "workspace:*",
