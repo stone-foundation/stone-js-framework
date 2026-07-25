@@ -83,7 +83,7 @@ export class Cli implements IPage<ReactIncomingEvent> {
 
         <H2>Typical flow</H2>
         <Code file='terminal' lang='bash'>{`npm create @stone-js@latest my-app   # scaffold
-cd my-app && npm install
+cd my-app
 npm run dev                          # stone dev
 npm run build                        # stone build
 npm run preview                      # stone preview`}</Code>

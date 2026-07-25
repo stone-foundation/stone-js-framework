@@ -16,6 +16,7 @@ import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescrip
 import { generateDeclarativeLazyPages, generateImperativeLazyPages, getViteConfig } from './react-utils'
 import { reactHtmlEntryPointTemplate, reactClientEntryPointTemplate, reactServerEntryPointTemplate } from './stubs'
 import { applyPluginInjections } from '../plugins/applyPluginInjections'
+import { RunStonePluginsBundleMiddleware } from '../plugins/RunStonePluginsMiddleware'
 import { MetaAdapterErrorPage, MetaErrorPage, MetaPageLayout, ReactIncomingEvent, UseReactBlueprint } from '@stone-js/use-react'
 
 const { outputFileSync, moveSync, removeSync, readFileSync } = fsExtra
@@ -432,6 +433,7 @@ export const GeneratePublicEnvFileMiddleware = async (
  * Middleware for building CSR React applications.
  */
 export const ReactCSRBuildMiddleware: Array<MetaPipe<ConsoleContext, IBlueprint>> = [
+  { module: RunStonePluginsBundleMiddleware, priority: -1 },
   { module: GenerateViewsIndexMiddleware, priority: 0 },
   { module: BuildViewsMiddleware, priority: 1 },
   { module: GenerateLazyPageMiddleware, priority: 2 },
@@ -446,6 +448,7 @@ export const ReactCSRBuildMiddleware: Array<MetaPipe<ConsoleContext, IBlueprint>
  * Middleware for building SSR React applications.
  */
 export const ReactSSRBuildMiddleware: Array<MetaPipe<ConsoleContext, IBlueprint>> = [
+  { module: RunStonePluginsBundleMiddleware, priority: -1 },
   { module: GenerateViewsIndexMiddleware, priority: 0 },
   { module: BuildViewsMiddleware, priority: 1 },
   { module: GenerateLazyPageMiddleware, priority: 2 },

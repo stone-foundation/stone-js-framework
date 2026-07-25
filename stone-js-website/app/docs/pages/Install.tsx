@@ -31,7 +31,7 @@ export class Install implements IPage<ReactIncomingEvent> {
         <H2>Requirements</H2>
         <p>
           Node.js 20 or newer, and a package manager. Stone.js is ESM-only and ships modern
-          TypeScript. Nothing else is required to start; adapters are added per context, not upfront.
+          JavaScript/TypeScript. Nothing else is required to start; adapters are added per context, not upfront.
         </p>
         <Code lang='bash' file='terminal'>{`node -v   # v20.x or newer`}</Code>
         <p>
@@ -45,12 +45,12 @@ export class Install implements IPage<ReactIncomingEvent> {
           by default; the tabs below use each manager's <code>create</code> command.
         </p>
         <CodeGroup files={[
-          { name: 'npm', lang: 'bash', code: 'npm create @stone-js@latest my-app\ncd my-app && npm install' },
-          { name: 'pnpm', lang: 'bash', code: 'pnpm create @stone-js@latest my-app\ncd my-app && pnpm install' },
-          { name: 'yarn', lang: 'bash', code: 'yarn create @stone-js my-app\ncd my-app && yarn' }
+          { name: 'npm', lang: 'bash', code: 'npm create @stone-js@latest my-app\ncd my-app && npm run dev' },
+          { name: 'pnpm', lang: 'bash', code: 'pnpm create @stone-js@latest my-app\ncd my-app && pnpm dev' },
+          { name: 'yarn', lang: 'bash', code: 'yarn create @stone-js my-app\ncd my-app && yarn dev' }
         ]} />
         <p>
-          The scaffolder asks what you are building. Every answer is an adapter it adds to a working
+          The scaffolder asks what you are building. Every answer is a feature it adds to a working
           app; none of them locks the domain to a platform. Two shortcuts:
         </p>
         <PropsTable nameHeader='Shortcut' rows={[
