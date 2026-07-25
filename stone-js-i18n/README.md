@@ -55,12 +55,13 @@ export default defineConfig({ plugins: [i18nCliPlugin()] })
 `@stone-js/i18n` also declares a `stone.cliPlugin` contract, so the CLI can **auto-discover** it from
 your direct dependencies (announced on every build). Opt out with `autoDiscoverPlugins: false`.
 
-**Lazy catalogs, no FOUC.** Pass `lazy: true` to import only the active locale's catalog on demand
-(code-split per file). The kernel middleware awaits it before the handler renders, so there is never a
-flash of untranslated keys:
+**Lazy by default, no FOUC.** Catalogs are lazy by default: only the active locale's catalog is
+imported on demand (code-split per file), for a lighter payload. The kernel middleware awaits it
+before the handler renders, so there is never a flash of untranslated keys. Pass `lazy: false` to
+bundle every locale eagerly instead:
 
 ```ts
-export default defineConfig({ plugins: [i18nCliPlugin({ lazy: true })] })
+export default defineConfig({ plugins: [i18nCliPlugin({ lazy: false })] })
 ```
 
 **2. By hand.** Set `stone.i18n.resources` yourself. On Vite targets (SPA, SSR), `import.meta.glob`

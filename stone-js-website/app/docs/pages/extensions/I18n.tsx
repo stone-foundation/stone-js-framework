@@ -19,8 +19,8 @@ const PLUGIN = `import { i18nCliPlugin } from '@stone-js/i18n/cli'
 // stone.config.mjs
 export default defineConfig({ plugins: [i18nCliPlugin()] })`
 
-const LAZY = `// Load only the active locale's catalog, on demand, awaited before render.
-export default defineConfig({ plugins: [i18nCliPlugin({ lazy: true })] })`
+const LAZY = `// Lazy is the default. To bundle every locale eagerly instead:
+export default defineConfig({ plugins: [i18nCliPlugin({ lazy: false })] })`
 
 const MANUAL = `import { defineI18n, loadTranslations } from '@stone-js/i18n'
 
@@ -112,12 +112,13 @@ export class I18n implements IPage<ReactIncomingEvent> {
           <a href='/docs/extending/cli-plugins'>Participate in the build</a> for how the plugin system works.
         </p>
 
-        <H3>Lazy catalogs, no FOUC</H3>
+        <H3>Lazy by default, no FOUC</H3>
         <p>
-          Pass <code>lazy: true</code> and only the active locale's catalog is imported, code-split per
-          file. The locale is resolved in a kernel middleware that runs before your handler, and it
-          awaits the catalog import, so the first render already has its translations: there is no flash
-          of untranslated keys and no layout shift.
+          Catalogs are lazy by default: only the active locale's catalog is imported, code-split per
+          file, for a lighter payload. The locale is resolved in a kernel middleware that runs before
+          your handler, and it awaits the catalog import, so the first render already has its
+          translations: there is no flash of untranslated keys and no layout shift. Pass{' '}
+          <code>lazy: false</code> to bundle every locale eagerly instead.
         </p>
         <Code file='stone.config.mjs' lang='ts'>{LAZY}</Code>
         <Callout kind='note' title='Why there is no FOUC'>

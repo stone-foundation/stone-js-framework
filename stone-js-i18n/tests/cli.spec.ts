@@ -3,6 +3,7 @@ import defaultPlugin, {
   toImportSpecifier,
   generateI18nModule,
   scanTranslationFiles,
+  toSafeJsStringLiteral,
   GENERATED_MODULE,
   DEFAULT_I18N_DIR
 } from '../src/cli'
@@ -64,16 +65,31 @@ describe('toImportSpecifier', () => {
   })
 })
 
+describe('toSafeJsStringLiteral', () => {
+  it('escapes the characters that could break out of the generated source', () => {
+    expect(toSafeJsStringLiteral('a/b')).toBe('"a\\u002Fb"')
+    expect(toSafeJsStringLiteral('</script>')).toBe('"\\u003C\\u002Fscript\\u003E"')
+  })
+
+  it('never leaves a raw angle bracket or slash in the output', () => {
+    const out = toSafeJsStringLiteral('</x>/y')
+    expect(out).not.toContain('<')
+    expect(out).not.toContain('>')
+    expect(out).not.toContain('/')
+  })
+})
+
 describe('generateI18nModule', () => {
   const moduleDir = '/proj/.stone/tmp/plugins'
   const files = [`${ROOT}/en/common.json`, `${ROOT}/fr/common.json`]
 
-  it('emits eager static imports handed to loadTranslations', () => {
+  it('emits eager static imports handed to loadTranslations, with escaped specifiers', () => {
     const source = generateI18nModule(moduleDir, files, false)
     expect(source).toContain("import { defineI18n, loadTranslations } from '@stone-js/i18n'")
-    expect(source).toContain('import * as __i18n0 from "../../../app/i18n/en/common.json"')
+    expect(source).toContain('import * as __i18n0 from ')
     expect(source).toContain('loadTranslations({')
-    expect(source).toContain('"../../../app/i18n/en/common.json": __i18n0')
+    expect(source).toContain('common.json')     // filename tail survives
+    expect(source).toContain('\\u002F')          // path separators are escaped
     expect(source).not.toContain('import.meta.glob')
   })
 
@@ -81,7 +97,7 @@ describe('generateI18nModule', () => {
     const source = generateI18nModule(moduleDir, files, true)
     expect(source).toContain("import { defineI18n } from '@stone-js/i18n'")
     expect(source).toContain('loaders: {')
-    expect(source).toContain('"../../../app/i18n/en/common.json": () => import("../../../app/i18n/en/common.json")')
+    expect(source).toContain('() => import(')
     expect(source).not.toContain('loadTranslations')
   })
 })
@@ -105,22 +121,24 @@ describe('i18nCliPlugin', () => {
     expect(plugin.blueprintMiddleware).toBeUndefined()
   })
 
-  it('scans and generates the eager module, then contributes it to the app', () => {
+  it('generates lazy loaders by default and contributes the module to the app', () => {
     const context = makeContext()
-    i18nCliPlugin().onPrepare?.(context as any)
-
-    expect(context.writeFile).toHaveBeenCalledWith(GENERATED_MODULE, expect.stringContaining('loadTranslations({'))
-    expect(context.writeFile).toHaveBeenCalledWith(GENERATED_MODULE, expect.stringContaining('en/common.json'))
-    expect(context.addModule).toHaveBeenCalledWith(`./${GENERATED_MODULE}`)
-  })
-
-  it('generates lazy loaders when lazy is enabled', () => {
-    const context = makeContext()
-    const plugin = i18nCliPlugin({ lazy: true })
+    const plugin = i18nCliPlugin()
     plugin.onPrepare?.(context as any)
 
     expect(plugin.description).toContain('(lazy)')
     expect(context.writeFile).toHaveBeenCalledWith(GENERATED_MODULE, expect.stringContaining('() => import('))
+    expect(context.writeFile).toHaveBeenCalledWith(GENERATED_MODULE, expect.stringContaining('common.json'))
+    expect(context.addModule).toHaveBeenCalledWith(`./${GENERATED_MODULE}`)
+  })
+
+  it('generates eager imports when lazy is disabled', () => {
+    const context = makeContext()
+    const plugin = i18nCliPlugin({ lazy: false })
+    plugin.onPrepare?.(context as any)
+
+    expect(plugin.description).toContain('(eager)')
+    expect(context.writeFile).toHaveBeenCalledWith(GENERATED_MODULE, expect.stringContaining('loadTranslations({'))
   })
 
   it('honours a custom dir and extensions', () => {
