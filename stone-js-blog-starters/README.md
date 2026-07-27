@@ -7,7 +7,7 @@ These are kept **separate from the default starters** on purpose: `npm create @s
 ## Use one
 
 ```bash
-npm create @stone-js@latest my-app --starters github:stone-foundation/stone-js-blog-starters
+npm create @stone-js@latest my-app -- --starters @stone-js/blog-starters
 ```
 
 The scaffolder lists the recipes declared in this package's `stone.starters` manifest; pick one and it is copied into `my-app`.
