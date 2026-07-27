@@ -23,11 +23,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    "types": ["node", "vite/client", "vitest/globals"],
+    "types": ["node"],
   },
   "include": [
     "app",
-    "tests",
-    "vitest.config.ts"
+    "tests"
   ]
 }

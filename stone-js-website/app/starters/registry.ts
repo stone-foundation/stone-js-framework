@@ -33,7 +33,8 @@ export interface Starter {
 }
 
 const GH = 'https://github.com/stone-foundation'
-const cmd = (id: string): string => `npm create @stone-js@latest my-app --starters ${id}`
+// `--` forwards the flag to the `stone` sub-command; without it npm would swallow `--starters`.
+const cmd = (id: string): string => `npm create @stone-js@latest my-app -- --starters ${id}`
 
 const TIERS = {
   basic: 'the minimal skeleton: routing over HTTP, wired and ready to run, nothing to remove.',
