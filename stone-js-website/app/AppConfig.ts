@@ -20,6 +20,7 @@ export const appConfig = {
   /** Canonical site origin (see public/CNAME). Used for absolute share/OG/RSS URLs. */
   siteUrl: 'https://stonejs.dev',
   githubUrl: 'https://github.com/stone-foundation',
+  discordUrl: 'https://discord.gg/3g93ppqMGH',
   manifestoUrl: 'https://evens-stone.github.io/continuum-manifesto/manifesto',
   analytics: { ga: 'G-F368Y4JRZR' },
   algolia: { appId: 'B8ZTXIHIAP', apiKey: '65a6a180473de963344f97d15302da4d', indexName: 'stonejs' }

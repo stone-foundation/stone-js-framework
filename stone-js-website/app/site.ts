@@ -10,6 +10,7 @@ import type { HeadContext } from '@stone-js/use-react'
 export const GA_MEASUREMENT_ID = appConfig.analytics.ga
 export const ALGOLIA = appConfig.algolia
 export const GITHUB_URL = appConfig.githubUrl
+export const DISCORD_URL = appConfig.discordUrl
 export const MANIFESTO_URL = appConfig.manifestoUrl
 export const SITE_URL = appConfig.siteUrl
 export const SITE_NAME = appConfig.name
