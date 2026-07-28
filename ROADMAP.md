@@ -6,7 +6,7 @@ Stone.js is currently in **public beta (0.8.x)**. This document describes the pa
 
 - Milestones are defined by **exit criteria, not dates**. A milestone ships when its criteria are met.
 - The only public time window is for 1.0: we are **targeting early 2027**.
-- Every roadmap item is (or will become) a real GitHub issue, tracked on the public [Stone.js Roadmap project board](https://github.com/orgs/stone-foundation/projects).
+- Every roadmap item is (or will become) a real GitHub issue, tracked on the public [Stone.js Roadmap project board](https://github.com/orgs/stone-foundation/projects/3).
 - All `@stone-js/*` packages are versioned together (lockstep). During the beta, fixes and new modules ship continuously as patch releases.
 
 Want to influence this roadmap? Open a thread in [GitHub Discussions](https://github.com/stone-foundation/stone-js-framework/discussions) (Ideas / RFC), or pick up a [`good first issue`](https://github.com/stone-foundation/stone-js-framework/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
@@ -19,7 +19,10 @@ Want to influence this roadmap? Open a thread in [GitHub Discussions](https://gi
 
 Goal: complete the module catalogue and harden the developer experience with real-world feedback.
 
-- [ ] Remaining first-party modules: `@stone-js/rate-limit`, `@stone-js/mail` (multi-channel notifications)
+- [ ] Remaining first-party modules:
+  - `@stone-js/rate-limit`: edge-friendly request throttling
+  - `@stone-js/notifications`: multi-channel notifications (email, SMS, push, in-app)
+  - `@stone-js/mcp`: MCP as a native application ability, exposing your domain to AI agents through your application's own routes (dev-time tooling already exists with `@stone-js/mcp-dev`)
 - [ ] Full parity between the declarative (decorators) and imperative (`define*`) APIs across every module
 - [ ] CLI scaffolding aligned with the full module catalogue
 - [ ] Official starters using `@stone-js/testing` end to end
@@ -60,21 +63,46 @@ These are directions, not commitments, and they carry no dates. They live on the
 
 ### Next
 
-- **Public benchmarks**: a reproducible, honest benchmark suite running the same domain across every supported target (cold start, TTFB, latency percentiles, memory, bundle size)
+- **Public benchmarks**: a reproducible benchmark suite measuring Stone.js against itself across every supported target: the same domain deployed everywhere, tracking cold start, TTFB, latency percentiles, memory, and bundle size over releases
 - **Starter catalogue**: a registry-driven catalogue of official and community starters, open to third-party submissions by PR
 - **Observability**: OTLP and Prometheus exporters on top of `@stone-js/telemetry`
 - **Scheduling**: cron-style background scheduling module
-- **Agent-native, deepened**: expanding the MCP story so applications and the framework itself are first-class citizens for AI agents
-- **"Why Stone.js" page**: an honest comparison with mainstream frameworks, including what they do better today
+- **Agent-native, deepened**: richer dev-time tooling around `@stone-js/mcp-dev` and deeper patterns for agent-driven applications
 
 ### Later
 
+- Adapters for additional runtimes and platforms as they emerge
 - A third-party module ecosystem, surfaced through the documentation site
 - Additional view engines on top of `@stone-js/use-view`, driven by demand
 - Additional drivers for queue, cache, and realtime (hosted providers)
 - ORM integrations via providers (there will be no first-party ORM, by design)
-- Expanded maintainer team and governance
 - A long-term support policy after 1.0, based on adoption
+
+---
+
+## Community & adoption
+
+Building the framework is half the work. This track covers how Stone.js grows as a project, on the same Now / Next / Later horizons.
+
+**Now**
+
+- Pilot user program: a first group of builders shipping real applications with direct maintainer support
+- Community channels: GitHub Discussions (Q&A, Ideas / RFC, Show and tell) and Discord
+- A curated [`good first issue`](https://github.com/stone-foundation/stone-js-framework/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) backlog for new contributors
+
+**Next**
+
+- Learning resources: guided tutorials, cloud-native architecture recipes on the blog, video walkthroughs
+- Contributor ladder: a documented path from first pull request to triager, reviewer, and maintainer
+- Production showcases: real applications built with Stone.js, documented as case studies
+- Talks and workshops: conferences, meetups, and developer communities
+
+**Later**
+
+- A dedicated core team around the project
+- Training programs for teams adopting Stone.js
+- Enterprise adoption support: long-term support policy, upgrade guarantees, priority security process
+- Regional communities and local meetups
 
 ---
 
