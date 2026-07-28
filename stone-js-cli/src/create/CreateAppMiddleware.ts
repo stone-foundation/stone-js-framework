@@ -9,7 +9,7 @@ import { basePath } from '@stone-js/filesystem'
 import { CreateAppConfig } from '../options/CreateAppConfig'
 import { ConsoleContext, PackageJson } from '../declarations'
 import { deriveVanilla } from './vanilla'
-import { getAvailableStarters, materializeStarter } from './StarterContract'
+import { formatStarterList, getAvailableStarters, materializeStarter } from './StarterContract'
 
 const { pathExistsSync, existsSync, renameSync, removeSync, readJsonSync, writeJsonSync } = fsExtra
 
@@ -30,6 +30,7 @@ export const CloneStarterMiddleware = async (
 ): Promise<IBlueprint> => {
   const {
     overwrite = false,
+    templateExplicit = false,
     projectName = 'stone-project',
     template = 'basic-service-declarative'
   } = context.blueprint.get<CreateAppConfig>('stone.createApp', {} as any)
@@ -44,7 +45,17 @@ export const CloneStarterMiddleware = async (
     cwd: basePath(),
     output: { info: (message: string) => context.commandOutput.info(message) }
   })
-  const starter = starters.find((s) => s.value === template) ?? starters[0]
+  const requested = starters.find((s) => s.value === template)
+
+  // An explicitly requested starter that does not exist must fail: falling back would scaffold a
+  // different project than the one asked for, and the user only finds out much later.
+  if (requested === undefined && templateExplicit) {
+    throw new CliError(
+      `Unknown starter "${template}".\nAvailable starters:\n${formatStarterList(starters)}`
+    )
+  }
+
+  const starter = requested ?? starters[0]
 
   if (starter === undefined) {
     throw new CliError('No starter available. Pass one with `--starters <link>` or install a starter package.')

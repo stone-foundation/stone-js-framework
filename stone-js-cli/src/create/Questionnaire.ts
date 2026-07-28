@@ -156,11 +156,17 @@ export class Questionnaire {
       [0]
     )
 
-    answers.template = await this.context.commandInput.choice(
-      this.messages.template,
-      await this.getTemplates(),
-      [0]
-    )
+    // `--starter <id>` already answered this one: asking again would let the user contradict the
+    // flag they just passed.
+    const chosenTemplate = this.context.blueprint.get<string>('stone.createApp.template', '')
+
+    answers.template = this.context.blueprint.get<boolean>('stone.createApp.templateExplicit', false)
+      ? chosenTemplate
+      : await this.context.commandInput.choice(
+        this.messages.template,
+        await this.getTemplates(),
+        [0]
+      )
 
     answers.packageManager = await this.context.commandInput.choice(
       this.messages.packageManager,

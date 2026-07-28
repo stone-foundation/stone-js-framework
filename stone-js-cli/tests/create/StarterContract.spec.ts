@@ -9,6 +9,7 @@ import {
   readStarterEntries,
   materializeStarter,
   autodetectStarters,
+  formatStarterList,
   DEFAULT_STARTER_LINK,
   getAvailableStarters,
   resolveStarterLinks
@@ -126,6 +127,22 @@ describe('fetchStarter', () => {
     expect(res.dir).toContain('node_modules/plain')
   })
 
+  it('explains the --starter / --starters mix-up when a bare id cannot be installed', async () => {
+    vi.mocked(fsExtra.existsSync).mockReturnValue(true)
+    vi.mocked(execFileSync).mockImplementationOnce(() => { throw new Error('npm 404') })
+
+    // The reported bug: an id passed to the plural flag 404s on the registry. The message must
+    // name the actual mistake instead of leaving the raw npm error as the only clue.
+    await expect(fetchStarter('basic-react-declarative', ctx)).rejects.toThrow(/Did you mean `--starter basic-react-declarative`/)
+  })
+
+  it('explains that a link is expected when a scoped package cannot be installed', async () => {
+    vi.mocked(fsExtra.existsSync).mockReturnValue(true)
+    vi.mocked(execFileSync).mockImplementationOnce(() => { throw new Error('npm 404') })
+
+    await expect(fetchStarter('@acme/nope', ctx)).rejects.toThrow(/expects a package or git link/)
+  })
+
   it('throws when a starter has no package.json', async () => {
     vi.mocked(fsExtra.existsSync).mockReturnValue(false)
     await expect(fetchStarter('./missing', ctx)).rejects.toThrow(CliError)
@@ -195,5 +212,20 @@ describe('getAvailableStarters', () => {
     const second = await getAvailableStarters(blueprint, ctx)
     expect(second).toBe(first)
     expect(fsExtra.readJsonSync).not.toHaveBeenCalled()
+  })
+})
+
+describe('formatStarterList', () => {
+  it('lists every starter with its provider', () => {
+    const list = formatStarterList([
+      { value: 'basic-react-declarative', provider: '@stone-js/starters', dir: '/d', path: '.' },
+      { value: 'realtime-chat', provider: '@stone-js/blog-starters', dir: '/d', path: '.' }
+    ])
+
+    expect(list).toBe('  - basic-react-declarative (@stone-js/starters)\n  - realtime-chat (@stone-js/blog-starters)')
+  })
+
+  it('hints at the flags when nothing resolved', () => {
+    expect(formatStarterList([])).toContain('--starters <link>')
   })
 })

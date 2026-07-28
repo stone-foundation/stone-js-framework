@@ -9,7 +9,7 @@ export type StarterTarget = 'backend' | 'frontend' | 'edge' | 'full'
 export type StarterParadigm = 'decorators' | 'define*' | 'both'
 
 export interface Starter {
-  /** Stable id, also the `--starters <id>` value. */
+  /** Stable id, also the `--starter <id>` value. */
   id: string
   title: string
   /** First-party (Stone Foundation) vs third-party. */
@@ -33,8 +33,12 @@ export interface Starter {
 }
 
 const GH = 'https://github.com/stone-foundation'
-// `--` forwards the flag to the `stone` sub-command; without it npm would swallow `--starters`.
-const cmd = (id: string): string => `npm create @stone-js@latest my-app -- --starters ${id}`
+const BLOG_PACK = '@stone-js/blog-starters'
+// `--` forwards the flags to the `stone` sub-command; without it npm would swallow them.
+// `--starter <id>` names one starter; `--starters <link>` adds the package that declares it. The
+// official pack is the built-in default, so first-party starters need the id alone.
+const cmd = (id: string): string => `npm create @stone-js@latest my-app -- --starter ${id}`
+const blogCmd = (id: string): string => `npm create @stone-js@latest my-app -- --starters ${BLOG_PACK} --starter ${id}`
 
 const TIERS = {
   basic: 'the minimal skeleton: routing over HTTP, wired and ready to run, nothing to remove.',
@@ -100,12 +104,12 @@ export const STARTERS: Starter[] = [
     target: 'backend',
     paradigm: 'decorators',
     problem: 'realtime',
-    command: cmd('@stone-js/blog-starters'),
+    command: blogCmd('realtime-chat'),
     repo: `${GH}/stone-js-framework/tree/main/stone-js-blog-starters/realtime-chat`,
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'Channels, presence and broadcast over WebSockets, ready to run.',
-    about: 'The realtime recipe as a runnable app: @NodeWs bridges sockets to the kernel, @Realtime broadcasts, and a @RealtimeGateway handles connect / disconnect / message. This is an opt-in blog starter kept out of the default listing: request it with -- --starters @stone-js/blog-starters. Switch the driver to redis to scale across nodes; the same gateway runs unchanged on the AWS API Gateway WebSocket adapter.',
+    about: 'The realtime recipe as a runnable app: @NodeWs bridges sockets to the kernel, @Realtime broadcasts, and a @RealtimeGateway handles connect / disconnect / message. This is an opt-in blog starter kept out of the default listing: add the pack with -- --starters @stone-js/blog-starters (the card shows the full command). Switch the driver to redis to scale across nodes; the same gateway runs unchanged on the AWS API Gateway WebSocket adapter.',
     blogSlug: 'real-time-features'
   },
   {
@@ -115,12 +119,12 @@ export const STARTERS: Starter[] = [
     target: 'backend',
     paradigm: 'decorators',
     problem: 'multi-tenant',
-    command: cmd('@stone-js/blog-starters'),
+    command: blogCmd('multi-tenant'),
     repo: `${GH}/stone-js-framework/tree/main/stone-js-blog-starters/multi-tenant`,
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'Capture the tenant from the subdomain and scope every request to it.',
-    about: 'Multi-tenancy as routing: a controller scoped to {tenant}.example.com captures the tenant from the host during matching, and every handler reads it off the event, no header parsing, no lookup middleware. An opt-in blog starter, request it with -- --starters @stone-js/blog-starters.',
+    about: 'Multi-tenancy as routing: a controller scoped to {tenant}.example.com captures the tenant from the host during matching, and every handler reads it off the event, no header parsing, no lookup middleware. An opt-in blog starter, add the pack with -- --starters @stone-js/blog-starters (the card shows the full command).',
     blogSlug: 'multi-tenant-subdomains'
   },
   {
@@ -130,12 +134,12 @@ export const STARTERS: Starter[] = [
     target: 'backend',
     paradigm: 'decorators',
     problem: 'validation',
-    command: cmd('@stone-js/blog-starters'),
+    command: blogCmd('isomorphic-validation'),
     repo: `${GH}/stone-js-framework/tree/main/stone-js-blog-starters/isomorphic-validation`,
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'One schema, enforced at the API boundary and reusable on the form.',
-    about: 'Write the shape of the data once as a Zod schema: validate({ body: NewTask }) gates the route and rejects a malformed body with a 422 before the handler runs, while the same schema validates the frontend form, so the API and UI can never drift. An opt-in blog starter, request it with -- --starters @stone-js/blog-starters.',
+    about: 'Write the shape of the data once as a Zod schema: validate({ body: NewTask }) gates the route and rejects a malformed body with a 422 before the handler runs, while the same schema validates the frontend form, so the API and UI can never drift. An opt-in blog starter, add the pack with -- --starters @stone-js/blog-starters (the card shows the full command).',
     blogSlug: 'isomorphic-validation'
   },
   {
@@ -145,12 +149,12 @@ export const STARTERS: Starter[] = [
     target: 'backend',
     paradigm: 'decorators',
     problem: 'auth',
-    command: cmd('@stone-js/blog-starters'),
+    command: blogCmd('stateless-auth'),
     repo: `${GH}/stone-js-framework/tree/main/stone-js-blog-starters/stateless-auth`,
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'Verify a JWT at the boundary and guard routes, no session store.',
-    about: 'Identity established once at the edge: a kernel middleware verifies the Bearer token on every request, then requireAuth() (401) and requireScopes(...) (403) guard routes. Nothing touches a session store, so the same code runs on Node, serverless and the edge. An opt-in blog starter, request it with -- --starters @stone-js/blog-starters.',
+    about: 'Identity established once at the edge: a kernel middleware verifies the Bearer token on every request, then requireAuth() (401) and requireScopes(...) (403) guard routes. Nothing touches a session store, so the same code runs on Node, serverless and the edge. An opt-in blog starter, add the pack with -- --starters @stone-js/blog-starters (the card shows the full command).',
     blogSlug: 'stateless-auth-at-the-edge'
   },
   {
@@ -160,12 +164,12 @@ export const STARTERS: Starter[] = [
     target: 'backend',
     paradigm: 'decorators',
     problem: 'agents',
-    command: cmd('@stone-js/blog-starters'),
+    command: blogCmd('agent-superpowers'),
     repo: `${GH}/stone-js-framework/tree/main/stone-js-blog-starters/agent-superpowers`,
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'Give your coding agent Stone.js superpowers: `stone mcp` serves the framework + your app.',
-    about: 'Add @McpDev() and one command, stone mcp, starts an MCP server (stdio) that gives your coding agent the framework knowledge (stone_search, stone_docs) AND a read-only view of this app (stone_routes, stone_app, stone_config), plus any tools you declare, so it stops guessing. `stone mcp --init` writes .mcp.json; the package also ships Agent Skills. An opt-in blog starter, request it with -- --starters @stone-js/blog-starters.',
+    about: 'Add @McpDev() and one command, stone mcp, starts an MCP server (stdio) that gives your coding agent the framework knowledge (stone_search, stone_docs) AND a read-only view of this app (stone_routes, stone_app, stone_config), plus any tools you declare, so it stops guessing. `stone mcp --init` writes .mcp.json; the package also ships Agent Skills. An opt-in blog starter, add the pack with -- --starters @stone-js/blog-starters (the card shows the full command).',
     blogSlug: 'agent-superpowers'
   },
   {
@@ -175,12 +179,12 @@ export const STARTERS: Starter[] = [
     target: 'backend',
     paradigm: 'decorators',
     problem: 'openapi',
-    command: cmd('@stone-js/blog-starters'),
+    command: blogCmd('openapi-contract'),
     repo: `${GH}/stone-js-framework/tree/main/stone-js-blog-starters/openapi-contract`,
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'Generate an OpenAPI document from your Zod schemas, served with Swagger UI.',
-    about: 'A hand-written OpenAPI spec drifts immediately. Here OpenApiGenerator derives the document from the same Zod schema the API validates with, so the contract stays a view of the code; GET /openapi.json serves it to tools and agents, GET /docs serves a Swagger UI for humans. An opt-in blog starter, request it with -- --starters @stone-js/blog-starters.',
+    about: 'A hand-written OpenAPI spec drifts immediately. Here OpenApiGenerator derives the document from the same Zod schema the API validates with, so the contract stays a view of the code; GET /openapi.json serves it to tools and agents, GET /docs serves a Swagger UI for humans. An opt-in blog starter, add the pack with -- --starters @stone-js/blog-starters (the card shows the full command).',
     blogSlug: 'openapi-from-your-schemas'
   },
   {
@@ -190,12 +194,12 @@ export const STARTERS: Starter[] = [
     target: 'backend',
     paradigm: 'decorators',
     problem: 'file-upload',
-    command: cmd('@stone-js/blog-starters'),
+    command: blogCmd('signed-url-uploads'),
     repo: `${GH}/stone-js-framework/tree/main/stone-js-blog-starters/signed-url-uploads`,
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'Upload straight to the bucket with signed URLs, the bytes never touch your function.',
-    about: 'Large files should not travel through your function. @CloudFile injects the agnostic fileSystem; /sign mints a short-lived temporaryUploadUrl so the client PUTs straight to the bucket, /complete stores only the metadata, and /:id/url mints a private read URL. S3-compatible: AWS, R2, MinIO, Spaces. An opt-in blog starter, request it with -- --starters @stone-js/blog-starters.',
+    about: 'Large files should not travel through your function. @CloudFile injects the agnostic fileSystem; /sign mints a short-lived temporaryUploadUrl so the client PUTs straight to the bucket, /complete stores only the metadata, and /:id/url mints a private read URL. S3-compatible: AWS, R2, MinIO, Spaces. An opt-in blog starter, add the pack with -- --starters @stone-js/blog-starters (the card shows the full command).',
     blogSlug: 'signed-url-file-uploads'
   },
   ...official()

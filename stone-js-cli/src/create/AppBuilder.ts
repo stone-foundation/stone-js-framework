@@ -32,7 +32,10 @@ export class AppBuilder {
 
     if (!event.get<boolean>('yes', false)) {
       const answers = await Questionnaire.create(this.context).getAnswers()
-      this.context.blueprint.set('stone.createApp', answers)
+      // `add` merges, `set` on a string key replaces the whole bucket: setting here would erase
+      // the options captured above (`starters` above all), so the starter links would be lost and
+      // the materialisation step would silently resolve a different starter from the default pack.
+      this.context.blueprint.add('stone.createApp', answers)
     }
 
     await this.executeThroughPipeline(CreateAppMiddleware)
@@ -49,6 +52,15 @@ export class AppBuilder {
 
     if (starters !== undefined && starters.length > 0) {
       this.context.blueprint.set('stone.createApp.starters', starters)
+    }
+
+    // `--starter <id>` names one entry inside the linked packages. Flagging the choice as explicit
+    // lets the materialisation step fail loudly on a typo instead of scaffolding another starter.
+    const starter = event.get<string>('starter', '')?.trim()
+
+    if (starter !== undefined && starter.length > 0) {
+      this.context.blueprint.set('stone.createApp.template', starter)
+      this.context.blueprint.set('stone.createApp.templateExplicit', true)
     }
   }
 

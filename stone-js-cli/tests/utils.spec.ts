@@ -9,6 +9,7 @@ import {
   isSSG,
   dirPath,
   getCache,
+  cliVersion,
   setCache,
   isReactApp,
   isLazyViews,
@@ -96,6 +97,14 @@ describe('utils: dirPath', () => {
   it('should resolve a path relative to this module', () => {
     const expected = path.join(path.dirname(import.meta.url.replace('file://', '')), '../src')
     expect(dirPath()).toBe(expected)
+  })
+})
+
+describe('utils: cliVersion', () => {
+  it('reads the version from the package manifest shipped with the bundle', () => {
+    // The banner's fallback: `stone init` has no project to read a version from, so the CLI's own
+    // version (= the framework version, lockstep) is what the user must see.
+    expect(cliVersion()).toMatch(/^\d+\.\d+\.\d+/)
   })
 })
 

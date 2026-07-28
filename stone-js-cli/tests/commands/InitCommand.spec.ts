@@ -41,18 +41,18 @@ describe('InitCommand', () => {
     expect(context.commandOutput.error).not.toHaveBeenCalled()
   })
 
-  it('should catch error and call commandOutput.error', async () => {
+  it('propagates failures so the process exits non-zero', async () => {
     const builder = vi.mocked(new AppBuilder(context))
     const err = new Error('boom!')
     builder.build.mockRejectedValue(err)
     vi.mocked(AppBuilder).mockImplementation(() => builder)
 
     const cmd = new InitCommand(context)
-    await cmd.handle(event)
 
-    expect(AppBuilder).toHaveBeenCalledWith(context)
-    expect(builder.build).toHaveBeenCalledWith(event)
-    expect(context.commandOutput.error).toHaveBeenCalledWith('boom!')
+    // Catching here printed the error but exited 0, so a failed scaffold looked like a success to
+    // any script or CI job. The kernel error handler prints the same message and fails the run.
+    await expect(cmd.handle(event)).rejects.toThrow('boom!')
+    expect(context.commandOutput.error).not.toHaveBeenCalled()
   })
 })
 
@@ -75,6 +75,11 @@ describe('initCommandOptions', () => {
     expect(mockYargs.positional).toHaveBeenCalledWith('project-name', {
       type: 'string',
       desc: 'your project name'
+    })
+
+    expect(mockYargs.option).toHaveBeenCalledWith('starter', {
+      type: 'string',
+      desc: expect.stringContaining('Starter id')
     })
 
     expect(mockYargs.option).toHaveBeenCalledWith('yes', {
