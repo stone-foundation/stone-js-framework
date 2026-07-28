@@ -1,4 +1,4 @@
-# Stone.js
+# <img src=".github/assets/logo.svg" alt="" height="32"> Stone.js
 
 > The Continuum framework. Write your JavaScript/TypeScript domain once; it runs anywhere: Node, serverless, edge, browser, CLI and AI agents. Build once, deploy anywhere.
 
