@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "💬 Questions & help"
+    url: https://github.com/stone-foundation/stone-js-framework/discussions/categories/q-a
+    about: Ask usage questions in Discussions Q&A so answers help the next person too.
+  - name: "💡 Ideas / RFC"
+    url: https://github.com/stone-foundation/stone-js-framework/discussions/categories/ideas
+    about: Propose and discuss API evolutions before they become feature requests.
+  - name: "🔒 Report a security vulnerability"
+    url: https://github.com/stone-foundation/stone-js-framework/security/advisories/new
+    about: Private disclosure. Never open a public issue for a security problem.

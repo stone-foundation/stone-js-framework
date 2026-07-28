@@ -1,0 +1,44 @@
+name: "✨ Feature request"
+description: "Propose an improvement or a new capability"
+labels: ["type: feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For open-ended ideas or API design discussions, prefer a thread in [Ideas / RFC](https://github.com/stone-foundation/stone-js-framework/discussions/categories/ideas). Use this form when the proposal is concrete enough to be actionable. The [roadmap](https://github.com/stone-foundation/stone-js-framework/blob/main/ROADMAP.md) shows what is already planned.
+  - type: input
+    id: packages
+    attributes:
+      label: Target package(s)
+      description: Which `@stone-js/*` package(s) would this touch? Write `new module` if none fits.
+      placeholder: "@stone-js/router"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can't you do today, or what is painful? A real use case beats an abstract one.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: |
+        Sketch the API you would like. Remember Stone.js keeps both paradigms at parity: if you propose a decorator, sketch the imperative `define*` form too (and vice versa).
+      placeholder: |
+        ```ts
+        // declarative
+        @Something(...)
+
+        // imperative
+        defineSomething(...)
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What do you do today as a workaround? What other designs did you rule out?
