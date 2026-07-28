@@ -1,0 +1,23 @@
+name: "📖 Documentation"
+description: "Report a mistake, a gap, or an unclear explanation in the docs"
+labels: ["type: docs"]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Where
+      description: URL of the page on stonejs.dev, or the package README path.
+      placeholder: "https://stonejs.dev/docs/..."
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is wrong or missing
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: Optional. If you can phrase the fix, you are one step away from a pull request; docs PRs are very welcome.
