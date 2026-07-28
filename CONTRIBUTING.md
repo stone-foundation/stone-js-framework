@@ -8,7 +8,7 @@ tooling guide; this file is the short contributor checklist.
 
 - **New here?** Pick a [`good first issue`](https://github.com/stone-foundation/stone-js-framework/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22): each one comes with context, file pointers, and acceptance criteria.
 - **Wondering where the project is going?** See the [roadmap](./ROADMAP.md).
-- **Questions?** Ask in [Discussions Q&A](https://github.com/stone-foundation/stone-js-framework/discussions). **API ideas?** Open a thread in Ideas / RFC before writing code: it saves everyone time.
+- **Questions?** Ask in [Discussions Q&A](https://github.com/stone-foundation/stone-js-framework/discussions) or on [Discord](https://discord.gg/3g93ppqMGH). **API ideas?** Open a thread in Ideas / RFC before writing code: it saves everyone time.
 - **Building something with Stone.js?** Tell us in Show and tell; real-world feedback is the most valuable contribution during the beta.
 
 ## Prerequisites
@@ -47,9 +47,11 @@ pnpm build                                # build all (incremental)
 
 ## Commits & branches
 
-- **Conventional Commits** (`feat:`, `fix:`, `chore:`...), enforced by commitlint.
+- **Conventional Commits** (`feat:`, `fix:`, `chore:`...), enforced by commitlint. The **PR title** must be one too: it becomes the squash commit on `main`.
+- **Branch names follow `<type>/<short-slug>`** (same types as commits), e.g. `docs/fix-api-count`, `fix/router-redos`. CI checks this on every PR, forks included.
 - Work on a feature branch, open a PR against `main`. Never push to `main` directly.
-- Each bug fix must come with a **behavioural** regression test.
+- Link the issue your PR closes with a `Closes #123` line in the description.
+- Each bug fix must come with a **behavioural** regression test (docs-only changes need none).
 
 ## Changesets (required for anything user-facing)
 
