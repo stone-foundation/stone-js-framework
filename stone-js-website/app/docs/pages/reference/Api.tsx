@@ -61,9 +61,9 @@ export class Api implements IPage<ReactIncomingEvent> {
 
         <H2>The full generated reference</H2>
         <p>
-          Every exported symbol of all 28 packages, with its types, is in the consolidated TypeDoc
-          reference: one cross-linked site, generated from the source at build time and exhaustive
-          by construction.
+          Every exported symbol of every published package, with its types, is in the consolidated
+          TypeDoc reference: one cross-linked site, generated from the source at build time and
+          exhaustive by construction.
         </p>
         <p>
           <a className='btn btn-primary' href='/api/' style={{ marginTop: 4 }}>Open the API reference →</a>
