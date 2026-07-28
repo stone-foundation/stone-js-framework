@@ -87,7 +87,7 @@ Building the framework is half the work. This track covers how Stone.js grows as
 **Now**
 
 - Pilot user program: a first group of builders shipping real applications with direct maintainer support
-- Community channels: GitHub Discussions (Q&A, Ideas / RFC, Show and tell) and Discord
+- Community channels: [GitHub Discussions](https://github.com/stone-foundation/stone-js-framework/discussions) (Q&A, Ideas / RFC, Show and tell) and [Discord](https://discord.gg/3g93ppqMGH)
 - A curated [`good first issue`](https://github.com/stone-foundation/stone-js-framework/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) backlog for new contributors
 
 **Next**

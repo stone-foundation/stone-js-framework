@@ -1,6 +1,6 @@
 # Stone.js
 
-> The Continuum framework. Write your TypeScript domain once; it runs anywhere: Node, serverless, edge, browser, CLI and AI agents. Build once, deploy anywhere.
+> The Continuum framework. Write your JavaScript/TypeScript domain once; it runs anywhere: Node, serverless, edge, browser, CLI and AI agents. Build once, deploy anywhere.
 
 [![CI](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/stone-foundation/stone-js-framework/actions/workflows/ci.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
@@ -147,9 +147,7 @@ Contributing? See **[CONTRIBUTING.md](./CONTRIBUTING.md)**. Security issues? See
 
 - 🗺️ **[Roadmap](./ROADMAP.md)**: the route to 1.0 and the directions beyond, tracked live on the [public project board](https://github.com/orgs/stone-foundation/projects/3).
 - 💬 **[GitHub Discussions](https://github.com/stone-foundation/stone-js-framework/discussions)**: usage questions (Q&A), API design (Ideas / RFC), and what you build (Show and tell). Start with the pinned [Start here](https://github.com/stone-foundation/stone-js-framework/discussions/63) thread.
-<!-- TODO(discord): once the server exists, replace INVITE and uncomment:
-- 🎧 **[Discord](https://discord.gg/INVITE)**: real-time chat with the community.
--->
+- 🎧 **[Discord](https://discord.gg/3g93ppqMGH)**: real-time chat with the community.
 - 🧭 **New contributors**: pick a [good first issue](https://github.com/stone-foundation/stone-js-framework/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22); each one ships with context, file pointers, and acceptance criteria.
 - 🚀 **Pilot users**: building something real with Stone.js during the beta? You get direct maintainer support, and your frictions become tracked issues. Say hello in [Discussions](https://github.com/stone-foundation/stone-js-framework/discussions).
 

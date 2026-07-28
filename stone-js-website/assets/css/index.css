@@ -125,6 +125,9 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 .slogan { font-family: var(--display); font-size: 20px; }
 .slogan .dot { color: var(--braise); }
 .foot .right { text-align: right; }
+.foot-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.foot-links a { color: inherit; font-size: 16px; opacity: .72; text-decoration: none; transition: opacity .15s ease, color .15s ease; }
+.foot-links a:hover { opacity: 1; color: var(--braise); }
 @media (max-width: 640px) {
   .site-footer { padding: 44px 0 38px; }
   .foot { flex-direction: column; align-items: flex-start; gap: 20px; padding-top: 30px; }

@@ -8,7 +8,7 @@ tooling guide; this file is the short contributor checklist.
 
 - **New here?** Pick a [`good first issue`](https://github.com/stone-foundation/stone-js-framework/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22): each one comes with context, file pointers, and acceptance criteria.
 - **Wondering where the project is going?** See the [roadmap](./ROADMAP.md).
-- **Questions?** Ask in [Discussions Q&A](https://github.com/stone-foundation/stone-js-framework/discussions). **API ideas?** Open a thread in Ideas / RFC before writing code: it saves everyone time.
+- **Questions?** Ask in [Discussions Q&A](https://github.com/stone-foundation/stone-js-framework/discussions) or on [Discord](https://discord.gg/3g93ppqMGH). **API ideas?** Open a thread in Ideas / RFC before writing code: it saves everyone time.
 - **Building something with Stone.js?** Tell us in Show and tell; real-world feedback is the most valuable contribution during the beta.
 
 ## Prerequisites
