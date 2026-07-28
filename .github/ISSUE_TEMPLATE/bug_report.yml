@@ -1,0 +1,76 @@
+name: "🐛 Bug report"
+description: "Something doesn't work as documented"
+labels: ["type: bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please search existing issues first, and remember: security vulnerabilities go through [private disclosure](https://github.com/stone-foundation/stone-js-framework/security/advisories/new), never a public issue.
+  - type: input
+    id: packages
+    attributes:
+      label: Affected package(s)
+      description: Which `@stone-js/*` package(s) are affected?
+      placeholder: "@stone-js/router"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The `@stone-js/*` version you are using (all packages share one version).
+      placeholder: "0.8.6"
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target / adapter
+      description: Where does the bug happen?
+      multiple: true
+      options:
+        - Node HTTP
+        - Node CLI
+        - Browser (SPA / SSR)
+        - AWS Lambda
+        - Azure Functions
+        - GCP Cloud Functions
+        - Alibaba FC
+        - Tencent SCF
+        - Edge (fetch / WinterCG)
+        - WebSocket
+        - Build / CLI tooling
+        - Other
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you do, and what went wrong? Include the exact error message if any.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: The smallest snippet or repository that reproduces the problem. A `npm create @stone-js` starter with your change on top is perfect.
+      placeholder: |
+        ```ts
+        // steps or code to reproduce
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Node.js version, OS, package manager.
+      placeholder: |
+        Node: 22.x
+        OS: macOS 15
+        Package manager: pnpm 9
