@@ -143,6 +143,16 @@ Commits follow [Conventional Commits](https://conventionalcommits.org) (enforced
 
 Contributing? See **[CONTRIBUTING.md](./CONTRIBUTING.md)**. Security issues? See **[SECURITY.md](./SECURITY.md)**.
 
+## Community & roadmap
+
+- 🗺️ **[Roadmap](./ROADMAP.md)**: the route to 1.0 and the directions beyond, tracked live on the [public project board](https://github.com/orgs/stone-foundation/projects/3).
+- 💬 **[GitHub Discussions](https://github.com/stone-foundation/stone-js-framework/discussions)**: usage questions (Q&A), API design (Ideas / RFC), and what you build (Show and tell). Start with the pinned [Start here](https://github.com/stone-foundation/stone-js-framework/discussions/63) thread.
+<!-- TODO(discord): once the server exists, replace INVITE and uncomment:
+- 🎧 **[Discord](https://discord.gg/INVITE)**: real-time chat with the community.
+-->
+- 🧭 **New contributors**: pick a [good first issue](https://github.com/stone-foundation/stone-js-framework/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22); each one ships with context, file pointers, and acceptance criteria.
+- 🚀 **Pilot users**: building something real with Stone.js during the beta? You get direct maintainer support, and your frictions become tracked issues. Say hello in [Discussions](https://github.com/stone-foundation/stone-js-framework/discussions).
+
 ## License
 
 [MIT](./LICENSE) © Evens Pierre ("Mr. Stone") and the Stone.js contributors.
