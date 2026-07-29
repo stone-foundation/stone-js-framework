@@ -1,3 +1,4 @@
+import { cliVersion } from './utils'
 import { IBlueprint } from '@stone-js/core'
 import { StoneReporter } from './StoneReporter'
 import { CommandOutput } from '@stone-js/node-cli-adapter'
@@ -15,6 +16,9 @@ import { CommandOutput } from '@stone-js/node-cli-adapter'
 export function PrintBannerHook (
   { commandOutput, blueprint }: { commandOutput: CommandOutput, blueprint: IBlueprint }
 ): void {
+  // The app's own version when it declares one (a built project), else the CLI's version. Nothing
+  // sets `stone.builder.version` during `stone init`: there is no project to read a version from
+  // yet, and the framework's version is the meaningful one there anyway (lockstep releases).
   const version = blueprint.get<string>('stone.builder.version', '') ?? ''
-  StoneReporter.create(commandOutput, version).banner()
+  StoneReporter.create(commandOutput, version.length > 0 ? version : cliVersion()).banner()
 }

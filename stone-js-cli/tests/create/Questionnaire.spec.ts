@@ -85,6 +85,28 @@ describe('Questionnaire', () => {
     }))
   })
 
+  it('does not ask for the starter when --starter already named one', async () => {
+    mockInput.ask.mockResolvedValue('my-app')
+    mockInput.confirm.mockResolvedValue(true)
+    mockInput.choice.mockResolvedValueOnce('typescript') // typing
+      .mockResolvedValueOnce('npm') // packageManager (the template question is skipped)
+      .mockResolvedValueOnce([]) // modules
+      .mockResolvedValueOnce('vitest') // testing
+
+    mockContext.blueprint.get.mockImplementation((key: string, fallback?: any) => {
+      if (key === 'stone.createApp.template') return 'basic-react-declarative'
+      if (key === 'stone.createApp.templateExplicit') return true
+      return fallback
+    })
+
+    const questionnaire = Questionnaire.create(mockContext)
+    const result = await questionnaire.getAnswers()
+
+    // The flag wins and the user is never asked to contradict it.
+    expect(result.template).toBe('basic-react-declarative')
+    expect(mockInput.choice).not.toHaveBeenCalledWith('Starter template: ', expect.anything(), expect.anything())
+  })
+
   it('should cancel if overwrite is false', async () => {
     mockContext.blueprint.get.mockImplementation((key: string) => {
       if (key === 'stone.createApp.projectName') return 'existing-app'

@@ -125,9 +125,45 @@ export async function fetchStarter (link: string, context: StarterFetchContext):
   const prefix = tmpPath(`starter-npm-${slug(link)}`)
   existsSync(prefix) && removeSync(prefix)
   context.output.info(`Installing starter ${parsed.target}`)
-  execFileSync('npm', ['install', parsed.target, '--prefix', prefix, '--no-save', '--no-audit', '--no-fund'], { stdio: 'inherit', shell: false })
+  try {
+    execFileSync('npm', ['install', parsed.target, '--prefix', prefix, '--no-save', '--no-audit', '--no-fund'], { stdio: 'inherit', shell: false })
+  } catch (error: any) {
+    throw new CliError(unresolvableLinkMessage(link), { cause: error })
+  }
   const dir = join(prefix, 'node_modules', barePackageName(parsed.target))
   return { dir, packageJson: readPackageJson(dir) }
+}
+
+/**
+ * The message shown when a link cannot be installed from npm.
+ *
+ * `--starters` takes provider LINKS while `--starter` takes a starter ID, and a bare id passed to
+ * the plural flag is indistinguishable from an unscoped package name until npm answers 404. That
+ * mistake is the likeliest reason to land here, so the message names it instead of leaving the raw
+ * registry error as the only clue.
+ *
+ * @param link - The link that could not be installed.
+ * @returns The error message.
+ */
+function unresolvableLinkMessage (link: string): string {
+  const looksLikeAnId = !link.includes('/') && !link.includes(':') && !link.includes('.')
+  const hint = looksLikeAnId
+    ? `\nDid you mean \`--starter ${link}\`? \`--starters\` expects a package or git link (e.g. @stone-js/blog-starters, github:owner/repo, ./local-dir), while \`--starter\` selects a starter by id inside a linked package.`
+    : '\n`--starters` expects a package or git link, e.g. @stone-js/blog-starters, github:owner/repo, npm:pkg, or a local path.'
+  return `Could not install starter link "${link}".${hint}`
+}
+
+/**
+ * Renders the available starters as a readable list, for error messages.
+ *
+ * @param starters - The resolved starters.
+ * @returns One `  - id (provider)` line per starter, or a hint when there is none.
+ */
+export function formatStarterList (starters: ResolvedStarter[]): string {
+  if (starters.length === 0) {
+    return '  (none resolved: pass a link with `--starters <link>` or install a starter package)'
+  }
+  return starters.map(({ value, provider }) => `  - ${value} (${provider})`).join('\n')
 }
 
 /**

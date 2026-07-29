@@ -25,6 +25,11 @@ export interface CreateAppConfig {
    * in its package.json. Installed starter packages are additionally auto-detected (0-config).
    */
   starters?: string[]
+  /**
+   * True when the starter was named explicitly with `--starter <id>`, so an id that matches no
+   * entry must fail instead of silently falling back to the first available starter.
+   */
+  templateExplicit?: boolean
 }
 
 /**

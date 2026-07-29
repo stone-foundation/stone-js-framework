@@ -34,6 +34,12 @@ export const initCommandOptions: CommandOptions = {
         type: 'string',
         desc: 'Comma-separated starter links (git/npm/local), e.g. github:owner/repo,@acme/stone-starters. Overrides the built-in default.'
       })
+      // Deliberately no short alias: `-s` belongs to `--starters`, and two one-letter flags for
+      // two flags that already differ by a single character would be a trap.
+      .option('starter', {
+        type: 'string',
+        desc: 'Starter id to scaffold, e.g. basic-react-declarative. Skips the starter question. Ids come from each linked package\'s stone.starters manifest.'
+      })
   }
 }
 
@@ -50,12 +56,13 @@ export class InitCommand {
 
   /**
    * Handle the incoming event.
+   *
+   * Errors are NOT caught here on purpose: `ConsoleErrorHandler` prints the very same message and
+   * returns a failing status, which the adapter turns into a non-zero exit code. Swallowing them
+   * printed the error but exited 0, so a broken scaffold looked like a success to any script or CI
+   * job calling `npm create @stone-js`.
    */
   async handle (event: IncomingEvent): Promise<void> {
-    try {
-      await new AppBuilder(this.context).build(event)
-    } catch (error: any) {
-      this.context.commandOutput.error(error.message)
-    }
+    await new AppBuilder(this.context).build(event)
   }
 }

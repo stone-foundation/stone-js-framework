@@ -25,7 +25,8 @@ const FLAGS = [
   { flag: '--imperative, -i', on: 'serve', desc: 'Run against the imperative entry instead of the decorated one.' },
   { flag: '--language, -lang', on: 'serve, build', desc: 'Target language for the build (ts or js).' },
   { flag: '--target, -t', on: 'preview', desc: 'Which built target to preview.' },
-  { flag: '--starters, -s', on: 'init', desc: 'Pick a starter template for the new project.' },
+  { flag: '--starter', on: 'init', desc: 'Scaffold this starter id, e.g. basic-react-declarative. Skips the starter question.' },
+  { flag: '--starters, -s', on: 'init', desc: 'Comma-separated packages that declare starters (npm, git or local), e.g. @stone-js/blog-starters. Adds to the built-in official pack.' },
   { flag: '--yes, -y / --force, -f', on: 'init', desc: 'Skip prompts / overwrite an existing directory.' },
   { flag: '--watch, -w', on: 'typings', desc: 'Regenerate declarations on change.' }
 ]

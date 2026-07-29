@@ -27,6 +27,23 @@ export function dirPath (...paths: string[]): string {
 }
 
 /**
+ * The CLI's own version, read from the package manifest shipped next to the bundle.
+ *
+ * Used as the banner's fallback: `stone init` runs before any project exists, so there is no
+ * application version to display, and every `@stone-js/*` package shares one version (lockstep),
+ * so the CLI's version IS the framework version the user is scaffolding with.
+ *
+ * @returns The version, or an empty string when the manifest cannot be read.
+ */
+export function cliVersion (): string {
+  try {
+    return readJsonSync(dirPath('../package.json'))?.version ?? ''
+  } catch {
+    return ''
+  }
+}
+
+/**
  * Get File Hash.
  * Creates a file hash for caching purposes.
  *

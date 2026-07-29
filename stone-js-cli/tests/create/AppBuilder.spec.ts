@@ -26,6 +26,7 @@ vi.mock('@stone-js/pipeline', async (mod) => {
 
 const mockBlueprint = {
   set: vi.fn(),
+  add: vi.fn(),
   get: vi.fn()
 }
 
@@ -59,7 +60,9 @@ describe('AppBuilder', () => {
     expect(mockBlueprint.set).toHaveBeenCalledWith('stone.createApp.overwrite', true)
     expect(mockBlueprint.set).toHaveBeenCalledWith('stone.createApp.projectName', 'awesome-app')
     expect(Questionnaire.create).toHaveBeenCalledWith(mockContext)
-    expect(mockBlueprint.set).toHaveBeenCalledWith('stone.createApp', { language: 'typescript' })
+    // Merged, never set: `set` on this key would replace the bucket and drop the options above.
+    expect(mockBlueprint.add).toHaveBeenCalledWith('stone.createApp', { language: 'typescript' })
+    expect(mockBlueprint.set).not.toHaveBeenCalledWith('stone.createApp', { language: 'typescript' })
     expect(Pipeline.create).toHaveBeenCalled()
   })
 
@@ -73,6 +76,46 @@ describe('AppBuilder', () => {
     await builder.build(mockEvent as any)
 
     expect(mockBlueprint.set).toHaveBeenCalledWith('stone.createApp.starters', ['github:o/r', '@acme/s'])
+  })
+
+  it('sets the template from --starter and flags it as explicit', async () => {
+    const builder = new AppBuilder(mockContext)
+    mockEvent.get = vi.fn().mockImplementation((key: string, fallback?: any) => {
+      const map: any = { yes: true, force: false, 'project-name': 'app', starter: ' basic-react-declarative ' }
+      return map[key] ?? fallback
+    })
+
+    await builder.build(mockEvent as any)
+
+    expect(mockBlueprint.set).toHaveBeenCalledWith('stone.createApp.template', 'basic-react-declarative')
+    expect(mockBlueprint.set).toHaveBeenCalledWith('stone.createApp.templateExplicit', true)
+  })
+
+  it('leaves the template untouched when --starter is absent', async () => {
+    const builder = new AppBuilder(mockContext)
+    mockEvent.get = vi.fn().mockImplementation((key: string, fallback?: any) => {
+      const map: any = { yes: true, force: false, 'project-name': 'app' }
+      return map[key] ?? fallback
+    })
+
+    await builder.build(mockEvent as any)
+
+    expect(mockBlueprint.set).not.toHaveBeenCalledWith('stone.createApp.templateExplicit', true)
+  })
+
+  it('keeps the starter links when the questionnaire answers are merged', async () => {
+    const builder = new AppBuilder(mockContext)
+    mockEvent.get = vi.fn().mockImplementation((key: string, fallback?: any) => {
+      const map: any = { yes: false, force: false, 'project-name': 'app', starters: '@stone-js/blog-starters' }
+      return map[key] ?? fallback
+    })
+
+    await builder.build(mockEvent as any)
+
+    const links = mockBlueprint.set.mock.calls.filter(([key]) => key === 'stone.createApp.starters')
+    const wipes = mockBlueprint.set.mock.calls.filter(([key]) => key === 'stone.createApp')
+    expect(links).toHaveLength(1)
+    expect(wipes).toHaveLength(0)
   })
 
   it('skips questionnaire if `yes` is true', async () => {

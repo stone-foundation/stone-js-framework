@@ -2,13 +2,14 @@ import fsExtra from 'fs-extra'
 import simpleGit from 'simple-git'
 import { execFileSync } from 'child_process'
 import { CliError } from '../../src/errors/CliError'
-import { getAvailableStarters, materializeStarter } from '../../src/create/StarterContract'
+import { formatStarterList, getAvailableStarters, materializeStarter } from '../../src/create/StarterContract'
 import { deriveVanilla } from '../../src/create/vanilla'
 import { CloneStarterMiddleware, ConfigureTestingMiddleware, ConvertToVanillaMiddleware, FinalizeMiddleware, InstallDependenciesMiddleware } from '../../src/create/CreateAppMiddleware'
 
 vi.mock('../../src/create/StarterContract', () => ({
   getAvailableStarters: vi.fn(),
-  materializeStarter: vi.fn()
+  materializeStarter: vi.fn(),
+  formatStarterList: vi.fn(() => '  - other (p)')
 }))
 
 vi.mock('../../src/create/vanilla', () => ({
@@ -107,6 +108,22 @@ describe('CloneStarterMiddleware', () => {
 
     await CloneStarterMiddleware(mockContext, next)
     expect(materializeStarter).toHaveBeenCalledWith(expect.objectContaining({ value: 'other' }), expect.any(String))
+  })
+
+  it('throws and lists the available ids when an explicitly requested starter is unknown', async () => {
+    vi.mocked(fsExtra.pathExistsSync).mockReturnValue(false)
+    vi.mocked(fsExtra.readJsonSync).mockReturnValue({ name: 'test' })
+    vi.mocked(getAvailableStarters).mockResolvedValue([{ value: 'other', provider: 'p', dir: '/d', path: '.' }])
+    mockContext.blueprint.get.mockImplementation((key: string) =>
+      key === 'stone.createApp'
+        ? { overwrite: true, projectName: 'my-app', template: 'typo-here', templateExplicit: true }
+        : undefined
+    )
+
+    // An explicit --starter that matches nothing must fail, never scaffold something else.
+    await expect(CloneStarterMiddleware(mockContext, next)).rejects.toThrow(/Unknown starter "typo-here"/)
+    expect(materializeStarter).not.toHaveBeenCalled()
+    expect(formatStarterList).toHaveBeenCalled()
   })
 
   it('throws when no starter is available', async () => {
