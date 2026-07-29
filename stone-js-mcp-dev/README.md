@@ -38,26 +38,29 @@ import { StoneApp } from '@stone-js/core'
 export class Application {}
 ```
 
-Then start the server from your project:
-
-```bash
-stone mcp
-```
-
-`stone mcp` starts an MCP server over **stdio** and keeps running until you press `Ctrl+C`, exactly
-like `stone dev`. It hands the [MCP SDK](https://github.com/modelcontextprotocol) the built-in
-framework-knowledge tools and lets the SDK own the protocol and run the handlers — these are dev and
-knowledge helpers, not your domain, so they do not need to traverse the kernel. Every tool call is
-logged to **stderr** (stdout is reserved for the JSON-RPC protocol) so you watch the agent think in
-real time.
-
 ### Register it for your agent
 
-Let `stone mcp` write `.mcp.json` for you (create or merge, never clobbering your own config):
+One command writes `.mcp.json` for you (create or merge, never clobbering your own config):
 
 ```bash
-stone mcp --init
+npx stone mcp --init
 ```
+
+That is the whole setup: **you never start the server yourself.** It speaks MCP over **stdio**, so the
+transport is the child process's own standard input and output. Your agent reads `.mcp.json`, spawns
+its own `stone mcp` process and performs the handshake; a server you launch in a terminal has no
+channel to your agent and would simply sit there. Restart your agent session after the first
+`--init` so it picks the entry up.
+
+The command hands the [MCP SDK](https://github.com/modelcontextprotocol) the built-in
+framework-knowledge tools and lets the SDK own the protocol and run the handlers: these are dev and
+knowledge helpers, not your domain, so they do not need to traverse the kernel. Every tool call is
+logged to **stderr** (stdout is reserved for the JSON-RPC protocol), so running `npx stone mcp` in a
+terminal lets you read those logs live. Useful for debugging, never required.
+
+> `npx` is used because `@stone-js/cli` is a dev dependency of your project: the bare `stone` command
+> only resolves if you also installed it globally (`npm i -g @stone-js/cli`). Inside a package script
+> the prefix is unnecessary.
 
 Or add the entry yourself (Claude Code, Cursor, Claude Desktop, …):
 
@@ -75,7 +78,6 @@ Or add the entry yourself (Claude Code, Cursor, Claude Desktop, …):
 |---|---|
 | `stone_search` | Search the knowledge base (concepts, modules, best-practices, gaps). |
 | `stone_concept` | Explain a core concept by id (omit id to list them all). |
-| `stone_docs` | Links to the authoritative documentation. |
 | `stone_modules` | The ecosystem modules and what each does. |
 | `stone_best_practices` | Conventions and anti-patterns, each with its rationale. |
 | `stone_gaps` | What the framework does not (yet) provide, and what to reach for. |
