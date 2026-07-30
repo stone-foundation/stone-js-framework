@@ -1,5 +1,12 @@
 # @stone-js/auth
 
+## 0.8.8
+
+### Patch Changes
+
+- @stone-js/core@0.8.8
+- @stone-js/http-core@0.8.8
+
 ## 0.8.7
 
 ### Patch Changes
