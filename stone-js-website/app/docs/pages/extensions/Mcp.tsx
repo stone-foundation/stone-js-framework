@@ -34,9 +34,8 @@ export class Mcp implements IPage<ReactIncomingEvent> {
 
         <H2>Add the command</H2>
         <p>
-          Enable it with the <code>@McpDev()</code> decorator (or register <code>mcpDevBlueprint</code>),
-          then start the server from your project. It runs over stdio and stops on <code>Ctrl+C</code>,
-          exactly like <code>stone dev</code>.
+          Enable it with the <code>@McpDev()</code> decorator (or register <code>mcpDevBlueprint</code>).
+          Your app gains one command, <code>stone mcp</code>.
         </p>
         <Code file='app/Application.ts'>{`import { McpDev } from '@stone-js/mcp-dev'
 import { StoneApp } from '@stone-js/core'
@@ -44,21 +43,36 @@ import { StoneApp } from '@stone-js/core'
 @McpDev()
 @StoneApp({ name: 'my-app' })
 export class Application {}`}</Code>
-        <Code file='terminal' lang='bash'>{`stone mcp`}</Code>
-
-        <Callout kind='tip' title='Logs on stderr, protocol on stdout'>
-          Every tool call is logged to <strong>stderr</strong> so you watch the agent think in real
-          time, while stdout stays reserved for the JSON-RPC protocol. That single detail is what
-          breaks most hand-rolled stdio MCP servers; here it is handled for you.
-        </Callout>
 
         <H2>Register it for your agent</H2>
         <p>
-          Let <code>stone mcp</code> write <code>.mcp.json</code> for you. It creates or merges the
-          entry and never clobbers your own config, so a coding agent (Claude Code, Cursor, Claude
-          Desktop, …) discovers the server.
+          One command writes <code>.mcp.json</code> for you. It creates or merges the entry and never
+          clobbers your own config, so a coding agent (Claude Code, Cursor, Claude Desktop, …)
+          discovers the server:
         </p>
-        <Code file='terminal' lang='bash'>{`stone mcp --init`}</Code>
+        <Code file='terminal' lang='bash'>{`npx stone mcp --init`}</Code>
+        <p>
+          That is the whole setup. <strong>You never start the server yourself.</strong> It speaks MCP
+          over stdio, which means the transport is the child process's own standard input and output:
+          your agent reads <code>.mcp.json</code>, spawns its own <code>stone mcp</code> process, and
+          performs the handshake. A server you launch in your terminal has no channel to your agent and
+          would simply sit there. Restart your agent session after the first <code>--init</code> so it
+          picks the entry up.
+        </p>
+
+        <Callout kind='tip' title='Logs on stderr, protocol on stdout'>
+          Every tool call is logged to <strong>stderr</strong> so you can watch the agent think, while
+          stdout stays reserved for the JSON-RPC protocol. That single detail is what breaks most
+          hand-rolled stdio MCP servers; here it is handled for you. To read those logs live, run
+          <code>npx stone mcp</code> in a terminal: useful for debugging, never required.
+        </Callout>
+
+        <Callout kind='note' title='npx, or install the CLI globally'>
+          The examples use <code>npx stone …</code> because <code>@stone-js/cli</code> is a dev
+          dependency of your project, so the bare <code>stone</code> command only resolves if you also
+          installed it globally (<code>npm i -g @stone-js/cli</code>). Inside a package script the
+          prefix is unnecessary: <code>&quot;mcp&quot;: &quot;stone mcp --init&quot;</code> works as is.
+        </Callout>
 
         <H2>Framework-knowledge tools</H2>
         <p>
@@ -67,7 +81,6 @@ export class Application {}`}</Code>
         <PropsTable nameHeader='Tool' rows={[
           { name: 'stone_search', type: 'query', desc: 'Search concepts, modules, best-practices and gaps.' },
           { name: 'stone_concept', type: 'id?', desc: 'Explain a core concept (omit id to list them).' },
-          { name: 'stone_docs', type: '()', desc: 'Links to the authoritative documentation.' },
           { name: 'stone_modules', type: '()', desc: 'The ecosystem modules and what each does.' },
           { name: 'stone_best_practices', type: '()', desc: 'Conventions and anti-patterns, with rationale.' },
           { name: 'stone_gaps', type: '()', desc: 'What the framework does not (yet) provide.' },

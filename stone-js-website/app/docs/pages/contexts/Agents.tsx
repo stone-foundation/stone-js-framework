@@ -72,13 +72,14 @@ export class Agents implements IPage<ReactIncomingEvent> {
 
         <H2>Serve the agent that builds with you</H2>
         <p>
-          Add <code>@McpDev()</code> and the manifest gains one command, <code>stone mcp</code>. It
-          starts an MCP server (stdio) that gives your coding agent the framework's knowledge and a
-          live, read-only view of <em>this</em> app: its routes, commands, providers and config.
+          Add <code>@McpDev()</code> and the manifest gains one command, <code>stone mcp</code>. Run
+          <code>npx stone mcp --init</code> once and your coding agent starts the server itself, over
+          stdio, to reach the framework's knowledge and a live, read-only view of <em>this</em> app:
+          its routes, commands, providers and config.
         </p>
         <CodeTabs file='app/Application.ts' decl={DECL} imp={IMP} />
         <Code file='agent session' lang='text'>{`agent → tools/list
-stone ← stone_routes · stone_app · stone_search · stone_docs
+stone ← stone_routes · stone_app · stone_search · stone_brief
 agent → stone_routes
 stone ← GET /tasks (Tasks.list) · POST /tasks (Tasks.create)
 agent → stone_search { query: "how do adapters collapse at runtime" }`}</Code>

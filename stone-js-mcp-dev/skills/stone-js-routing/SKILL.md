@@ -57,7 +57,7 @@ class UserController {
 
 After adding routes, call `stone_routes` to confirm the resolved tree (path, methods, name,
 handler, middleware). Use `stone_kernel` to see the middleware pipeline that every route traverses.
-When unsure of an option, `stone_search` the knowledge base or `stone_docs` for the routing guide.
+When unsure of an option, `stone_search` the knowledge base or read `stone_brief` for the full brief.
 
 ## Do not
 

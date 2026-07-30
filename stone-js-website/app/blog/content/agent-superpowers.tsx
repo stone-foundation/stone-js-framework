@@ -39,7 +39,7 @@ export class AgentSuperpowers implements IPage<ReactIncomingEvent> {
           caption='One `stone mcp` server feeds the coding agent three streams: the framework’s knowledge, a read-only view of this app, and the tools you declare.'
           nodes={[
             { label: 'stone mcp', sub: 'MCP server (stdio)', kind: 'core' },
-            { label: 'Framework knowledge', sub: 'stone_search · stone_docs', kind: 'client' },
+            { label: 'Framework knowledge', sub: 'stone_search · stone_brief', kind: 'client' },
             { label: 'This app', sub: 'stone_routes · stone_config', kind: 'client' },
             { label: 'Your tools', sub: 'project_notes · …', kind: 'client' }
           ]}

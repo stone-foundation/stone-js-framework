@@ -47,7 +47,7 @@ The same class can be served over HTTP, in a Lambda, in the browser, or on the e
 ## Workflow
 
 1. **Before writing code, query the framework.** Call the `stone_search`, `stone_concept`,
-   `stone_modules`, and `stone_docs` MCP tools (served by `stone mcp`) to confirm the current
+   `stone_modules`, and `stone_brief` MCP tools (served by `stone mcp`) to confirm the current
    conventions and the right module for the job, instead of guessing from generic Node knowledge.
 2. **Inspect the app** with `stone_app`, `stone_routes`, `stone_commands`, `stone_adapters`,
    `stone_providers`, `stone_kernel`, and `stone_config` to see what it actually declares.
