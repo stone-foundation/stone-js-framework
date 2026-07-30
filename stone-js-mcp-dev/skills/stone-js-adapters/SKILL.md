@@ -53,5 +53,5 @@ platforms, and the environment decides which context applies.
 ## Verify with the MCP tools
 
 Call `stone_adapters` to list registered adapters (platform, alias, default/current) and the active
-platform. Use `stone_app` for a quick summary, and `stone_docs` for the adapter guides. `stone_search`
+platform. Use `stone_app` for a quick summary, and `stone_adapters` for what is registered. `stone_search`
 the knowledge base when picking a target or debugging selection.

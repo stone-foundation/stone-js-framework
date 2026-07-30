@@ -169,7 +169,7 @@ export const STARTERS: Starter[] = [
     author: 'Stone Foundation',
     authorUrl: GH,
     description: 'Give your coding agent Stone.js superpowers: `stone mcp` serves the framework + your app.',
-    about: 'Add @McpDev() and one command, stone mcp, starts an MCP server (stdio) that gives your coding agent the framework knowledge (stone_search, stone_docs) AND a read-only view of this app (stone_routes, stone_app, stone_config), plus any tools you declare, so it stops guessing. `stone mcp --init` writes .mcp.json; the package also ships Agent Skills. An opt-in blog starter, add the pack with -- --starters @stone-js/blog-starters (the card shows the full command).',
+    about: 'Add @McpDev() and one command, stone mcp, starts an MCP server (stdio) that gives your coding agent the framework knowledge (stone_search, stone_brief) AND a read-only view of this app (stone_routes, stone_app, stone_config), plus any tools you declare, so it stops guessing. `npx stone mcp --init` writes .mcp.json and your agent starts the server itself; the package also ships Agent Skills. An opt-in blog starter, add the pack with -- --starters @stone-js/blog-starters (the card shows the full command).',
     blogSlug: 'agent-superpowers'
   },
   {

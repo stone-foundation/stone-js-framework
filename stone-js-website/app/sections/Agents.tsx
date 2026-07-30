@@ -6,7 +6,7 @@ interface ConsoleLine { who: 'agent' | 'stone', msg: string }
 /** The looping agent ⟷ app exchange shown in the console. */
 const SCRIPT: ConsoleLine[] = [
   { who: 'agent', msg: 'tools/list' },
-  { who: 'stone', msg: 'stone_routes · stone_app · stone_search · stone_docs' },
+  { who: 'stone', msg: 'stone_routes · stone_app · stone_search · stone_brief' },
   { who: 'agent', msg: 'stone_routes' },
   { who: 'stone', msg: 'GET /tasks (Tasks.list) · POST /tasks (Tasks.create)' },
   { who: 'agent', msg: 'stone_concept { id: "continuum" }' },
