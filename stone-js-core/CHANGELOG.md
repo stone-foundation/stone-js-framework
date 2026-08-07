@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.9
+
+### Patch Changes
+
+- @stone-js/pipeline@0.8.9
+- @stone-js/config@0.8.9
+- @stone-js/service-container@0.8.9
+
 ## 0.8.8
 
 ### Patch Changes

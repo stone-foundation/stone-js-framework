@@ -1,5 +1,12 @@
 # @stone-js/edge-adapter
 
+## 0.8.9
+
+### Patch Changes
+
+- @stone-js/core@0.8.9
+- @stone-js/fetch-adapter@0.8.9
+
 ## 0.8.8
 
 ### Patch Changes
