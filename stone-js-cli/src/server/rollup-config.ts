@@ -7,6 +7,26 @@ import nodeExternals from 'rollup-plugin-node-externals'
 import { defineConfig, RollupLog, LoggingFunction } from 'rollup'
 
 /**
+ * Drop circular-dependency warnings coming from `node_modules`, keep everything else.
+ *
+ * Dependencies legitimately contain cycles (zod and zod-to-json-schema, reached through the MCP
+ * SDK, emit around twenty lines on their own). The application author cannot act on any of them,
+ * and a wall of warnings on an otherwise successful build reads as a failure. Cycles in the user's
+ * own code still warn, because those are actionable.
+ *
+ * @param warning - The Rollup warning.
+ * @param warn - The default Rollup warning handler.
+ */
+export function onwarnSkipVendorCycles (warning: RollupLog, warn: LoggingFunction): void {
+  if (
+    warning.code === 'CIRCULAR_DEPENDENCY' &&
+    /node_modules[/\\]/.test(`${warning.message ?? ''}${warning.ids?.join(' ') ?? ''}`)
+  ) { return }
+
+  warn(warning)
+}
+
+/**
  * Generate Rollup build options for the entire application.
 */
 const rollupBuildConfig = defineConfig({
@@ -51,7 +71,8 @@ const rollupBuildConfig = defineConfig({
         '@babel/plugin-transform-private-methods'
       ]
     })
-  ]
+  ],
+  onwarn: onwarnSkipVendorCycles
 })
 
 /**
@@ -73,15 +94,7 @@ const rollupBundleConfig = defineConfig({
     json(),
     commonjs({ include: /node_modules/, transformMixedEsModules: true })
   ],
-  onwarn (warning: RollupLog, warn: LoggingFunction) {
-    // Suppress only circular dependency warning
-    if (
-      warning.code === 'CIRCULAR_DEPENDENCY' &&
-      /node_modules[/\\]/.test(warning.message)
-    ) { return }
-
-    warn(warning)
-  }
+  onwarn: onwarnSkipVendorCycles
 })
 
 export { rollupBuildConfig, rollupBundleConfig }

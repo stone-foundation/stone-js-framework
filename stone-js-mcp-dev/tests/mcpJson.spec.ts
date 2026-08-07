@@ -1,9 +1,11 @@
 import { mcpServerEntry, mergeMcpJson, initMcpJson, hasMcpJson } from '../src/mcpJson'
 
 describe('mcpServerEntry', () => {
-  it('launches `stone mcp` by default', () => {
-    expect(mcpServerEntry()).toEqual({ command: 'stone', args: ['mcp'] })
-    expect(mcpServerEntry('npx').command).toBe('npx')
+  it('launches `npx stone mcp` by default', () => {
+    // Not a bare `stone`: the CLI is a project dev dependency, so the entry an agent spawns would
+    // fail with ENOENT unless the CLI were also installed globally.
+    expect(mcpServerEntry()).toEqual({ command: 'npx', args: ['stone', 'mcp'] })
+    expect(mcpServerEntry('stone', ['mcp']).command).toBe('stone')
   })
 })
 
@@ -11,7 +13,7 @@ describe('mergeMcpJson', () => {
   it('adds the stone entry when the file does not exist', () => {
     const { config, changed } = mergeMcpJson(undefined)
     expect(changed).toBe(true)
-    expect((config.mcpServers as any).stone).toEqual({ command: 'stone', args: ['mcp'] })
+    expect((config.mcpServers as any).stone).toEqual({ command: 'npx', args: ['stone', 'mcp'] })
   })
 
   it('keeps other servers and adds stone', () => {

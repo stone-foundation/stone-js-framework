@@ -21,11 +21,20 @@ const defaultIo: McpJsonIo = {
 /**
  * The `.mcp.json` server entry that launches this dev server.
  *
- * @param command - The launcher command (defaults to `stone`).
+ * It goes through `npx` because `@stone-js/cli` is a project dev dependency: a bare `stone` only
+ * resolves when the CLI is also installed globally, so the entry an agent spawns would fail with
+ * ENOENT on a normal project. `npx` resolves the project-local binary first, and still finds a
+ * global install, so the generated file works either way.
+ *
+ * @param command - The launcher command (defaults to `npx`).
+ * @param args - The launcher arguments (defaults to `stone mcp`).
  * @returns The MCP server entry.
  */
-export function mcpServerEntry (command: string = 'stone'): { command: string, args: string[] } {
-  return { command, args: ['mcp'] }
+export function mcpServerEntry (
+  command: string = 'npx',
+  args: string[] = ['stone', 'mcp']
+): { command: string, args: string[] } {
+  return { command, args }
 }
 
 /**
