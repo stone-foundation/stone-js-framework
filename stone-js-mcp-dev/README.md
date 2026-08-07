@@ -66,7 +66,7 @@ Or add the entry yourself (Claude Code, Cursor, Claude Desktop, …):
 
 ```jsonc
 { "mcpServers": {
-  "stone": { "command": "stone", "args": ["mcp"] }
+  "stone": { "command": "npx", "args": ["stone", "mcp"] }
 } }
 ```
 

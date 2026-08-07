@@ -5,6 +5,11 @@ on:
     branches: [main]
     paths:
       - 'stone-js-website/**'
+      # The header shows the published version, generated from @stone-js/core's manifest by the
+      # site's `sync-version` script at build time. A release commit bumps that manifest without
+      # touching stone-js-website/**, so without this path the site kept advertising the previous
+      # version until the next unrelated site change.
+      - 'stone-js-core/package.json'
       - '.github/workflows/deploy-website.yml'
   workflow_dispatch:
 

@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import babel from 'vite-plugin-babel'
 import browserslist from 'browserslist'
 import react from '@vitejs/plugin-react'
+import { onwarnSkipVendorCycles } from '../server/rollup-config'
 
 /**
  * The default browser targets.
@@ -96,6 +97,10 @@ export const viteConfig = defineConfig(() => {
       chunkSizeWarningLimit: 900,
       rollupOptions: {
         external: [...builtins.builtinModules, /node:/],
+        // `ssr.noExternal` bundles every dependency into the server build, so a dependency's own
+        // cycles surface here as warnings the user cannot act on (the MCP SDK pulls zod and
+        // zod-to-json-schema, which alone emit around twenty lines). Silence those, keep the rest.
+        onwarn: onwarnSkipVendorCycles,
         output: {
           manualChunks: (id) => {
             if (id.includes('node_modules')) {
