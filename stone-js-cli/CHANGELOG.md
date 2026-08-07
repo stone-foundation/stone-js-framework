@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.8
+
+### Patch Changes
+
+- @stone-js/core@0.8.8
+- @stone-js/pipeline@0.8.8
+- @stone-js/config@0.8.8
+- @stone-js/filesystem@0.8.8
+- @stone-js/router@0.8.8
+- @stone-js/node-cli-adapter@0.8.8
+- @stone-js/use-react@0.8.8
+
 ## 0.8.7
 
 ### Patch Changes
