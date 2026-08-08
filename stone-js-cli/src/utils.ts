@@ -283,6 +283,36 @@ export const isDeclarative = (blueprint: IBlueprint, event: IncomingEvent): bool
 }
 
 /**
+ * App-level decorator names whose presence in a .tsx/.jsx file makes the file
+ * require eager loading. These are decorators that configure the application
+ * itself, not individual pages.
+ */
+const APP_LEVEL_DECORATORS = ['@StoneApp', '@Browser', '@UseReact', '@Configuration', '@Provider']
+
+/**
+ * Scans .tsx and .jsx app source files for app-level decorators when lazy views
+ * are on. Returns the set of files that need eager loading because they carry
+ * application configuration, not page-level declarations.
+ *
+ * @param blueprint The blueprint object.
+ * @returns The list of .tsx/.jsx files that contain app-level decorators.
+ */
+export const checkAppLevelDecoratorsInTsx = (blueprint: IBlueprint): string[] => {
+  const tsxFiles = glob.sync(basePath(
+    blueprint.get('stone.builder.input.views', 'app/**/*.{tsx,jsx,mjsx}')
+  ))
+
+  const appLevelMarkers = new RegExp(
+    APP_LEVEL_DECORATORS.map(d => d.replace('@', '@\\s*')).join('|')
+  )
+
+  return tsxFiles.filter((filePath) => {
+    const content = readFileSync(filePath, 'utf-8')
+    return appLevelMarkers.test(content)
+  })
+}
+
+/**
  * Determines if the application is using client-side rendering.
  *
  * @param blueprint The blueprint object.
