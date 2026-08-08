@@ -23,7 +23,8 @@ import {
   inferRenderingStrategy,
   setupProcessSignalHandlers,
   getDefaultPublicEnvOptions,
-  generatePublicEnvironmentsFile
+  generatePublicEnvironmentsFile,
+  checkAppLevelDecoratorsInTsx
 } from '../src/utils'
 import Dotenv from 'dotenv'
 import { importModule } from '@stone-js/filesystem'
@@ -564,5 +565,128 @@ describe('setupProcessSignalHandlers', () => {
   it('should be a no-op when no process is present', () => {
     setupProcessSignalHandlers(() => undefined)
     expect(() => process.emit('SIGTERM')).not.toThrow()
+  })
+})
+
+describe('checkAppLevelDecoratorsInTsx', () => {
+  beforeEach(() => {
+    fs.rmSync(TMP_DIR, { recursive: true, force: true })
+    fs.mkdirSync(TMP_DIR, { recursive: true })
+  })
+
+  afterEach(() => {
+    fs.rmSync(TMP_DIR, { recursive: true, force: true })
+  })
+
+  it('should return .tsx files that contain @StoneApp', () => {
+    writeTempFile(path.join(TMP_DIR, 'app/Application.tsx'), `
+      import { StoneApp } from '@stone-js/core'
+
+      @StoneApp()
+      export class Application {}
+    `)
+    writeTempFile(path.join(TMP_DIR, 'app/HomePage.tsx'), `
+      import { Page } from '@stone-js/router'
+
+      @Page({ path: '/' })
+      export class HomePage {}
+    `)
+
+    const blueprint = createFakeBlueprint({
+      'stone.builder.input.views': 'app/**/*.tsx'
+    })
+
+    const result = checkAppLevelDecoratorsInTsx(blueprint)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toContain('Application.tsx')
+  })
+
+  it('should not flag .tsx files with only page-level decorators', () => {
+    writeTempFile(path.join(TMP_DIR, 'app/HomePage.tsx'), `
+      import { Page } from '@stone-js/router'
+
+      @Page({ path: '/' })
+      export class HomePage {}
+    `)
+
+    const blueprint = createFakeBlueprint({
+      'stone.builder.input.views': 'app/**/*.tsx'
+    })
+
+    const result = checkAppLevelDecoratorsInTsx(blueprint)
+    expect(result).toHaveLength(0)
+  })
+
+  it('should detect @Browser in .tsx files', () => {
+    writeTempFile(path.join(TMP_DIR, 'app/Application.tsx'), `
+      import { Browser } from '@stone-js/browser-adapter'
+
+      @Browser()
+      export class Application {}
+    `)
+
+    const blueprint = createFakeBlueprint({
+      'stone.builder.input.views': 'app/**/*.tsx'
+    })
+
+    const result = checkAppLevelDecoratorsInTsx(blueprint)
+    expect(result).toHaveLength(1)
+  })
+
+  it('should detect @UseReact in .tsx files', () => {
+    writeTempFile(path.join(TMP_DIR, 'app/Application.tsx'), `
+      import { UseReact } from '@stone-js/use-react'
+
+      @UseReact()
+      export class Application {}
+    `)
+
+    const blueprint = createFakeBlueprint({
+      'stone.builder.input.views': 'app/**/*.tsx'
+    })
+
+    const result = checkAppLevelDecoratorsInTsx(blueprint)
+    expect(result).toHaveLength(1)
+  })
+
+  it('should detect @Configuration in .tsx files', () => {
+    writeTempFile(path.join(TMP_DIR, 'app/Config.tsx'), `
+      import { Configuration } from '@stone-js/config'
+
+      @Configuration()
+      export class Config {}
+    `)
+
+    const blueprint = createFakeBlueprint({
+      'stone.builder.input.views': 'app/**/*.tsx'
+    })
+
+    const result = checkAppLevelDecoratorsInTsx(blueprint)
+    expect(result).toHaveLength(1)
+  })
+
+  it('should detect @Provider in .tsx files', () => {
+    writeTempFile(path.join(TMP_DIR, 'app/Provider.tsx'), `
+      import { Provider } from '@stone-js/core'
+
+      @Provider()
+      export class MyProvider {}
+    `)
+
+    const blueprint = createFakeBlueprint({
+      'stone.builder.input.views': 'app/**/*.tsx'
+    })
+
+    const result = checkAppLevelDecoratorsInTsx(blueprint)
+    expect(result).toHaveLength(1)
+  })
+
+  it('should return an empty array when no .tsx files exist', () => {
+    const blueprint = createFakeBlueprint({
+      'stone.builder.input.views': 'app/**/*.tsx'
+    })
+
+    const result = checkAppLevelDecoratorsInTsx(blueprint)
+    expect(result).toHaveLength(0)
   })
 })
