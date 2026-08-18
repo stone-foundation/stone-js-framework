@@ -186,9 +186,34 @@ Retrieves and validates the value of the specified environment variable using a 
 
 ### `clearCache(): void`
 
-Clears the environment variable cache.
+Clears the environment variable cache. See [Caching](#caching) for when you need it.
 
 - **Returns**: Nothing.
+
+## Caching
+
+Values read through `custom()` (and therefore through every typed getter built on it) are
+**memoized for the lifetime of the process**. Reading the same key twice validates it once, which
+keeps hot paths free of repeated parsing and validation.
+
+Two consequences worth knowing:
+
+- **Changing a variable after it has been read has no effect** until the cache is cleared. This is
+  what you hit when a test suite mutates `process.env` between cases: call `clearCache()` first.
+
+  ```ts
+  import { clearCache, getString } from '@stone-js/env'
+
+  beforeEach(() => {
+    process.env.FEATURE_FLAG = 'on'
+    clearCache()                    // without this, the previous value is still served
+    expect(getString('FEATURE_FLAG')).toBe('on')
+  })
+  ```
+
+- **Config sources are unaffected.** `@stone-js/config-source`'s `envSource` reads `process.env`
+  directly, so a `live` configuration reloaded per request sees fresh values regardless of this
+  cache.
 
 ### `is(env: string): boolean`
 
