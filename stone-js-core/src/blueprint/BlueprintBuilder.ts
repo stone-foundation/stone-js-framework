@@ -81,11 +81,44 @@ export class BlueprintBuilder<
 
     // The pipeline returns whatever the OUTERMOST middleware returned, not what `then` produced:
     // a middleware that ignores its own return contract replaces the blueprint with its value.
-    assertIsBlueprint(blueprint)
+    this.assertIsBlueprint(blueprint)
 
     await this.executeHooks('onBlueprintPrepared', context)
 
     return blueprint
+  }
+
+  /**
+   * Assert the value the build pipeline produced is still the blueprint.
+   *
+   * A blueprint middleware must return what its `next` returned. When one returns its own value
+   * instead, the pipeline hands that value back as the build result, so the application boots with
+   * something that is not a blueprint and misbehaves far from the cause. Failing here keeps the
+   * mistake nameable, at the only place that can still name it.
+   *
+   * Duck-typed on the two methods every later phase relies on, so the check stays independent of the
+   * concrete store implementation.
+   *
+   * @param value - The value the pipeline produced.
+   * @throws {SetupError} When the blueprint was replaced along the way.
+   */
+  private assertIsBlueprint (value: unknown): asserts value is BlueprintType {
+    const candidate = value as IBlueprint | null | undefined
+
+    if (
+      candidate === null ||
+      candidate === undefined ||
+      typeof candidate.get !== 'function' ||
+      typeof candidate.set !== 'function'
+    ) {
+      throw new SetupError(
+        'The blueprint pipeline did not return the blueprint: a blueprint middleware returned its ' +
+        'own value instead of passing `next`\'s result through, so the configuration is lost.\n' +
+        'A build-phase middleware runs once, before any event, and must return `await next(context)`. ' +
+        'Registering a per-event middleware (HTTP, kernel) as one is the usual cause: both shapes are ' +
+        '`handle(context, next)`, so neither the types nor the runtime object to it.'
+      )
+    }
   }
 
   /**
@@ -121,40 +154,5 @@ export class BlueprintBuilder<
         await listener(context)
       }
     }
-  }
-}
-
-/**
- * Assert the value the build pipeline produced is still the blueprint.
- *
- * A blueprint middleware must return what its `next` returned. When one returns its own value
- * instead, the pipeline hands that value back as the build result, so the application boots with
- * something that is not a blueprint and misbehaves far from the cause. The known case is a
- * per-event middleware (HTTP, kernel) registered as a build-phase middleware: both shapes are
- * `handle(context, next)`, so neither the types nor the runtime object to it, and the app ends up
- * reading its configuration off an HTTP response. Failing here keeps the mistake nameable.
- *
- * Duck-typed on the two methods every later phase relies on, so the check stays independent of the
- * concrete store implementation.
- *
- * @param value - The value the pipeline produced.
- * @throws {SetupError} When the blueprint was replaced along the way.
- */
-function assertIsBlueprint (value: unknown): asserts value is IBlueprint {
-  const candidate = value as IBlueprint | null | undefined
-
-  if (
-    candidate === null ||
-    candidate === undefined ||
-    typeof candidate.get !== 'function' ||
-    typeof candidate.set !== 'function'
-  ) {
-    throw new SetupError(
-      'The blueprint pipeline did not return the blueprint: a blueprint middleware returned its ' +
-      'own value instead of passing `next`\'s result through, so the configuration is lost.\n' +
-      'The usual cause is a per-event middleware (HTTP, kernel) registered as a build-phase ' +
-      'middleware via `defineBlueprintMiddleware`. Those run at different times against ' +
-      'different contexts: configure the feature through its `stone.*` options instead.'
-    )
   }
 }

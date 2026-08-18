@@ -59,7 +59,9 @@ describe('BlueprintBuilder', () => {
     builder = BlueprintBuilder.create(blueprint)
 
     await expect(builder.build([{}])).rejects.toThrow(/did not return the blueprint/)
-    await expect(builder.build([{}])).rejects.toThrow(/defineBlueprintMiddleware/)
+    // The message must name the contract that was broken, not a helper: registering this through
+    // `defineBlueprintMiddleware` is legal, returning something other than `next`'s result is not.
+    await expect(builder.build([{}])).rejects.toThrow(/must return `await next\(context\)`/)
   })
 
   it('does not run the prepared hook when the pipeline lost the blueprint', async () => {
