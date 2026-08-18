@@ -208,13 +208,21 @@ export class I18nManager implements II18n {
     if (this.loaders === undefined || this.loaded.has(locale)) { return }
 
     const matched = Object.entries(this.loaders)
+      .sort(([a], [b]) => a.localeCompare(b))
       .map(([path, load]) => ({ parsed: parseResourcePath(path), load }))
       .filter((entry): entry is { parsed: { locale: Locale, namespace: string }, load: () => Promise<unknown> } =>
         entry.parsed?.locale === locale)
 
-    await Promise.all(matched.map(async ({ parsed, load }) => {
-      this.addResources(locale, parsed.namespace, normalizeTranslations(await load()))
-    }))
+    // Imported in parallel, merged in path order: two catalogues can carry the same namespace for a
+    // locale (a shared `common` plus a module's own), and a conflicting key must not resolve by
+    // whichever import happened to settle first.
+    const bundles = await Promise.all(matched.map(async ({ parsed, load }) => ({
+      namespace: parsed.namespace, translations: normalizeTranslations(await load())
+    })))
+
+    for (const { namespace, translations } of bundles) {
+      this.addResources(locale, namespace, translations)
+    }
 
     this.loaded.add(locale)
   }

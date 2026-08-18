@@ -198,6 +198,27 @@ describe('I18nManager', () => {
     it('is a no-op when no loaders are configured', async () => {
       await expect(create().loadLocale('fr')).resolves.toBeUndefined()
     })
+
+    it('merges every catalogue of a locale that shares a namespace', async () => {
+      // Deep discovery finds a catalogue per module, so several of them carry the same namespace for
+      // one locale. All of them must land, and a slow import must not lose to a fast one.
+      const i18n = I18nManager.create({
+        locale: 'fr',
+        loaders: {
+          '/app/i18n/fr/translation.json': async () => ({ default: { hi: 'Salut', bye: 'Ciao' } }),
+          '/app/modules/billing/i18n/fr/translation.json': async () => {
+            await new Promise((resolve) => setTimeout(resolve, 5)) // settles last
+            return { default: { hi: 'Bonjour', invoice: 'Facture' } }
+          }
+        }
+      })
+
+      await i18n.loadLocale('fr')
+
+      expect(i18n.t('invoice')).toBe('Facture') // the module catalogue landed
+      expect(i18n.t('bye')).toBe('Ciao') // the shared one was not replaced
+      expect(i18n.t('hi')).toBe('Bonjour') // the deeper path wins the conflict, whatever the timing
+    })
   })
 
   describe('collectNamespaces', () => {

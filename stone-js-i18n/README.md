@@ -9,8 +9,8 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stone-foundation_stone-js-framework&metric=coverage)](https://sonarcloud.io/summary/new_code?id=stone-foundation_stone-js-framework)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
-> Framework-agnostic, cloud-native i18n for Stone.js. Drop your translations in `app/i18n/<lang>/`
-> and use them identically on the backend and the frontend. Powered by
+> Framework-agnostic, cloud-native i18n for Stone.js. Drop your translations in any `i18n/<lang>/`
+> directory and use them identically on the backend and the frontend. Powered by
 > [i18next](https://www.i18next.com), with native `Intl` formatting.
 
 Part of **[Stone.js](https://stonejs.dev)**, the reference implementation of the
@@ -40,14 +40,23 @@ export class Application {}
 ```
 
 `@I18n()` registers the service provider (so `constructor ({ i18n })` injects it anywhere), installs
-the middleware that resolves the request locale, and lets the build discover `app/i18n` on its own.
+the middleware that resolves the request locale, and lets the build discover your catalogs on its own.
 Options only narrow the defaults: `@I18n({ locales: ['en', 'fr'], fallbackLocale: 'en' })`.
 
-The imperative equivalent is the `i18nBlueprint` constant: `blueprint.set(i18nBlueprint)`.
+The imperative equivalent hands the blueprint to `defineStoneApp`, exactly where the decorator form
+lists it:
+
+```ts
+import { defineStoneApp } from '@stone-js/core'
+import { i18nBlueprint } from '@stone-js/i18n'
+
+export const Application = defineStoneApp(handler, { name: 'my-app' }, [i18nBlueprint])
+```
 
 ## Translations layout
 
-Lay them out as `app/i18n/<locale>/<namespace>.<ext>`:
+A catalog is any directory named `i18n`, holding `<locale>/<namespace>.<ext>` files. The simplest
+project keeps one:
 
 ```
 app/i18n/
@@ -55,11 +64,34 @@ app/i18n/
 └─ fr/common.json   → { "hello": "Bonjour {{name}} !", "items_one": "{{count}} article", "items_other": "{{count}} articles" }
 ```
 
+**Catalogs are found at any depth under `app`**, so a larger codebase can keep translations next to
+the code that uses them instead of in one growing directory:
+
+```
+app/
+├─ i18n/                       ← shared across the app
+│  ├─ en/common.json
+│  └─ fr/common.json
+└─ modules/
+   ├─ billing/
+   │  ├─ BillingService.ts
+   │  └─ i18n/                 ← owned by the billing module
+   │     ├─ en/invoice.json
+   │     └─ fr/invoice.json
+   └─ crm/contacts/i18n/fr/contact.json
+```
+
+Every catalog contributes, and **catalogs sharing a locale and a namespace merge deeply**, so several
+modules can each add their own keys to a shared `common` namespace. On a conflicting key the deeper
+catalog wins, which makes the outcome the same on every machine and every build. `node_modules` and
+dotted directories are never scanned: a dependency's translations are not yours.
+
 ## Loading translations
 
-**1. The CLI plugin (recommended, true zero-config).** It scans `app/i18n` at build time and generates
-the wiring for you with plain imports, so it works on every target: a backend service (Rollup), a
-browser SPA and SSR (Vite) alike. No `loadTranslations(...)` line is needed. Add it to `stone.config`:
+**1. The CLI plugin (recommended, true zero-config).** At build time it walks `app` for every `i18n`
+directory and generates the wiring for you with plain imports, so it works on every target: a backend
+service (Rollup), a browser SPA and SSR (Vite) alike. No `loadTranslations(...)` line is needed. Add it
+to `stone.config`:
 
 ```ts
 import { i18nCliPlugin } from '@stone-js/i18n/cli'
@@ -78,6 +110,27 @@ bundle every locale eagerly instead:
 ```ts
 export default defineConfig({ plugins: [i18nCliPlugin({ lazy: false })] })
 ```
+
+**When the convention does not fit.** Four options, from the least to the most explicit. You need none
+of them for a conventional project:
+
+| Option | Default | What it does |
+|---|---|---|
+| `root` | `'app'` | The directory walked for catalogs |
+| `dirname` | `'i18n'` | The directory name that marks a catalog, for example `'locales'` |
+| `dir` | -- | Scan exactly this one directory, no walk, for translations kept outside `root` |
+| `pattern` | -- | Take the files from a glob instead of the walk, when nothing above fits |
+
+```ts
+// Catalogs named `locales/` instead of `i18n/`, anywhere under `src`
+i18nCliPlugin({ root: 'src', dirname: 'locales' })
+
+// Full control, for a layout no convention describes
+i18nCliPlugin({ pattern: 'packages/*/translations/*/*.json' })
+```
+
+Whatever a `pattern` matches must still end in `<locale>/<namespace>.<ext>`: that tail is how the
+runtime knows which locale and namespace a file carries.
 
 **2. By hand.** Set `stone.i18n.resources` yourself. On Vite targets (SPA, SSR), `import.meta.glob`
 autoloads them, isomorphic and tree-shaking:
