@@ -15,7 +15,7 @@ export interface CacheOptions extends Partial<StoreConfig> {
  *
  * `@Cache({ driver: 'memory' })` registers the {@link CacheServiceProvider} and sets that store as
  * the default. For multiple stores or richer setups, configure `stone.cache` via `@Configuration()`
- * (or the imperative `cacheBlueprint` / `defineCache`) instead.
+ * (or the imperative `cacheBlueprint`) instead.
  *
  * @param options - The store configuration (driver required).
  * @returns A class decorator.

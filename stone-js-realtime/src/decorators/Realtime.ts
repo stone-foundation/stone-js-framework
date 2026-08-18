@@ -17,7 +17,7 @@ export interface RealtimeOptions extends Partial<ConnectionOptions> {
  *
  * `@Realtime({ driver: 'memory' })` registers the {@link RealtimeServiceProvider} and sets that
  * connection as the default. For multiple connections or richer setups, configure `stone.realtime`
- * via `@Configuration()` (or the imperative `realtimeBlueprint` / `defineRealtime`) instead.
+ * via `@Configuration()` (or the imperative `realtimeBlueprint`) instead.
  *
  * @param options - The connection configuration (driver required).
  * @returns A class decorator.

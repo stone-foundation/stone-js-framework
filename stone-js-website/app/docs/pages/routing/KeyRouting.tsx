@@ -70,9 +70,10 @@ export class Handlers {
 }`}</Code>
         <p>Or define routes imperatively:</p>
         <Code file='app/config.ts'>{`import { defineConfig } from '@stone-js/core'
-import { defineKeyRouting, defineKeyRoute } from '@stone-js/router'
+import { defineConfig } from '@stone-js/core'
+import { defineKeyRoute } from '@stone-js/router'
 
-export const AppConfig = defineConfig(defineKeyRouting({
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.keyRouting', {
   source: 'detail-type',
   definitions: [ defineKeyRoute('order.shipped', OnShipped, { isClass: true }) ]
 }))`}</Code>
