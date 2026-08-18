@@ -95,9 +95,10 @@ export const AppConfig = defineConfig((blueprint) => {
 })
 ```
 
-> `defineConfig` takes a **function** (or an object carrying `configure`). Passing it a fragment,
-> `defineConfig(defineI18n({...}))`, compiles and runs but configures nothing: the fragment is not a
-> configuration. Use the function form above, or `blueprint.set(defineI18n({...}))` from inside one.
+> `defineConfig` takes a **function** (or an object carrying `configure`), never a configuration
+> fragment: a fragment compiles, runs, and configures nothing. There used to be a `defineI18n`
+> helper returning such a fragment; it was removed, because a module is enabled either by its
+> decorator (`@I18n()`) or by its blueprint (`i18nBlueprint`), and configured with `blueprint.set`.
 
 (For a plain backend service, prefer the plugin: it emits static imports rather than `import.meta.glob`,
 which only Vite understands.)

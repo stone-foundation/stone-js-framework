@@ -37,21 +37,3 @@ export const cacheBlueprint: CacheBlueprint = {
     ]
   }
 }
-
-/**
- * Build a cache configuration fragment imperatively (for `defineConfig`/meta-modules).
- *
- * @param config - The cache configuration.
- * @returns A partial app config carrying the `cache` bucket.
- *
- * @example
- * ```typescript
- * export const AppConfig = defineConfig(defineCache({
- *   default: 'redis',
- *   stores: [{ name: 'redis', driver: 'redis', url: 'redis://localhost:6379' }]
- * }))
- * ```
- */
-export function defineCache (config: CacheModuleConfig): { cache: CacheModuleConfig } {
-  return { cache: config }
-}

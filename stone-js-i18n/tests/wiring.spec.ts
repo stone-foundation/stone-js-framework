@@ -4,7 +4,7 @@ import { I18nError } from '../src/errors/I18nError'
 import { IntegrationError } from '@stone-js/core'
 import { I18nServiceProvider } from '../src/I18nServiceProvider'
 import { SetLocaleMiddleware, MetaSetLocaleMiddleware } from '../src/middleware/SetLocaleMiddleware'
-import { i18nBlueprint, defineI18n } from '../src/options/I18nBlueprint'
+import { i18nBlueprint } from '../src/options/I18nBlueprint'
 
 const resources = {
   en: { translation: { hello: 'Hello {{name}}!' } },
@@ -153,9 +153,6 @@ describe('i18nBlueprint', () => {
     expect(i18nBlueprint.stone.blueprint).toBeUndefined()
   })
 
-  it('defineI18n wraps a config fragment', () => {
-    expect(defineI18n({ locale: 'fr', locales: ['en', 'fr'] })).toEqual({ i18n: { locale: 'fr', locales: ['en', 'fr'] } })
-  })
 })
 
 describe('I18nError', () => {

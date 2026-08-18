@@ -20,9 +20,10 @@ export type GlobLoaders = Record<string, () => Promise<unknown>>
  *
  * @example
  * ```typescript
- * import { defineI18n, loadTranslations } from '@stone-js/i18n'
+ * import { defineConfig } from '@stone-js/core'
+ * import { loadTranslations } from '@stone-js/i18n'
  *
- * export const AppConfig = defineConfig(defineI18n({
+ * export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.i18n', {
  *   locales: ['en', 'fr'],
  *   resources: loadTranslations(import.meta.glob('/app/i18n/**\/*.{json,ts,js,yaml,yml}', { eager: true }))
  * }))
