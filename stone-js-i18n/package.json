@@ -59,6 +59,7 @@
     "prepare": "husky"
   },
   "peerDependencies": {
+    "@stone-js/config": "workspace:*",
     "@stone-js/core": "workspace:*"
   },
   "dependencies": {
@@ -72,6 +73,7 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
     "@stone-js/cli": "workspace:*",
+    "@stone-js/config": "workspace:*",
     "@stone-js/core": "workspace:*",
     "@types/node": "^24.0.7",
     "@vitest/coverage-v8": "^3.2.4",

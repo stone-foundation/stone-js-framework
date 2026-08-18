@@ -14,8 +14,8 @@ type LocaleLoaders = Record<string, () => Promise<unknown>>
  * mutates the shared instance and stays concurrency-safe on the server). On the frontend, switch
  * the active locale with {@link setLocale}. Formatting uses the native `Intl` APIs.
  */
-export class I18n implements II18n {
-  private static instance?: I18n
+export class I18nManager implements II18n {
+  private static instance?: I18nManager
 
   private readonly i18next: I18nextInstance
   private readonly boundLocale?: Locale
@@ -52,9 +52,9 @@ export class I18n implements II18n {
    * Create and synchronously initialise the service from its options.
    *
    * @param options - The i18n options (`stone.i18n.*`).
-   * @returns A ready-to-use I18n instance.
+   * @returns A ready-to-use I18nManager instance.
    */
-  static create (options: I18nOptions = {}): I18n {
+  static create (options: I18nOptions = {}): I18nManager {
     const instance = createInstance()
     const resources: Resources = options.resources ?? {}
     const defaultNS = options.defaultNamespace ?? 'translation'
@@ -92,7 +92,7 @@ export class I18n implements II18n {
         : undefined
     })
 
-    return new I18n(instance, undefined, options.timeZone, options.loaders, undefined, fallback)
+    return new I18nManager(instance, undefined, options.timeZone, options.loaders, undefined, fallback)
   }
 
   /**
@@ -101,8 +101,8 @@ export class I18n implements II18n {
    *
    * @param instance - The instance to publish.
    */
-  static setInstance (instance: I18n): void {
-    I18n.instance = instance
+  static setInstance (instance: I18nManager): void {
+    I18nManager.instance = instance
   }
 
   /**
@@ -111,11 +111,11 @@ export class I18n implements II18n {
    * @returns The published instance.
    * @throws {I18nError} When no instance has been published yet.
    */
-  static getInstance (): I18n {
-    if (I18n.instance === undefined) {
+  static getInstance (): I18nManager {
+    if (I18nManager.instance === undefined) {
       throw new I18nError('No i18n instance available. Register `i18nBlueprint` first.')
     }
-    return I18n.instance
+    return I18nManager.instance
   }
 
   /** The locale this translator resolves against. */
@@ -176,8 +176,8 @@ export class I18n implements II18n {
    * @param locale - The locale to bind.
    * @returns A locale-bound translator.
    */
-  forLocale (locale: Locale): I18n {
-    return new I18n(this.i18next, locale, this.timeZone, this.loaders, this.loaded, this.fallbackLocale)
+  forLocale (locale: Locale): I18nManager {
+    return new I18nManager(this.i18next, locale, this.timeZone, this.loaders, this.loaded, this.fallbackLocale)
   }
 
   /**

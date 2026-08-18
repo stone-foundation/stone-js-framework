@@ -85,7 +85,7 @@ describe('generateI18nModule', () => {
 
   it('emits eager static imports handed to loadTranslations, with escaped specifiers', () => {
     const source = generateI18nModule(moduleDir, files, false)
-    expect(source).toContain("import { defineI18n, loadTranslations } from '@stone-js/i18n'")
+    expect(source).toContain("import { loadTranslations } from '@stone-js/i18n'")
     expect(source).toContain('import * as __i18n0 from ')
     expect(source).toContain('loadTranslations({')
     expect(source).toContain('common.json')     // filename tail survives
@@ -95,10 +95,23 @@ describe('generateI18nModule', () => {
 
   it('emits lazy per-file dynamic importers as loaders', () => {
     const source = generateI18nModule(moduleDir, files, true)
-    expect(source).toContain("import { defineI18n } from '@stone-js/i18n'")
     expect(source).toContain('loaders: {')
     expect(source).toContain('() => import(')
     expect(source).not.toContain('loadTranslations')
+  })
+
+  it('emits a `stone`-wrapped blueprint the module scan actually applies', () => {
+    // It used to emit `defineConfig(defineI18n({...}))`, which silently did NOTHING: `defineI18n`
+    // returns an unwrapped `{ i18n }` fragment while `defineConfig` expects a function or an object
+    // carrying `configure`, so `configure` resolved to a no-op and no catalogue ever reached the
+    // blueprint. Every translation returned its key, reading exactly like a missing catalogue.
+    for (const lazy of [true, false]) {
+      const source = generateI18nModule(moduleDir, files, lazy)
+      expect(source).toContain('stone: {')
+      expect(source).toContain('i18n: {')
+      expect(source).not.toContain('defineConfig')
+      expect(source).not.toContain('defineI18n')
+    }
   })
 })
 

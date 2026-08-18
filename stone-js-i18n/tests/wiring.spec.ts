@@ -1,4 +1,4 @@
-import { I18n } from '../src/I18n'
+import { I18nManager } from '../src/I18nManager'
 import { t, localeFromEvent, translatorFor } from '../src/helpers'
 import { I18nError } from '../src/errors/I18nError'
 import { IntegrationError } from '@stone-js/core'
@@ -28,16 +28,16 @@ describe('I18nServiceProvider', () => {
     new I18nServiceProvider(container).register()
 
     expect(blueprint.get).toHaveBeenCalledWith('stone.i18n', {})
-    expect(container.instanceIf).toHaveBeenCalledWith(I18n, expect.any(I18n))
-    expect(container.alias).toHaveBeenCalledWith(I18n, ['i18n', 'I18n'])
+    expect(container.instanceIf).toHaveBeenCalledWith(I18nManager, expect.any(I18nManager))
+    expect(container.alias).toHaveBeenCalledWith(I18nManager, ['i18n', 'I18n'])
     expect(container.instanceIf).toHaveBeenCalledWith('i18next', expect.objectContaining({ t: expect.any(Function) }))
-    expect(I18n.getInstance().getLocale()).toBe('fr')
+    expect(I18nManager.getInstance().getLocale()).toBe('fr')
   })
 })
 
 describe('helpers', () => {
   beforeEach(() => {
-    I18n.setInstance(I18n.create({ locale: 'en', resources }))
+    I18nManager.setInstance(I18nManager.create({ locale: 'en', resources }))
   })
 
   it('t() translates through the process-wide instance', () => {
@@ -54,19 +54,19 @@ describe('helpers', () => {
   })
 
   it('translatorFor returns the request-bound translator when present', () => {
-    const bound = I18n.getInstance().forLocale('fr')
+    const bound = I18nManager.getInstance().forLocale('fr')
     const event = { getMetadataValue: vi.fn().mockReturnValue(bound) }
     expect(translatorFor(event)).toBe(bound)
   })
 
   it('translatorFor falls back to the process-wide instance', () => {
-    expect(translatorFor({ getMetadataValue: () => undefined })).toBe(I18n.getInstance())
-    expect(translatorFor({})).toBe(I18n.getInstance())
+    expect(translatorFor({ getMetadataValue: () => undefined })).toBe(I18nManager.getInstance())
+    expect(translatorFor({})).toBe(I18nManager.getInstance())
   })
 })
 
 describe('SetLocaleMiddleware', () => {
-  const i18n = I18n.create({ locale: 'en', locales: ['en', 'fr'], resources })
+  const i18n = I18nManager.create({ locale: 'en', locales: ['en', 'fr'], resources })
 
   const noRouter = { bound: () => false, make: () => undefined }
 

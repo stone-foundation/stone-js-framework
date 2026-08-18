@@ -22,12 +22,16 @@ export default defineConfig({ plugins: [i18nCliPlugin()] })`
 const LAZY = `// Lazy is the default. To bundle every locale eagerly instead:
 export default defineConfig({ plugins: [i18nCliPlugin({ lazy: false })] })`
 
-const MANUAL = `import { defineI18n, loadTranslations } from '@stone-js/i18n'
+const MANUAL = `import { defineConfig } from '@stone-js/core'
+import { loadTranslations } from '@stone-js/i18n'
 
-export const AppConfig = defineConfig(defineI18n({
-  locales: ['en', 'fr'],
-  resources: loadTranslations(import.meta.glob('/app/i18n/**/*.{json,ts,js,yaml,yml}', { eager: true }))
-}))`
+export const AppConfig = defineConfig((blueprint) => {
+  blueprint.set('stone.i18n.locales', ['en', 'fr'])
+  blueprint.set(
+    'stone.i18n.resources',
+    loadTranslations(import.meta.glob('/app/i18n/**/*.{json,ts,js,yaml,yml}', { eager: true }))
+  )
+})`
 
 const USAGE = `import { translatorFor } from '@stone-js/i18n'
 import { EventHandler, Get } from '@stone-js/router'
@@ -50,7 +54,7 @@ const FRONTEND = `// A locale switcher in the browser
 await i18n.setLocale('fr')                      // re-renders in French
 document.documentElement.dir = i18n.dir()       // 'ltr' | 'rtl' for the <html> element`
 
-const CONFIG = `export const AppConfig = defineConfig(defineI18n({
+const CONFIG = `export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.i18n', {
   locale: 'en',                    // active locale
   locales: ['en', 'fr', 'ar'],     // negotiated set (fr-CA -> fr)
   fallbackLocale: 'en',            // used for missing keys
@@ -87,8 +91,20 @@ export class I18n implements IPage<ReactIncomingEvent> {
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i @stone-js/i18n`}</Code>
         <p>
-          Register the opt-in <code>i18nBlueprint</code> in your app, then configure through
-          <code>stone.i18n</code> or <code>defineI18n</code>. Everything below is optional.
+          Then add one decorator. That is the whole setup: it registers the service provider (so
+          <code> constructor ({'{'} i18n {'}'})</code> injects it anywhere), installs the middleware that
+          resolves the request locale, and lets the build discover <code>app/i18n</code> on its own.
+          Everything below is optional.
+        </p>
+        <Code file='app/Application.ts'>{`import { I18n } from '@stone-js/i18n'
+import { StoneApp } from '@stone-js/core'
+
+@I18n({ locales: ['en', 'fr'], fallbackLocale: 'en' })
+@StoneApp({ name: 'my-app' })
+export class Application {}`}</Code>
+        <p>
+          The imperative equivalent is the <code>i18nBlueprint</code> constant:
+          <code> blueprint.set(i18nBlueprint)</code>.
         </p>
 
         <H2>Zero-config layout</H2>
