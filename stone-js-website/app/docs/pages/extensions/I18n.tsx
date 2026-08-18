@@ -14,6 +14,24 @@ const LAYOUT = `app/i18n/
     common.json     { "hello": "Bonjour {{name}} !" }
     cart.json       { "items_one": "{{count}} article", "items_other": "{{count}} articles" }`
 
+const DEEP_LAYOUT = `app/
+  i18n/                        <- shared across the app
+    en/common.json
+    fr/common.json
+  modules/
+    billing/
+      BillingService.ts
+      i18n/                    <- owned by the billing module
+        en/invoice.json
+        fr/invoice.json
+    crm/contacts/i18n/fr/contact.json`
+
+const CUSTOM_LAYOUT = `// Catalogs named \`locales/\` instead of \`i18n/\`, anywhere under \`src\`
+export default defineConfig({ plugins: [i18nCliPlugin({ root: 'src', dirname: 'locales' })] })
+
+// Full control, for a layout no convention describes
+export default defineConfig({ plugins: [i18nCliPlugin({ pattern: 'packages/*/translations/*/*.json' })] })`
+
 const PLUGIN = `import { i18nCliPlugin } from '@stone-js/i18n/cli'
 
 // stone.config.mjs
@@ -22,12 +40,16 @@ export default defineConfig({ plugins: [i18nCliPlugin()] })`
 const LAZY = `// Lazy is the default. To bundle every locale eagerly instead:
 export default defineConfig({ plugins: [i18nCliPlugin({ lazy: false })] })`
 
-const MANUAL = `import { defineI18n, loadTranslations } from '@stone-js/i18n'
+const MANUAL = `import { defineConfig } from '@stone-js/core'
+import { loadTranslations } from '@stone-js/i18n'
 
-export const AppConfig = defineConfig(defineI18n({
-  locales: ['en', 'fr'],
-  resources: loadTranslations(import.meta.glob('/app/i18n/**/*.{json,ts,js,yaml,yml}', { eager: true }))
-}))`
+export const AppConfig = defineConfig((blueprint) => {
+  blueprint.set('stone.i18n.locales', ['en', 'fr'])
+  blueprint.set(
+    'stone.i18n.resources',
+    loadTranslations(import.meta.glob('/app/i18n/**/*.{json,ts,js,yaml,yml}', { eager: true }))
+  )
+})`
 
 const USAGE = `import { translatorFor } from '@stone-js/i18n'
 import { EventHandler, Get } from '@stone-js/router'
@@ -50,7 +72,7 @@ const FRONTEND = `// A locale switcher in the browser
 await i18n.setLocale('fr')                      // re-renders in French
 document.documentElement.dir = i18n.dir()       // 'ltr' | 'rtl' for the <html> element`
 
-const CONFIG = `export const AppConfig = defineConfig(defineI18n({
+const CONFIG = `export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.i18n', {
   locale: 'en',                    // active locale
   locales: ['en', 'fr', 'ar'],     // negotiated set (fr-CA -> fr)
   fallbackLocale: 'en',            // used for missing keys
@@ -77,7 +99,7 @@ export class I18n implements IPage<ReactIncomingEvent> {
       <>
         <ArticleTop eyebrow='Extensions' title='Internationalization (i18n)' />
         <Lead>
-          One i18n layer for the backend and the frontend. Drop your catalogs in <code>app/i18n</code>,
+          One i18n layer for the backend and the frontend. Drop your catalogs in any <code>i18n</code> directory,
           and the request locale is resolved and scoped for you: on the server every request gets its
           own translator, concurrency-safe; in the browser you switch the active locale in one call.
           Translation runs on <a href='https://www.i18next.com'>i18next</a>; numbers, dates and lists
@@ -87,22 +109,53 @@ export class I18n implements IPage<ReactIncomingEvent> {
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i @stone-js/i18n`}</Code>
         <p>
-          Register the opt-in <code>i18nBlueprint</code> in your app, then configure through
-          <code>stone.i18n</code> or <code>defineI18n</code>. Everything below is optional.
+          Then add one decorator. That is the whole setup: it registers the service provider (so
+          <code> constructor ({'{'} i18n {'}'})</code> injects it anywhere), installs the middleware that
+          resolves the request locale, and lets the build discover your catalogs on its own.
+          Everything below is optional.
         </p>
+        <Code file='app/Application.ts'>{`import { I18n } from '@stone-js/i18n'
+import { StoneApp } from '@stone-js/core'
+
+@I18n({ locales: ['en', 'fr'], fallbackLocale: 'en' })
+@StoneApp({ name: 'my-app' })
+export class Application {}`}</Code>
+        <p>
+          The imperative equivalent hands the blueprint to <code>defineStoneApp</code>, exactly where
+          the decorator form lists it.
+        </p>
+        <Code file='app/Application.ts'>{`import { defineStoneApp } from '@stone-js/core'
+import { i18nBlueprint } from '@stone-js/i18n'
+
+export const Application = defineStoneApp(handler, { name: 'my-app' }, [i18nBlueprint])`}</Code>
 
         <H2>Zero-config layout</H2>
         <p>
-          Lay out catalogs as <code>app/i18n/&lt;locale&gt;/&lt;namespace&gt;.json</code>. The locale and
-          namespace are read from the path, so no manifest is needed.
+          A catalog is any directory named <code>i18n</code>, holding{' '}
+          <code>&lt;locale&gt;/&lt;namespace&gt;.json</code> files. The locale and namespace are read from
+          the path, so no manifest is needed. The simplest project keeps one catalog.
         </p>
         <Code file='project' lang='text'>{LAYOUT}</Code>
 
+        <H3>Catalogs at any depth</H3>
+        <p>
+          Catalogs are found anywhere under <code>app</code>, so a larger codebase can keep translations
+          next to the code that uses them instead of in one growing directory.
+        </p>
+        <Code file='project' lang='text'>{DEEP_LAYOUT}</Code>
+        <p>
+          Every catalog contributes, and catalogs sharing a locale and a namespace <strong>merge
+          deeply</strong>: several modules can each add their own keys to a shared <code>common</code>{' '}
+          namespace. On a conflicting key the deeper catalog wins, so the result is identical on every
+          machine and every build. <code>node_modules</code> and dotted directories are never scanned,
+          because a dependency's translations are not yours.
+        </p>
+
         <H2>Loading catalogs</H2>
         <p>
-          The recommended path is the CLI plugin: it scans <code>app/i18n</code> at build time and
-          generates the wiring with plain imports, so the same setup works on a backend service
-          (Rollup), a browser SPA and SSR (Vite) alike. No wiring line in your code.
+          The recommended path is the CLI plugin: at build time it walks <code>app</code> for every{' '}
+          <code>i18n</code> directory and generates the wiring with plain imports, so the same setup works
+          on a backend service (Rollup), a browser SPA and SSR (Vite) alike. No wiring line in your code.
         </p>
         <Code file='stone.config.mjs' lang='ts'>{PLUGIN}</Code>
         <p>
@@ -126,6 +179,23 @@ export class I18n implements IPage<ReactIncomingEvent> {
           kernel middleware that runs and is awaited before the handler renders. The catalog is present
           at first paint, and the fallback locale is loaded alongside it so missing keys still resolve.
         </Callout>
+
+        <H3>When the convention does not fit</H3>
+        <p>
+          Four options, from the least to the most explicit. A conventional project needs none of them.
+        </p>
+        <PropsTable nameHeader='Option' rows={[
+          { name: 'root', type: "'app'", desc: 'The directory walked for catalogs.' },
+          { name: 'dirname', type: "'i18n'", desc: "The directory name that marks a catalog, for example 'locales'." },
+          { name: 'dir', type: 'string', desc: 'Scan exactly this one directory, no walk, for translations kept outside root.' },
+          { name: 'pattern', type: 'glob', desc: 'Take the files from a glob instead of the walk, when nothing above fits.' }
+        ]} />
+        <Code file='stone.config.mjs' lang='ts'>{CUSTOM_LAYOUT}</Code>
+        <p>
+          Whatever a <code>pattern</code> matches must still end in{' '}
+          <code>&lt;locale&gt;/&lt;namespace&gt;.&lt;ext&gt;</code>: that tail is how the runtime knows
+          which locale and namespace a file carries.
+        </p>
 
         <H3>By hand</H3>
         <p>

@@ -1,4 +1,4 @@
-import { I18n } from './I18n'
+import { I18nManager } from './I18nManager'
 import { II18n, Locale, TranslateOptions } from './declarations'
 
 /** A duck-typed event carrying request-scoped metadata. */
@@ -14,7 +14,7 @@ interface MetadataEvent {
  * @returns The translated string.
  */
 export function t (key: string, options?: TranslateOptions): string {
-  return I18n.getInstance().t(key, options)
+  return I18nManager.getInstance().t(key, options)
 }
 
 /**
@@ -35,5 +35,5 @@ export function localeFromEvent (event: MetadataEvent): Locale | undefined {
  * @returns A translator bound to the request locale.
  */
 export function translatorFor (event: MetadataEvent): II18n {
-  return event.getMetadataValue?.<II18n>('i18n') ?? I18n.getInstance()
+  return event.getMetadataValue?.<II18n>('i18n') ?? I18nManager.getInstance()
 }
