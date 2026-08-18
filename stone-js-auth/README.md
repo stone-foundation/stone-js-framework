@@ -44,6 +44,21 @@ export class TaskController {
 //   blueprint.set(authBlueprint).set('stone.auth.secret', getString('JWT_SECRET'))
 ```
 
+### Mapping the token to your own user
+
+The verified claims describe the token, not your application's principal. `resolveUser` turns one
+into the other, and it may be **asynchronous**: resolving a principal usually hits a store, and
+that first lookup is often where the account gets provisioned.
+
+```ts
+blueprint.set('stone.auth.resolveUser', async (claims) => {
+  return await users.findOrCreateBySubject(claims.sub)
+})
+```
+
+The resolved value is what `event.getUser()` returns for the rest of the request. A synchronous
+resolver works exactly the same way; omit the option entirely and the raw claims are used.
+
 ## Documentation
 
 Full documentation: **[stonejs.dev/docs/extensions/auth](https://stonejs.dev/docs/extensions/auth)**.
