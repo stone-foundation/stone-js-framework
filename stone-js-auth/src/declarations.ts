@@ -1,3 +1,5 @@
+import { Promiseable } from '@stone-js/core'
+
 /**
  * Standard + custom JWT claims.
  */
@@ -75,8 +77,13 @@ export interface AuthOptions {
   expiresIn?: string | number
   /** Clock skew tolerance for verification. */
   clockTolerance?: string | number
-  /** Maps verified claims into the application principal attached to the event. */
-  resolveUser?: (claims: JwtClaims) => unknown
+  /**
+   * Maps verified claims into the application principal attached to the event.
+   *
+   * May be asynchronous: resolving a principal usually hits a store (the token subject has to
+   * become *your* user, and that first lookup often provisions the account).
+   */
+  resolveUser?: (claims: JwtClaims) => Promiseable<unknown>
 }
 
 /**
