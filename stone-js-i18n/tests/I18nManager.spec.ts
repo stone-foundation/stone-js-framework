@@ -1,4 +1,4 @@
-import { I18n, collectNamespaces } from '../src/I18n'
+import { I18nManager, collectNamespaces } from '../src/I18nManager'
 import { I18nError } from '../src/errors/I18nError'
 
 const resources = {
@@ -12,16 +12,16 @@ const resources = {
   }
 }
 
-const create = (overrides = {}): I18n =>
-  I18n.create({ locale: 'en', fallbackLocale: 'en', locales: ['en', 'fr'], resources: structuredClone(resources), ...overrides })
+const create = (overrides = {}): I18nManager =>
+  I18nManager.create({ locale: 'en', fallbackLocale: 'en', locales: ['en', 'fr'], resources: structuredClone(resources), ...overrides })
 
-describe('I18n', () => {
+describe('I18nManager', () => {
   it('translates with interpolation', () => {
     expect(create().t('hello', { name: 'Ada' })).toBe('Hello Ada!')
   })
 
   it('creates with all defaults (no options)', () => {
-    const i18n = I18n.create()
+    const i18n = I18nManager.create()
     expect(i18n.getLocale()).toBe('en')
     expect(i18n.t('any.key')).toBe('any.key')
   })
@@ -89,7 +89,7 @@ describe('I18n', () => {
   })
 
   it('honours custom interpolation delimiters', () => {
-    const i18n = I18n.create({ resources: { en: { translation: { hi: 'Hi <name>' } } }, interpolation: { prefix: '<', suffix: '>' } })
+    const i18n = I18nManager.create({ resources: { en: { translation: { hi: 'Hi <name>' } } }, interpolation: { prefix: '<', suffix: '>' } })
     expect(i18n.t('hi', { name: 'Zoe' })).toBe('Hi Zoe')
   })
 
@@ -141,7 +141,7 @@ describe('I18n', () => {
 
     it('notifies onMissingKey for untranslated keys (dev aid)', () => {
       const missing: string[] = []
-      const i18n = I18n.create({ locale: 'en', resources: structuredClone(resources), onMissingKey: (key, locale, ns) => missing.push(`${ns}:${locale}:${key}`) })
+      const i18n = I18nManager.create({ locale: 'en', resources: structuredClone(resources), onMissingKey: (key, locale, ns) => missing.push(`${ns}:${locale}:${key}`) })
       i18n.t('nope.here')
       expect(missing).toContain('translation:en:nope.here')
     })
@@ -150,14 +150,14 @@ describe('I18n', () => {
   describe('process-wide instance', () => {
     it('publishes and retrieves the instance', () => {
       const i18n = create()
-      I18n.setInstance(i18n)
-      expect(I18n.getInstance()).toBe(i18n)
+      I18nManager.setInstance(i18n)
+      expect(I18nManager.getInstance()).toBe(i18n)
     })
 
     it('throws when no instance is published', () => {
       // @ts-expect-error reset private static for the test
-      I18n.instance = undefined
-      expect(() => I18n.getInstance()).toThrow(I18nError)
+      I18nManager.instance = undefined
+      expect(() => I18nManager.getInstance()).toThrow(I18nError)
     })
   })
 
@@ -168,7 +168,7 @@ describe('I18n', () => {
     })
 
     it('loads the active locale and the fallback on demand, then translates both', async () => {
-      const i18n = I18n.create({ locale: 'fr', fallbackLocale: 'en', loaders: makeLoaders({}) })
+      const i18n = I18nManager.create({ locale: 'fr', fallbackLocale: 'en', loaders: makeLoaders({}) })
       await i18n.loadLocale('fr')
       expect(i18n.t('hi', { locale: 'fr' })).toBe('Salut')
       expect(i18n.t('hi', { locale: 'en' })).toBe('Hi') // fallback catalog loaded alongside
@@ -176,7 +176,7 @@ describe('I18n', () => {
 
     it('is idempotent and shares the loaded set across forLocale clones', async () => {
       const calls: Record<string, number> = {}
-      const i18n = I18n.create({ locale: 'en', fallbackLocale: 'en', loaders: makeLoaders(calls) })
+      const i18n = I18nManager.create({ locale: 'en', fallbackLocale: 'en', loaders: makeLoaders(calls) })
       await i18n.loadLocale('fr')
       await i18n.forLocale('fr').loadLocale('fr') // clone shares `loaded` → no reimport
       expect(calls.fr).toBe(1)
@@ -184,19 +184,40 @@ describe('I18n', () => {
 
     it('does not load the fallback twice when it is the active locale', async () => {
       const calls: Record<string, number> = {}
-      const i18n = I18n.create({ locale: 'en', fallbackLocale: 'en', loaders: makeLoaders(calls) })
+      const i18n = I18nManager.create({ locale: 'en', fallbackLocale: 'en', loaders: makeLoaders(calls) })
       await i18n.loadLocale('en')
       expect(calls.en).toBe(1)
     })
 
     it('uses the first entry of an array fallbackLocale', async () => {
-      const i18n = I18n.create({ locale: 'fr', fallbackLocale: ['en', 'de'], loaders: makeLoaders({}) })
+      const i18n = I18nManager.create({ locale: 'fr', fallbackLocale: ['en', 'de'], loaders: makeLoaders({}) })
       await i18n.loadLocale('fr')
       expect(i18n.t('hi', { locale: 'en' })).toBe('Hi') // 'en' (first of the array) loaded as fallback
     })
 
     it('is a no-op when no loaders are configured', async () => {
       await expect(create().loadLocale('fr')).resolves.toBeUndefined()
+    })
+
+    it('merges every catalogue of a locale that shares a namespace', async () => {
+      // Deep discovery finds a catalogue per module, so several of them carry the same namespace for
+      // one locale. All of them must land, and a slow import must not lose to a fast one.
+      const i18n = I18nManager.create({
+        locale: 'fr',
+        loaders: {
+          '/app/i18n/fr/translation.json': async () => ({ default: { hi: 'Salut', bye: 'Ciao' } }),
+          '/app/modules/billing/i18n/fr/translation.json': async () => {
+            await new Promise((resolve) => setTimeout(resolve, 5)) // settles last
+            return { default: { hi: 'Bonjour', invoice: 'Facture' } }
+          }
+        }
+      })
+
+      await i18n.loadLocale('fr')
+
+      expect(i18n.t('invoice')).toBe('Facture') // the module catalogue landed
+      expect(i18n.t('bye')).toBe('Ciao') // the shared one was not replaced
+      expect(i18n.t('hi')).toBe('Bonjour') // the deeper path wins the conflict, whatever the timing
     })
   })
 

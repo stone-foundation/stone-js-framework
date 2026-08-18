@@ -17,9 +17,8 @@ export class Application {}
 
 const IMP = `
 import { defineConfig } from '@stone-js/core'
-import { defineCache } from '@stone-js/cache'
 
-export const AppConfig = defineConfig(defineCache({
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.cache', {
   default: 'redis',
   stores: [
     { name: 'redis', driver: 'redis', url: 'redis://localhost:6379', prefix: 'app' },

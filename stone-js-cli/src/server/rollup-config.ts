@@ -34,7 +34,12 @@ const rollupBuildConfig = defineConfig({
   context: 'globalThis',
   output: {
     format: 'es',
-    file: 'dist/app.mjs'
+    file: 'dist/app.mjs',
+    // A server artefact is one file, so a dynamic `import()` anywhere in the app (lazy i18n
+    // catalogs, a conditionally-loaded driver) otherwise fails the build with "when building
+    // multiple chunks, the output.dir option must be used". Inlining keeps the single artefact and
+    // still defers evaluation to the moment the import is awaited.
+    inlineDynamicImports: true
   },
   plugins: [
     multiEntry(),
@@ -83,7 +88,12 @@ const rollupBundleConfig = defineConfig({
   context: 'globalThis',
   output: {
     format: 'es',
-    file: 'dist/app.mjs'
+    file: 'dist/app.mjs',
+    // A server artefact is one file, so a dynamic `import()` anywhere in the app (lazy i18n
+    // catalogs, a conditionally-loaded driver) otherwise fails the build with "when building
+    // multiple chunks, the output.dir option must be used". Inlining keeps the single artefact and
+    // still defers evaluation to the moment the import is awaited.
+    inlineDynamicImports: true
   },
   plugins: [
     nodeExternals({ deps: false }), // Must always be before `nodeResolve()`.
