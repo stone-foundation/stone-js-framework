@@ -1,3 +1,4 @@
+import { defineJobHandler } from '../../src/options/QueueBlueprint'
 import { addBlueprint } from '@stone-js/core'
 import { Queue } from '../../src/decorators/Queue'
 
@@ -28,13 +29,25 @@ describe('Queue (enable decorator)', () => {
     expect(lastBlueprint().stone.queue.default).toBe('jobs')
   })
 
-  it('defineQueue / defineJobHandler build config fragments', async () => {
-    const { defineQueue, defineJobHandler } = await import('../../src/options/QueueBlueprint')
-    expect(defineQueue({ default: 'memory' })).toEqual({ queue: { default: 'memory' } })
-    expect(defineJobHandler('send', SendEmailStub, { isClass: true })).toEqual({ name: 'send', module: SendEmailStub, isClass: true })
-    expect(defineJobHandler('ping', pingStub)).toEqual({ name: 'ping', module: pingStub })
-  })
 })
 
 class SendEmailStub {}
 const pingStub = (): void => {}
+
+describe('defineJobHandler', () => {
+  it('builds a job-handler meta-module for the imperative API', () => {
+    // The imperative counterpart of `@JobHandler`, and a different kind of helper from the config
+    // fragments that were removed: it declares a module, not a configuration bucket.
+    class SendEmail {}
+
+    expect(defineJobHandler('send-email', SendEmail, { isClass: true })).toEqual({
+      name: 'send-email',
+      module: SendEmail,
+      isClass: true
+    })
+    expect(defineJobHandler('resize', () => {})).toEqual({
+      name: 'resize',
+      module: expect.any(Function)
+    })
+  })
+})

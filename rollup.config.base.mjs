@@ -59,15 +59,20 @@ export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [] } = 
  *   extensions?: string[],
  *   builds?: Array<{
  *     input: string | string[], file?: string, output?: object,
- *     entryFileName?: string, json?: boolean, barrel?: { exclude?: string[] }
+ *     entryFileName?: string, json?: boolean, multiEntry?: boolean,
+ *     barrel?: { exclude?: string[] }
  *   }>
  * }} p - Injected plugins and options.
  * @returns {import('rollup').RollupOptions[]}
  */
 export function createRollupConfig (p) {
-  const stack = ({ entryFileName, json } = {}) => {
+  const stack = ({ entryFileName, json, multiEntry = true } = {}) => {
     const list = [
-      p.multi(entryFileName !== undefined ? { entryFileName } : {}),
+      // `multi-entry` merges several inputs behind a synthetic entry, and that synthetic entry
+      // re-exports NAMED exports only: a `export default` in the source silently disappears from the
+      // bundle. Any build whose contract is a default export (a CLI plugin, for instance) must opt
+      // out, and a single-file input has nothing to merge anyway.
+      ...(multiEntry ? [p.multi(entryFileName !== undefined ? { entryFileName } : {})] : []),
       p.nodeExternals(), // Must always be before nodeResolve().
       p.nodeResolve({
         extensions: p.extensions ?? ['.js', '.mjs', '.ts'],
@@ -82,7 +87,11 @@ export function createRollupConfig (p) {
   const builds = p.builds ?? [{ input: 'src/**/*.ts', file: 'dist/index.js', barrel: {} }]
 
   return builds.map((b) => {
-    const plugins = stack({ entryFileName: b.entryFileName, json: b.json ?? (p.json !== undefined) })
+    const plugins = stack({
+      entryFileName: b.entryFileName,
+      json: b.json ?? (p.json !== undefined),
+      multiEntry: b.multiEntry ?? true
+    })
     if (b.barrel !== undefined) plugins.push(dtsBarrel(b.barrel))
     return {
       input: b.input,

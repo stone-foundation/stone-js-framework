@@ -30,8 +30,4 @@ describe('Cache (enable decorator)', () => {
     expect(bp.stone.cache.stores[0]).toMatchObject({ name: 'sessions', driver: 'redis', url: 'redis://x' })
   })
 
-  it('defineCache builds a config fragment', async () => {
-    const { defineCache } = await import('../../src/options/CacheBlueprint')
-    expect(defineCache({ default: 'redis', stores: [] })).toEqual({ cache: { default: 'redis', stores: [] } })
-  })
 })
