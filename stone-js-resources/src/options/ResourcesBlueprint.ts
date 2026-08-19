@@ -1,6 +1,7 @@
 import { IResource } from '../declarations'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { MetaResourceRouteMiddleware } from '../middleware/ResourceRouteMiddleware'
+import { MetaApiResourceMiddleware } from '../middleware/BlueprintMiddleware'
 
 /**
  * Resources configuration bucket (`stone.resources`).
@@ -51,6 +52,11 @@ export interface ResourcesBlueprint extends StoneBlueprint {
 export const resourcesBlueprint: ResourcesBlueprint = {
   stone: {
     resources: {},
+    blueprint: {
+      middleware: [
+        MetaApiResourceMiddleware
+      ]
+    },
     router: {
       middleware: [
         MetaResourceRouteMiddleware

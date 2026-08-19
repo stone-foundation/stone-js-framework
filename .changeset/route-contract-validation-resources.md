@@ -32,3 +32,48 @@ Both accept a name instead of a value, resolved from `stone.validation.schemas` 
 `@stone-js/resources` gains its two activation paths, `@Resources()` and `resourcesBlueprint`, which it needed to contribute its middleware.
 
 Both middlewares are a no-op on routes that declare nothing, so enabling either costs an application that does not use it one function call per request.
+
+## Each module owns its key, so it works with or without a router
+
+`@Validate(schema)` and `@Returns(resource)` record what a handler accepts and exposes **on the
+handler itself**, under each module's own metadata key. Neither knows anything about the router, so
+both work in a routed application, a single-handler service, a CLI command or the browser. The route
+props stay available as the tidier transport when a router is in play, and win when both are present,
+because a route is then the single description of itself.
+
+```ts
+@Validate(CreateUserSchema)   // in
+@Returns(userResource)        // out
+create (event) { return this.users.add(event.get('validatedBody')) }
+```
+
+## Schemas and resources as classes, registered under a name
+
+```ts
+@ValidationSchema('createUser')
+export class CreateUserSchema implements IValidationSchema {
+  constructor ({ i18n }) { this.i18n = i18n }
+  rules () { return { body: z.object({ email: z.string().email(this.i18n.t('validation.email')) }) } }
+}
+
+@ApiResource('user')
+export class UserResource extends Resource<User> {
+  toArray (user) { return { id: user.id, name: user.name } }
+}
+```
+
+`rules()` is deliberately declarative: a contract that describes itself can be read by
+`@stone-js/openapi` to publish the request schema, which a method that merely validated could not.
+There is no `messages()` method, and none is needed: the **class** is resolved by the container, so
+its constructor takes the services and `rules()` builds its schemas with them, i18n included. Zod
+already carries per-field messages; a global failure is an exception.
+
+A build-phase middleware in each module collects the registered classes into
+`stone.validation.schemas` and `stone.resources.registry`, with the same scan the router uses for its
+route definitions. Routes and handlers then name a schema or a resource instead of importing it, and
+openapi can walk the registries without loading anything. `defineValidationSchema` is the imperative
+counterpart, with the same dependencies.
+
+Nothing in either module touches HTTP, so the same schema class validates a form on the frontend:
+resolve it from the container and call `rules()`. One schema, both sides.
+
