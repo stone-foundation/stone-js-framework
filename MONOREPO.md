@@ -5,6 +5,25 @@
 
 ---
 
+## Version de Node
+
+L'**outillage** de ce monorepo exige Node **>= 22.22.1**, épinglé dans `.nvmrc` et utilisé par tous les
+jobs de CI, donc un pipeline vert signifie que le plancher déclaré est bien celui qui a été testé :
+
+```bash
+nvm use     # lit .nvmrc
+```
+
+Ce plancher est celui de l'outillage, pas celui du framework. **Les paquets publiés gardent
+`engines.node >= 18.17`** : une application bâtie avec Stone.js tourne sur Node 18 et 20 exactement
+comme avant, et rien ici ne change cela. Les deux sont séparés à dessein, car les confondre imposerait
+une rupture à tous les consommateurs pour la commodité de nos propres dépendances de développement.
+
+Le plancher a bougé parce que les outils l'exigent : `@changesets/cli@3` déclare `^22.11`,
+`lint-staged@17` déclare `>= 22.22.1`, et sous Node 20.11 la commande `changeset` échoue déjà
+(`@changesets/write` requiert `human-id`, devenu ESM seulement, et `require(ESM)` n'est arrivé qu'en
+Node 20.19).
+
 ## 1. C'est quoi un monorepo, ici ?
 
 Avant : ~18 dépôts git séparés, un par module (`@stone-js/core`, `@stone-js/router`…).

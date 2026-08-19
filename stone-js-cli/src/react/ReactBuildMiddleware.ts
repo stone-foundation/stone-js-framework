@@ -12,7 +12,7 @@ import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 import { removeImportsVitePlugin } from './RemoveImportsVitePlugin'
 import { basePath, buildPath, distPath } from '@stone-js/filesystem'
 import { isNotEmpty, IBlueprint, ClassType, isStoneBlueprint } from '@stone-js/core'
-import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp } from '../utils'
+import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp, checkAppLevelDecoratorsInTsx } from '../utils'
 import { generateDeclarativeLazyPages, generateImperativeLazyPages, getViteConfig } from './react-utils'
 import { reactHtmlEntryPointTemplate, reactClientEntryPointTemplate, reactServerEntryPointTemplate } from './stubs'
 import { applyPluginInjections } from '../plugins/applyPluginInjections'
@@ -201,6 +201,22 @@ export const GenerateClientFileMiddleware = async (
   next: NextPipe<ConsoleContext, IBlueprint>
 ): Promise<IBlueprint> => {
   const isLazy = isLazyViews(context.blueprint, context.event)
+
+  if (isLazy) {
+    const offendingFiles = checkAppLevelDecoratorsInTsx(context.blueprint)
+    if (offendingFiles.length > 0) {
+      const fileList = offendingFiles.map(f => `  ${relative(basePath(), f)}`).join('\n')
+      throw new CliError(
+        'App-level configuration must live in a .ts file, not a .tsx file.\n' +
+        'Lazy views are on (detected from router usage). The following .tsx file(s) contain ' +
+        'app-level decorators (e.g. @StoneApp, @Browser, @UseReact):\n' +
+        `${fileList}\n` +
+        'Move the app-level configuration to a .ts file so it is eagerly loaded.\n' +
+        'You can also set lazy: false in your configuration to disable lazy views entirely.'
+      )
+    }
+  }
+
   const basePattern = basePath(!isLazy
     ? context.blueprint.get('stone.builder.input.all', 'app/**/*.**')
     : context.blueprint.get('stone.builder.input.app', 'app/**/*.{ts,js,mjs,json}'))

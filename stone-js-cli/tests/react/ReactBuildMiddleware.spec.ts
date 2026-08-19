@@ -16,7 +16,7 @@ import {
 } from '../../src/react/ReactBuildMiddleware'
 import { stoneCliBlueprint } from '../../src/options/StoneCliBlueprint'
 import { generateImperativeLazyPages, generateDeclarativeLazyPages } from '../../src/react/react-utils'
-import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp } from '../../src/utils'
+import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp, checkAppLevelDecoratorsInTsx } from '../../src/utils'
 
 const { outputFileSync, moveSync, removeSync, readFileSync } = fsExtra
 
@@ -72,7 +72,8 @@ vi.mock('../../src/utils', async () => ({
   generatePublicEnvironmentsFile: vi.fn().mockReturnValue(true),
   isDeclarative: vi.fn().mockReturnValue(false),
   isLazyViews: vi.fn().mockReturnValue(true),
-  isTypescriptApp: vi.fn().mockReturnValue(true)
+  isTypescriptApp: vi.fn().mockReturnValue(true),
+  checkAppLevelDecoratorsInTsx: vi.fn().mockReturnValue([])
 }))
 
 vi.mock('../../src/react/react-utils', async () => ({
@@ -325,6 +326,56 @@ describe('ReactBuildMiddleware', () => {
     const buildArgs: any = vi.mocked(vite.build).mock.calls[0][0]
     expect(buildArgs.build?.lib?.entry).toContain('viewsIndex.mjs')
     expect(buildArgs.build?.rollupOptions?.output?.format).toBe('es')
+  })
+
+  it('should throw when .tsx file contains @StoneApp with lazy views on', async () => {
+    vi.mocked(isLazyViews).mockReturnValue(true)
+    vi.mocked(checkAppLevelDecoratorsInTsx).mockReturnValue(['app/Application.tsx'])
+
+    await expect(GenerateClientFileMiddleware(context, mockNext)).rejects.toThrow(
+      /App-level configuration must live in a \.ts file, not a \.tsx file/
+    )
+  })
+
+  it('should throw with actionable fix message naming the file', async () => {
+    vi.mocked(isLazyViews).mockReturnValue(true)
+    vi.mocked(checkAppLevelDecoratorsInTsx).mockReturnValue(['app/Application.tsx'])
+
+    await expect(GenerateClientFileMiddleware(context, mockNext)).rejects.toThrow(
+      /Application\.tsx/
+    )
+  })
+
+  it('should throw mentioning lazy: false as alternative', async () => {
+    vi.mocked(isLazyViews).mockReturnValue(true)
+    vi.mocked(checkAppLevelDecoratorsInTsx).mockReturnValue(['app/Application.tsx'])
+
+    await expect(GenerateClientFileMiddleware(context, mockNext)).rejects.toThrow(
+      /lazy: false/
+    )
+  })
+
+  it('should not throw when .tsx files have no app-level decorators', async () => {
+    vi.mocked(isLazyViews).mockReturnValue(true)
+    vi.mocked(checkAppLevelDecoratorsInTsx).mockReturnValue([])
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(readFileSync).mockReturnValue('// %concat%')
+
+    const result = await GenerateClientFileMiddleware(context, mockNext)
+
+    // `mockNext` is a bare `vi.fn()`, so the middleware resolves to undefined by design: what proves
+    // it did not throw is that the client file was still generated.
+    expect(result).toEqual(await mockNext(context))
+    expect(outputFileSync).toHaveBeenCalled()
+  })
+
+  it('should not check for app-level decorators when lazy views are off', async () => {
+    vi.mocked(isLazyViews).mockReturnValue(false)
+
+    const result = await GenerateClientFileMiddleware(context, mockNext)
+
+    expect(result).toEqual(await mockNext(context))
+    expect(checkAppLevelDecoratorsInTsx).not.toHaveBeenCalled()
   })
 })
 
