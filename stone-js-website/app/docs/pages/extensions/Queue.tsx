@@ -16,8 +16,13 @@ export class Application {}
 `
 
 const IMP = `
-import { defineConfig } from '@stone-js/core'
+import { defineConfig, defineStoneApp } from '@stone-js/core'
+import { queueBlueprint } from '@stone-js/queue'
 
+// Enable the module on the manifest, exactly where the decorator sits
+export const App = defineStoneApp({ name: 'app' }, [queueBlueprint])
+
+// Then configure it
 export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.queue', {
   default: 'redis',
   connections: [
