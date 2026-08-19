@@ -25,6 +25,33 @@ domain once, and the context (runtime, protocol, caller) applies to it at run ti
 npm i @stone-js/auth
 ```
 
+## Enabling it
+
+Like every Stone.js module, it is enabled in one of two ways, and configured afterwards under
+`stone.auth`. It registers the authentication provider and the kernel middleware that verifies every request.
+
+```ts
+import { Auth } from '@stone-js/auth'
+import { StoneApp } from '@stone-js/core'
+
+@Auth({ secret: getString('JWT_SECRET'), issuer: 'https://issuer.example', audience: 'my-api' })
+@StoneApp({ name: 'my-app' })
+export class Application {}
+```
+
+```ts
+import { defineStoneApp } from '@stone-js/core'
+import { authBlueprint } from '@stone-js/auth'
+
+export const Application = defineStoneApp({ name: 'my-app' }, [authBlueprint])
+```
+
+Configure it from a `@Configuration` class or `defineConfig`:
+
+```ts
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.auth', { /* ... */ }))
+```
+
 ## Usage
 
 ```ts
@@ -40,8 +67,8 @@ export class TaskController {
   create (event) { /* ... */ }
 }
 
-// Enable + configure the signing strategy from a @Configuration:
-//   blueprint.set(authBlueprint).set('stone.auth.secret', getString('JWT_SECRET'))
+// Enabled with @Auth() (or authBlueprint) on the application; the signing strategy is
+// configured from a @Configuration: blueprint.set('stone.auth.secret', getString('JWT_SECRET'))
 ```
 
 ### Mapping the token to your own user

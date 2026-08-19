@@ -25,6 +25,33 @@ domain once, and the context (runtime, protocol, caller) applies to it at run ti
 npm i @stone-js/telemetry
 ```
 
+## Enabling it
+
+Like every Stone.js module, it is enabled in one of two ways, and configured afterwards under
+`stone.telemetry`. It registers the telemetry provider and the kernel middleware that traces every event.
+
+```ts
+import { Telemetry } from '@stone-js/telemetry'
+import { StoneApp } from '@stone-js/core'
+
+@Telemetry({ serviceName: 'tasks-api' })
+@StoneApp({ name: 'my-app' })
+export class Application {}
+```
+
+```ts
+import { defineStoneApp } from '@stone-js/core'
+import { telemetryBlueprint } from '@stone-js/telemetry'
+
+export const Application = defineStoneApp({ name: 'my-app' }, [telemetryBlueprint])
+```
+
+Configure it from a `@Configuration` class or `defineConfig`:
+
+```ts
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.telemetry', { /* ... */ }))
+```
+
 ## Usage
 
 ```ts

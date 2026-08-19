@@ -25,6 +25,33 @@ domain once, and the context (runtime, protocol, caller) applies to it at run ti
 npm i @stone-js/authz
 ```
 
+## Enabling it
+
+Like every Stone.js module, it is enabled in one of two ways, and configured afterwards under
+`stone.authz`. It registers the authorization provider and the kernel middleware that builds the caller's abilities.
+
+```ts
+import { Authz } from '@stone-js/authz'
+import { StoneApp } from '@stone-js/core'
+
+@Authz()
+@StoneApp({ name: 'my-app' })
+export class Application {}
+```
+
+```ts
+import { defineStoneApp } from '@stone-js/core'
+import { authzBlueprint } from '@stone-js/authz'
+
+export const Application = defineStoneApp({ name: 'my-app' }, [authzBlueprint])
+```
+
+Configure it from a `@Configuration` class or `defineConfig`:
+
+```ts
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.authz', { /* ... */ }))
+```
+
 ## Usage
 
 ```ts

@@ -1,29 +1,21 @@
-import { telemetryBlueprint } from '@stone-js/telemetry'
 import { InMemoryTelemetryExporter } from './telemetry/InMemoryTelemetryExporter'
 import { Configuration, IBlueprint, IConfiguration, Promiseable } from '@stone-js/core'
 
 /**
- * Wires the telemetry module into this app, declaratively.
+ * Plugs the exporter the dashboard reads from.
  *
- * `@Configuration()` runs imperative config at blueprint-build time. Here it reuses the module's
- * own `telemetryBlueprint` (its provider + kernel middleware) so nothing is hard-coded, then
- * overrides `stone.telemetry.exporter` with our shared in-memory exporter. Setting the exporter
- * at blueprint scope is the key: it is created once and shared across every request's ephemeral
- * telemetry collector, which is what makes cross-request aggregation possible.
+ * The module itself is enabled on the application with `@Telemetry()` (see Application), or with
+ * `telemetryBlueprint` on the manifest for the imperative API. This class only configures, which is
+ * what a `@Configuration` is for: reaching into `telemetryBlueprint` here to re-register its
+ * provider and middleware by hand worked, but it froze a copy of what the module declares, so
+ * anything the module added later would silently stop being applied.
  *
- * (Imperative apps would instead pass `telemetryBlueprint` in the `defineStoneApp` blueprints
- * array — same effect.)
+ * Setting the exporter at blueprint scope is the key: it is created once and shared across every
+ * request's ephemeral telemetry collector, which is what makes cross-request aggregation possible.
  */
 @Configuration()
 export class TelemetryConfiguration implements IConfiguration {
   configure (blueprint: IBlueprint): Promiseable<void> {
-    blueprint
-      .add('stone.providers', telemetryBlueprint.stone.providers)
-      .add('stone.kernel.middleware', telemetryBlueprint.stone.kernel?.middleware)
-      .set('stone.telemetry', {
-        ...telemetryBlueprint.stone.telemetry,
-        serviceName: 'security-dashboard',
-        exporter: new InMemoryTelemetryExporter()
-      })
+    blueprint.set('stone.telemetry.exporter', new InMemoryTelemetryExporter())
   }
 }

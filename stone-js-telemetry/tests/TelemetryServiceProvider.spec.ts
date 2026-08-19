@@ -1,4 +1,4 @@
-import { Telemetry } from '../src/Telemetry'
+import { TelemetryManager } from '../src/TelemetryManager'
 import { TelemetryServiceProvider } from '../src/TelemetryServiceProvider'
 
 describe('TelemetryServiceProvider', () => {
@@ -11,10 +11,10 @@ describe('TelemetryServiceProvider', () => {
     void new TelemetryServiceProvider(container).register()
 
     expect(container.make).toHaveBeenCalledWith('blueprint')
-    expect(singletonIf).toHaveBeenCalledWith(Telemetry, expect.any(Function))
-    expect(alias).toHaveBeenCalledWith(Telemetry, ['telemetry', 'Telemetry'])
+    expect(singletonIf).toHaveBeenCalledWith(TelemetryManager, expect.any(Function))
+    expect(alias).toHaveBeenCalledWith(TelemetryManager, ['telemetry', 'Telemetry'])
     // The factory builds a Telemetry from the resolved options.
     const factory = singletonIf.mock.calls[0][1]
-    expect(factory()).toBeInstanceOf(Telemetry)
+    expect(factory()).toBeInstanceOf(TelemetryManager)
   })
 })

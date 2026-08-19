@@ -37,6 +37,28 @@ describe('NodeConsole', () => {
     NodeConsole()(class {})
     expect(addBlueprint).toHaveBeenCalled()
   })
+
+  it('does not hand out the shared blueprint, nor mutate it', () => {
+    // It used to merge the options INTO the exported constant and hand that very object to every
+    // decorated class, so a second application inherited the first one's options and the constant
+    // stayed dirty for the rest of the process. Every other adapter decorator clones first.
+    vi.mocked(addBlueprint).mockImplementation(() => {})
+
+    // The mocked wrapper invokes the decorator body itself, so each decoration reaches addBlueprint
+    // more than once; clearing between the two keeps each application's blueprint identifiable.
+    vi.mocked(addBlueprint).mockClear()
+    NodeConsole({ alias: 'first' })(class {})
+    const first = vi.mocked(addBlueprint).mock.calls.at(-1)?.[2] as any
+
+    vi.mocked(addBlueprint).mockClear()
+    NodeConsole()(class {})
+    const second = vi.mocked(addBlueprint).mock.calls.at(-1)?.[2] as any
+
+    expect(first).not.toBe(nodeConsoleAdapterBlueprint)
+    expect(first.stone.adapters[0].alias).toBe('first')
+    expect(second.stone.adapters[0].alias).not.toBe('first')
+    expect(nodeConsoleAdapterBlueprint.stone.adapters?.[0]).not.toHaveProperty('alias', 'first')
+  })
 })
 
 describe('Command', () => {
