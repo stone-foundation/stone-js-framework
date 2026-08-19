@@ -1,4 +1,5 @@
 import { toJsonSchema } from './toJsonSchema'
+import { DerivationRegistries, routesFromRouter, RouterLike } from './fromRouter'
 import {
   JsonSchema,
   HttpMethod,
@@ -93,6 +94,21 @@ export class OpenApiGenerator {
    * @param routes - The routes.
    * @returns This generator.
    */
+  /**
+   * Derive every documented path from a router.
+   *
+   * The routing table already says what each endpoint is: its path, its method, what it accepts and
+   * whether it is protected. Reading it makes the document a view of the application rather than a
+   * second description of it, so there is nothing to restate and nothing that can drift.
+   *
+   * @param router - The router, duck-typed so this module does not depend on `@stone-js/router`.
+   * @param registries - How to resolve a name a route used instead of an inline value.
+   * @returns This generator.
+   */
+  addRouter (router: RouterLike, registries: DerivationRegistries = {}): this {
+    return this.addRoutes(routesFromRouter(router, registries))
+  }
+
   addRoutes (routes: OpenApiRoute[]): this {
     for (const route of routes) {
       if (route.openapi !== undefined) {
@@ -131,6 +147,9 @@ export class OpenApiGenerator {
     if (operation.description !== undefined) { result.description = operation.description }
     if (operation.tags !== undefined) { result.tags = operation.tags }
     if (operation.operationId !== undefined) { result.operationId = operation.operationId }
+    // A protected endpoint must SAY it is protected: a contract that omits it invites a caller to
+    // try the endpoint unauthenticated and read the 401 as a bug.
+    if (operation.security !== undefined) { result.security = operation.security }
 
     const parameters = [
       ...this.parametersFrom('path', operation.request?.params),
