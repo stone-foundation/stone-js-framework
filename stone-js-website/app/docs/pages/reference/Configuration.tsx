@@ -28,7 +28,7 @@ const BUILD_KEYS = [
   { key: 'stone.builder.output', type: 'string', desc: 'The build output directory.' },
   { key: 'stone.builder.ssg.routes', type: 'string[]', desc: 'Extra static paths to pre-render, ADDED to the routes auto-derived from your pages.' },
   { key: 'stone.builder.dotenv', type: 'object', desc: 'How .env files are loaded into the build.' },
-  { key: 'stone.builder.excludedModules', type: 'string[]', desc: 'Modules to keep out of the browser bundle.' },
+  { key: 'stone.builder.browser.excludedModules', type: 'string[]', desc: 'Modules to keep out of the browser bundle (server-only code).' },
   { key: 'stone.builder.vite / rollup', type: 'object', desc: 'Escape hatches: raw Vite (frontend) or Rollup (backend) config.' }
 ]
 

@@ -67,6 +67,14 @@ export default defineConfig({
   ssg: { routes: ['/', '/about'] }
 })`}</Code>
 
+        <Callout kind='important' title='Two different defineConfig'>
+          This one comes from <code>@stone-js/cli</code> and configures the <strong>build</strong>.
+          There is another <code>defineConfig</code>, from <code>@stone-js/core</code>, which
+          configures your <strong>application</strong> onto the Blueprint. Same name, unrelated jobs:
+          check which package an example imports from. See
+          {' '}<a href='/docs/essentials/configuration'>Configuration</a>.
+        </Callout>
+
         <Callout kind='note' title='.stone and dist are derived'>
           <code>.stone/</code> (codegen) and <code>dist/</code> (build output) are produced from your
           source and regenerated on every build. Never edit or commit them; deleting them is safe.
