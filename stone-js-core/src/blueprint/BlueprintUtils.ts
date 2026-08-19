@@ -18,6 +18,7 @@ import {
 import { IncomingEvent } from '../events/IncomingEvent'
 import { MetadataSymbol } from '../decorators/Metadata'
 import { CONFIGURATION_KEY } from '../decorators/constants'
+import { ConfigurationOptions } from '../decorators/Configuration'
 import { AppConfig, stoneBlueprint, StoneBlueprint } from '../options/StoneBlueprint'
 import { isFunctionModule, isNotEmpty, isObjectLikeModule, mergeBlueprints } from '../utils'
 
@@ -153,7 +154,8 @@ export function defineStoneApp<U extends IncomingEvent = IncomingEvent> (
 export function defineConfig (
   configuration:
   | FunctionalConfiguration
-  | Partial<Record<'configure' | 'afterConfigure', FunctionalConfiguration>>
+  | Partial<Record<'configure' | 'afterConfigure', FunctionalConfiguration>>,
+  options: ConfigurationOptions = {}
 ): ConfigurationClass {
   let configure: FunctionalConfiguration
   let afterConfigure: FunctionalConfiguration
@@ -169,7 +171,7 @@ export function defineConfig (
   return class implements IConfiguration {
     configure = configure
     afterConfigure = afterConfigure
-    static readonly [MetadataSymbol] = { [CONFIGURATION_KEY]: { isClass: true } }
+    static readonly [MetadataSymbol] = { [CONFIGURATION_KEY]: { ...options, isClass: true } }
   }
 }
 

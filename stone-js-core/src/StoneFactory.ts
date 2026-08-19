@@ -18,6 +18,7 @@ import { BlueprintBuilder } from './blueprint/BlueprintBuilder'
 import { isConstructor, isEmpty, isNotEmpty, isStoneBlueprint } from './utils'
 import { hasBlueprint, getBlueprint, hasMetadata, getMetadata } from './decorators/Metadata'
 import { CONFIG_MIDDLEWARE_KEY, CONFIGURATION_KEY, LIFECYCLE_HOOK_KEY } from './decorators/constants'
+import { ConfigurationOptions, ConfigurationPriority } from './decorators/Configuration'
 
 /**
  * Stone factory options.
@@ -125,6 +126,8 @@ export class StoneFactory<TEvent extends IncomingEvent, UResponse extends Outgoi
    * @returns A promise that resolves when the blueprint is initialized.
    */
   private async initBlueprint (): Promise<void> {
+    const configurations: ClassType[] = []
+
     for (const module of this.modules) {
       if (isStoneBlueprint(module)) { // Blueprint configuration (Plain object)
         this.blueprint.set(module)
@@ -143,10 +146,40 @@ export class StoneFactory<TEvent extends IncomingEvent, UResponse extends Outgoi
         }
 
         if (hasMetadata(module, CONFIGURATION_KEY)) { // From @Configuration()
-          await this.initBlueprintConfigurations(module)
+          configurations.push(module)
         }
       }
     }
+
+    // Configurations run last, in `priority` order (ascending, declaration order for ties). Running
+    // them after the loop is what makes explicit configuration win over the implicit configuration
+    // of decorators, whatever order the modules were discovered in; sorting them lets a
+    // configuration depend on values another one loads (a remote overlay before what reads it).
+    for (const module of this.sortByConfigurationPriority(configurations)) {
+      await this.initBlueprintConfigurations(module)
+    }
+  }
+
+  /**
+   * Order configuration modules by their declared `priority`, ascending.
+   *
+   * A stable sort on the declaration index keeps equal priorities in discovery order, so
+   * configurations that declare nothing behave exactly as they did before this option existed.
+   *
+   * @param modules - The configuration modules, in discovery order.
+   * @returns The same modules, ordered for execution.
+   */
+  private sortByConfigurationPriority (modules: ClassType[]): ClassType[] {
+    return modules
+      .map((module, index) => ({
+        module,
+        index,
+        priority: getMetadata<ClassType, ConfigurationOptions>(
+          module, CONFIGURATION_KEY, {}
+        ).priority ?? ConfigurationPriority.App
+      }))
+      .sort((a, b) => a.priority === b.priority ? a.index - b.index : a.priority - b.priority)
+      .map(({ module }) => module)
   }
 
   /**

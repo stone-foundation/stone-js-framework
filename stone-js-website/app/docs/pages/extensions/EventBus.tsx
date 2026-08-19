@@ -17,9 +17,8 @@ export class Application {}
 
 const IMP = `
 import { defineConfig } from '@stone-js/core'
-import { defineEventBus } from '@stone-js/event-bus'
 
-export const AppConfig = defineConfig(defineEventBus({
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.eventBus', {
   default: 'cloud',
   targets: ['local', 'cloud'],
   connections: [{ name: 'cloud', driver: 'eventbridge', source: 'my.app' }]

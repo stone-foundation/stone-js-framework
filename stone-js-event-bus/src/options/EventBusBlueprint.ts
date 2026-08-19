@@ -36,13 +36,3 @@ export const eventBusBlueprint: EventBusBlueprint = {
     ]
   }
 }
-
-/**
- * Build an event-bus configuration fragment imperatively (for `defineConfig`/meta-modules).
- *
- * @param config - The event-bus configuration.
- * @returns A partial app config carrying the `eventBus` bucket.
- */
-export function defineEventBus (config: EventBusModuleConfig): { eventBus: EventBusModuleConfig } {
-  return { eventBus: config }
-}

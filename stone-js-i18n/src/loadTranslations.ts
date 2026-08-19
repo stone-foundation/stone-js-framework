@@ -20,9 +20,10 @@ export type GlobLoaders = Record<string, () => Promise<unknown>>
  *
  * @example
  * ```typescript
- * import { defineI18n, loadTranslations } from '@stone-js/i18n'
+ * import { defineConfig } from '@stone-js/core'
+ * import { loadTranslations } from '@stone-js/i18n'
  *
- * export const AppConfig = defineConfig(defineI18n({
+ * export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.i18n', {
  *   locales: ['en', 'fr'],
  *   resources: loadTranslations(import.meta.glob('/app/i18n/**\/*.{json,ts,js,yaml,yml}', { eager: true }))
  * }))
@@ -31,14 +32,51 @@ export type GlobLoaders = Record<string, () => Promise<unknown>>
 export function loadTranslations (modules: GlobModules): Resources {
   const resources: Resources = {}
 
-  for (const [path, mod] of Object.entries(modules)) {
+  // Sorted, so a build is reproducible and a conflicting key always resolves the same way.
+  for (const [path, mod] of Object.entries(modules).sort(([a], [b]) => a.localeCompare(b))) {
     const parsed = parseResourcePath(path)
     if (parsed === undefined) { continue }
     resources[parsed.locale] ??= {}
-    resources[parsed.locale][parsed.namespace] = normalizeTranslations(mod)
+    // Merged, not assigned: several catalogues legitimately carry the same locale and namespace, for
+    // instance a shared `app/i18n/fr/common.json` and a module's `app/modules/billing/i18n/fr/common.json`.
+    // Assigning would silently drop all but the last one.
+    resources[parsed.locale][parsed.namespace] = deepMerge(
+      resources[parsed.locale][parsed.namespace],
+      normalizeTranslations(mod)
+    )
   }
 
   return resources
+}
+
+/**
+ * Merge two translation bundles, recursing into nested key groups.
+ *
+ * The incoming bundle wins on a conflicting leaf, which combined with the sorted iteration above
+ * makes the outcome deterministic and gives the deeper (more specific) catalogue the final word.
+ *
+ * @param target - The bundle merged into, possibly absent.
+ * @param source - The incoming bundle.
+ * @returns The merged bundle.
+ */
+export function deepMerge (target: Translations | undefined, source: Translations): Translations {
+  if (target === undefined) { return source }
+
+  const merged: Translations = { ...target }
+
+  for (const [key, value] of Object.entries(source)) {
+    const existing = merged[key]
+    merged[key] = isPlainObject(existing) && isPlainObject(value)
+      ? deepMerge(existing as Translations, value as Translations)
+      : value
+  }
+
+  return merged
+}
+
+/** Whether a value is a plain object, and so a nested key group rather than a leaf. */
+function isPlainObject (value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 /**
