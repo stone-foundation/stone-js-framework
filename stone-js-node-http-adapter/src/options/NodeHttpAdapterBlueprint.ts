@@ -3,6 +3,7 @@ import { nodeHttpAdapterResolver } from '../resolvers'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import { NodeHttpErrorHandler } from '../NodeHttpErrorHandler'
 import { metaAdapterBlueprintMiddleware } from '../middleware/BlueprintMiddleware'
+import { MetaBodyEventMiddleware } from '../middleware/BodyEventMiddleware'
 import { MetaIncomingEventMiddleware } from '../middleware/IncomingEventMiddleware'
 import { MetaServerResponseMiddleware } from '../middleware/ServerResponseMiddleware'
 import { NodeHttpServer, NodeServerOptions, ServerMiddleware } from '../declarations'
@@ -97,6 +98,11 @@ export const nodeHttpAdapterBlueprint: NodeHttpAdapterBlueprint = {
         platform: NODE_HTTP_PLATFORM,
         middleware: [
           MetaIncomingEventMiddleware,
+          // Parsing the body of a POST is the default expectation, not an option. Leaving it opt-in
+          // meant an app worked locally and received an empty body in production the day one of its
+          // adapters was missing the line, with no error anywhere. It is inert when there is no body,
+          // and both middlewares only contribute to the same event builder, so order is free.
+          MetaBodyEventMiddleware,
           MetaServerResponseMiddleware
         ],
         resolver: nodeHttpAdapterResolver,

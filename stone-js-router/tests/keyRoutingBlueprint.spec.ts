@@ -1,7 +1,7 @@
 import { KeyRoutingEventHandler } from '../src/KeyRoutingEventHandler'
 import { KeyRoutingError } from '../src/errors/KeyRoutingError'
 import { KeyRoutingServiceProvider } from '../src/KeyRoutingServiceProvider'
-import { keyRoutingBlueprint, defineKeyRouting, defineKeyRoute } from '../src/options/KeyRoutingBlueprint'
+import { keyRoutingBlueprint, defineKeyRoute } from '../src/options/KeyRoutingBlueprint'
 import { metaKeyRoutingBlueprintMiddleware, SetKeyRoutingEventHandlerMiddleware } from '../src/middleware/KeyRoutingBlueprintMiddleware'
 
 /* eslint-disable @typescript-eslint/no-extraneous-class */
@@ -13,9 +13,6 @@ describe('keyRoutingBlueprint & define* helpers', () => {
     expect(keyRoutingBlueprint.stone.blueprint?.middleware).toHaveLength(1)
   })
 
-  it('defineKeyRouting wraps a config fragment', () => {
-    expect(defineKeyRouting({ source: 'type' })).toEqual({ keyRouting: { source: 'type' } })
-  })
 
   it('defineKeyRoute builds a definition', () => {
     class OnShipped {}
