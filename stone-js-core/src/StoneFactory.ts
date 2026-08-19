@@ -155,9 +155,31 @@ export class StoneFactory<TEvent extends IncomingEvent, UResponse extends Outgoi
     // them after the loop is what makes explicit configuration win over the implicit configuration
     // of decorators, whatever order the modules were discovered in; sorting them lets a
     // configuration depend on values another one loads (a remote overlay before what reads it).
-    for (const module of sortByConfigurationPriority(configurations)) {
+    for (const module of this.sortByConfigurationPriority(configurations)) {
       await this.initBlueprintConfigurations(module)
     }
+  }
+
+  /**
+   * Order configuration modules by their declared `priority`, ascending.
+   *
+   * A stable sort on the declaration index keeps equal priorities in discovery order, so
+   * configurations that declare nothing behave exactly as they did before this option existed.
+   *
+   * @param modules - The configuration modules, in discovery order.
+   * @returns The same modules, ordered for execution.
+   */
+  private sortByConfigurationPriority (modules: ClassType[]): ClassType[] {
+    return modules
+      .map((module, index) => ({
+        module,
+        index,
+        priority: getMetadata<ClassType, ConfigurationOptions>(
+          module, CONFIGURATION_KEY, {}
+        ).priority ?? ConfigurationPriority.App
+      }))
+      .sort((a, b) => a.priority === b.priority ? a.index - b.index : a.priority - b.priority)
+      .map(({ module }) => module)
   }
 
   /**
@@ -249,26 +271,4 @@ export function stoneApp<
   V extends OutgoingResponse
 > (options: StoneFactoryOptions = {}): StoneFactory<U, V> {
   return StoneFactory.create(options)
-}
-
-/**
- * Order configuration modules by their declared `priority`, ascending.
- *
- * A stable sort on the declaration index keeps equal priorities in discovery order, so
- * configurations that declare nothing behave exactly as they did before this option existed.
- *
- * @param modules - The configuration modules, in discovery order.
- * @returns The same modules, ordered for execution.
- */
-function sortByConfigurationPriority (modules: ClassType[]): ClassType[] {
-  return modules
-    .map((module, index) => ({
-      module,
-      index,
-      priority: getMetadata<ClassType, ConfigurationOptions>(
-        module, CONFIGURATION_KEY, {}
-      ).priority ?? ConfigurationPriority.App
-    }))
-    .sort((a, b) => a.priority === b.priority ? a.index - b.index : a.priority - b.priority)
-    .map(({ module }) => module)
 }
