@@ -1,6 +1,7 @@
 import bytes from 'bytes'
 import typeIs from 'type-is'
 import { Mock } from 'vitest'
+import { Logger } from '@stone-js/core'
 import { isMultipart, getCharset } from '@stone-js/http-core'
 import { AwsLambdaHttpAdapterContext } from '../../src/declarations'
 import { BodyEventMiddleware } from '../../src/middleware/BodyEventMiddleware'
@@ -10,6 +11,11 @@ vi.mock('bytes')
 vi.mock('type-is')
 vi.mock('raw-body')
 vi.mock('co-body')
+
+vi.mock('@stone-js/core', async (importOriginal) => {
+  const actual: any = await importOriginal()
+  return { ...actual, Logger: { getInstance: vi.fn(() => ({ debug: vi.fn() })) } }
+})
 
 vi.mock('@stone-js/http-core', () => ({
   getType: vi.fn(),
@@ -79,6 +85,32 @@ describe('BodyEventMiddleware', () => {
 
     expect(mockContext.incomingEventBuilder?.add).toHaveBeenCalledWith('body', {})
     expect(next).toHaveBeenCalledWith(mockContext)
+  })
+
+  it('logs when a payload is present but unreadable for lack of headers', async () => {
+    // API Gateway sends `content-length` in practice, but a synthetic event or a hand-rolled invoker
+    // may not, and the payload would then vanish without a trace.
+    vi.mocked(isMultipart).mockReturnValue(false)
+    vi.mocked(typeIs.hasBody).mockReturnValue(false)
+    const debug = vi.fn()
+    vi.mocked(Logger.getInstance).mockReturnValue({ debug } as any)
+    ;(mockContext.rawEvent as any).body = '{"vote":1}'
+
+    await middleware.handle(mockContext, next)
+
+    expect(debug).toHaveBeenCalledWith(expect.stringContaining('content-length'))
+    expect(mockContext.incomingEventBuilder?.add).toHaveBeenCalledWith('body', {})
+  })
+
+  it('stays silent when there is genuinely no payload', async () => {
+    vi.mocked(isMultipart).mockReturnValue(false)
+    vi.mocked(typeIs.hasBody).mockReturnValue(false)
+    const debug = vi.fn()
+    vi.mocked(Logger.getInstance).mockReturnValue({ debug } as any)
+
+    await middleware.handle(mockContext, next)
+
+    expect(debug).not.toHaveBeenCalled()
   })
 
   it('should parse and add empty object body to the event builder on invalid type', async () => {

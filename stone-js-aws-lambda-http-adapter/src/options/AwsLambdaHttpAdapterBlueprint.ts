@@ -3,6 +3,7 @@ import { AWS_LAMBDA_HTTP_PLATFORM } from '../constants'
 import { awsLambdaHttpAdapterResolver } from '../resolvers'
 import { AwsLambdaHttpErrorHandler } from '../AwsLambdaHttpErrorHandler'
 import { metaAdapterBlueprintMiddleware } from '../middleware/BlueprintMiddleware'
+import { MetaBodyEventMiddleware } from '../middleware/BodyEventMiddleware'
 import { MetaIncomingEventMiddleware } from '../middleware/IncomingEventMiddleware'
 import { MetaServerResponseMiddleware } from '../middleware/ServerResponseMiddleware'
 import { AwsLambdaContext, AwsLambdaHttpEvent, RawHttpResponse } from '../declarations'
@@ -68,6 +69,9 @@ export const awsLambdaHttpAdapterBlueprint: AwsLambdaHttpAdapterBlueprint = {
         platform: AWS_LAMBDA_HTTP_PLATFORM,
         middleware: [
           MetaIncomingEventMiddleware,
+          // On by default: an app whose Lambda adapter was missing this line worked locally and
+          // received an empty body in production, with no error anywhere. Inert without a body.
+          MetaBodyEventMiddleware,
           MetaServerResponseMiddleware
         ],
         resolver: awsLambdaHttpAdapterResolver,
