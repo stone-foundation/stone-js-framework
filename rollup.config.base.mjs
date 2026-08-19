@@ -1,5 +1,5 @@
-import { join, relative } from 'node:path'
-import { writeFileSync, readdirSync, statSync, existsSync } from 'node:fs'
+import { dirname, join, relative, resolve } from 'node:path'
+import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs'
 
 /**
  * Shared Rollup build for @stone-js/* packages.
@@ -39,8 +39,52 @@ export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [] } = 
         .map((p) => relative(dir, p).replaceAll('\\', '/'))
         .filter((r) => r !== out && !exclude.some((e) => r.startsWith(e)))
         .sort()
-      const lines = rels.map((r) => `export * from './${r.replace(/\.d\.ts$/, '')}';`)
+      // `.js`, not extensionless: this package is ESM with an `exports` map, and a consumer on
+      // `moduleResolution: nodenext` cannot resolve a relative import without its extension. It
+      // silently sees no exports at all, and TypeScript reports the misleading "has no exported
+      // member" instead of "module not resolved".
+      const lines = rels.map((r) => `export * from './${r.replace(/\.d\.ts$/, '')}.js';`)
       writeFileSync(join(dir, out), lines.join('\n') + '\n', 'utf-8')
+    }
+  }
+}
+
+/**
+ * Add the `.js` extension to every relative specifier inside the emitted declarations.
+ *
+ * `tsc` reproduces what the sources wrote, and the sources are bundler-style (extensionless). In a
+ * published ESM package that makes every per-file declaration unresolvable under
+ * `moduleResolution: nodenext`, so the types of everything they re-export vanish. Directory
+ * specifiers resolve to `<dir>/index.js`; anything already carrying an extension is left alone, and
+ * so is a specifier pointing at neither a sibling declaration nor a directory barrel.
+ *
+ * @param {{ dir?: string }} [options]
+ */
+export function dtsExtensions ({ dir = 'dist' } = {}) {
+  return {
+    name: 'stone-dts-extensions',
+    writeBundle () {
+      if (!existsSync(dir)) return
+
+      const walk = (d) => readdirSync(d).flatMap((name) => {
+        const p = join(d, name)
+        return statSync(p).isDirectory() ? walk(p) : [p]
+      })
+
+      for (const file of walk(dir).filter((p) => p.endsWith('.d.ts'))) {
+        const source = readFileSync(file, 'utf-8')
+        const patched = source.replace(
+          /((?:from|import|export)\s*\(?\s*)'(\.[^']*)'/g,
+          (match, head, specifier) => {
+            if (/\.(js|mjs|cjs|jsx|json|css)$/.test(specifier)) return match
+            const target = resolve(dirname(file), specifier)
+            if (existsSync(`${target}.d.ts`)) return `${head}'${specifier}.js'`
+            if (existsSync(join(target, 'index.d.ts'))) return `${head}'${specifier}/index.js'`
+            return match
+          }
+        )
+        if (patched !== source) writeFileSync(file, patched, 'utf-8')
+      }
     }
   }
 }
@@ -92,6 +136,7 @@ export function createRollupConfig (p) {
       json: b.json ?? (p.json !== undefined),
       multiEntry: b.multiEntry ?? true
     })
+    plugins.push(dtsExtensions())
     if (b.barrel !== undefined) plugins.push(dtsBarrel(b.barrel))
     return {
       input: b.input,

@@ -1,7 +1,6 @@
 import { Config } from '@libsql/client'
 import { getString } from '@stone-js/env'
-import { CORSHeadersMiddleware } from '@stone-js/http-core'
-import { Configuration, defineBlueprintMiddleware, IBlueprint, IConfiguration, LogLevel, Promiseable } from '@stone-js/core'
+import { Configuration, IBlueprint, IConfiguration, LogLevel, Promiseable } from '@stone-js/core'
 
 /**
  * User Implicit Configuration
@@ -23,7 +22,6 @@ export class AppConfiguration implements IConfiguration {
       .set('stone.logger.level', LogLevel.INFO)
       .set('stone.http.cors.preflightStop', true)
       .set('stone.http.cors.allowedHeaders', ['*'])
-      .set(defineBlueprintMiddleware(CORSHeadersMiddleware))
   }
 
   /**

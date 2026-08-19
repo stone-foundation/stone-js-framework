@@ -1,4 +1,4 @@
-import { Telemetry } from '../src/Telemetry'
+import { TelemetryManager } from '../src/TelemetryManager'
 import { TelemetryRecord, TelemetryExporter } from '../src/declarations'
 
 const makeExporter = (): { exporter: TelemetryExporter, records: TelemetryRecord[], flush: any } => {
@@ -7,16 +7,16 @@ const makeExporter = (): { exporter: TelemetryExporter, records: TelemetryRecord
   return { records, flush, exporter: { export: (r) => { records.push(r) }, flush } }
 }
 
-describe('Telemetry', () => {
+describe('TelemetryManager', () => {
   it('is enabled by default and disabled on request', () => {
-    expect(Telemetry.create().isEnabled()).toBe(true)
-    expect(Telemetry.create({ enabled: false }).isEnabled()).toBe(false)
+    expect(TelemetryManager.create().isEnabled()).toBe(true)
+    expect(TelemetryManager.create({ enabled: false }).isEnabled()).toBe(false)
   })
 
   it('records a successful span with duration and attributes', () => {
     const { exporter, records } = makeExporter()
     let t = 100
-    const telemetry = Telemetry.create({ exporter, serviceName: 'svc', now: () => t })
+    const telemetry = TelemetryManager.create({ exporter, serviceName: 'svc', now: () => t })
 
     const span = telemetry.startSpan('op', { a: 1 })
     span.setAttribute('b', 2).setAttributes({ c: 3 })
@@ -31,7 +31,7 @@ describe('Telemetry', () => {
 
   it('infers error status when an error is recorded', () => {
     const { exporter, records } = makeExporter()
-    const telemetry = Telemetry.create({ exporter, now: () => 0 })
+    const telemetry = TelemetryManager.create({ exporter, now: () => 0 })
     const span = telemetry.startSpan('op')
     span.recordError(new Error('boom'))
     span.end()
@@ -41,7 +41,7 @@ describe('Telemetry', () => {
 
   it('only emits a span once even if end is called twice', () => {
     const { exporter, records } = makeExporter()
-    const telemetry = Telemetry.create({ exporter, now: () => 0 })
+    const telemetry = TelemetryManager.create({ exporter, now: () => 0 })
     const span = telemetry.startSpan('op')
     span.end('ok')
     span.end('error')
@@ -51,7 +51,7 @@ describe('Telemetry', () => {
 
   it('emits counters (default and custom value) and gauges', () => {
     const { exporter, records } = makeExporter()
-    const telemetry = Telemetry.create({ exporter, now: () => 0 })
+    const telemetry = TelemetryManager.create({ exporter, now: () => 0 })
     telemetry.counter('hits')
     telemetry.counter('hits', 5, { route: '/x' })
     telemetry.gauge('mem', 42)
@@ -65,7 +65,7 @@ describe('Telemetry', () => {
 
   it('does nothing when disabled (no-op span + no records)', () => {
     const { exporter, records } = makeExporter()
-    const telemetry = Telemetry.create({ enabled: false, exporter, now: () => 0 })
+    const telemetry = TelemetryManager.create({ enabled: false, exporter, now: () => 0 })
     const span = telemetry.startSpan('op')
     span.setAttribute('a', 1).setAttributes({ b: 2 }).recordError(new Error('x')).end()
     telemetry.counter('c')
@@ -75,20 +75,20 @@ describe('Telemetry', () => {
 
   it('flushes the exporter, and tolerates an exporter without flush', async () => {
     const { exporter, flush } = makeExporter()
-    await Telemetry.create({ exporter, now: () => 0 }).flush()
+    await TelemetryManager.create({ exporter, now: () => 0 }).flush()
     expect(flush).toHaveBeenCalled()
 
-    await expect(Telemetry.create({ exporter: { export: () => {} }, now: () => 0 }).flush()).resolves.toBeUndefined()
+    await expect(TelemetryManager.create({ exporter: { export: () => {} }, now: () => 0 }).flush()).resolves.toBeUndefined()
   })
 
   it('never throws when the exporter fails', () => {
-    const telemetry = Telemetry.create({ now: () => 0, exporter: { export: () => { throw new Error('exporter down') } } })
+    const telemetry = TelemetryManager.create({ now: () => 0, exporter: { export: () => { throw new Error('exporter down') } } })
     expect(() => telemetry.counter('x')).not.toThrow()
   })
 
   it('falls back to the console exporter and Date.now when not provided', () => {
     const spy = vi.spyOn(console, 'log').mockImplementation(() => {})
-    const telemetry = Telemetry.create({ serviceName: 'svc' })
+    const telemetry = TelemetryManager.create({ serviceName: 'svc' })
     telemetry.counter('boot')
     expect(spy).toHaveBeenCalled()
     spy.mockRestore()

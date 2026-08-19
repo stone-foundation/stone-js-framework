@@ -259,4 +259,4 @@ export class HandleCorsMiddleware {
 /**
  * Meta Middleware for processing CORS headers.
  */
-export const MetaHandleCorsMiddleware: MetaMiddleware = { module: HandleCorsMiddleware, isClass: true, global: true }
+export const MetaHandleCorsMiddleware: MetaMiddleware<IncomingHttpEvent, OutgoingHttpResponse> = { module: HandleCorsMiddleware, isClass: true, global: true }
