@@ -22,29 +22,46 @@ describe('readValidation', () => {
   })
 
   it('resolves a name against the registry, which is why routes can name a schema', () => {
-    expect(readValidation('createUser', { createUser: { body: NameSchema } })).toEqual({ body: NameSchema })
+    expect(readValidation('createUser', { schemas: { createUser: { body: NameSchema } } })).toEqual({ body: NameSchema })
   })
 
   it('reads a schema class by instantiating it at documentation time', () => {
     class CreateUser { rules (): any { return { body: NameSchema } } }
-    expect(readValidation('createUser', { createUser: CreateUser })).toEqual({ body: NameSchema })
+    expect(readValidation('createUser', { schemas: { createUser: CreateUser } })).toEqual({ body: NameSchema })
     expect(readValidation(new CreateUser())).toEqual({ body: NameSchema })
   })
 
-  it('skips a class whose rules need a service, rather than guessing', () => {
-    // A wrong contract is worse than a missing one, so it declines instead of inventing.
+  it('builds a class through the container, so rules() gets the services it asked for', () => {
+    // The complete case: booted inside the application, a schema whose rules need i18n contributes.
+    class NeedsI18n {
+      private readonly label: string
+      constructor ({ i18n }: any) { this.label = i18n.t('validation.name') }
+      rules (): any { return { body: { validate: () => ({ success: true as const, value: this.label }) } } }
+    }
+
+    const read: any = readValidation('x', {
+      schemas: { x: NeedsI18n },
+      resolve: (Class: any) => new Class({ i18n: { t: () => 'translated' } })
+    })
+
+    expect(read.body.validate().value).toBe('translated')
+  })
+
+  it('skips a class nothing could build, rather than guessing its shape', () => {
+    // Without a resolver, a class needing a service cannot be read. A wrong contract is worse than a
+    // missing one: inventing a shape makes a client be written against something that does not exist.
     class NeedsI18n {
       private readonly t: any
       constructor ({ i18n }: any) { this.t = i18n.t }
       rules (): any { return { body: NameSchema } }
     }
-    expect(readValidation('x', { x: NeedsI18n })).toBeUndefined()
+    expect(readValidation('x', { schemas: { x: NeedsI18n } })).toBeUndefined()
   })
 
   it('reads nothing out of nothing', () => {
     expect(readValidation(undefined)).toBeUndefined()
     expect(readValidation(null)).toBeUndefined()
-    expect(readValidation('missing', {})).toBeUndefined()
+    expect(readValidation('missing', { schemas: {} })).toBeUndefined()
   })
 })
 

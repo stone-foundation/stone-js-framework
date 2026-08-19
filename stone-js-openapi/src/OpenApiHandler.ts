@@ -83,7 +83,11 @@ export class OpenApiHandler {
     if (options.deriveFromRouter !== false) {
       generator.addRouter(this.router(), {
         schemas: this.blueprint.get<Record<string, unknown>>('stone.validation.schemas', {}),
-        securityScheme: options.securityScheme
+        securityScheme: options.securityScheme,
+        // The request already runs inside the container, so a schema class whose rules need i18n
+        // gets i18n, and the contract is complete rather than partial. Reaching here at all means a
+        // router was resolved, so a container exists.
+        resolve: (target: any) => this.container?.resolve?.(target, true)
       })
     }
 

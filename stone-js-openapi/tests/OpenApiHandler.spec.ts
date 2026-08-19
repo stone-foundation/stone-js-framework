@@ -140,3 +140,33 @@ describe('OpenApiHandler: deriving from the router', () => {
     expect(document.paths['/x'].get.summary).toBe('x')
   })
 })
+
+describe('OpenApiHandler: schema classes at request time', () => {
+  it('builds a schema class through the container, so its rules get their services', () => {
+    // At request time the container is already up, so the served contract is as complete as the one
+    // the console command exports.
+    class NeedsI18n {
+      private readonly label: string
+      constructor ({ i18n }: any) { this.label = i18n.t('validation.name') }
+      rules (): any { return { body: { validate: () => ({ success: true as const, value: this.label }) } } }
+    }
+
+    const container: any = {
+      has: (key: string) => key === 'router',
+      make: () => ({ getRoutes: () => ({ getRoutes: () => [routeOf('/users', 'POST', { validation: 'createUser' })] }) }),
+      resolve: (Class: any) => new Class({ i18n: { t: () => 'translated' } })
+    }
+    const blueprint: any = {
+      get: (key: string, fallback?: unknown) => {
+        if (key === 'stone.openapi') return {}
+        if (key === 'stone.validation.schemas') return { createUser: NeedsI18n }
+        return fallback
+      }
+    }
+
+    const document: any = new OpenApiHandler({ container, blueprint }).spec(eventOf('http://localhost/openapi.json'))
+
+    expect(document.paths['/users'].post.requestBody).toBeDefined()
+  })
+})
+
