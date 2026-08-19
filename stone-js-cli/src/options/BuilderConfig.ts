@@ -5,6 +5,38 @@ import { StoneCliPlugin } from '../plugins/declarations'
 import { rollupBuildConfig, rollupBundleConfig } from '../server/rollup-config'
 
 /**
+ * Configuration for the test run, under `stone.builder.test`.
+ *
+ * Tests are a context like any other, so they are configured in the same file as the build: a project
+ * needs no second config file to keep in sync with the first.
+ */
+export interface TestConfig {
+  /**
+   * The files to treat as test suites.
+   * Defaults to `./tests/**` matching `.test.` / `.spec.` in js/ts, with or without JSX.
+   */
+  include?: string[]
+
+  /**
+   * The env file to load before the runner starts, so a value read at module load sees it.
+   * Defaults to `.env.test`. It takes precedence over `.env`, which is already loaded by then.
+   */
+  envFile?: string
+
+  /**
+   * The files `createTestApp()` discovers the application from.
+   * Defaults to whatever the build scans, which is the point: the suite boots what ships.
+   */
+  pattern?: string
+
+  /**
+   * Escape hatch: raw Vitest config, merged over the defaults, exactly as `vite` and `rollup` are.
+   * This is where a frontend project switches `environment` to `happy-dom` for component tests.
+   */
+  vitest?: Record<string, unknown>
+}
+
+/**
  * Configuration for automatically loading modules during buildtime.
  *
  * Specifies glob patterns to identify modules for transpilation.
@@ -102,6 +134,11 @@ export interface BuilderConfig {
    * Environment variable management configuration.
    */
   dotenv?: Partial<DotenvConfig>
+
+  /**
+   * The test run configuration.
+   */
+  test?: TestConfig
 
   /**
    * The HTTP server configuration for the application.
