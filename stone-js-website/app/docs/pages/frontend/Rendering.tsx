@@ -57,7 +57,7 @@ export class Rendering implements IPage<ReactIncomingEvent> {
         </Lead>
 
         <H2>Choosing a strategy</H2>
-        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+        <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   rendering: 'ssg'   // 'csr' | 'ssr' | 'ssg'
 })`}</Code>
         <PropsTable nameHeader='Strategy' rows={[
@@ -86,7 +86,7 @@ export class Rendering implements IPage<ReactIncomingEvent> {
           optional segment also yields the path without it. <code>ssg.routes</code> stays additive,
           for paths no declaration can produce.
         </p>
-        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+        <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   rendering: 'ssg',
   ssg: {
     // /:lang?/about  ->  /about, /en/about, /fr/about

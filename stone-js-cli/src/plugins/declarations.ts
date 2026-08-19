@@ -63,7 +63,7 @@ export interface StonePluginContext {
    *
    * The specifier is imported by the generated entry point and its exports are collected into
    * the app's `modules` (exactly like the user's own `app/**` modules), so a plugin can inject
-   * decorated classes, blueprints or `defineConfig(...)` meta-modules. Use a specifier that
+   * decorated classes, blueprints or `defineBuilderConfig(...)` meta-modules. Use a specifier that
    * resolves from `.stone/tmp` (a relative path like `./plugins/x.mjs`, or a bare package name).
    *
    * @param specifier - An import specifier resolvable from `.stone/tmp`.

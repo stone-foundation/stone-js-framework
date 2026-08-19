@@ -27,18 +27,18 @@ const DEEP_LAYOUT = `app/
     crm/contacts/i18n/fr/contact.json`
 
 const CUSTOM_LAYOUT = `// Catalogs named \`locales/\` instead of \`i18n/\`, anywhere under \`src\`
-export default defineConfig({ plugins: [i18nCliPlugin({ root: 'src', dirname: 'locales' })] })
+export default defineBuilderConfig({ plugins: [i18nCliPlugin({ root: 'src', dirname: 'locales' })] })
 
 // Full control, for a layout no convention describes
-export default defineConfig({ plugins: [i18nCliPlugin({ pattern: 'packages/*/translations/*/*.json' })] })`
+export default defineBuilderConfig({ plugins: [i18nCliPlugin({ pattern: 'packages/*/translations/*/*.json' })] })`
 
 const PLUGIN = `import { i18nCliPlugin } from '@stone-js/i18n/cli'
 
 // stone.config.mjs
-export default defineConfig({ plugins: [i18nCliPlugin()] })`
+export default defineBuilderConfig({ plugins: [i18nCliPlugin()] })`
 
 const LAZY = `// Lazy is the default. To bundle every locale eagerly instead:
-export default defineConfig({ plugins: [i18nCliPlugin({ lazy: false })] })`
+export default defineBuilderConfig({ plugins: [i18nCliPlugin({ lazy: false })] })`
 
 const MANUAL = `import { defineConfig } from '@stone-js/core'
 import { loadTranslations } from '@stone-js/i18n'

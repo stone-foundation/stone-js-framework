@@ -14,7 +14,7 @@ import { isSSR,
   isLazyViews,
   shouldBuild,
   getFileHash,
-  defineConfig,
+  defineBuilderConfig,
   isDeclarative,
   getEnvVariables,
   isTypescriptApp,
@@ -126,10 +126,10 @@ describe('utils: getFileHash', () => {
   })
 })
 
-describe('utils: defineConfig', () => {
+describe('utils: defineBuilderConfig', () => {
   it('should return the config as-is', () => {
     const config: any = { foo: 'bar' }
-    expect(defineConfig(config)).toBe(config)
+    expect(defineBuilderConfig(config)).toBe(config)
   })
 })
 

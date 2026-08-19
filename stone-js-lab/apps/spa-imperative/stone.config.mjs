@@ -1,8 +1,8 @@
-import { defineConfig } from '@stone-js/cli'
+import { defineBuilderConfig } from '@stone-js/cli'
 
 /**
  * Pin the rendering strategy to client-side rendering (SPA).
  */
-export default defineConfig({
+export default defineBuilderConfig({
   rendering: 'csr'
 })
