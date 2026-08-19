@@ -52,6 +52,25 @@ export class Authorization implements IPage<ReactIncomingEvent> {
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i @stone-js/authz`}</Code>
 
+        <H2>Enabling it</H2>
+        <p>
+          Enabled the way every Stone.js module is, with its decorator or with its blueprint. Either
+          one registers the authorization provider and the kernel middleware that builds the caller's abilities for each request.
+        </p>
+        <CodeTabs
+          file='app/Application.ts'
+          decl={`import { Authz } from '@stone-js/authz'
+import { StoneApp } from '@stone-js/core'
+
+@Authz()
+@StoneApp({ name: 'my-app' })
+export class Application {}`}
+          imp={`import { defineStoneApp } from '@stone-js/core'
+import { authzBlueprint } from '@stone-js/authz'
+
+export const Application = defineStoneApp({ name: 'my-app' }, [authzBlueprint])`}
+        />
+
         <H2>Declare abilities once</H2>
         <Principle
           principle={

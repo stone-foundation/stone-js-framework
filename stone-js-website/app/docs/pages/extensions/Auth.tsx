@@ -57,23 +57,40 @@ export class Auth implements IPage<ReactIncomingEvent> {
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i @stone-js/auth`}</Code>
 
+        <H2>Enabling it</H2>
+        <p>
+          Auth is enabled the way every Stone.js module is, with its decorator or with its blueprint.
+          Either one registers the service provider and the kernel middleware that verifies the Bearer
+          token carried by each request.
+        </p>
+        <CodeTabs
+          file='app/Application.ts'
+          decl={`import { Auth } from '@stone-js/auth'
+import { StoneApp } from '@stone-js/core'
+
+@Auth()
+@StoneApp({ name: 'my-app' })
+export class Application {}`}
+          imp={`import { defineStoneApp } from '@stone-js/core'
+import { authBlueprint } from '@stone-js/auth'
+
+export const Application = defineStoneApp({ name: 'my-app' }, [authBlueprint])`}
+        />
+
         <H2>Configure the signing strategy</H2>
         <p>
-          Auth is enabled from a <code>@Configuration()</code> that merges the auth blueprint (its
-          service provider and the kernel middleware that verifies the Bearer token) and sets how
-          tokens are signed and verified. Use a shared HMAC <code>secret</code> for symmetric JWT, or a
-          <code> publicKey</code>/<code>jwksUri</code> to verify tokens minted by an external identity
-          provider. Read secrets from the environment, never hard-code them.
+          Nothing is verified until you say how tokens are signed. Use a shared HMAC{' '}
+          <code>secret</code> for symmetric JWT, or a <code>publicKey</code>/<code>jwksUri</code> to
+          verify tokens minted by an external identity provider. Read secrets from the environment,
+          never hard-code them.
         </p>
         <Code file='app/configurations/AuthConfiguration.ts'>{`import { getString } from '@stone-js/env'
-import { authBlueprint } from '@stone-js/auth'
 import { Configuration, IBlueprint, IConfiguration } from '@stone-js/core'
 
 @Configuration()
 export class AuthConfiguration implements IConfiguration {
   configure (blueprint: IBlueprint): void {
     blueprint
-      .set(authBlueprint)                                    // provider + verify middleware
       .set('stone.auth.secret', getString('JWT_SECRET'))     // HMAC (HS256); or publicKey / jwksUri
       .set('stone.auth.issuer', 'https://your-issuer.example')
       .set('stone.auth.audience', 'your-api')

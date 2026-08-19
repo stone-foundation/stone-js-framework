@@ -69,7 +69,8 @@ export class NodeCli implements IPage<ReactIncomingEvent> {
 @NodeConsole()
 @StoneApp({ name: 'tasks' })
 export class Application {}`}
-          imp={`import { nodeConsoleAdapterBlueprint } from '@stone-js/node-cli-adapter'
+          imp={`import { defineStoneApp } from '@stone-js/core'
+import { nodeConsoleAdapterBlueprint } from '@stone-js/node-cli-adapter'
 
 export const App = defineStoneApp({ name: 'tasks' }, [nodeConsoleAdapterBlueprint])`}
         />

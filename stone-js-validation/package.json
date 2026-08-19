@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/validation",
   "version": "0.8.8",
-  "description": "Framework-agnostic input validation for Stone.js. Define a schema once (Zod, Valibot, ArkType — anything Standard Schema) and validate it identically on the backend and the frontend.",
+  "description": "Framework-agnostic input validation for Stone.js. Define a schema once (Zod, Valibot, ArkType \u2014 anything Standard Schema) and validate it identically on the backend and the frontend.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -87,5 +87,8 @@
       "describe",
       "beforeEach"
     ]
+  },
+  "dependencies": {
+    "@stone-js/config": "workspace:*"
   }
 }
