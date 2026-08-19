@@ -70,6 +70,32 @@ export function stubSource (names: string[]): string {
 }
 
 /**
+ * The names a module source declares, in either shape a bundler emits.
+ *
+ * Rollup ends a bundle with `export { a, b as c }`; a hand-written or differently-bundled module uses
+ * `export const a`. Both are read, so the stub is complete whichever produced the file.
+ *
+ * @param source - The module source.
+ * @returns The exported names, `default` excluded.
+ */
+export function parseExportNames (source: string): string[] {
+  const names = new Set<string>()
+
+  for (const match of source.matchAll(/export\s*\{([^}]*)\}/g)) {
+    for (const part of match[1].split(',')) {
+      const name = part.trim().split(/\s+as\s+/).pop()?.trim()
+      if (name !== undefined && /^[A-Za-z_$][\w$]*$/.test(name) && name !== 'default') { names.add(name) }
+    }
+  }
+
+  for (const match of source.matchAll(/export\s+(?:const|let|var|function|class)\s+([A-Za-z_$][\w$]*)/g)) {
+    names.add(match[1])
+  }
+
+  return [...names]
+}
+
+/**
  * The names a built package exports, read from its own bundle.
  *
  * Deterministic and complete: the stub declares exactly what the real module declares, so whatever
@@ -82,21 +108,7 @@ export function stubSource (names: string[]): string {
 export function exportedNames (pkg: string, resolveFrom: string = process.cwd()): string[] {
   try {
     const entry = createRequire(join(resolveFrom, 'noop.js')).resolve(pkg)
-    const source = readFileSync(entry, 'utf-8')
-    const names = new Set<string>()
-
-    for (const match of source.matchAll(/export\s*\{([^}]*)\}/g)) {
-      for (const part of match[1].split(',')) {
-        const name = part.trim().split(/\s+as\s+/).pop()?.trim()
-        if (name !== undefined && /^[A-Za-z_$][\w$]*$/.test(name) && name !== 'default') { names.add(name) }
-      }
-    }
-
-    for (const match of source.matchAll(/export\s+(?:const|let|var|function|class)\s+([A-Za-z_$][\w$]*)/g)) {
-      names.add(match[1])
-    }
-
-    return [...names]
+    return parseExportNames(readFileSync(entry, 'utf-8'))
   } catch {
     return []
   }
