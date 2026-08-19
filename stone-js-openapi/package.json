@@ -56,6 +56,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@stone-js/config": "workspace:*",
     "openapi-typescript": "^7.13.0",
     "zod-to-json-schema": "^3.24.1"
   },

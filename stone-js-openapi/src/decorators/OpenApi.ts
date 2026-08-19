@@ -1,6 +1,6 @@
-import { OpenApiConfig, OpenApiBlueprint, openApiBlueprint } from '../options/OpenApiBlueprint'
+import { cloneValue } from '@stone-js/config'
+import { OpenApiConfig, openApiBlueprint } from '../options/OpenApiBlueprint'
 import { addBlueprint, classDecoratorLegacyWrapper, ClassType } from '@stone-js/core'
-import { MetaOpenApiRoutesMiddleware } from '../middleware/OpenApiRoutesMiddleware'
 
 /**
  * Options for the `@OpenApi` decorator: the `stone.openapi` bucket, every key optional.
@@ -29,16 +29,12 @@ export interface OpenApiDecoratorOptions extends OpenApiConfig {}
  */
 export const OpenApi = <T extends ClassType = ClassType>(options: OpenApiDecoratorOptions = {}): ClassDecorator => {
   return classDecoratorLegacyWrapper<T>((target: T, context: ClassDecoratorContext<T>): undefined => {
-    // Rebuilt rather than referenced, so two decorated applications never share the same options
-    // object or middleware array. It registers the very same middleware constant the blueprint
-    // does, which is what keeps the two activation paths from drifting apart.
-    const blueprint: OpenApiBlueprint = {
-      stone: {
-        ...openApiBlueprint.stone,
-        openapi: { ...openApiBlueprint.stone.openapi, ...options },
-        blueprint: { middleware: [MetaOpenApiRoutesMiddleware] }
-      }
-    }
+    // The blueprint is the single source of truth for what the module declares; the decorator only
+    // overrides what it can, its options bucket. Cloning is what lets it: two decorated applications
+    // get their own copy instead of sharing the exported constant.
+    const blueprint = cloneValue(openApiBlueprint)
+
+    blueprint.stone.openapi = { ...blueprint.stone.openapi, ...options }
 
     addBlueprint(target, context, blueprint)
   })

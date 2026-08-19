@@ -1,7 +1,7 @@
 import { getBlueprint, hasBlueprint } from '@stone-js/core'
 import { OpenApi } from '../../src/decorators/OpenApi'
 import { openApiBlueprint } from '../../src/options/OpenApiBlueprint'
-import { MetaOpenApiRoutesMiddleware } from '../../src/middleware/OpenApiRoutesMiddleware'
+import { OpenApiRoutesMiddleware } from '../../src/middleware/OpenApiRoutesMiddleware'
 
 describe('@OpenApi', () => {
   it('is the declarative half of the pair, registering the same middleware as the blueprint', () => {
@@ -12,7 +12,11 @@ describe('@OpenApi', () => {
     expect(hasBlueprint(Application)).toBe(true)
     const blueprint: any = getBlueprint(Application, { stone: {} })
 
-    expect(blueprint.stone.blueprint.middleware).toEqual([MetaOpenApiRoutesMiddleware])
+    // The blueprint is deep-cloned, so the meta entry is a copy; what must survive is the module it
+    // points at, which is what the builder runs.
+    expect(blueprint.stone.blueprint.middleware).toEqual([
+      expect.objectContaining({ module: OpenApiRoutesMiddleware })
+    ])
     expect(blueprint.stone.openapi).toEqual({})
   })
 

@@ -2996,6 +2996,9 @@ importers:
 
   stone-js-openapi:
     dependencies:
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
       openapi-typescript:
         specifier: ^7.13.0
         version: 7.13.0(typescript@5.9.3)
