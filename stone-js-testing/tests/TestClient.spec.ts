@@ -37,3 +37,13 @@ describe('TestClient response readers', () => {
     expect(JSON.parse(JSON.stringify(response))).toEqual({ statusCode: 200, content: '{}' })
   })
 })
+
+describe('TestClient on an app that produced nothing', () => {
+  it('hands back what it got, so the assertion names the real problem', async () => {
+    // Attaching readers to a non-object would throw inside the harness, and the test author would
+    // read a `defineProperty` error instead of "your app returned nothing".
+    const client = new TestClient(async () => undefined as any)
+
+    await expect(client.send({} as any)).resolves.toBeUndefined()
+  })
+})

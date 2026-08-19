@@ -36,6 +36,10 @@ export type TestResponse<ResponseType extends OutgoingResponse = OutgoingRespons
  * @returns The same response, with `json()`, `text()` and `html()`.
  */
 function withReaders<ResponseType extends OutgoingResponse> (response: ResponseType): TestResponse<ResponseType> {
+  // An app that produced nothing is a failing assertion, not a crash in the harness: attaching to a
+  // non-object would throw here and bury the real reason under a `defineProperty` error.
+  if (typeof response !== 'object' || response === null) { return response as TestResponse<ResponseType> }
+
   const text = (): string => {
     const content = response.content
     return typeof content === 'string' ? content : JSON.stringify(content)
