@@ -1,6 +1,5 @@
 import { JSX } from 'react'
 import { Browser } from '@stone-js/browser-adapter'
-import { NodeConsole } from '@stone-js/node-cli-adapter'
 import { ILogger, LogLevel, Promiseable, StoneApp } from '@stone-js/core'
 import { ReactIncomingEvent, UseReact, HeadContext, IPage, PageHeadContext, PageRenderContext } from '@stone-js/use-react'
 
@@ -15,7 +14,6 @@ import { ReactIncomingEvent, UseReact, HeadContext, IPage, PageHeadContext, Page
  */
 @Browser()
 @UseReact()
-@NodeConsole()
 @StoneApp({ logger: { level: LogLevel.INFO } })
 export class Application implements IPage<ReactIncomingEvent> {
   /**

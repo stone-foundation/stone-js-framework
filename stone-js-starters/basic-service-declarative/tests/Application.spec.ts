@@ -1,61 +1,28 @@
-import { Application } from '../app/Application'
-import { ILogger, IncomingEvent } from '@stone-js/core'
+import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
 
-// We must mock decorators to lighten the test environment
-vi.mock(import("@stone-js/core"), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    StoneApp: vi.fn(() => vi.fn()),
-  }
-})
-
-// We must mock decorators to lighten the test environment
-vi.mock(import("@stone-js/node-cli-adapter"), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    NodeConsole: vi.fn(() => vi.fn()),
-  }
-})
-
-// We must mock decorators to lighten the test environment
-vi.mock(import("@stone-js/node-http-adapter"), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    NodeHttp: vi.fn(() => vi.fn()),
-  }
-})
-
+/**
+ * The whole application, booted in memory and asked a real question.
+ *
+ * Nothing is mocked and nothing is listed: `createTestApp()` discovers `app/**`, and the event goes
+ * through the same kernel production runs. If this passes the application works; if it fails the
+ * application is broken. That is the only kind of test worth shipping in a starter — the previous one
+ * stubbed out the framework's own decorators, which meant it could pass while nothing worked.
+ */
 describe('Application', () => {
-  let app: Application
-  let mockedLogger: ILogger
+  it('answers the caller', async () => {
+    const app = await createTestApp()
 
-  beforeEach(() => {
-    mockedLogger = {
-      info: vi.fn(),
-    } as unknown as ILogger
+    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/?name=Ada' }))
 
-    app = new Application({ logger: mockedLogger })
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toMatchObject({ message: expect.stringContaining('Ada') })
   })
 
-  it('should create an application instance', () => {
-    // Assert
-    expect(app).toBeInstanceOf(Application)
-  })
+  it('answers when nobody says who they are', async () => {
+    const app = await createTestApp()
 
-  it('should handle incoming events', () => {
-    // Arrange
-    const expectedMessage = 'Hello World! Welcome to Stone.js.'
-    const event = { get: () => 'World' } as unknown as IncomingEvent
+    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/' }))
 
-    // Act
-    const response = app.handle(event)
-
-    // Assert
-    expect(response.message).toBe(expectedMessage)
-    expect(response.framework.name).toBe('Stone.js')
-    expect(mockedLogger.info).toHaveBeenCalledWith(expectedMessage)
+    expect(response.statusCode).toBe(200)
   })
 })

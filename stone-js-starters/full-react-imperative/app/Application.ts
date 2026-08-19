@@ -1,7 +1,6 @@
 import { routerBlueprint } from '@stone-js/router'
 import { browserAdapterBlueprint } from '@stone-js/browser-adapter'
 import { nodeHttpAdapterBlueprint } from '@stone-js/node-http-adapter'
-import { nodeConsoleAdapterBlueprint } from '@stone-js/node-cli-adapter'
 import { defineStoneReactApp, ReactLifecycleHookType } from '@stone-js/use-react'
 import { defineHookListeners, IBlueprint, IContainer, ILogger, LogLevel, Promiseable } from '@stone-js/core'
 
@@ -61,8 +60,7 @@ export const MyStoneReactApp = defineStoneReactApp(
   [
     routerBlueprint,
     browserAdapterBlueprint,
-    nodeHttpAdapterBlueprint,
-    nodeConsoleAdapterBlueprint
+    nodeHttpAdapterBlueprint
   ]
 )
 

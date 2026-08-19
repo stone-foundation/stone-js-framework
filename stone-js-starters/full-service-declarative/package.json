@@ -17,8 +17,8 @@
     "db:setup": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "test": "vitest run",
-    "test:cvg": "npm run test -- --coverage"
+    "test": "stone test",
+    "test:cvg": "stone test --coverage"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0",
@@ -31,7 +31,7 @@
     "@stone-js/pipeline": "^0.8.9",
     "@stone-js/router": "^0.8.9",
     "bcryptjs": "^3.0.2",
-    "drizzle-orm": "^0.44.7",
+    "drizzle-orm": "^0.45.2",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
@@ -39,6 +39,7 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.27.0",
     "@stone-js/cli": "^0.8.9",
+    "@stone-js/testing": "^0.8.9",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^24.0.3",
     "@vitest/coverage-v8": "^3.0.9",
