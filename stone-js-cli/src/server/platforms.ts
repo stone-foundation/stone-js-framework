@@ -29,7 +29,8 @@ export const ADAPTER_PLATFORMS: Record<string, string> = {
 /**
  * Every platform a targeted build can be asked for.
  */
-export const KNOWN_PLATFORMS: string[] = [...new Set(Object.values(ADAPTER_PLATFORMS))].sort()
+export const KNOWN_PLATFORMS: string[] = [...new Set(Object.values(ADAPTER_PLATFORMS))]
+  .sort((a, b) => a.localeCompare(b))
 
 /**
  * The adapter packages that must stay out of an artefact built for one platform.
