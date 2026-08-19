@@ -47,7 +47,7 @@ stone export         # emit static output (SSG)`}</Code>
           stacked, and the routes to pre-render are derived from the pages your app already declares.
           <code> stone.config.mjs</code> exists only for when you want to pin something.
         </p>
-        <Code file='stone.config.mjs' lang='js'>{`import { defineConfig } from '@stone-js/cli'
+        <Code file='stone.config.mjs' lang='js'>{`import { defineBuilderConfig } from '@stone-js/cli'
 
 // Zero-config: rendering is deduced from adapters, SSG is a build flag
 // (stone build --ssg), and pre-rendered routes come from your own pages.
@@ -75,7 +75,7 @@ export default defineConfig({})`}</Code>
           Every option stays reachable. Pin the rendering mode, add extra static paths (e.g. expanded
           parameterized routes), or tune the bundlers, all optional.
         </p>
-        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+        <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   builder: {
     target: 'react',                 // 'react' | 'service' (usually deduced)
     rendering: 'ssg',                // pin instead of using the --ssg flag

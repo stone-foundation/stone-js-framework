@@ -199,7 +199,7 @@ export function setupProcessSignalHandlers (getServerProcess: () => ChildProcess
  * @param config - The user configuration.
  * @returns The user configuration.
  */
-export const defineConfig = (config: Partial<BuilderConfig>): Partial<BuilderConfig> => config
+export const defineBuilderConfig = (config: Partial<BuilderConfig>): Partial<BuilderConfig> => config
 
 /**
  * Get the Stone.js builder configuration.

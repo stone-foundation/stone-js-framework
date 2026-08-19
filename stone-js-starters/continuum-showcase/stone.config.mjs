@@ -1,4 +1,4 @@
-import { defineConfig } from '@stone-js/cli'
+import { defineBuilderConfig } from '@stone-js/cli'
 
 /**
  * Build configuration for the showcase.
@@ -6,7 +6,7 @@ import { defineConfig } from '@stone-js/cli'
  * - `target: 'react'` + `rendering: 'ssr'` exercises the server-rendered head pipeline.
  * - `assets` enables the `@img` / `@css` / `@assets` import aliases used in components.
  */
-export default defineConfig({
+export default defineBuilderConfig({
   target: 'react',
   rendering: 'ssr',
   assets: {
