@@ -167,6 +167,8 @@ export class StateStore<State extends Record<string, any> = Record<string, any>>
     this.state = next
     // Iterated over a copy: a listener that unsubscribes (or subscribes) while being notified must not
     // change what this round notifies, which is how a set-mutation-during-iteration bug hides.
-    for (const listener of [...this.listeners]) { listener(next, previous) }
+    const listeners = [...this.listeners]
+
+    for (const listener of listeners) { listener(next, previous) }
   }
 }

@@ -64,6 +64,9 @@ interface DynamicSegment {
   end: number
 }
 
+/** What may appear in a segment name. */
+const NAME_CHAR = /\w/
+
 /** Marks an optional segment left out of a combination, which is not the same as an empty value. */
 const ABSENT = Symbol('absent')
 
@@ -82,36 +85,72 @@ type Choice = Record<string, string | typeof ABSENT>
  */
 function parseDynamicSegments (path: string): DynamicSegment[] {
   const segments: DynamicSegment[] = []
-  const nameChars = /[A-Za-z0-9_]/
+  let index = 0
 
-  for (let i = 0; i < path.length; i++) {
-    if (path[i] !== ':') { continue }
+  while (index < path.length) {
+    if (path[index] !== ':') { index++; continue }
 
-    let cursor = i + 1
-    while (cursor < path.length && nameChars.test(path[cursor])) { cursor++ }
-    const name = path.slice(i + 1, cursor)
-    if (name.length === 0) { continue }
+    const segment = readSegment(path, index)
 
-    let pattern: string | undefined
-    if (path[cursor] === '(') {
-      let depth = 0
-      const open = cursor
-      while (cursor < path.length) {
-        if (path[cursor] === '(') { depth++ }
-        if (path[cursor] === ')') { depth--; if (depth === 0) { cursor++; break } }
-        cursor++
-      }
-      pattern = path.slice(open + 1, cursor - 1)
-    }
+    if (segment === undefined) { index++; continue }
 
-    const optional = path[cursor] === '?'
-    if (optional) { cursor++ }
-
-    segments.push({ name, pattern, optional, start: i, end: cursor })
-    i = cursor - 1
+    segments.push(segment)
+    index = segment.end
   }
 
   return segments
+}
+
+/**
+ * Read one dynamic segment starting at a colon.
+ *
+ * @param path - The route path.
+ * @param start - The colon's index.
+ * @returns The segment, or `undefined` when the colon names nothing.
+ */
+function readSegment (path: string, start: number): DynamicSegment | undefined {
+  let cursor = start + 1
+
+  while (cursor < path.length && NAME_CHAR.test(path[cursor])) { cursor++ }
+
+  const name = path.slice(start + 1, cursor)
+  if (name.length === 0) { return undefined }
+
+  const constraint = readConstraint(path, cursor)
+  cursor = constraint.end
+
+  const optional = path[cursor] === '?'
+  if (optional) { cursor++ }
+
+  return { name, pattern: constraint.pattern, optional, start, end: cursor }
+}
+
+/**
+ * Read a segment's constraint, if it has one.
+ *
+ * Parentheses are matched by depth rather than by a pattern, because a constraint legitimately
+ * contains them (`:lang((en|fr)-CA)`) and a lazy match would cut it in the wrong place.
+ *
+ * @param path - The route path.
+ * @param start - Where the constraint would begin.
+ * @returns The constraint and where it ends.
+ */
+function readConstraint (path: string, start: number): { pattern?: string, end: number } {
+  if (path[start] !== '(') { return { end: start } }
+
+  let depth = 0
+  let cursor = start
+
+  while (cursor < path.length) {
+    if (path[cursor] === '(') { depth++ }
+    if (path[cursor] === ')') {
+      depth--
+      if (depth === 0) { cursor++; break }
+    }
+    cursor++
+  }
+
+  return { pattern: path.slice(start + 1, cursor - 1), end: cursor }
 }
 
 /**
@@ -136,9 +175,17 @@ function substitute (
   for (const segment of segments) {
     const before = path.slice(cursor, segment.start)
     const value = choice[segment.name]
-    out += value === ABSENT
-      ? (before.endsWith('/') ? before.slice(0, -1) : before)
-      : before + value
+
+    if (value !== ABSENT) {
+      out += before + value
+    } else if (before.endsWith('/')) {
+      // An absent optional segment takes its leading slash with it, so `/:lang?/about` becomes
+      // `/about` rather than `//about`.
+      out += before.slice(0, -1)
+    } else {
+      out += before
+    }
+
     cursor = segment.end
   }
 

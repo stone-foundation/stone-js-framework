@@ -28,6 +28,18 @@ export interface OpenapiCliPluginOptions {
 }
 
 /**
+ * Read a declared source: a URL is fetched, a path is read from disk.
+ *
+ * @param source - A URL, an absolute path, or a path relative to the project.
+ * @returns The parsed document.
+ */
+async function readSource (source: string): Promise<unknown> {
+  if (/^https?:\/\//.test(source)) { return await fetchJson(source) }
+
+  return readJsonFile(path.isAbsolute(source) ? source : path.resolve(process.cwd(), source))
+}
+
+/**
  * Generate TypeScript type definitions from an OpenAPI schema object.
  *
  * This is build-time code only. It pulls in `openapi-typescript` dynamically so
@@ -103,9 +115,7 @@ export function openapiCliPlugin (options: OpenapiCliPluginOptions = {}): StoneC
       let schema: unknown
 
       if (source !== undefined) {
-        schema = /^https?:\/\//.test(source)
-          ? await fetchJson(source)
-          : readJsonFile(path.isAbsolute(source) ? source : path.resolve(process.cwd(), source))
+        schema = await readSource(source)
       } else {
         const specPath = context.buildPath('openapi.json')
         try {
