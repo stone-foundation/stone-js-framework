@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/store",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "View-engine-agnostic universal store for Stone.js, with SSR hydration built in.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

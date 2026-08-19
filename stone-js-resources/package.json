@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/resources",
-  "version": "0.8.8",
-  "description": "Framework-agnostic API resources for Stone.js. Shape what your domain exposes \u2014 sparse fieldsets, conditional fields, includes and envelopes \u2014 decoupled from controllers, the same on backend and frontend.",
+  "version": "0.8.9",
+  "description": "Framework-agnostic API resources for Stone.js. Shape what your domain exposes — sparse fieldsets, conditional fields, includes and envelopes — decoupled from controllers, the same on backend and frontend.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "repository": {
