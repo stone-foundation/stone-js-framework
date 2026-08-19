@@ -44,7 +44,7 @@ export const GenerateEntryPointFileMiddleware = async (
     ? readFileSync(basePath(userFilename), 'utf-8')
     : reactClientEntryPointTemplate(pattern)
 
-  content = applyPluginInjections(content, context.blueprint).replace('%pattern%', pattern)
+  content = applyPluginInjections(content, context.blueprint, buildPath()).replace('%pattern%', pattern)
 
   outputFileSync(buildPath(filename), content, 'utf-8')
 
@@ -153,7 +153,7 @@ export const GenerateReactConsoleFileMiddleware = async (
     ? readFileSync(basePath(userFilename), 'utf-8')
     : reactConsoleEntryPointTemplate(pattern)
 
-  content = applyPluginInjections(content, context.blueprint).replace('%pattern%', pattern)
+  content = applyPluginInjections(content, context.blueprint, buildPath()).replace('%pattern%', pattern)
 
   outputFileSync(buildPath(filename), content, 'utf-8')
 

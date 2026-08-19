@@ -57,7 +57,7 @@ export const GenerateDevServerFileMiddleware = async (
   const raw = existsSync(basePath('server.mjs'))
     ? readFileSync(basePath('server.mjs'), 'utf-8').replace("'%printUrls%'", String(printUrls))
     : serverIndexFile(printUrls)
-  const content = applyPluginInjections(raw, context.blueprint)
+  const content = applyPluginInjections(raw, context.blueprint, buildPath())
 
   outputFileSync(buildPath('server.mjs'), content, 'utf-8')
 
@@ -82,7 +82,7 @@ export const GenerateConsoleFileMiddleware = async (
   const raw = existsSync(basePath('console.mjs'))
     ? readFileSync(basePath('console.mjs'), 'utf-8')
     : consoleIndexFile()
-  const content = applyPluginInjections(raw, context.blueprint)
+  const content = applyPluginInjections(raw, context.blueprint, buildPath())
 
   setCache(pattern)
   outputFileSync(buildPath('console.mjs'), content, 'utf-8')

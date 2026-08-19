@@ -100,9 +100,46 @@ export class Application {}`}</Code>
           { name: 'stone_providers', type: '()', desc: 'The service providers.' },
           { name: 'stone_kernel', type: '()', desc: 'The kernel pipeline: event handler, middleware, error handlers.' },
           { name: 'stone_key_routes', type: '()', desc: 'Key-routing definitions (event-bus / realtime).' },
-          { name: 'stone_config', type: 'key?', desc: 'A resolved stone.* value by dotted key (secrets redacted).' }
+          { name: 'stone_config', type: 'key?', desc: 'A resolved stone.* value by dotted key (secrets redacted).' },
+          { name: 'stone_describes', type: '()', desc: 'Which application the answers describe, and how the server knows.' }
         ]} />
         <Aphorism>The agent reads the app the way the framework does: one blueprint, one source of truth.</Aphorism>
+
+        <H3>Which application, exactly</H3>
+        <p>
+          <code>stone mcp</code> is a console command, so a blueprint it resolves itself is the one a
+          {' '}<strong>console</strong> boot produces: its adapters, its response type and every
+          platform-conditional contribution belong to a different application than the one you run
+          under <code>stone dev</code>. Answering from it without saying so is how an agent ends up
+          confidently describing an app that does not exist.
+        </p>
+        <p>
+          So the running application publishes its own truth, and the <strong>build</strong> arranges
+          it — not your application. Introspection is a development concern: this package ships a CLI
+          plugin, the CLI auto-discovers it from your direct dependencies, and on a development build
+          it injects a hook that writes the resolved configuration to
+          {' '}<code>.stone/app-context.json</code>. Your app never imports this module, and a
+          production build carries none of it.
+        </p>
+        <Code file='terminal' lang='bash'>{'npm i -D @stone-js/mcp-dev'}</Code>
+        <p>
+          Run <code>stone dev</code> once and the agent sees the real thing: the platform you actually
+          run, your adapters, your resolved config. Until then the server answers from its own boot and
+          names, through <code>stone_describes</code>, which of its answers not to trust. Opt out with
+          {' '}<code>mcpDev: {'{'} publishContext: false {'}'}</code>, which generates nothing at all
+          rather than shipping code that decides not to run.
+        </p>
+        <Callout kind='future' title='A file, not a dev endpoint'>
+          The Blueprint is the setup dimension: assembled once before the first event, then read. So
+          publishing it at boot is not a snapshot of something moving, it <em>is</em> the value — which
+          means no port to discover, no route added to your application, no token to protect, and it
+          works for a CLI or an edge context that has no HTTP surface at all. What genuinely moves at
+          run time is a different question, and will get a different tool.
+        </Callout>
+        <p>
+          Publishing is on outside production and off in it, since nothing there reads it. Override it
+          either way with <code>mcpDev: {'{'} publishContext: true {'}'}</code>.
+        </p>
 
         <H2>Your own tools</H2>
         <p>

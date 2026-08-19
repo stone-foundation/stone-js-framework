@@ -1,5 +1,6 @@
 import { McpDevOptions } from '../declarations'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
+import { PublishAppContextHook } from '../hooks/PublishAppContextHook'
 import { metaMcpDevBlueprintMiddleware } from '../middleware/BlueprintMiddleware'
 
 /**
@@ -33,10 +34,16 @@ export const mcpDevBlueprint: McpDevBlueprint = {
     blueprint: {
       middleware: metaMcpDevBlueprintMiddleware
     },
+    // The app half of this module: whichever platform the application runs as, it leaves its resolved
+    // configuration where the MCP server can read it. The command half registers itself on the
+    // console platform; one activation covers both, because they are two halves of one job.
+    lifecycleHooks: {
+      onStart: [PublishAppContextHook]
+    },
     mcpDev: {
       tools: []
     }
-  }
+  } as unknown as McpDevAppConfig
 }
 
 /**
@@ -51,7 +58,10 @@ export function defineMcpDev (options: McpDevOptions = {}): McpDevBlueprint {
       blueprint: {
         middleware: metaMcpDevBlueprintMiddleware
       },
+      lifecycleHooks: {
+        onStart: [PublishAppContextHook]
+      },
       mcpDev: options
-    }
+    } as unknown as McpDevAppConfig
   }
 }
