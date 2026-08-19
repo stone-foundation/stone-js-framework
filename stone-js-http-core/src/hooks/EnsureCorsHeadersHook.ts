@@ -40,10 +40,17 @@ export const EnsureCorsHeadersHook = async ({
     return
   }
 
-  // Apply CORS handling, using an existing response or creating a default response if none exists
+  // Apply CORS handling to the response the kernel already produced, and synthesize one ONLY when
+  // there is none, which is the whole point of this hook: a failure upstream of the kernel leaves
+  // nothing to answer with. `next` used to always build a fresh 500, so a perfectly successful
+  // request had its response discarded here and replaced by an empty 500 (`content: undefined`,
+  // `prepared: false`). Every adapter's ServerResponseMiddleware happens to copy the real response
+  // into the raw builder before this hook runs, and `addIf` below will not overwrite it, so the
+  // wire response survived by luck; anything reading `context.outgoingResponse` afterwards (a later
+  // hook, `onTerminate`, an adapter that builds its response here) saw the empty 500 instead.
   context.outgoingResponse = await (new HandleCorsMiddleware({ blueprint })).handle(
     context.incomingEvent,
-    () => OutgoingHttpResponse.create({ statusCode: 500 })
+    () => context.outgoingResponse ?? OutgoingHttpResponse.create({ statusCode: 500 })
   )
 
   // Update the raw response with CORS headers and appropriate status code

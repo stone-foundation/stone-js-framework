@@ -37,13 +37,3 @@ export const realtimeBlueprint: RealtimeBlueprint = {
     ]
   }
 }
-
-/**
- * Build a realtime configuration fragment imperatively (for `defineConfig`/meta-modules).
- *
- * @param config - The realtime configuration.
- * @returns A partial app config carrying the `realtime` bucket.
- */
-export function defineRealtime (config: RealtimeModuleConfig): { realtime: RealtimeModuleConfig } {
-  return { realtime: config }
-}

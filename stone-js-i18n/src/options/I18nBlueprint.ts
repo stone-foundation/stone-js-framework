@@ -45,22 +45,3 @@ export const i18nBlueprint: I18nBlueprint = {
     }
   }
 }
-
-/**
- * Build an i18n configuration fragment imperatively (for `defineConfig`/meta-modules).
- *
- * @param config - The i18n configuration.
- * @returns A partial app config carrying the `i18n` bucket.
- *
- * @example
- * ```typescript
- * export const AppConfig = defineConfig(defineI18n({
- *   locale: 'en',
- *   locales: ['en', 'fr'],
- *   fallbackLocale: 'en'
- * }))
- * ```
- */
-export function defineI18n (config: I18nModuleConfig): { i18n: I18nModuleConfig } {
-  return { i18n: config }
-}

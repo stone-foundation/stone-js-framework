@@ -43,18 +43,34 @@ export const spec = OpenApiGenerator
 
 ## Serving the contract
 
-One line and the contract serves itself, at `/openapi.json` with an explorer at `/docs`:
+One line and the contract serves itself, at `/openapi.json` with an explorer at `/docs`. Enable it
+the way every Stone.js module is enabled, with its decorator or with its blueprint:
 
 ```ts
+import { OpenApi } from '@stone-js/openapi'
+import { StoneApp } from '@stone-js/core'
+
+@OpenApi({ info: { title: 'Tasks', version: '1.0.0' } })
+@StoneApp({ name: 'my-app' })
+export class Application {}
+```
+
+```ts
+import { defineStoneApp } from '@stone-js/core'
 import { openApiBlueprint } from '@stone-js/openapi'
 
-// From a @Configuration (or defineConfig):
-blueprint
-  .set(openApiBlueprint)
-  .set('stone.openapi.info', { title: 'Tasks', version: '1.0.0' })
-  .set('stone.openapi.routes', [
+export const Application = defineStoneApp(handler, { name: 'my-app' }, [openApiBlueprint])
+```
+
+Configure it afterwards from a `@Configuration` class or `defineConfig`, under `stone.openapi`:
+
+```ts
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.openapi', {
+  info: { title: 'Tasks', version: '1.0.0' },
+  routes: [
     { path: '/tasks', method: 'get', openapi: { summary: 'List tasks' } }
-  ])
+  ]
+}))
 ```
 
 Everything under `stone.openapi` is optional:

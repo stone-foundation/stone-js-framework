@@ -181,6 +181,30 @@ describe('Pipeline Class', () => {
     expect(modules).toEqual([pipe2, pipe1])
   })
 
+  it('runs a module once when it is registered twice', async () => {
+    // The list-level dedupe above is the mechanism; this is the guarantee callers depend on. An
+    // application that passes a middleware its adapter already provides must not run it twice, and
+    // for a middleware that consumes a stream (a request body) running twice hangs or yields empty.
+    let runs = 0
+    const spy = {
+      module: class {
+        async handle (context: unknown, next: (c: unknown) => Promise<unknown>): Promise<unknown> {
+          runs++
+          return await next(context)
+        }
+      },
+      isClass: true
+    }
+
+    await Pipeline
+      .create<any, any>({ resolver: (meta: any) => new meta.module() })
+      .send({})
+      .through(spy, spy)
+      .then((v: unknown) => v)
+
+    expect(runs).toBe(1)
+  })
+
   it('should append new pipes via .pipe() without losing previous ones', () => {
     const pipe1 = vi.fn()
     const pipe2 = vi.fn()

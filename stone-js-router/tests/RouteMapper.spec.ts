@@ -103,9 +103,64 @@ describe('RouteMapper', () => {
       name: 'users.show',
       path: '/api/users/:id',
       method: GET,
-      middleware: ['log', 'auth'],
+      // Parent first: the group encloses the route, so its middleware runs before the route's.
+      middleware: ['auth', 'log'],
       excludeMiddleware: ['log'],
       rules: { id: /^\d+$/ }
+    }))
+  })
+
+  it('runs a group guard before a route validator (the 401-before-422 case)', () => {
+    const mapper = RouteMapper.create(options)
+
+    // Measured on a pilot project: an anonymous request with an invalid body answered 422 with
+    // field-level details, describing the expected body of a protected surface to a caller the
+    // group's guard should have rejected with 401 first.
+    mapper.toRoutes([{
+      name: 'manage',
+      path: '/manage/notes',
+      handler: { module: UserController },
+      middleware: ['actorContext', 'requireUser'],
+      children: [{
+        name: 'create',
+        method: POST,
+        path: '/',
+        handler: { action: 'create' },
+        middleware: ['validateBody']
+      }]
+    }])
+
+    expect(Route.create).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'manage.create',
+      middleware: ['actorContext', 'requireUser', 'validateBody']
+    }))
+  })
+
+  it('keeps the group order across two nesting levels', () => {
+    const mapper = RouteMapper.create(options)
+
+    mapper.toRoutes([{
+      name: 'v1',
+      path: '/v1',
+      handler: { module: UserController },
+      middleware: ['outer'],
+      children: [{
+        name: 'notes',
+        path: '/notes',
+        middleware: ['inner'],
+        children: [{
+          name: 'show',
+          method: GET,
+          path: '/:id',
+          handler: { action: 'show' },
+          middleware: ['route']
+        }]
+      }]
+    }])
+
+    expect(Route.create).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'v1.notes.show',
+      middleware: ['outer', 'inner', 'route']
     }))
   })
 

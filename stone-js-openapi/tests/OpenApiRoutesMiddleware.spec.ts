@@ -1,5 +1,6 @@
 import { OpenApiHandler } from '../src/OpenApiHandler'
-import { openApiBlueprint, OpenApiBlueprintMiddleware } from '../src/options/OpenApiBlueprint'
+import { openApiBlueprint } from '../src/options/OpenApiBlueprint'
+import { MetaOpenApiRoutesMiddleware, OpenApiRoutesMiddleware } from '../src/middleware/OpenApiRoutesMiddleware'
 
 /** A blueprint stub carrying only what the middleware touches: `get` and the appending `add`. */
 const blueprintStub = (openapi: Record<string, unknown>): any => {
@@ -14,7 +15,7 @@ const blueprintStub = (openapi: Record<string, unknown>): any => {
 
 const runMiddleware = async (openapi: Record<string, unknown>): Promise<any> => {
   const blueprint = blueprintStub(openapi)
-  return await OpenApiBlueprintMiddleware(
+  return await OpenApiRoutesMiddleware(
     { blueprint, modules: [] } as any,
     (async (context: any) => context.blueprint) as any
   )
@@ -23,7 +24,20 @@ const runMiddleware = async (openapi: Record<string, unknown>): Promise<any> => 
 describe('openApiBlueprint', () => {
   it('is a single opt-in line, like the other module blueprints', () => {
     expect(openApiBlueprint.stone.openapi).toEqual({})
-    expect(openApiBlueprint.stone.blueprint?.middleware).toHaveLength(1)
+    expect(openApiBlueprint.stone.blueprint?.middleware).toEqual([MetaOpenApiRoutesMiddleware])
+  })
+
+  it('passes the blueprint through, as a build-phase middleware must', async () => {
+    // A build-phase middleware that returns its own value replaces the blueprint for every later
+    // phase, which is exactly how an application ends up reading its configuration off something
+    // that is not a blueprint. This one returns what `next` returned.
+    const blueprint = blueprintStub({})
+    const returned = await OpenApiRoutesMiddleware(
+      { blueprint, modules: [] } as any,
+      (async (context: any) => context.blueprint) as any
+    )
+
+    expect(returned).toBe(blueprint)
   })
 
   it('registers both routes with zero configuration', async () => {
