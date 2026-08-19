@@ -8,6 +8,7 @@ vi.mock('@stone-js/filesystem', () => ({ distPath: () => defaultOutDir }))
 
 import {
   collectStaticTargets,
+  expandPath,
   targetToFilePath,
   writePrerendered,
   runSsg
@@ -33,6 +34,140 @@ describe('collectStaticTargets', () => {
     ])
     // Both aliases of the first route; only the static alias of the second.
     expect(targets.map((t) => t.path)).toEqual(['/', '/home', '/docs'])
+  })
+
+  it('reports what it could not expand instead of dropping it silently', () => {
+    // The silent hole is the real defect: a site pre-renders a fraction of itself and nothing says
+    // so. The message has to name what would fix it.
+    const onSkipped = vi.fn()
+
+    collectStaticTargets([{ path: '/blog/:slug' }, { path: '/:lang/about' }], { onSkipped })
+
+    expect(onSkipped).toHaveBeenCalledOnce()
+    expect(onSkipped.mock.calls[0][0]).toEqual({
+      paths: ['/blog/:slug', '/:lang/about'],
+      segments: ['slug', 'lang']
+    })
+  })
+
+  it('ignores a definition whose path is not a string', () => {
+    // Definitions come from a scan, so a malformed one must be skipped rather than crash the build.
+    expect(collectStaticTargets([{ path: [undefined as any, '/ok'] }])).toEqual([{ path: '/ok' }])
+  })
+
+  it('says nothing when there is nothing to report', () => {
+    const onSkipped = vi.fn()
+
+    collectStaticTargets([{ path: '/about' }], { onSkipped })
+
+    expect(onSkipped).not.toHaveBeenCalled()
+  })
+
+  it('recovers a whole site from a parameterized global prefix', () => {
+    // The case that motivated this: one `:lang` on the router prefix lands on every route, so
+    // every route was skipped and auto-discovery collapsed from all pages to none.
+    const targets = collectStaticTargets(
+      [{ path: '/:lang(en|fr)?/' }, { path: '/:lang(en|fr)?/about' }, { path: '/:lang(en|fr)?/blog' }],
+      { params: { lang: ['en', 'fr'] } }
+    )
+
+    expect(targets.map((t) => t.path)).toEqual([
+      '/', '/en', '/fr',
+      '/about', '/en/about', '/fr/about',
+      '/blog', '/en/blog', '/fr/blog'
+    ])
+  })
+})
+
+describe('expandPath', () => {
+  it('substitutes a required segment', () => {
+    const { targets } = expandPath('/plans/:tier', { tier: ['free', 'pro'] })
+
+    expect(targets).toEqual([
+      { path: '/plans/free', params: { tier: 'free' } },
+      { path: '/plans/pro', params: { tier: 'pro' } }
+    ])
+  })
+
+  it('an optional segment also yields the path without it, canonical form first', () => {
+    // This single detail reproduces the whole "bare path plus prefixed twins" grid that localized
+    // sites were rebuilding by hand.
+    const { targets } = expandPath('/:lang?/about', { lang: ['en', 'fr'] })
+
+    expect(targets.map((t) => t.path)).toEqual(['/about', '/en/about', '/fr/about'])
+    // The bare form carries no value for the segment it left out.
+    expect(targets[0].params).toBeUndefined()
+    expect(targets[1].params).toEqual({ lang: 'en' })
+  })
+
+  it('reduces an optional segment at the root to the root itself', () => {
+    const { targets } = expandPath('/:lang?', { lang: ['en'] })
+
+    expect(targets.map((t) => t.path)).toEqual(['/', '/en'])
+  })
+
+  it('combines several segments as a cartesian product', () => {
+    const { targets } = expandPath('/:lang?/blog/:slug', { lang: ['en', 'fr'], slug: ['a', 'b'] })
+
+    expect(targets.map((t) => t.path)).toEqual([
+      '/blog/a', '/blog/b', '/en/blog/a', '/en/blog/b', '/fr/blog/a', '/fr/blog/b'
+    ])
+  })
+
+  it('keeps one segment consistent with itself when a path repeats it', () => {
+    const { targets } = expandPath('/:lang/x/:lang', { lang: ['en', 'fr'] })
+
+    expect(targets.map((t) => t.path)).toEqual(['/en/x/en', '/fr/x/fr'])
+  })
+
+  it('reads a constraint containing parentheses without cutting it short', () => {
+    const { targets } = expandPath('/:lang((en|fr)-CA)?/about', { lang: ['en-CA', 'fr-CA'] })
+
+    expect(targets.map((t) => t.path)).toEqual(['/about', '/en-CA/about', '/fr-CA/about'])
+  })
+
+  it('fails the build when a declared value contradicts the segment constraint', () => {
+    // Pre-rendering a path the router can never match would ship a page nobody can reach, so a
+    // typo has to stop the build rather than produce dead HTML.
+    expect(() => expandPath('/:lang(en|fr)/about', { lang: ['en', 'de'] }))
+      .toThrow(/"de".*:lang.*does not match.*en\|fr/)
+  })
+
+  it('leaves a path alone when its segments have no declared values', () => {
+    const { targets, missing } = expandPath('/blog/:slug', { lang: ['en'] })
+
+    expect(targets).toEqual([])
+    expect(missing).toEqual(['slug'])
+  })
+
+  it('never expands a wildcard, and does not ask anyone to declare it', () => {
+    // There is no segment name to declare values for, so reporting it would be noise.
+    const { targets, missing } = expandPath('/files/*', { lang: ['en'] })
+
+    expect(targets).toEqual([])
+    expect(missing).toEqual([])
+  })
+
+  it('passes a static path straight through', () => {
+    expect(expandPath('/about', {})).toEqual({ targets: [{ path: '/about' }], missing: [] })
+  })
+
+  it('ignores a colon that names nothing', () => {
+    // `/a:/b` is not a segment: a bare colon has no name to declare values for.
+    expect(expandPath('/a:/b', {})).toEqual({ targets: [{ path: '/a:/b' }], missing: [] })
+  })
+
+  it('substitutes a segment that does not follow a slash', () => {
+    const { targets } = expandPath('/v:major', { major: ['1', '2'] })
+
+    expect(targets.map((t) => t.path)).toEqual(['/v1', '/v2'])
+  })
+
+  it('drops only the segment when an optional one is mid-word, not the path before it', () => {
+    // `/v:major?` absent must leave `/v`, not `''`: the leading slash belongs to the path here.
+    const { targets } = expandPath('/v:major?', { major: ['1'] })
+
+    expect(targets.map((t) => t.path)).toEqual(['/v', '/v1'])
   })
 })
 
