@@ -2653,6 +2653,9 @@ importers:
       '@stone-js/core':
         specifier: workspace:*
         version: link:../stone-js-core
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1

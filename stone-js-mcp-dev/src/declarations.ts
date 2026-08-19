@@ -1,3 +1,5 @@
+import type { ZodRawShape } from 'zod'
+
 /** A core architectural concept of Stone.js. */
 export interface Concept {
   /** Slug id (e.g. `continuum`). */
@@ -55,7 +57,14 @@ export interface KnowledgeBase {
 export interface McpToolDef {
   name: string
   description?: string
-  inputSchema?: Record<string, unknown>
+  /**
+   * The arguments the tool accepts, as a Zod shape (`{ query: z.string() }`).
+   *
+   * Required for any tool whose handler reads `args`: a tool that publishes no schema is advertised
+   * as taking none, and an MCP client drops the arguments before sending them, so the handler runs
+   * with `{}` and there is no error anywhere to say so.
+   */
+  inputSchema?: ZodRawShape
   handler: (args: Record<string, unknown>) => unknown
 }
 

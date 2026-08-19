@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { IBlueprint } from '@stone-js/core'
 import { McpToolDef } from './declarations'
 
@@ -170,6 +171,9 @@ export function createIntrospectionTools (blueprint: IBlueprint): McpToolDef[] {
     {
       name: 'stone_config',
       description: 'Read a resolved config value by dotted key under `stone.*` (secrets redacted). Omit `key` to list the top-level `stone` keys.',
+      inputSchema: {
+        key: z.string().optional().describe('A dotted key such as `stone.router`. Omit it to list the top-level `stone` keys instead.')
+      },
       handler: (args) => {
         const key = String(args.key ?? '')
         if (key.length === 0) { return Object.keys(blueprint.get<Record<string, unknown>>('stone', {})) }
