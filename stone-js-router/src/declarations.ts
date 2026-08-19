@@ -482,35 +482,15 @@ export interface RouteDefinition<
   redirect?: string | Record<string, unknown> | RouteDefinitionRedirect<IncomingEventType>
 
   /**
-   * The schema that validates this route's input, or the name of one registered in
-   * `stone.validation.schemas`.
+   * Anything a module declares on a route.
    *
-   * Read by `@stone-js/validation`, which validates before the handler runs and puts the **parsed**
-   * value in the event's metadata. The router itself does nothing with it: a route definition is
-   * the one place that describes a route, and each module reads the part it owns. That is also what
-   * lets `@stone-js/openapi` publish the request schema without being told twice.
+   * This is deliberate, and it is what keeps the router agnostic. A route definition is the one place
+   * that describes a route, so modules declare what they need on it, `validation`, `resource`,
+   * `auth`, `authz`, and each reads back the part it owns through `route.getOption(name)`. The router
+   * carries them and never interprets them, exactly as the kernel carries an event it knows nothing
+   * about. Naming those keys here would tie this package's public type to modules it does not depend
+   * on, and would buy nothing: an index signature already accepts every one of them.
    */
-  validation?: unknown
-
-  /**
-   * The resource that shapes this route's output, or the name of one registered in
-   * `stone.resources.registry`.
-   *
-   * Read by `@stone-js/resources`, which applies it to whatever the handler returned, so a handler
-   * can return its domain model and still expose only what the resource allows.
-   */
-  resource?: unknown
-
-  /**
-   * How this route authenticates, read by `@stone-js/auth`.
-   */
-  auth?: unknown
-
-  /**
-   * What this route authorizes, read by `@stone-js/authz`.
-   */
-  authz?: unknown
-
   [k: string]: unknown
 }
 
