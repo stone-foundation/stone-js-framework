@@ -23,6 +23,8 @@ Goal: complete the module catalogue and harden the developer experience with rea
   - `@stone-js/rate-limit`: edge-friendly request throttling
   - `@stone-js/notifications`: multi-channel notifications (email, SMS, push, in-app)
   - `@stone-js/mcp`: MCP as a native application ability, exposing your domain to AI agents through your application's own routes (dev-time tooling already exists with `@stone-js/mcp-dev`)
+  - `@stone-js/react-native-adapter` and `@stone-js/use-react-native`: mobile applications with React Native and Expo, the same domain and router collapsing to native screens
+- [ ] Module-owned builds: the CLI becomes a pure, module-agnostic orchestrator; each module ships its own build and bundle as a CLI plugin, and third-party libraries plug into the exact same mechanism
 - [ ] Full parity between the declarative (decorators) and imperative (`define*`) APIs across every module
 - [ ] CLI scaffolding aligned with the full module catalogue
 - [ ] Official starters using `@stone-js/testing` end to end
@@ -45,7 +47,7 @@ Goal: complete the module catalogue and harden the developer experience with rea
 A hardening period of a few weeks. Bug fixes only; every feature moves to post-1.0.
 
 - [ ] Documentation freeze and full review, including a migration guide from 0.8/0.9
-- [ ] Platform matrix validated with real deployments: Node 20/22/24, AWS Lambda, Azure Functions, GCP Cloud Functions, Alibaba FC, Tencent SCF, WinterCG edge runtimes, browser, CLI
+- [ ] Platform matrix validated with real deployments: Node 20/22/24, AWS Lambda, Azure Functions, GCP Cloud Functions, Alibaba FC, Tencent SCF, WinterCG edge runtimes, browser, CLI, React Native (Expo)
 - [ ] `SECURITY.md` and a responsible disclosure process
 - [ ] Zero known dependency vulnerabilities, quality gate green
 
@@ -53,7 +55,7 @@ A hardening period of a few weeks. Bug fixes only; every feature moves to post-1
 
 - [ ] Published stability contract: what semver covers, supported versions, release cadence
 - [ ] Lightweight governance: how contributors become triagers, reviewers, and maintainers
-- [ ] Launch announcement and a signature demo: the same domain running on Node, serverless, edge, and the browser, and exposed to AI agents
+- [ ] Launch announcement and a signature demo: the same domain running on Node, serverless, edge, the browser, and native mobile, and exposed to AI agents
 
 ---
 
