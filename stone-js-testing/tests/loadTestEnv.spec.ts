@@ -36,3 +36,11 @@ describe('loadTestEnv, on an empty file', () => {
     expect(loadTestEnv('tests/fixtures/.env.empty')).toEqual({})
   })
 })
+
+describe('loadTestEnv, on a path it cannot read', () => {
+  it('contributes nothing rather than failing the whole run', () => {
+    // A path that exists but is not a readable file (here, a directory bearing the name). Booting a
+    // test app must not die on it: the env file is an input, not a prerequisite.
+    expect(loadTestEnv('tests/fixtures')).toEqual({})
+  })
+})

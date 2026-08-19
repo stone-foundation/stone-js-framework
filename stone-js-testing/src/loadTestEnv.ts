@@ -24,5 +24,8 @@ export function loadTestEnv (envFile: string = DEFAULT_TEST_ENV_FILE): Record<st
   // A missing `.env.test` is the normal case for a project that does not need one, not a failure.
   if (!existsSync(path)) { return {} }
 
-  return config({ path, override: false, quiet: true }).parsed ?? {}
+  // Spread rather than a fallback: `dotenv` returns an empty `parsed` even for a path it could not
+  // read (a directory bearing the name, a permission error), so a branch here would be dead code.
+  // It also hands back a copy, so a caller cannot mutate what dotenv holds.
+  return { ...config({ path, override: false, quiet: true }).parsed }
 }
