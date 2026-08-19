@@ -117,4 +117,36 @@ describe('EnsureCorsHeadersHook', () => {
     await EnsureCorsHeadersHook({ context, blueprint })
     expect(rawResponseBuilder.add).toHaveBeenCalledWith('headers', expect.any(Headers))
   })
+
+
+  it('decorates the response the kernel produced instead of discarding it', async () => {
+    // The hook exists for requests that die before the kernel; it must not touch the ones that did
+    // not. It used to hand `next` a brand-new 500 unconditionally, so a successful response was
+    // replaced here by an empty one (`content: undefined`, `prepared: false`). The wire response
+    // survived only because ServerResponseMiddleware had already copied the real one into the raw
+    // builder and `addIf` will not overwrite a status; anything reading `context.outgoingResponse`
+    // afterwards saw the empty 500.
+    const real = OutgoingHttpResponse.create({ statusCode: 201, content: { id: 7 } })
+    context.outgoingResponse = real
+    context.incomingEvent = IncomingHttpEvent.create({
+      source: {} as any, ip: '127.0.0.1', headers: {}, url: new URL('http://localhost/tasks'), method: 'POST'
+    })
+
+    await EnsureCorsHeadersHook({ context, blueprint })
+
+    expect(context.outgoingResponse).toBe(real)
+    expect(context.outgoingResponse.statusCode).toBe(201)
+    expect(context.outgoingResponse.content).toEqual({ id: 7 })
+    // The real status is what the builder is offered, so a later `addIf` cannot degrade it to 500.
+    expect(rawResponseBuilder.addIf).toHaveBeenCalledWith('statusCode', 201)
+  })
+
+  it('still synthesizes a response when the request died before the kernel produced one', async () => {
+    // The reason the hook exists: an adapter-level failure leaves nothing to answer with, and a
+    // response with no CORS headers is an opaque network error in the browser rather than a status.
+    await EnsureCorsHeadersHook({ context, blueprint })
+
+    expect(context.outgoingResponse).toBeInstanceOf(OutgoingHttpResponse)
+    expect(context.outgoingResponse.statusCode).toBe(500)
+  })
 })
