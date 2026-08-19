@@ -84,5 +84,8 @@
       "describe",
       "beforeEach"
     ]
+  },
+  "dependencies": {
+    "@stone-js/config": "workspace:*"
   }
 }

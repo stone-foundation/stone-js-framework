@@ -1,3 +1,4 @@
+import { cloneValue } from '@stone-js/config'
 import deepmerge from 'deepmerge'
 import { addBlueprint, classDecoratorLegacyWrapper, ClassType } from '@stone-js/core'
 import { nodeConsoleAdapterBlueprint, NodeConsoleAdapterAdapterConfig } from '../options/NodeConsoleAdapterBlueprint'
@@ -34,12 +35,15 @@ export interface NodeConsoleOptions extends Partial<NodeConsoleAdapterAdapterCon
  */
 export const NodeConsole = <T extends ClassType = ClassType>(options: NodeConsoleOptions = {}): ClassDecorator => {
   return classDecoratorLegacyWrapper<T>((target: T, context: ClassDecoratorContext<T>): undefined => {
-    if (nodeConsoleAdapterBlueprint.stone?.adapters?.[0] !== undefined) {
-      // Merge provided options with the default Node Cli adapter blueprint.
-      nodeConsoleAdapterBlueprint.stone.adapters[0] = deepmerge(nodeConsoleAdapterBlueprint.stone.adapters[0], options)
+    // Clone the module-level default before merging so decorating a class never mutates the shared
+    // singleton (which would accumulate options across classes and leak between two applications
+    // built together). Every other adapter decorator already does this.
+    const blueprint = cloneValue(nodeConsoleAdapterBlueprint)
+
+    if (blueprint.stone?.adapters?.[0] !== undefined) {
+      blueprint.stone.adapters[0] = deepmerge(blueprint.stone.adapters[0], options)
     }
 
-    // Add the modified blueprint to the target class.
-    addBlueprint(target, context, nodeConsoleAdapterBlueprint)
+    addBlueprint(target, context, blueprint)
   })
 }

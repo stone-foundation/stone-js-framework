@@ -1,9 +1,9 @@
-import { Telemetry } from './Telemetry'
+import { TelemetryManager } from './TelemetryManager'
 import { TelemetryOptions } from './declarations'
 import { IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
 
 /**
- * Registers the {@link Telemetry} service (singleton) in the container from `stone.telemetry`
+ * Registers the {@link TelemetryManager} service (singleton) in the container from `stone.telemetry`
  * config, aliased as `telemetry`/`Telemetry` so middleware and user code can resolve it.
  */
 export class TelemetryServiceProvider implements IServiceProvider {
@@ -19,7 +19,7 @@ export class TelemetryServiceProvider implements IServiceProvider {
     const options = this.container.make<IBlueprint>('blueprint').get<TelemetryOptions>('stone.telemetry', {})
 
     this.container
-      .singletonIf(Telemetry, () => Telemetry.create(options))
-      .alias(Telemetry, ['telemetry', 'Telemetry'])
+      .singletonIf(TelemetryManager, () => TelemetryManager.create(options))
+      .alias(TelemetryManager, ['telemetry', 'Telemetry'])
   }
 }

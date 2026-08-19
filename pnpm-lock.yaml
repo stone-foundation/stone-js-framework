@@ -214,6 +214,9 @@ importers:
 
   stone-js-auth:
     dependencies:
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
       jose:
         specifier: ^5.9.6
         version: 5.10.0
@@ -284,6 +287,9 @@ importers:
       '@casl/ability':
         specifier: ^6.7.3
         version: 6.8.1
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
@@ -2705,6 +2711,9 @@ importers:
 
   stone-js-node-cli-adapter:
     dependencies:
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
       '@stone-js/core':
         specifier: workspace:*
         version: link:../stone-js-core
@@ -3476,6 +3485,10 @@ importers:
         version: 5.9.3
 
   stone-js-telemetry:
+    dependencies:
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
@@ -3939,6 +3952,10 @@ importers:
         version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
 
   stone-js-validation:
+    dependencies:
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1

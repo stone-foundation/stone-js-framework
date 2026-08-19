@@ -20,9 +20,10 @@ Nothing touches a session store, so the exact same code runs on Node, serverless
 @Post('/tasks', { middleware: [requireScopes('tasks:write')] })  // 403 without the scope
 ```
 
-Auth is enabled in `app/configurations/AuthConfiguration.ts`, which merges `authBlueprint` and sets
-the signing strategy (a shared HMAC secret here; swap for `publicKey`/`jwksUri` to trust an external
-identity provider).
+Auth is enabled on the application with `@Auth()` (see `app/Application.ts`), or with
+`authBlueprint` on the manifest for the imperative API. `app/configurations/AuthConfiguration.ts`
+then sets the signing strategy (a shared HMAC secret here; swap for `publicKey`/`jwksUri` to trust an
+external identity provider).
 
 ## Run it
 

@@ -25,6 +25,33 @@ domain once, and the context (runtime, protocol, caller) applies to it at run ti
 npm i @stone-js/validation
 ```
 
+## Enabling it
+
+Like every Stone.js module, it is enabled in one of two ways, and configured afterwards under
+`stone.validation`. It registers the validation provider, so the validator is injectable and the route decorators resolve.
+
+```ts
+import { Validation } from '@stone-js/validation'
+import { StoneApp } from '@stone-js/core'
+
+@Validation()
+@StoneApp({ name: 'my-app' })
+export class Application {}
+```
+
+```ts
+import { defineStoneApp } from '@stone-js/core'
+import { validationBlueprint } from '@stone-js/validation'
+
+export const Application = defineStoneApp({ name: 'my-app' }, [validationBlueprint])
+```
+
+Configure it from a `@Configuration` class or `defineConfig`:
+
+```ts
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.validation', { /* ... */ }))
+```
+
 ## Usage
 
 ```ts

@@ -15,7 +15,7 @@ import { ConsoleTelemetryExporter } from './exporters/ConsoleTelemetryExporter'
  * exporter. Platform-agnostic: it knows nothing about HTTP/CLI/etc.; callers attach whatever
  * attributes make sense. When disabled, every operation is a cheap no-op.
  */
-export class Telemetry implements ITelemetry {
+export class TelemetryManager implements ITelemetry {
   private readonly enabled: boolean
   private readonly service: string
   private readonly exporter: TelemetryExporter
@@ -25,9 +25,9 @@ export class Telemetry implements ITelemetry {
    * Factory.
    *
    * @param options - Telemetry options.
-   * @returns A new Telemetry instance.
+   * @returns A new TelemetryManager instance.
    */
-  static create (options: TelemetryOptions = {}): Telemetry {
+  static create (options: TelemetryOptions = {}): TelemetryManager {
     return new this(options)
   }
 

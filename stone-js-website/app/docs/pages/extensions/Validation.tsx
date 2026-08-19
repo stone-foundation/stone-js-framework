@@ -59,6 +59,25 @@ export class Validation implements IPage<ReactIncomingEvent> {
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i @stone-js/validation`}</Code>
 
+        <H2>Enabling it</H2>
+        <p>
+          Enabled the way every Stone.js module is, with its decorator or with its blueprint. Either
+          one registers the validation provider, so the validator is injectable and the route decorators have something to resolve.
+        </p>
+        <CodeTabs
+          file='app/Application.ts'
+          decl={`import { Validation } from '@stone-js/validation'
+import { StoneApp } from '@stone-js/core'
+
+@Validation()
+@StoneApp({ name: 'my-app' })
+export class Application {}`}
+          imp={`import { defineStoneApp } from '@stone-js/core'
+import { validationBlueprint } from '@stone-js/validation'
+
+export const Application = defineStoneApp({ name: 'my-app' }, [validationBlueprint])`}
+        />
+
         <H2>Validate at the boundary</H2>
         <Principle
           principle={
