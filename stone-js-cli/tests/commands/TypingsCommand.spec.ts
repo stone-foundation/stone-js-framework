@@ -95,7 +95,8 @@ describe('TypingsCommand', async () => {
 
   it('should define correct CLI metadata', () => {
     expect(typingsCommandOptions.name).toBe('typings')
-    expect(typingsCommandOptions.alias).toBe('t')
+    // `-t` belongs to `stone test`, the command typed all day; typings answers to `-ty`.
+    expect(typingsCommandOptions.alias).toBe('ty')
     expect(typingsCommandOptions.desc).toBe('Check code typings for typescript')
   })
 

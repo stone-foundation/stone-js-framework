@@ -16,5 +16,8 @@ the file set the build uses, so `createTestApp()` discovers exactly what ships.
 
 Vitest is imported lazily from the project rather than bundled: an application pins its own runner
 version, and one that does not test carries none. A project without it gets a line telling it what to
-install, not a module-resolution error. `stone test` deliberately has no short alias, since `-t`
-already belongs to `stone typings`.
+install, not a module-resolution error.
+
+`stone test` answers to `-t`, the letter going to the command a developer types all day.
+**`stone typings` moves from `-t` to `-ty`**; its full name is unchanged, and nothing in the starters
+or the docs used the short form.

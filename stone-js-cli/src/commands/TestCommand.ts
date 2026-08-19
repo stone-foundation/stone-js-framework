@@ -40,8 +40,7 @@ type StartVitest = (
  */
 export const testCommandOptions: CommandOptions = {
   name: 'test',
-  // No short alias: `-t` already belongs to `stone typings`, and two commands answering to one letter
-  // is how a `stone t` in a script silently runs the wrong thing.
+  alias: 't',
   args: ['[filters..]'],
   desc: 'Run the test suite',
   options: (yargs: Argv) => {

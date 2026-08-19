@@ -11,10 +11,10 @@ const COMMANDS = [
   { cmd: 'stone build', alias: 'prod', desc: 'Produce the production build for your configured target.' },
   { cmd: 'stone preview', alias: 'p', desc: 'Serve the production build locally.' },
   { cmd: 'stone export', alias: 'e', desc: 'Emit the static output (SSG) to disk.' },
-  { cmd: 'stone test', alias: '·', desc: 'Run the test suite (Vitest), configured from stone.config.mjs.' },
+  { cmd: 'stone test', alias: 't', desc: 'Run the test suite (Vitest), configured from stone.config.mjs.' },
   { cmd: 'stone list', alias: 'ls', desc: 'List the routes and commands the Blueprint resolves.' },
   { cmd: 'stone init', alias: 'i', desc: 'Scaffold a new project into the current directory.' },
-  { cmd: 'stone typings', alias: 't', desc: 'Generate the .stone/ type declarations (add --watch).' },
+  { cmd: 'stone typings', alias: 'ty', desc: 'Generate the .stone/ type declarations (add --watch).' },
   { cmd: 'stone cache-clear', alias: 'cc', desc: 'Clear the build cache.' },
   { cmd: 'stone <custom>', alias: '·', desc: 'Run a handler exposed as a CLI command (node-cli-adapter).' }
 ]

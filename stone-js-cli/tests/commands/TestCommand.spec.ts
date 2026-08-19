@@ -39,9 +39,9 @@ describe('TestCommand', () => {
     startVitest.mockResolvedValue(vitestReporting(0))
   })
 
-  it('is registered as `stone test`, with no alias to collide with `stone typings`', () => {
-    expect(testCommandOptions).toEqual(expect.objectContaining({ name: 'test' }))
-    expect(testCommandOptions.alias).toBeUndefined()
+  it('is registered as `stone test`, and owns `-t`', () => {
+    // `-t` goes to the command a developer types all day; `stone typings` answers to `-ty`.
+    expect(testCommandOptions).toEqual(expect.objectContaining({ name: 'test', alias: 't' }))
   })
 
   it('loads the env file before the runner starts', async () => {
