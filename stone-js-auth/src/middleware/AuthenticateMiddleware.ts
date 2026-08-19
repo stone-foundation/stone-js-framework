@@ -1,4 +1,4 @@
-import { IBlueprint, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
+import { IBlueprint, NextMiddleware, Promiseable, type MetaMiddleware } from '@stone-js/core'
 import { AuthOptions, IAuthenticator, JwtClaims } from '../declarations'
 import { IncomingHttpEvent, OutgoingHttpResponse } from '@stone-js/http-core'
 
@@ -12,7 +12,7 @@ import { IncomingHttpEvent, OutgoingHttpResponse } from '@stone-js/http-core'
  */
 export class AuthenticateMiddleware {
   private readonly authenticator: IAuthenticator
-  private readonly resolveUser: (claims: JwtClaims) => unknown
+  private readonly resolveUser: (claims: JwtClaims) => Promiseable<unknown>
 
   /**
    * @param dependencies - Auto-wired container services.
@@ -32,7 +32,9 @@ export class AuthenticateMiddleware {
 
     if (token.length > 0) {
       const claims = await this.authenticator.verify(token)
-      const user = this.resolveUser(claims)
+      // Awaited: resolving a principal is a store lookup in any real application. Awaiting a
+      // synchronous resolver's plain value is a no-op, so both forms work unchanged.
+      const user = await this.resolveUser(claims)
       event.setMetadataValue('auth', claims)
       event.setUserResolver(() => user)
     }
