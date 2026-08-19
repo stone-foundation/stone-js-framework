@@ -3286,6 +3286,13 @@ importers:
         version: 8.21.1
 
   stone-js-resources:
+    dependencies:
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../stone-js-core
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1

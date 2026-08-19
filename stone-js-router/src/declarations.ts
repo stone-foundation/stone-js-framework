@@ -480,6 +480,37 @@ export interface RouteDefinition<
   children?: Array<RouteDefinition<IncomingEventType, OutgoingResponseType>>
   excludeMiddleware?: Array<PipeType<IncomingEventType, OutgoingResponseType>>
   redirect?: string | Record<string, unknown> | RouteDefinitionRedirect<IncomingEventType>
+
+  /**
+   * The schema that validates this route's input, or the name of one registered in
+   * `stone.validation.schemas`.
+   *
+   * Read by `@stone-js/validation`, which validates before the handler runs and puts the **parsed**
+   * value in the event's metadata. The router itself does nothing with it: a route definition is
+   * the one place that describes a route, and each module reads the part it owns. That is also what
+   * lets `@stone-js/openapi` publish the request schema without being told twice.
+   */
+  validation?: unknown
+
+  /**
+   * The resource that shapes this route's output, or the name of one registered in
+   * `stone.resources.registry`.
+   *
+   * Read by `@stone-js/resources`, which applies it to whatever the handler returned, so a handler
+   * can return its domain model and still expose only what the resource allows.
+   */
+  resource?: unknown
+
+  /**
+   * How this route authenticates, read by `@stone-js/auth`.
+   */
+  auth?: unknown
+
+  /**
+   * What this route authorizes, read by `@stone-js/authz`.
+   */
+  authz?: unknown
+
   [k: string]: unknown
 }
 

@@ -86,6 +86,16 @@ export interface IValidator {
  * Validation configuration (`stone.validation.*`).
  */
 export interface ValidationOptions {
-  /** Whether to strip unknown keys is left to the schema; reserved for future options. */
-  reserved?: never
+  /**
+   * Named rule sets a route can refer to by name, instead of importing the schemas at the route.
+   *
+   * ```ts
+   * blueprint.set('stone.validation.schemas', { createUser: { body: CreateUserSchema } })
+   * // then, on the route: { validation: 'createUser' }
+   * ```
+   *
+   * Naming a rule set that is not registered fails loudly at request time rather than validating
+   * nothing, because silently accepting anything is the one outcome a validator must never have.
+   */
+  schemas?: Record<string, Record<string, SchemaInput>>
 }
