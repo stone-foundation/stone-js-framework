@@ -1,4 +1,5 @@
 import {
+  corsBlueprint,
   IncomingHttpEvent,
   OutgoingHttpResponse,
   IncomingHttpEventOptions
@@ -288,6 +289,7 @@ export const onTerminate = defineHookListener((container: IContainer): void => {
 export const Application = defineStoneApp(
   { name: 'MyApp', logger: { level: LogLevel.INFO } },
   [
+    corsBlueprint,
     routerBlueprint,
     nodeHttpAdapterBlueprint,
     nodeConsoleAdapterBlueprint
@@ -308,6 +310,10 @@ export const AppConfig = defineConfig({
       })
   },
   afterConfigure (blueprint: IBlueprint) {
+    // Nothing is allowed cross-origin until you name the origins you trust:
+    // add `origin: ['https://your-front']` here.
+    blueprint.set('stone.http.cors', { preflightStop: true, allowedHeaders: ['*'] })
+
     if (blueprint.is('stone.adapter.platform', NODE_HTTP_PLATFORM)) {
       blueprint
         .set('stone.adapter.url', getString('BASE_URL', 'http://localhost:8080'))

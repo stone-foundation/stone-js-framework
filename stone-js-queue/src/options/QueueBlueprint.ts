@@ -38,16 +38,6 @@ export const queueBlueprint: QueueBlueprint = {
 }
 
 /**
- * Build a queue configuration fragment imperatively (for `defineConfig`/meta-modules).
- *
- * @param config - The queue configuration.
- * @returns A partial app config carrying the `queue` bucket.
- */
-export function defineQueue (config: QueueModuleConfig): { queue: QueueModuleConfig } {
-  return { queue: config }
-}
-
-/**
  * Build a job-handler meta-module for imperative registration under `stone.queue.handlers`.
  *
  * @param name - The job name.
@@ -57,7 +47,7 @@ export function defineQueue (config: QueueModuleConfig): { queue: QueueModuleCon
  *
  * @example
  * ```typescript
- * defineQueue({ handlers: [ defineJobHandler('send-email', SendEmail, { isClass: true }) ] })
+ * blueprint.set('stone.queue.handlers', [defineJobHandler('send-email', SendEmail, { isClass: true })])
  * ```
  */
 export function defineJobHandler (

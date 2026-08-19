@@ -1,4 +1,4 @@
-import { I18n } from '../I18n'
+import { I18nManager } from '../I18nManager'
 import { negotiate, resolveLocale } from '../resolveLocale'
 import { I18nOptions, Locale, LocaleAwareEvent, LocaleResolutionOptions } from '../declarations'
 import { IBlueprint, IContainer, IncomingEvent, NextMiddleware, OutgoingResponse, type MetaMiddleware } from '@stone-js/core'
@@ -22,14 +22,14 @@ interface RouteLike {
  * request-bound, concurrency-safe translator). Read them via `translatorFor`/`localeFromEvent`.
  */
 export class SetLocaleMiddleware {
-  private readonly i18n: I18n
+  private readonly i18n: I18nManager
   private readonly container: IContainer
   private readonly options: LocaleResolutionOptions
 
   /**
    * @param dependencies - Auto-wired container services.
    */
-  constructor ({ i18n, blueprint, container }: { i18n: I18n, blueprint: IBlueprint, container: IContainer }) {
+  constructor ({ i18n, blueprint, container }: { i18n: I18nManager, blueprint: IBlueprint, container: IContainer }) {
     this.i18n = i18n
     this.container = container
     const config = blueprint.get<I18nOptions>('stone.i18n', {})

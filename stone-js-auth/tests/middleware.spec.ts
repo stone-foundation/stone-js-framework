@@ -33,6 +33,23 @@ describe('AuthenticateMiddleware', () => {
     expect(res).toBe('ok')
   })
 
+  it('awaits an asynchronous resolveUser', async () => {
+    // Resolving a principal hits a store in any real application: without the await the event
+    // received a pending Promise as its user, so the option was unusable.
+    const authenticator: any = { verify: vi.fn(async () => ({ sub: 'u9' })) }
+    const resolveUser = vi.fn(async (c: any) => {
+      await new Promise((resolve) => setTimeout(resolve, 1))
+      return { id: c.sub, provisioned: true }
+    })
+    const mw = new AuthenticateMiddleware({ authenticator, blueprint: blueprintStub({ resolveUser }) })
+    const event = eventStub({ Authorization: 'Bearer t' })
+
+    await mw.handle(event, (async () => 'ok') as any)
+
+    expect(resolveUser).toHaveBeenCalledWith({ sub: 'u9' })
+    expect(event.getUser()).toEqual({ id: 'u9', provisioned: true })
+  })
+
   it('defaults to identity mapping (user === claims) when no resolveUser is configured', async () => {
     const authenticator: any = { verify: vi.fn(async () => ({ sub: 'u2', scope: 'read' })) }
     const mw = new AuthenticateMiddleware({ authenticator, blueprint: blueprintStub() })

@@ -1,4 +1,5 @@
 import {
+  Cors,
   IncomingHttpEvent,
   OutgoingHttpResponse,
   IncomingHttpEventOptions
@@ -34,11 +35,14 @@ import { PipelineHookContext } from '@stone-js/pipeline'
  * @NodeHttp() is used to enable the Node HTTP adapter.
  * @NodeConsole() is used to enable the Node Console adapter.
  * @NodeConsole() requires the incoming event type.
+ * @Cors() answers cross-origin requests, on the kernel and the adapter alike.
+ *   Nothing is allowed until you name the origins you trust: add `origin: ['https://your-front']`.
  * BodyEventMiddleware is used to parse the incoming event body.
  * BodyEventMiddleware is imported because it is not installed by default.
  *
  * Note: In this example we implement the IBlueprintHook, IAdapterHook and IKernelHook interfaces for demonstration purposes.
  */
+@Cors({ preflightStop: true, allowedHeaders: ['*'] })
 @Routing()
 @NodeConsole()
 @StoneApp({ name: 'MyApps', logger: { level: LogLevel.INFO } })

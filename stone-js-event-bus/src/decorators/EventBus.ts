@@ -19,7 +19,7 @@ export interface EventBusOptions extends Partial<ConnectionOptions> {
  * `@EventBus({ driver: 'eventbridge' })` registers the {@link EventBusServiceProvider}, adds the
  * connection, and defaults emit to both `local` and that connection so the same code works in a
  * monolith and distributed. For richer setups, configure `stone.eventBus` via `@Configuration()`
- * (or `defineEventBus`).
+ * (or the imperative `eventBusBlueprint`).
  *
  * @param options - The connection configuration (driver required).
  * @returns A class decorator.

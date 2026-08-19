@@ -15,6 +15,8 @@ export default createRollupConfig({
     // The agnostic runtime (`.`) — never includes the build-time CLI plugin.
     { input: ['src/**/*.ts', '!src/cli.ts'], file: 'dist/index.js', barrel: { exclude: ['cli'] } },
     // The build-time CLI plugin (`./cli`) — build-only, kept out of the runtime bundle.
-    { input: ['src/cli.ts'], file: 'dist/cli.js' }
+    // `multiEntry: false` because auto-discovery reads this bundle's DEFAULT export, and
+    // multi-entry re-exports named exports only, which silently disabled the whole plugin.
+    { input: ['src/cli.ts'], file: 'dist/cli.js', multiEntry: false }
   ]
 })
