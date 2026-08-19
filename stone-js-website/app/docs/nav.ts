@@ -174,6 +174,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Event Bus', path: '/docs/extensions/event-bus' },
       { title: 'Config Source', path: '/docs/extensions/config-source' },
       { title: 'OpenAPI', path: '/docs/extensions/openapi' },
+      { title: 'Store (universal state)', path: '/docs/extensions/store' },
       { title: 'Testing', path: '/docs/extensions/testing' },
       { title: 'MCP dev server', path: '/docs/extensions/mcp' },
       { title: 'Telemetry', path: '/docs/extensions/telemetry' }
