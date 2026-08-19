@@ -6,7 +6,9 @@ describe('rollupBuildConfig', () => {
     expect(rollupBuildConfig.context).toBe('globalThis')
     expect(rollupBuildConfig.output).toEqual({
       format: 'es',
-      file: 'dist/app.mjs'
+      file: 'dist/app.mjs',
+      // A server artefact is one file: without this, any dynamic import in the app fails the build.
+      inlineDynamicImports: true
     })
   })
 
@@ -28,7 +30,8 @@ describe('rollupBundleConfig', () => {
     expect(rollupBundleConfig.context).toBe('globalThis')
     expect(rollupBundleConfig.output).toEqual({
       format: 'es',
-      file: 'dist/app.mjs'
+      file: 'dist/app.mjs',
+      inlineDynamicImports: true
     })
   })
 
