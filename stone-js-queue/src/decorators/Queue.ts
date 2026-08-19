@@ -15,7 +15,7 @@ export interface QueueOptions extends Partial<ConnectionConfig> {
  *
  * `@Queue({ driver: 'memory' })` registers the {@link QueueServiceProvider} and sets that connection
  * as the default. For multiple connections or richer setups, configure `stone.queue` via
- * `@Configuration()` (or the imperative `queueBlueprint` / `defineQueue`) instead.
+ * `@Configuration()` (or the imperative `queueBlueprint`) instead.
  *
  * @param options - The connection configuration (driver required).
  * @returns A class decorator.

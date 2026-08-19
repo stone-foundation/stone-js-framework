@@ -10,6 +10,7 @@ describe('BlueprintBuilder', () => {
 
   beforeEach(() => {
     blueprint = {
+      set: vi.fn(),
       get: vi.fn((key, fallback) => {
         if (key === 'stone.lifecycleHooks') return {}
         if (key === 'stone.blueprint.middleware') return []
@@ -44,9 +45,41 @@ describe('BlueprintBuilder', () => {
     expect(middlewareSpy).toHaveBeenCalledTimes(1)
   })
 
+  it('fails loudly when a blueprint middleware does not pass the context through', async () => {
+    // The shipped-starter bug: an HTTP/kernel middleware registered as a build-phase middleware.
+    // Both shapes are `handle(context, next)`, so nothing objects; the chain simply stops carrying
+    // the blueprint and every later phase misbehaves far from the cause.
+    const httpLikeMiddleware = vi.fn(async (context, next) => {
+      await next(context)
+      return { statusCode: 204, headers: {} } // an HTTP response, not the context
+    })
+    blueprint = Config.create()
+    blueprint.set('stone.blueprint.middleware', [httpLikeMiddleware])
+
+    builder = BlueprintBuilder.create(blueprint)
+
+    await expect(builder.build([{}])).rejects.toThrow(/did not return the blueprint/)
+    // The message must name the contract that was broken, not a helper: registering this through
+    // `defineBlueprintMiddleware` is legal, returning something other than `next`'s result is not.
+    await expect(builder.build([{}])).rejects.toThrow(/must return `await next\(context\)`/)
+  })
+
+  it('does not run the prepared hook when the pipeline lost the blueprint', async () => {
+    const hookSpy = vi.fn()
+    blueprint = Config.create()
+    blueprint.set('stone.blueprint.middleware', [async () => undefined])
+    blueprint.set('stone.lifecycleHooks', { onBlueprintPrepared: [hookSpy] })
+
+    builder = BlueprintBuilder.create(blueprint)
+
+    await expect(builder.build([{}])).rejects.toThrow()
+    expect(hookSpy).not.toHaveBeenCalled()
+  })
+
   it('should execute lifecycle hooks if present', async () => {
     const hookSpy = vi.fn()
 
+    blueprint.set = vi.fn()
     blueprint.get = vi.fn((key, fallback) => {
       if (key === 'stone.lifecycleHooks') {
         return {

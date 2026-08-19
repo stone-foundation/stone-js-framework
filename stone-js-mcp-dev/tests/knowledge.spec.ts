@@ -1,3 +1,6 @@
+import { readFileSync, readdirSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { getConcept, searchKnowledge, knowledgeBase } from '../src/knowledge'
 import { generateLlmsTxt, generateLlmsFullTxt } from '../src/llms'
 
@@ -7,6 +10,31 @@ describe('knowledge base', () => {
     expect(knowledgeBase.modules.some((m) => m.package === '@stone-js/core')).toBe(true)
     expect(knowledgeBase.bestPractices.length).toBeGreaterThan(0)
     expect(knowledgeBase.gaps.some((g) => g.name === 'ORM')).toBe(true)
+  })
+
+  it('does not report shipped workspace packages as planned gaps', () => {
+    const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+    const workspacePackages = new Set(
+      readdirSync(workspaceRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory() && entry.name.startsWith('stone-js-'))
+        .map((entry) => resolve(workspaceRoot, entry.name, 'package.json'))
+        .map((packageJson) => JSON.parse(readFileSync(packageJson, 'utf8')).name as string)
+        .filter((name) => name?.startsWith('@stone-js/'))
+        .map((name) => name.slice('@stone-js/'.length))
+    )
+
+    const plannedAliases: Record<string, string[]> = {
+      'queue/jobs': ['queue'],
+      cache: ['cache'],
+      i18n: ['i18n'],
+      'websocket/realtime': ['realtime'],
+      'cloud file drivers': ['cloud-file']
+    }
+
+    for (const gap of knowledgeBase.gaps.filter((entry) => entry.status === 'planned')) {
+      const aliases = plannedAliases[gap.name] ?? [gap.name]
+      expect(aliases.some((alias) => workspacePackages.has(alias)), `${gap.name} already ships as a workspace package`).toBe(false)
+    }
   })
 
   it('getConcept finds a concept (case-insensitive) or returns undefined', () => {
