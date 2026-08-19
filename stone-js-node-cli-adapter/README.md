@@ -114,8 +114,8 @@ This adapter is ideal for scripting, developer tooling, generators, or any use c
 
 ## API documentation
 
-* [API](https://github.com/stone-foundation/stone-js-node-cli-adapter/blob/main/docs)
+* [API](https://stonejs.dev/api)
 
 ## Contributing
 
-We welcome contributions! See the [Contributing Guide](https://github.com/stone-foundation/stone-js-node-cli-adapter/blob/main/CONTRIBUTING.md) for details.
+We welcome contributions! See the [Contributing Guide](https://github.com/stone-foundation/stone-js-framework/blob/main/CONTRIBUTING.md) for details.

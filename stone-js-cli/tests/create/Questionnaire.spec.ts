@@ -1,5 +1,5 @@
 import fsExtra from 'fs-extra'
-import { CliError } from '../../src/errors/CliError'
+import { CancellationError } from '../../src/errors/CancellationError'
 import { Questionnaire } from '../../src/create/Questionnaire'
 
 const { pathExistsSync } = fsExtra
@@ -119,19 +119,76 @@ describe('Questionnaire', () => {
 
     const questionnaire = Questionnaire.create(mockContext)
 
-    await expect(questionnaire.getAnswers()).rejects.toThrow(CliError)
+    await expect(questionnaire.getAnswers()).rejects.toThrow(CancellationError)
+    // Nothing else is asked, so nothing is written: refusing to overwrite leaves the directory as
+    // it was, which is precisely what the user asked for by saying no.
+    expect(mockInput.choice).not.toHaveBeenCalled()
   })
 
   it('should cancel if user declines final confirmation', async () => {
     mockContext.blueprint.get.mockReturnValue(undefined)
-    mockInput.confirm.mockResolvedValueOnce(true)
+    mockInput.ask.mockResolvedValue('my-app')
+    mockInput.choice.mockResolvedValueOnce('typescript')
+      .mockResolvedValueOnce('template')
+      .mockResolvedValueOnce('npm')
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce('vitest')
+    mockInput.confirm.mockResolvedValueOnce(true) // initGit
     mockInput.confirm.mockResolvedValueOnce(false) // final confirmation
 
     vi.mocked(pathExistsSync).mockReturnValueOnce(false)
 
     const questionnaire = Questionnaire.create(mockContext)
 
-    await expect(questionnaire.getAnswers()).rejects.toThrow(CliError)
+    // Answering the whole questionnaire and then declining is a decision, not a breakage: the type
+    // is what lets the error handler exit `0` instead of printing a crash wall.
+    await expect(questionnaire.getAnswers()).rejects.toThrow(CancellationError)
+  })
+
+  it('treats an abandoned prompt as a cancellation, and stops asking', async () => {
+    // Ctrl-C does not end the process: `prompts` resolves with nothing. Left unchecked, the
+    // questionnaire would keep asking and then scaffold from answers nobody gave.
+    mockContext.blueprint.get.mockReturnValue(undefined)
+    mockInput.ask.mockResolvedValue(undefined)
+
+    vi.mocked(pathExistsSync).mockReturnValue(false)
+
+    const questionnaire = Questionnaire.create(mockContext)
+
+    await expect(questionnaire.getAnswers()).rejects.toThrow(CancellationError)
+    expect(mockInput.choice).not.toHaveBeenCalled()
+    expect(mockInput.confirm).not.toHaveBeenCalled()
+  })
+
+  it('treats an abandoned choice the same way', async () => {
+    mockContext.blueprint.get.mockReturnValue(undefined)
+    mockInput.ask.mockResolvedValue('my-app')
+    mockInput.choice.mockResolvedValue(undefined)
+
+    vi.mocked(pathExistsSync).mockReturnValue(false)
+
+    const questionnaire = Questionnaire.create(mockContext)
+
+    await expect(questionnaire.getAnswers()).rejects.toThrow(CancellationError)
+  })
+
+  it('keeps an empty selection as a real answer', async () => {
+    // Choosing no module and no test framework must not look like an abandoned prompt: those come
+    // back as `[]` and `''`, and only a truly abandoned one comes back as nothing.
+    mockContext.blueprint.get.mockReturnValue(undefined)
+    mockInput.ask.mockResolvedValue('my-app')
+    mockInput.choice.mockResolvedValueOnce('typescript')
+      .mockResolvedValueOnce('template')
+      .mockResolvedValueOnce('npm')
+      .mockResolvedValueOnce([]) // no module
+      .mockResolvedValueOnce('') // no test framework
+    mockInput.confirm.mockResolvedValue(true)
+
+    vi.mocked(pathExistsSync).mockReturnValue(false)
+
+    const result = await Questionnaire.create(mockContext).getAnswers()
+
+    expect(result).toEqual(expect.objectContaining({ modules: [], testing: '', confirmation: true }))
   })
 
   it('should use provided projectName and overwrite if present', async () => {
