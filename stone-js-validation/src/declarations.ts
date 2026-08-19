@@ -86,6 +86,41 @@ export interface IValidator {
  * Validation configuration (`stone.validation.*`).
  */
 export interface ValidationOptions {
-  /** Whether to strip unknown keys is left to the schema; reserved for future options. */
-  reserved?: never
+  /**
+   * Named rule sets a route can refer to by name, instead of importing the schemas at the route.
+   *
+   * ```ts
+   * blueprint.set('stone.validation.schemas', { createUser: { body: CreateUserSchema } })
+   * // then, on the route: { validation: 'createUser' }
+   * ```
+   *
+   * Naming a rule set that is not registered fails loudly at request time rather than validating
+   * nothing, because silently accepting anything is the one outcome a validator must never have.
+   */
+  schemas?: Record<string, Record<string, SchemaInput>>
+
+  /**
+   * Schema engines to make resolvable from the container, keyed by the name to resolve them under.
+   *
+   * ```ts
+   * import { z } from 'zod'
+   * blueprint.set('stone.validation.engines', { zod: z })
+   * ```
+   *
+   * A schema class then takes its engine through its constructor, which is both more elegant and
+   * more testable: a test hands it a fake instead of mocking a module.
+   *
+   * ```ts
+   * @ValidationSchema('createUser')
+   * export class CreateUserSchema implements IValidationSchema {
+   *   constructor ({ zod }: { zod: typeof z }) { this.z = zod }
+   *   rules () { return { body: this.z.object({ email: this.z.string().email() }) } }
+   * }
+   * ```
+   *
+   * The application names the engine; this module never imports one. That is what keeps it agnostic:
+   * Zod, Valibot and ArkType arrive through Standard Schema, and a native schema needs no engine at
+   * all. Binding a specific library here would make every application depend on it.
+   */
+  engines?: Record<string, unknown>
 }

@@ -480,6 +480,17 @@ export interface RouteDefinition<
   children?: Array<RouteDefinition<IncomingEventType, OutgoingResponseType>>
   excludeMiddleware?: Array<PipeType<IncomingEventType, OutgoingResponseType>>
   redirect?: string | Record<string, unknown> | RouteDefinitionRedirect<IncomingEventType>
+
+  /**
+   * Anything a module declares on a route.
+   *
+   * This is deliberate, and it is what keeps the router agnostic. A route definition is the one place
+   * that describes a route, so modules declare what they need on it, `validation`, `resource`,
+   * `auth`, `authz`, and each reads back the part it owns through `route.getOption(name)`. The router
+   * carries them and never interprets them, exactly as the kernel carries an event it knows nothing
+   * about. Naming those keys here would tie this package's public type to modules it does not depend
+   * on, and would buy nothing: an index signature already accepts every one of them.
+   */
   [k: string]: unknown
 }
 
