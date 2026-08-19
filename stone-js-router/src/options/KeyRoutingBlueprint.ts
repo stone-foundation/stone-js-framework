@@ -42,16 +42,6 @@ export const keyRoutingBlueprint: KeyRoutingBlueprint = {
 }
 
 /**
- * Build a key-routing configuration fragment imperatively (for `defineConfig`/meta-modules).
- *
- * @param config - The key-routing configuration.
- * @returns A partial app config carrying the `keyRouting` bucket.
- */
-export function defineKeyRouting (config: KeyRoutingModuleConfig): { keyRouting: KeyRoutingModuleConfig } {
-  return { keyRouting: config }
-}
-
-/**
  * Build a key-route definition for `stone.keyRouting.definitions`.
  *
  * @param key - The routing key.

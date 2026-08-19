@@ -77,6 +77,34 @@ export const appConfig = {
   stone: { tasks: { pageSize: getNumber('PAGE_SIZE', 20) } }
 }`}</Code>
 
+        <H3>Ordering several configurations</H3>
+        <p>
+          A real application has more than one: static settings, a remote overlay (SSM, Secrets
+          Manager), one per vendable module. Give them a <code>priority</code> when one depends on
+          what another loads. It is ascending, the lowest runs first, and equal priorities keep their
+          declaration order, so configurations that declare nothing behave exactly as before.
+        </p>
+        <Code file='app/configurations/RemoteConfiguration.ts'>{`import { Configuration, ConfigurationPriority } from '@stone-js/core'
+
+@Configuration({ priority: ConfigurationPriority.Sources })   // 0: everything may depend on these
+export class RemoteConfiguration {
+  async configure (blueprint) {
+    await loadConfigSources(blueprint, [ssmSource({ path: '/my-app/' })])
+  }
+}
+
+@Configuration({ priority: ConfigurationPriority.App })       // 10: the default
+export class AppConfiguration {
+  configure (blueprint) {
+    blueprint.set('stone.tasks.pageSize', blueprint.get('remote.pageSize', 20))
+  }
+}`}</Code>
+        <p>
+          The named steps are <code>Sources</code> (0), <code>App</code> (10) and <code>Module</code>
+          {' '}(20), with gaps left so you can slot something between two of them without renumbering.
+          The imperative form takes the same options: <code>defineConfig(fn, {'{'} priority {'}'})</code>.
+        </p>
+
         <Callout kind='note' title='Config is read-only at runtime'>
           The manifest is frozen after the build phase. Nothing rewrites it mid-flight, which is what
           makes configuration a fact rather than a moving target. To change behaviour per deployment,

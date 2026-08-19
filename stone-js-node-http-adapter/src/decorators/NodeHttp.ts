@@ -25,7 +25,7 @@ export interface NodeHttpOptions extends Partial<NodeHttpAdapterAdapterConfig> {
  *
  * @example
  * ```typescript
- * import { NodeHttp } from '@stone-js/node-http';
+ * import { NodeHttp } from '@stone-js/node-http-adapter';
  *
  * @NodeHttp({
  *   url: 'http://localhost:3000',
