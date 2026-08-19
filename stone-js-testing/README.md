@@ -27,14 +27,61 @@ npm i @stone-js/testing
 
 ## Usage
 
+Nothing to list: your application is discovered from `app/**`, the same files the CLI builds.
+
 ```ts
 import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
-import { Application } from '../app/Application'
 
-const client = await createTestApp(Application)   // boots the REAL app in-memory, no port
-const response = await client.send(makeIncomingHttpEvent({ method: 'GET', url: '/tasks' }))
+const app = await createTestApp()                 // boots the REAL app in-memory, no port
+const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/tasks' }))
 
 expect(response.statusCode).toBe(200)             // goes through the full kernel
+expect(response.json()).toEqual([{ id: 1 }])      // `content` is the wire payload; this reads it
+```
+
+A frontend app answers with a page, read the same way:
+
+```ts
+expect(response.html()).toContain('<h1>Tasks</h1>')
+```
+
+There is no assertion library here on purpose: query that HTML with whatever you already use
+(`happy-dom`, `jsdom`, Testing Library).
+
+### Substituting a dependency
+
+```ts
+const app = await createTestApp({ bindings: { clock: { now: () => '2026-01-01T00:00:00.000Z' } } })
+```
+
+Bound after your own registrations, in the container the kernel builds for each event, so the code
+under test resolves the fake exactly as it resolves the real one.
+
+### Options
+
+| Option | Default | What it does |
+|---|---|---|
+| `modules` | discovered | Boot exactly these, for a test that runs a slice of the app |
+| `appDir` / `pattern` | `app` | Where to discover from, for a non-standard layout |
+| `envFile` | `.env.test` | Loaded before booting; `false` loads none. A missing file is not an error |
+| `bindings` | — | Container substitutions, by alias |
+| `blueprint` | — | A base blueprint to merge in |
+
+### Running through the CLI
+
+`stone test` runs your suite with Vitest, configured from `stone.config.mjs` like everything else,
+and does two things a bare runner cannot: it loads `.env.test` **before** the runner starts, so a
+value read at module load sees it, and it hands the test process the same file set the build uses, so
+`createTestApp()` cannot boot a different application than the one that ships.
+
+```js
+// stone.config.mjs
+export default defineConfig({
+  test: {
+    envFile: '.env.test',
+    vitest: { environment: 'happy-dom' }   // for component tests
+  }
+})
 ```
 
 ## Documentation

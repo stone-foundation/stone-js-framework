@@ -41,7 +41,12 @@ vi.mock('@stone-js/filesystem', async (mod) => {
     ...actual,
     importModule: vi.fn(),
     basePath: (p: string) => path.resolve(__dirname, './.tmp-utils', p),
-    buildPath: (p: string) => path.resolve(__dirname, './.tmp-utils', p)
+    buildPath: (p: string) => path.resolve(__dirname, './.tmp-utils', p),
+    // The scan resolves paths internally, so pointing `basePath` at the temp dir is not enough:
+    // it has to be given the absolute pattern, which it accepts.
+    appModuleFiles: ({ pattern }: { pattern?: string } = {}) => actual.appModuleFiles({
+      pattern: path.resolve(__dirname, './.tmp-utils', pattern ?? actual.DEFAULT_APP_MODULES_PATTERN)
+    })
   }
 })
 

@@ -1,9 +1,10 @@
 import { tmpdir } from 'node:os'
+import { globSync } from 'glob'
 import process from 'node:process'
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { dirname, isAbsolute, join } from 'node:path'
 
 /**
  * Constructs a base path by joining the current working directory with the provided paths.
@@ -96,4 +97,30 @@ export async function importModule<R> (relativePath: string): Promise<R | undefi
   try {
     return await import(new URL(join(process.cwd(), relativePath), 'file://').href)
   } catch (_) {}
+}
+
+/**
+ * The files that make up an application's source.
+ *
+ * This is the one definition of "the app" shared by the tools that need to find it: the CLI scans it
+ * to decide how to build, and `@stone-js/testing` scans it to boot the same modules a test would
+ * otherwise have to list by hand. Keeping it here is what stops those two answers from drifting
+ * apart.
+ */
+export const DEFAULT_APP_MODULES_PATTERN = 'app/**/*.{ts,tsx,js,jsx,mjsx}'
+
+/**
+ * List an application's source files.
+ *
+ * Results are absolute and sorted, so a build or a test suite sees the same files in the same order
+ * on every machine: an unsorted directory read is one of the ways a suite passes locally and fails
+ * in CI.
+ *
+ * @param options - The pattern to match (defaults to {@link DEFAULT_APP_MODULES_PATTERN}), relative
+ *                  to the project root unless it is already absolute.
+ * @returns The matching file paths.
+ */
+export function appModuleFiles (options: { pattern?: string } = {}): string[] {
+  const pattern = options.pattern ?? DEFAULT_APP_MODULES_PATTERN
+  return globSync(isAbsolute(pattern) ? pattern : basePath(pattern)).sort((a, b) => a.localeCompare(b))
 }

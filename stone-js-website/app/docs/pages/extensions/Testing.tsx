@@ -49,11 +49,10 @@ export class Testing implements IPage<ReactIncomingEvent> {
           }
         />
         <Code file='tests/tasks.test.ts'>{`import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
-import { TaskController } from '../app/TaskController'
-import { TaskService } from '../app/TaskService'
 
 it('creates a task', async () => {
-  const app = await createTestApp({ modules: [TaskController, TaskService] })
+  // No module list: your app is discovered from app/**, the same files the CLI builds.
+  const app = await createTestApp()
 
   const response = await app.send(makeIncomingHttpEvent({
     method: 'POST',
@@ -62,17 +61,63 @@ it('creates a task', async () => {
   }))
 
   expect(response.statusCode).toBe(201)
-  expect(response.getContent()).toMatchObject({ title: 'Ship the docs' })
+  expect(response.json()).toMatchObject({ title: 'Ship the docs' })
+})`}</Code>
+        <Callout kind='note' title='A list you maintain is a list that drifts'>
+          Listing modules by hand is still possible, and useful when a test deliberately runs a slice
+          of the application. It is not the default because a forgotten handler answers 404 in a way
+          that reads as a routing bug, and a forgotten <code>@Configuration</code> makes a whole suite
+          validate behaviour production does not have.
+        </Callout>
+
+        <H3>Frontend apps answer with a page</H3>
+        <p>
+          A rendered page is an HTML string, so it is asserted like any other response. There is no
+          assertion library here on purpose: query that HTML with whatever you already use
+          ({'happy-dom'}, {'jsdom'}, Testing Library).
+        </p>
+        <Code file='tests/home.test.ts'>{`const response = await app.send(makeIncomingHttpEvent({ url: '/' }))
+
+expect(response.html()).toContain('<h1>Tasks</h1>')`}</Code>
+
+        <H3>Substituting a dependency</H3>
+        <p>
+          A fake repository, a fixed clock, a provider made to fail: <code>bindings</code> substitutes
+          container registrations after your own, in the container the kernel builds for each event, so
+          the code under test resolves the fake exactly as it resolves the real one.
+        </p>
+        <Code file='tests/expiry.test.ts'>{`const app = await createTestApp({
+  bindings: { clock: { now: () => '2026-01-01T00:00:00.000Z' } }
+})`}</Code>
+
+        <H3>One config file, tests included</H3>
+        <p>
+          <code>stone test</code> runs your suite with Vitest, configured from
+          {' '}<code>stone.config.mjs</code> like the build is. It does two things a bare runner cannot:
+          it loads <code>.env.test</code> <em>before</em> the runner starts, so a value read at module
+          load sees it, and it hands the test process the same file set the build uses, so a suite
+          cannot boot a different application than the one that ships.
+        </p>
+        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+  test: {
+    envFile: '.env.test',                  // loaded before anything imports
+    include: ['./tests/**/*.spec.ts'],
+    vitest: { environment: 'happy-dom' }   // raw Vitest config, merged over the defaults
+  }
 })`}</Code>
         <Aphorism>Boot the real app. Send a real intention. Assert on the real response.</Aphorism>
 
         <H3>The harness API</H3>
         <PropsTable nameHeader='API' rows={[
-          { name: 'createTestApp(options?)', type: '(opts) => Promise<TestClient>', desc: 'Boot the app in memory. options.modules lists decorated classes and/or blueprints; options.blueprint merges a base blueprint.' },
+          { name: 'createTestApp(options?)', type: '(opts) => Promise<TestClient>', desc: 'Boot the app in memory, discovering modules from app/** unless options.modules names them.' },
+          { name: 'options.appDir / pattern', type: 'string', desc: 'Where to discover from, for a non-standard layout.' },
+          { name: 'options.envFile', type: 'string | false', desc: 'Env file to load before booting. Defaults to .env.test; a missing file is not an error.' },
+          { name: 'options.bindings', type: 'Record<string, unknown>', desc: 'Container substitutions by alias, bound after the app\'s own registrations.' },
           { name: 'app.send(event)', type: '(event) => Promise<Response>', desc: 'Dispatch an event through the full kernel.' },
           { name: 'makeIncomingHttpEvent(opts)', type: '(opts) => event', desc: 'Build an event: { method, url, body, headers, query }.' },
           { name: 'response.statusCode', type: 'number', desc: 'The response status.' },
-          { name: 'response.getContent()', type: '() => unknown', desc: 'The response body.' }
+          { name: 'response.json()', type: '<T>() => T', desc: 'The body as data: parsed when the payload is a JSON string.' },
+          { name: 'response.html() / text()', type: '() => string', desc: 'The body as text, for a rendered page.' }
         ]} />
 
         <H2>Every context, one harness</H2>

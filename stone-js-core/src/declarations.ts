@@ -6,9 +6,10 @@ import { OutgoingResponse, OutgoingResponseOptions } from './events/OutgoingResp
 import { FactoryPipe, FunctionalPipe, MetaPipe, MixedPipe, NextPipe, PipeAlias, PipeClass, PipelineHookContext, PipelineHookListener, PipeType } from '@stone-js/pipeline'
 
 /**
- * Export the Container interface
+ * Export the Container interface, and what may be bound into it: a module that registers something
+ * on the container has to be able to name the type it is allowed to bind.
  */
-export { IContainer } from '@stone-js/service-container'
+export { IContainer, BindingValue } from '@stone-js/service-container'
 
 /**
  * The unique symbol type used as the metadata key on decorated classes.
