@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { generateLlmsFullTxt } from './llms'
 import { McpToolDef, ReportToolsOptions } from './declarations'
 import { getConcept, knowledgeBase, searchKnowledge } from './knowledge'
@@ -11,11 +12,17 @@ export const stoneMcpTools: McpToolDef[] = [
   {
     name: 'stone_search',
     description: 'Search the Stone.js knowledge base (concepts, modules, best-practices, gaps).',
+    inputSchema: {
+      query: z.string().describe('What to look for, matched against concepts, modules, best practices and gaps.')
+    },
     handler: (args) => searchKnowledge(String(args.query ?? ''))
   },
   {
     name: 'stone_concept',
     description: 'Explain a core Stone.js concept by id (omit id to list them all).',
+    inputSchema: {
+      id: z.string().optional().describe('The concept id. Omit it to list every concept instead.')
+    },
     handler: (args) => {
       const id = String(args.id ?? '')
       if (id.length === 0) { return knowledgeBase.concepts.map((c) => ({ id: c.id, title: c.title })) }
@@ -77,11 +84,19 @@ export function createReportTools (options: ReportToolsOptions): McpToolDef[] {
     {
       name: 'stone_report_bug',
       description: 'Open a bug report as a GitHub issue on the Stone.js repository.',
+      inputSchema: {
+        title: z.string().describe('One line naming the defect.'),
+        body: z.string().describe('What happens, what was expected, and how to reproduce it.')
+      },
       handler: async (args) => await openIssue(String(args.title ?? 'Bug report'), String(args.body ?? ''), 'bug')
     },
     {
       name: 'stone_request_feature',
       description: 'Open a feature request as a GitHub issue on the Stone.js repository.',
+      inputSchema: {
+        title: z.string().describe('One line naming the feature.'),
+        body: z.string().describe('The problem it solves, and how it should behave.')
+      },
       handler: async (args) => await openIssue(String(args.title ?? 'Feature request'), String(args.body ?? ''), 'enhancement')
     }
   ]

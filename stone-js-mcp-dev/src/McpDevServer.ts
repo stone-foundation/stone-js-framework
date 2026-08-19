@@ -94,9 +94,12 @@ export function buildMcpServer (options: McpDevOptions, log: McpDevLogger): McpS
   )
 
   for (const tool of resolveTools(options)) {
+    // A tool with no schema is registered with none at all, rather than with an empty one: both are
+    // advertised as taking no arguments, but the empty shape reads like a declared contract when it
+    // is the absence of one.
     server.registerTool(
       tool.name,
-      { description: tool.description, inputSchema: (tool.inputSchema ?? {}) as never },
+      { description: tool.description, inputSchema: tool.inputSchema as never },
       createToolCallback(tool, log) as never
     )
   }

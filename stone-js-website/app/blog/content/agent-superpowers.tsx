@@ -47,21 +47,14 @@ export class AgentSuperpowers implements IPage<ReactIncomingEvent> {
 
         <h2>One command</h2>
         <p>
-          Add <code>@McpDev()</code> to your app, then run <code>stone mcp</code>. It starts an MCP
-          server over stdio and stops on <code>Ctrl+C</code>, exactly like <code>stone dev</code>. The
-          MCP SDK owns the protocol and runs the handlers in-process, so these dev helpers never touch
-          your domain or the kernel.
+          Install it as a devDependency and you have <code>stone mcp</code>. There is nothing to add to
+          your application: this is dev tooling, so the CLI discovers its plugin and registers the
+          command. It starts an MCP server over stdio and stops on <code>Ctrl+C</code>, exactly like
+          {' '}<code>stone dev</code>. The MCP SDK owns the protocol and runs the handlers in-process,
+          so these dev helpers never touch your domain or the kernel.
         </p>
-        <Code file='app/Application.ts'>{`import { McpDev } from '@stone-js/mcp-dev'
-import { Routing } from '@stone-js/router'
-import { NodeHttp } from '@stone-js/node-http-adapter'
-import { StoneApp } from '@stone-js/core'
-
-@McpDev()   // adds the \`stone mcp\` command
-@Routing()
-@NodeHttp({ default: true })
-@StoneApp({ name: 'my-app' })
-export class Application {}`}</Code>
+        <Code file='terminal' lang='bash'>{`npm i -D @stone-js/mcp-dev   # that is the whole setup
+npx stone mcp --init         # registers the server in .mcp.json`}</Code>
 
         <h2>It reads your app, not just the framework</h2>
         <p>
