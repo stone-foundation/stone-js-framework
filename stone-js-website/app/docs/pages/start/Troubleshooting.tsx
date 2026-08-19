@@ -28,18 +28,78 @@ export class Troubleshooting implements IPage<ReactIncomingEvent> {
           each, plus answers to the questions that come up most.
         </Lead>
 
-        <H2>Decorators do nothing / metadata is missing</H2>
+        <H2>Decorators do nothing, or `SetupError: This decorator can only be applied to...`</H2>
         <p>
           Stone.js uses <strong>TC39 stage-3 decorators</strong> (the 2023-11 standard) with
-          <code> Symbol.metadata</code>, not the legacy TypeScript ones. If a decorator seems ignored,
-          your toolchain is almost certainly emitting the old form. Do <strong>not</strong> enable
-          <code> experimentalDecorators</code> or <code>emitDecoratorMetadata</code>, and never install
-          <code> reflect-metadata</code>. The Stone.js CLI already configures Babel correctly; if you
-          run your own build, use the stage-3 plugin:
+          <code> Symbol.metadata</code>, never the legacy TypeScript ones and never
+          <code> reflect-metadata</code>. Almost every problem here comes from one rule:
+        </p>
+        <Callout kind='important' title='Every transformer in the project must emit 2023-11'>
+          <code>experimentalDecorators: true</code> is a <strong>compiler</strong> setting you cannot
+          avoid today (see below), but it also tells <strong>esbuild</strong> to emit the
+          <em> legacy</em> form. So any decorated class imported under an esbuild-based tool (Vitest,
+          Vite) throws <code>SetupError: This decorator can only be applied to class methods</code>.
+          Babel with <code>version: 2023-11</code> is what keeps the runtime correct.
+        </Callout>
+        <p>
+          <strong>Why the flag is required.</strong> The published method-decorator signatures are
+          legacy-shaped, because that is the only shape TypeScript knows, while the bodies require a
+          2023-11 context. Without the flag, a method decorator does not typecheck
+          (<code>TS1241</code>, <code>TS1270</code>); with it, it compiles and Babel makes sure the
+          legacy form never exists at run time. Class decorators alone do not need it.
+        </p>
+        <Code file='tsconfig.json' lang='json'>{`{
+  "compilerOptions": {
+    // Appeases the compiler for method decorators. Babel emits 2023-11 at build time,
+    // so the legacy form never reaches the runtime.
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false
+  }
+}`}</Code>
+        <p>
+          The Stone.js CLI configures Babel for you. If you run your <strong>own</strong> build, or a
+          test runner, add the plugin yourself:
         </p>
         <Code file='babel (only if you bypass the Stone CLI)' lang='json'>{`{
   "plugins": [["@babel/plugin-proposal-decorators", { "version": "2023-11" }]]
 }`}</Code>
+        <H3>Testing a real application with Vitest</H3>
+        <p>
+          Vitest transforms with esbuild, so a decorated class imported in a test hits the rule above.
+          Add Babel to the test transform and the whole application boots in-memory, handlers,
+          services, error handlers and routes included:
+        </p>
+        <Code file='vitest.config.ts'>{`import babel from 'vite-plugin-babel'
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  plugins: [
+    babel({
+      filter: /\\.[jt]sx?$/,
+      babelConfig: {
+        babelrc: false,
+        configFile: false,
+        presets: ['@babel/preset-typescript'],
+        plugins: [['@babel/plugin-proposal-decorators', { version: '2023-11' }]]
+      }
+    })
+  ]
+})`}</Code>
+        <Callout kind='note' title='esbuild alone is fine, the flag is what forces Babel back in'>
+          esbuild 0.25 and later implement 2023-11 decorators correctly, metadata included. Without
+          <code> experimentalDecorators</code>, decorated classes work under esbuild with no Babel at
+          all. It is the compiler flag, imposed by the published typings, that requires the Babel
+          step. Typing the decorator factories as 2023-11 so the flag can disappear is tracked as the
+          real fix.
+        </Callout>
+        <H3>Checking metadata by hand</H3>
+        <p>
+          Metadata keys are <strong>symbols</strong>, so <code>JSON.stringify</code> hides them:
+          <code> JSON.stringify(MyClass[Symbol.metadata])</code> prints <code>{'{}'}</code> even when
+          everything is correct. Use <code>Reflect.ownKeys()</code> instead.
+        </p>
+        <Code file='node' lang='js'>{`Reflect.ownKeys(MyClass[Symbol.metadata] ?? {})   // the real keys
+JSON.stringify(MyClass[Symbol.metadata])          // always "{}" — do not trust it`}</Code>
         <Callout kind='important' title='Node version'>
           Stone.js targets <code>Node &gt;= 20.11</code> and is <strong>ESM-only</strong>. On an older
           Node, or with <code>"type": "commonjs"</code>, decorators and <code>Symbol.metadata</code>

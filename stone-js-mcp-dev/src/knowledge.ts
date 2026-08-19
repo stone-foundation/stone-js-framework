@@ -22,6 +22,11 @@ const modules: ModuleInfo[] = [
   { package: '@stone-js/router', summary: 'Universal router (node & browser).', tier: 'crosscutting' },
   { package: '@stone-js/env', summary: 'Environment access with masking.', tier: 'crosscutting' },
   { package: '@stone-js/filesystem', summary: 'Filesystem + file abstractions.', tier: 'crosscutting' },
+  { package: '@stone-js/cache', summary: 'Platform-agnostic caching with pluggable stores.', tier: 'crosscutting' },
+  { package: '@stone-js/cloud-file', summary: 'Cloud object-storage drivers extending the filesystem abstractions.', tier: 'crosscutting' },
+  { package: '@stone-js/i18n', summary: 'Runtime localization and translation services.', tier: 'crosscutting' },
+  { package: '@stone-js/queue', summary: 'Background job queues with pluggable drivers.', tier: 'crosscutting' },
+  { package: '@stone-js/realtime', summary: 'Realtime channels, rooms and presence.', tier: 'crosscutting' },
   { package: '@stone-js/browser-core', summary: 'Browser-side primitives.', tier: 'crosscutting' },
   { package: '@stone-js/node-http-adapter', summary: 'Node HTTP server adapter.', tier: 'adapter' },
   { package: '@stone-js/node-cli-adapter', summary: 'Node CLI adapter.', tier: 'adapter' },
@@ -56,13 +61,8 @@ const bestPractices: BestPractice[] = [
 ]
 
 const gaps: Gap[] = [
-  { name: 'queue/jobs', status: 'planned', note: 'Background jobs (in-memory, Redis/BullMQ, SQS, Cloud Tasks).' },
-  { name: 'cache', status: 'planned', note: 'Agnostic cache (memory, Redis, CF KV) — the legitimate shared scope.' },
   { name: 'mail/notifications', status: 'planned', note: 'Multi-channel notifications.' },
   { name: 'rate-limiting', status: 'planned', note: 'Edge-friendly throttling.' },
-  { name: 'i18n', status: 'planned', note: 'Runtime localization.' },
-  { name: 'websocket/realtime', status: 'planned', note: 'Channels/rooms/presence, agnostic drivers.' },
-  { name: 'cloud file drivers', status: 'planned', note: 'S3/R2/GCS drivers extending @stone-js/filesystem.' },
   { name: 'ORM', status: 'missing', note: 'By design: integrate Drizzle/Prisma/Kysely via providers — Stone.js will not ship an ORM.' }
 ]
 

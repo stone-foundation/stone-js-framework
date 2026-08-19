@@ -36,7 +36,12 @@ export const BuildServerAppMiddleware = async (
   rollupConfig.input = basePath(pattern)
   rollupConfig.output = {
     format: 'es',
-    file: buildPath('tmp/modules.mjs')
+    file: buildPath('tmp/modules.mjs'),
+    // A server artefact is a single file, so a dynamic `import()` anywhere in the app (lazy i18n
+    // catalogs, a conditionally-loaded driver) would otherwise fail with "when building multiple
+    // chunks, the output.dir option must be used". Inlining keeps one file and still defers
+    // evaluation to the moment the import is awaited.
+    inlineDynamicImports: true
   }
 
   const builder = await rollup(rollupConfig)
@@ -89,7 +94,8 @@ export const BundleServerAppMiddleware = async (
   rollupConfig.input = buildPath('tmp/server.mjs')
   rollupConfig.output = {
     format: 'es',
-    file: distPath(output)
+    file: distPath(output),
+    inlineDynamicImports: true
   }
 
   const bundle = await rollup(rollupConfig)

@@ -10,6 +10,12 @@ import { BlueprintContext, IBlueprint, ClassType, NextMiddleware, type MetaMiddl
  *
  * And also ensures that CORS headers are applied even when the middleware is not executed.
  *
+ * @deprecated Use the `@Cors()` decorator or `corsBlueprint` instead, the two ways a Stone.js module
+ * is enabled. This middleware runs at build time for the sole purpose of `add`-ing the two entries a
+ * blueprint can simply declare, which makes it a third activation path with nothing to show for it.
+ * It also has to be reached through `defineBlueprintMiddleware`, which is only legal from a place
+ * that runs before the builder reads its middleware list, and that is not obvious from the call site.
+ *
  * @param context - The configuration context containing modules and blueprint.
  * @param next - The next function in the pipeline.
  * @returns The updated blueprint.

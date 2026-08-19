@@ -245,7 +245,10 @@ export function classDecoratorLegacyWrapper<T extends ClassType = ClassType> (
       if (potentialContext.kind === 'class') {
         return decorator(target as unknown as T, potentialContext) as (TFunction | undefined)
       } else {
-        throw new SetupError('This decorator can only be applied to classes.')
+        throw new SetupError(
+          'This decorator can only be applied to classes. ' +
+          'Stone.js decorators require the TC39 2023-11 proposal, and the usual cause is a transformer emitting LEGACY decorators: the `experimentalDecorators` compiler flag makes esbuild (so Vite and Vitest) emit the legacy form, while Babel plugin-proposal-decorators with `version: 2023-11` emits the right one. Every transformer in the project must emit 2023-11. See https://stonejs.dev/docs/start/troubleshooting'
+        )
       }
     } else {
       throw new SetupError('Class decorators must be used with the 2023-11 decorators proposal. This usage is not supported.')
@@ -277,7 +280,10 @@ export function methodDecoratorLegacyWrapper<T extends Function = Function> (
       if ((potentialContext as ClassMethodDecoratorContext).kind === 'method') {
         return decorator(target as T, potentialContext as ClassMethodDecoratorContext) as TypedPropertyDescriptor<TFunction>
       } else {
-        throw new SetupError('This decorator can only be applied to class methods.')
+        throw new SetupError(
+          'This decorator can only be applied to class methods. ' +
+          'Stone.js decorators require the TC39 2023-11 proposal, and the usual cause is a transformer emitting LEGACY decorators: the `experimentalDecorators` compiler flag makes esbuild (so Vite and Vitest) emit the legacy form, while Babel plugin-proposal-decorators with `version: 2023-11` emits the right one. Every transformer in the project must emit 2023-11. See https://stonejs.dev/docs/start/troubleshooting'
+        )
       }
     } else {
       throw new SetupError('Class method decorators must be used with the 2023-11 decorators proposal. This usage is not supported.')
@@ -307,7 +313,10 @@ export function propertyDecoratorLegacyWrapper (
       if ((potentialContext as ClassFieldDecoratorContext).kind === 'field') {
         return decorator(undefined, potentialContext as ClassFieldDecoratorContext)
       } else {
-        throw new SetupError('This decorator can only be applied to class fields.')
+        throw new SetupError(
+          'This decorator can only be applied to class fields. ' +
+          'Stone.js decorators require the TC39 2023-11 proposal, and the usual cause is a transformer emitting LEGACY decorators: the `experimentalDecorators` compiler flag makes esbuild (so Vite and Vitest) emit the legacy form, while Babel plugin-proposal-decorators with `version: 2023-11` emits the right one. Every transformer in the project must emit 2023-11. See https://stonejs.dev/docs/start/troubleshooting'
+        )
       }
     } else {
       throw new SetupError('Class field decorators must be used with the 2023-11 decorators proposal. This usage is not supported.')

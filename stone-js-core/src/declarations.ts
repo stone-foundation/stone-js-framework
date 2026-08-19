@@ -870,7 +870,7 @@ export interface IErrorHandler<TEvent extends IncomingEvent, UResponse = unknown
 export type FunctionalErrorHandler<
 TEvent extends IncomingEvent,
 UResponse = unknown
-> = (error: any, event: TEvent) => Promiseable<UResponse>
+> = (error: any, event: TEvent) => Promiseable<UResponse | ResponseResolverOptions>
 
 /**
  * FactoryErrorHandler Type.

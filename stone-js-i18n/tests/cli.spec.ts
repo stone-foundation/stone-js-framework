@@ -3,9 +3,14 @@ import defaultPlugin, {
   toImportSpecifier,
   generateI18nModule,
   scanTranslationFiles,
+  findTranslationDirs,
+  collectTranslationFiles,
+  resolveTranslationFiles,
   toSafeJsStringLiteral,
   GENERATED_MODULE,
-  DEFAULT_I18N_DIR
+  DEFAULT_I18N_DIR,
+  DEFAULT_I18N_ROOT,
+  DEFAULT_I18N_DIRNAME
 } from '../src/cli'
 
 vi.mock('node:fs', () => ({
@@ -14,22 +19,48 @@ vi.mock('node:fs', () => ({
   statSync: vi.fn()
 }))
 
+vi.mock('glob', () => ({ globSync: vi.fn(() => []) }))
+
+import { globSync } from 'glob'
 import { existsSync, readdirSync, statSync } from 'node:fs'
 
-const ROOT = `/proj/${DEFAULT_I18N_DIR}`
-const DIRS = new Set([ROOT, `${ROOT}/en`, `${ROOT}/fr`])
+const APP = `/proj/${DEFAULT_I18N_ROOT}`
+const ROOT = `/proj/${DEFAULT_I18N_DIR}`                 // app/i18n, the conventional catalogue
+const MODULE_ROOT = `${APP}/modules/billing/i18n`         // a catalogue next to the code that uses it
+
+// A realistic nested layout: a shared catalogue plus one per module, which is how a large app groups
+// translations. Both are found by the walk, at any depth.
+const DIRS = new Set([
+  APP, `${APP}/modules`, `${APP}/modules/billing`, `${APP}/node_modules`, `${APP}/.cache`,
+  ROOT, `${ROOT}/en`, `${ROOT}/fr`,
+  MODULE_ROOT, `${MODULE_ROOT}/fr`
+])
 const ENTRIES: Record<string, string[]> = {
-  [ROOT]: ['en', 'fr', 'README.md'], // README.md at locale level is skipped (not a dir)
+  [APP]: ['i18n', 'modules', 'node_modules', '.cache', 'Application.ts'],
+  [`${APP}/modules`]: ['billing'],
+  [`${APP}/modules/billing`]: ['i18n', 'BillingService.ts'],
+  [`${APP}/node_modules`]: ['i18n'],                     // must be ignored
+  [`${APP}/.cache`]: ['i18n'],                           // must be ignored
+  [ROOT]: ['en', 'fr', 'README.md'],                     // README.md at locale level is skipped (not a dir)
   [`${ROOT}/en`]: ['common.json', 'auth.json', 'notes.txt'], // notes.txt (unlisted ext) skipped
-  [`${ROOT}/fr`]: ['common.json']
+  [`${ROOT}/fr`]: ['common.json'],
+  [MODULE_ROOT]: ['fr'],
+  [`${MODULE_ROOT}/fr`]: ['invoice.json']
 }
 const FILES = new Set([
-  `${ROOT}/en/common.json`, `${ROOT}/en/auth.json`, `${ROOT}/fr/common.json`, `${ROOT}/en/notes.txt`
+  `${ROOT}/en/common.json`, `${ROOT}/en/auth.json`, `${ROOT}/fr/common.json`, `${ROOT}/en/notes.txt`,
+  `${MODULE_ROOT}/fr/invoice.json`
 ])
 
 function mountFs (): void {
-  vi.mocked(existsSync).mockImplementation((p) => p === ROOT)
-  vi.mocked(readdirSync).mockImplementation((p) => (ENTRIES[p as string] ?? []) as any)
+  vi.mocked(existsSync).mockImplementation((p) => DIRS.has(p as string))
+  vi.mocked(readdirSync).mockImplementation((p, options?: any) => {
+    const names = ENTRIES[p as string] ?? []
+    // The deep walk asks for dirents; the per-locale scan asks for names.
+    return (options?.withFileTypes === true
+      ? names.map((name) => ({ name, isDirectory: () => DIRS.has(`${String(p)}/${name}`) }))
+      : names) as any
+  })
   vi.mocked(statSync).mockImplementation((p) => ({
     isDirectory: () => DIRS.has(p as string),
     isFile: () => FILES.has(p as string)
@@ -85,7 +116,7 @@ describe('generateI18nModule', () => {
 
   it('emits eager static imports handed to loadTranslations, with escaped specifiers', () => {
     const source = generateI18nModule(moduleDir, files, false)
-    expect(source).toContain("import { defineI18n, loadTranslations } from '@stone-js/i18n'")
+    expect(source).toContain("import { loadTranslations } from '@stone-js/i18n'")
     expect(source).toContain('import * as __i18n0 from ')
     expect(source).toContain('loadTranslations({')
     expect(source).toContain('common.json')     // filename tail survives
@@ -95,10 +126,95 @@ describe('generateI18nModule', () => {
 
   it('emits lazy per-file dynamic importers as loaders', () => {
     const source = generateI18nModule(moduleDir, files, true)
-    expect(source).toContain("import { defineI18n } from '@stone-js/i18n'")
     expect(source).toContain('loaders: {')
     expect(source).toContain('() => import(')
     expect(source).not.toContain('loadTranslations')
+  })
+
+  it('emits a `stone`-wrapped blueprint the module scan actually applies', () => {
+    // It used to emit `defineConfig(defineI18n({...}))`, which silently did NOTHING: `defineI18n`
+    // returns an unwrapped `{ i18n }` fragment while `defineConfig` expects a function or an object
+    // carrying `configure`, so `configure` resolved to a no-op and no catalogue ever reached the
+    // blueprint. Every translation returned its key, reading exactly like a missing catalogue.
+    for (const lazy of [true, false]) {
+      const source = generateI18nModule(moduleDir, files, lazy)
+      expect(source).toContain('stone: {')
+      expect(source).toContain('i18n: {')
+      expect(source).not.toContain('defineConfig')
+      expect(source).not.toContain('defineI18n')
+    }
+  })
+})
+
+describe('findTranslationDirs', () => {
+  beforeEach(() => { vi.clearAllMocks(); mountFs() })
+
+  it('finds every catalogue under the root, at any depth', () => {
+    // What lets a project group translations with the code that uses them, instead of forcing one
+    // flat directory: a shared catalogue plus one per module.
+    expect(findTranslationDirs(APP)).toEqual([ROOT, MODULE_ROOT])
+  })
+
+  it('ignores node_modules and dotted directories', () => {
+    expect(findTranslationDirs(APP)).not.toContain(`${APP}/node_modules/i18n`)
+    expect(findTranslationDirs(APP)).not.toContain(`${APP}/.cache/i18n`)
+  })
+
+  it('does not descend into a catalogue it already found', () => {
+    // A locale directory is not another catalogue, so the walk stops there.
+    expect(findTranslationDirs(APP)).not.toContain(`${ROOT}/en`)
+  })
+
+  it('honours a custom directory name, and copes with an absent root', () => {
+    expect(findTranslationDirs(APP, 'modules')).toEqual([`${APP}/modules`])
+    expect(findTranslationDirs('/nowhere')).toEqual([])
+  })
+})
+
+describe('collectTranslationFiles', () => {
+  beforeEach(() => { vi.clearAllMocks(); mountFs() })
+
+  it('collects the files of every catalogue, sorted and de-duplicated', () => {
+    expect(collectTranslationFiles(APP, ['json'])).toEqual([
+      `${ROOT}/en/auth.json`,
+      `${ROOT}/en/common.json`,
+      `${ROOT}/fr/common.json`,
+      `${MODULE_ROOT}/fr/invoice.json`
+    ].sort((a, b) => a.localeCompare(b)))
+  })
+})
+
+describe('resolveTranslationFiles', () => {
+  beforeEach(() => { vi.clearAllMocks(); mountFs() })
+
+  const base = { root: DEFAULT_I18N_ROOT, dirname: DEFAULT_I18N_DIRNAME }
+
+  it('walks the root by default', () => {
+    const files = resolveTranslationFiles('/proj', base, ['json'])
+    expect(files).toContain(`${ROOT}/en/common.json`)
+    expect(files).toContain(`${MODULE_ROOT}/fr/invoice.json`)
+  })
+
+  it('scans one explicit directory when `dir` is given', () => {
+    const files = resolveTranslationFiles('/proj', { ...base, dir: DEFAULT_I18N_DIR }, ['json'])
+    expect(files).toEqual([
+      `${ROOT}/en/auth.json`, `${ROOT}/en/common.json`, `${ROOT}/fr/common.json`
+    ])
+    expect(files).not.toContain(`${MODULE_ROOT}/fr/invoice.json`)
+  })
+
+  it('takes a glob when `pattern` is given, filtered by extension', () => {
+    vi.mocked(globSync).mockReturnValue([
+      `${ROOT}/fr/common.json`, `${ROOT}/en/common.json`, `${ROOT}/en/notes.txt`
+    ] as any)
+
+    const files = resolveTranslationFiles('/proj', { ...base, pattern: 'app/**/locales/*/*.json' }, ['json'])
+
+    // A dependency's catalogues are never the app's, whatever the glob matches.
+    expect(globSync).toHaveBeenCalledWith('app/**/locales/*/*.json', expect.objectContaining({
+      cwd: '/proj', nodir: true, ignore: expect.arrayContaining(['**/node_modules/**'])
+    }))
+    expect(files).toEqual([`${ROOT}/en/common.json`, `${ROOT}/fr/common.json`])
   })
 })
 
@@ -116,7 +232,10 @@ describe('i18nCliPlugin', () => {
   it('is a Stone CLI plugin with an onPrepare hook and no legacy blueprint middleware', () => {
     const plugin = i18nCliPlugin()
     expect(plugin.name).toBe('@stone-js/i18n')
-    expect(plugin.description).toContain(DEFAULT_I18N_DIR)
+    // The description advertises the walk, not a single directory, so `stone plugins` tells the truth.
+    expect(plugin.description).toContain(`${DEFAULT_I18N_ROOT}/**/${DEFAULT_I18N_DIRNAME}`)
+    expect(i18nCliPlugin({ dir: 'locales' }).description).toContain('locales')
+    expect(i18nCliPlugin({ pattern: 'src/**/*.json' }).description).toContain('src/**/*.json')
     expect(typeof plugin.onPrepare).toBe('function')
     expect(plugin.blueprintMiddleware).toBeUndefined()
   })

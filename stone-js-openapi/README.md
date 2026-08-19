@@ -41,6 +41,54 @@ export const spec = OpenApiGenerator
 // Serve spec as JSON from one route, and swaggerUiHtml('/openapi.json') as HTML from another.
 ```
 
+## Serving the contract
+
+One line and the contract serves itself, at `/openapi.json` with an explorer at `/docs`. Enable it
+the way every Stone.js module is enabled, with its decorator or with its blueprint:
+
+```ts
+import { OpenApi } from '@stone-js/openapi'
+import { StoneApp } from '@stone-js/core'
+
+@OpenApi({ info: { title: 'Tasks', version: '1.0.0' } })
+@StoneApp({ name: 'my-app' })
+export class Application {}
+```
+
+```ts
+import { defineStoneApp } from '@stone-js/core'
+import { openApiBlueprint } from '@stone-js/openapi'
+
+export const Application = defineStoneApp(handler, { name: 'my-app' }, [openApiBlueprint])
+```
+
+Configure it afterwards from a `@Configuration` class or `defineConfig`, under `stone.openapi`:
+
+```ts
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.openapi', {
+  info: { title: 'Tasks', version: '1.0.0' },
+  routes: [
+    { path: '/tasks', method: 'get', openapi: { summary: 'List tasks' } }
+  ]
+}))
+```
+
+Everything under `stone.openapi` is optional:
+
+| Key | Default | What it does |
+|---|---|---|
+| `info` | `{ title: 'API', version: '1.0.0' }` | Document metadata |
+| `specPath` | `/openapi.json` | Where the JSON document is served |
+| `docsPath` | `/docs` | Where the explorer is served; `false` serves the JSON only |
+| `routes` | `[]` | Routes to describe |
+| `document` | none | A pre-built document, when your app assembles its own |
+| `servers` | the requesting host | Server URLs to advertise |
+| `swaggerUi` | `{}` | Explorer rendering options |
+
+**The advertised server URL is the host that answered**, not a value frozen at build time: the same
+artefact runs behind a local port, a load balancer and an API Gateway stage, and a hardcoded URL is
+wrong for at least two of them. Declare `servers` to override that.
+
 ## Documentation
 
 Full documentation: **[stonejs.dev/docs/extensions/openapi](https://stonejs.dev/docs/extensions/openapi)**.
