@@ -52,8 +52,8 @@ Explore the full documentation: [https://stonejs.dev](https://stonejs.dev)
 
 ## API documentation
 
-- [API](https://github.com/stone-foundation/stone-js-core/blob/main/docs/modules.md)
+- [API](https://stonejs.dev/api)
 
 ## Contributing
 
-See [Contributing Guide](https://github.com/stone-foundation/stone-js-core/blob/main/CONTRIBUTING.md).
+See [Contributing Guide](https://github.com/stone-foundation/stone-js-framework/blob/main/CONTRIBUTING.md).
