@@ -45,6 +45,14 @@ export interface OpenApiOperation {
     headers?: SchemaInput
   }
   responses?: Record<string | number, OpenApiResponse>
+
+  /**
+   * Security requirements for this operation, as OpenAPI expects them.
+   *
+   * Derived from a route's `auth` and `authz` when the document is built from the router, so a
+   * protected endpoint documents itself as protected without anyone restating it.
+   */
+  security?: Array<Record<string, string[]>>
 }
 
 /** A route to derive an operation from (generic — decoupled from the router). */

@@ -2,6 +2,7 @@ import { AuthOptions } from '../declarations'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { AuthServiceProvider } from '../AuthServiceProvider'
 import { AuthenticateMiddleware } from '../middleware/AuthenticateMiddleware'
+import { MetaProtectRouteMiddleware } from '../middleware/ProtectRouteMiddleware'
 
 /**
  * Authentication configuration bucket (`stone.auth`).
@@ -40,6 +41,11 @@ export const authBlueprint: AuthBlueprint = {
     kernel: {
       middleware: [
         { module: AuthenticateMiddleware, isClass: true }
+      ]
+    },
+    router: {
+      middleware: [
+        MetaProtectRouteMiddleware
       ]
     }
   }

@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { Code } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, H3, Callout, PropsTable, SeeAlso, Pager } from '../../components/content'
@@ -46,19 +46,30 @@ export class KeyRouting implements IPage<ReactIncomingEvent> {
           <code> @KeyRouting()</code> is present.
         </Callout>
 
-        <H2>Enable it</H2>
+        <H2>Install and enable it</H2>
         <p>
           Stack it on any adapter that runs the kernel. Each incoming event is routed by a key read
           from a configurable property.
         </p>
-        <Code file='app/Application.ts'>{`import { StoneApp } from '@stone-js/core'
+        <Code file='terminal' lang='bash'>{`npm i @stone-js/router`}</Code>
+        <CodeTabs file='app/Application.ts' decl={`import { StoneApp } from '@stone-js/core'
 import { AwsLambda } from '@stone-js/aws-lambda-adapter'
 import { KeyRouting } from '@stone-js/router'
 
 @KeyRouting({ source: 'detail-type' })   // which incoming property carries the key
 @AwsLambda()
 @StoneApp({ name: 'consumer' })
-export class Application {}`}</Code>
+export class Application {}`} imp={`import { defineConfig, defineStoneApp } from '@stone-js/core'
+import { keyRoutingBlueprint } from '@stone-js/router'
+import { awsLambdaAdapterBlueprint } from '@stone-js/aws-lambda-adapter'
+
+export const App = defineStoneApp(
+  { name: 'consumer' },
+  [keyRoutingBlueprint, awsLambdaAdapterBlueprint]
+)
+
+// which incoming property carries the key
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.keyRouting.source', 'detail-type'))`} />
 
         <H3>Handlers</H3>
         <Code file='app/Handlers.ts'>{`import { KeyHandler, OnKey } from '@stone-js/router'

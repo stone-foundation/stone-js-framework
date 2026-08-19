@@ -16,17 +16,21 @@ export class Application {}
 `
 
 const IMP = `
-import { defineConfig } from '@stone-js/core'
+import { defineConfig, defineStoneApp } from '@stone-js/core'
+import { cloudFileBlueprint } from '@stone-js/cloud-file'
 
-export const AppConfig = defineConfig({
-  filesystem: {
-    default: 's3',
-    disks: [
-      { name: 's3', driver: 's3', bucket: 'uploads', region: 'eu-west-3' },
-      { name: 'r2', driver: 's3', bucket: 'assets', endpoint: 'https://<acct>.r2.cloudflarestorage.com' }
-    ]
-  }
-})
+// Enable the module on the manifest, exactly where the decorator sits
+export const App = defineStoneApp({ name: 'app' }, [cloudFileBlueprint])
+
+// Then configure it. defineConfig takes a function (or an object carrying \`configure\`):
+// handed a bare { filesystem: ... } fragment it silently configures nothing.
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.filesystem', {
+  default: 's3',
+  disks: [
+    { name: 's3', driver: 's3', bucket: 'uploads', region: 'eu-west-3' },
+    { name: 'r2', driver: 's3', bucket: 'assets', endpoint: 'https://<acct>.r2.cloudflarestorage.com' }
+  ]
+}))
 `
 
 /**
