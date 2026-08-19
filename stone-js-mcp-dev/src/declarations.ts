@@ -117,4 +117,12 @@ export interface McpDevOptions {
   report?: ReportToolsOptions
   /** Silence the stderr activity log. */
   quiet?: boolean
+
+  /**
+   * Whether a running application publishes its resolved configuration for the MCP server to read.
+   *
+   * Defaults to on outside production. It is what lets `stone mcp` describe the application actually
+   * running rather than the one the console command boots, so leave it on while developing.
+   */
+  publishContext?: boolean
 }
