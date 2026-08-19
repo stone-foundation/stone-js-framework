@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/npm/l/@stone-js/starters)](https://opensource.org/licenses/MIT)
 [![Maintenance](https://img.shields.io/maintenance/yes/2026)](https://stonejs.dev)
-[![Used by Stone CLI](https://img.shields.io/badge/Used%20by-Stone%20CLI-blue)](https://github.com/stone-foundation/stone-js-cli)
+[![Used by Stone CLI](https://img.shields.io/badge/Used%20by-Stone%20CLI-blue)](https://github.com/stone-foundation/stone-js-framework)
 
 This repository contains official **starter templates** for Stone.js applications.
 
@@ -98,4 +98,4 @@ Explore the full documentation: [https://stonejs.dev](https://stonejs.dev)
 
 ## Contributing
 
-See [Contributing Guide](https://github.com/stone-foundation/stone-js-starters/blob/main/CONTRIBUTING.md)
+See [Contributing Guide](https://github.com/stone-foundation/stone-js-framework/blob/main/CONTRIBUTING.md)
