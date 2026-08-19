@@ -4,7 +4,73 @@ import { multiEntry } from './multiEntry'
 import commonjs from '@rollup/plugin-commonjs'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import nodeExternals from 'rollup-plugin-node-externals'
+import fsExtra from 'fs-extra'
+import { join } from 'node:path'
+import { basePath } from '@stone-js/filesystem'
+import { createRequire } from 'node:module'
+import { existsSync, readdirSync } from 'node:fs'
 import { defineConfig, RollupLog, LoggingFunction } from 'rollup'
+
+const { readJsonSync } = fsExtra
+
+/** Memoized set of optional peers no consumer installed, computed once per build. */
+let unresolvablePeers: Set<string> | undefined
+
+/**
+ * Collect the optional peer dependencies declared by the installed `@stone-js/*` packages that the
+ * project has NOT installed.
+ *
+ * Nine packages ship optional peers (js-yaml, ioredis, ws, the cloud SDKs...): each is imported
+ * lazily, behind the branch that needs it, precisely so an app pays for only what it uses. Rollup
+ * still sees the specifier and, unable to resolve it, warns "could not be resolved - treating it as
+ * an external dependency" on every build. Treating them as external up front is what the warning
+ * suggests anyway, minus the noise, and it is scoped to what is genuinely absent: an installed
+ * optional peer keeps its normal resolution.
+ *
+ * @returns The unresolvable optional peer names.
+ */
+function collectUnresolvableOptionalPeers (): Set<string> {
+  if (unresolvablePeers !== undefined) { return unresolvablePeers }
+
+  unresolvablePeers = new Set<string>()
+  const scopeDir = basePath('node_modules', '@stone-js')
+
+  if (!existsSync(scopeDir)) { return unresolvablePeers }
+
+  const require = createRequire(basePath('package.json'))
+
+  for (const name of readdirSync(scopeDir)) {
+    const manifest = join(scopeDir, name, 'package.json')
+    if (!existsSync(manifest)) { continue }
+
+    const meta = readJsonSync(manifest, { throws: false })?.peerDependenciesMeta ?? {}
+
+    for (const [peer, options] of Object.entries<{ optional?: boolean }>(meta)) {
+      if (options?.optional !== true) { continue }
+      try {
+        require.resolve(peer)
+      } catch {
+        unresolvablePeers.add(peer)
+      }
+    }
+  }
+
+  return unresolvablePeers
+}
+
+/**
+ * Whether a module id is an optional peer the project did not install.
+ *
+ * Used as Rollup's `external` predicate. Subpaths count (`ioredis/cluster`), since a package that is
+ * absent cannot have resolvable subpaths either.
+ *
+ * @param id - The module id Rollup is resolving.
+ * @returns True when the id must be treated as external.
+ */
+export function isUnresolvableOptionalPeer (id: string): boolean {
+  const peers = collectUnresolvableOptionalPeers()
+  return peers.has(id) || [...peers].some((peer) => id.startsWith(`${peer}/`))
+}
 
 /**
  * Drop circular-dependency warnings coming from `node_modules`, keep everything else.
@@ -32,6 +98,7 @@ export function onwarnSkipVendorCycles (warning: RollupLog, warn: LoggingFunctio
 const rollupBuildConfig = defineConfig({
   input: 'app/**/*.ts',
   context: 'globalThis',
+  external: isUnresolvableOptionalPeer,
   output: {
     format: 'es',
     file: 'dist/app.mjs',
@@ -86,6 +153,7 @@ const rollupBuildConfig = defineConfig({
 const rollupBundleConfig = defineConfig({
   input: 'app/**/*.ts',
   context: 'globalThis',
+  external: isUnresolvableOptionalPeer,
   output: {
     format: 'es',
     file: 'dist/app.mjs',

@@ -5,6 +5,7 @@ import { StoneFactory, stoneApp } from '../src/StoneFactory'
 import { defineConfig } from '../src/blueprint/BlueprintUtils'
 import { IntegrationError } from '../src/errors/IntegrationError'
 import { BlueprintBuilder } from '../src/blueprint/BlueprintBuilder'
+import { ConfigurationPriority } from '../src/decorators/Configuration'
 import { CONFIGURATION_KEY, CONFIG_MIDDLEWARE_KEY, LIFECYCLE_HOOK_KEY, BLUEPRINT_KEY } from '../src/decorators/constants'
 
 vi.mock('../src/blueprint/BlueprintUtils', async (importOriginal) => {
@@ -260,6 +261,60 @@ describe('StoneFactory', () => {
       // @ts-expect-error access private
       const hook = factory.blueprint.get('stone.lifecycleHooks.onBlueprintPrepared', [])
       expect(hook[0]).toBeDefined()
+    })
+
+    it('runs configurations in ascending priority order, whatever the module order', async () => {
+      const order: string[] = []
+      const make = (name: string, priority?: number): any => class {
+        configure = (): void => { order.push(name) }
+        public static [MetadataSymbol] = {
+          [CONFIGURATION_KEY]: priority === undefined ? { live: false } : { live: false, priority }
+        }
+      }
+
+      // Declared app-first, remote-last: without ordering the remote overlay would land after the
+      // configuration that reads it.
+      const App = make('app', ConfigurationPriority.App)
+      const Remote = make('remote', ConfigurationPriority.Sources)
+      const Module = make('module', ConfigurationPriority.Module)
+
+      const factory = StoneFactory.create({ modules: [App, Module, Remote] })
+      // @ts-expect-error access private
+      await factory.initBlueprint()
+
+      expect(order).toEqual(['remote', 'app', 'module'])
+    })
+
+    it('keeps declaration order for equal priorities, and defaults to the App step', async () => {
+      const order: string[] = []
+      const make = (name: string, options: Record<string, unknown>): any => class {
+        configure = (): void => { order.push(name) }
+        public static [MetadataSymbol] = { [CONFIGURATION_KEY]: { live: false, ...options } }
+      }
+
+      // `second` declares nothing: an unordered configuration must behave exactly as before, which
+      // means sitting with the App step and keeping its place among equals.
+      const first = make('first', { priority: ConfigurationPriority.App })
+      const second = make('second', {})
+      const third = make('third', { priority: ConfigurationPriority.App })
+
+      const factory = StoneFactory.create({ modules: [first, second, third] })
+      // @ts-expect-error access private
+      await factory.initBlueprint()
+
+      expect(order).toEqual(['first', 'second', 'third'])
+    })
+
+    it('carries the priority through defineConfig', async () => {
+      const order: string[] = []
+      const Remote = defineConfig(() => { order.push('remote') }, { priority: ConfigurationPriority.Sources })
+      const App = defineConfig(() => { order.push('app') })
+
+      const factory = StoneFactory.create({ modules: [App, Remote] })
+      // @ts-expect-error access private
+      await factory.initBlueprint()
+
+      expect(order).toEqual(['remote', 'app'])
     })
 
     it('should register live configs if live: true', async () => {
