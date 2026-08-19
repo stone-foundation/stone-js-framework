@@ -152,7 +152,11 @@ export class RouteMapper<
     child.bindings = { ...parent.bindings, ...child.bindings }
     child.name = [parent.name, child.name].filter(Boolean).join('.')
     child.path = ['/', parent.path, child.path].filter(Boolean).join('/')
-    child.middleware = [child.middleware, parent.middleware].flat().filter((v) => v !== undefined)
+    // Parent first: a group encloses its routes, so its middleware must run before theirs. The
+    // reverse order let a route's validation answer 422 to a request the group's guard would have
+    // rejected with 401, doing work for an unauthenticated caller and describing the expected body
+    // of a protected surface to them.
+    child.middleware = [parent.middleware, child.middleware].flat().filter((v) => v !== undefined)
     child.excludeMiddleware = [child.excludeMiddleware, parent.excludeMiddleware].flat().filter((v) => v !== undefined)
 
     if (
