@@ -1,6 +1,5 @@
 import { NODE_HTTP_PLATFORM, nodeHttpAdapterBlueprint } from '@stone-js/node-http-adapter'
-import { defineCommand, NODE_CONSOLE_PLATFORM, nodeConsoleAdapterBlueprint } from '@stone-js/node-cli-adapter'
-import { defineStoneApp, defineConfig, IBlueprint, ILogger, IncomingEvent, FunctionalEventHandler } from '@stone-js/core'
+import { defineStoneApp, ILogger, IncomingEvent, FunctionalEventHandler } from '@stone-js/core'
 
 /**
  * Create an handler using the factory handler.
@@ -40,19 +39,8 @@ export const Application = defineStoneApp(
     isFactory: true,
     adapter: { platform: NODE_HTTP_PLATFORM }
   },
-  [nodeHttpAdapterBlueprint, nodeConsoleAdapterBlueprint]
+  [nodeHttpAdapterBlueprint]
 )
-
-/**
- * Application configuration.
- */
-export const AppConfig = defineConfig({
-  afterConfigure (blueprint: IBlueprint) {
-    if (blueprint.is('stone.adapter.platform', NODE_CONSOLE_PLATFORM)) {
-      blueprint.set(defineCommand(FactoryHandler, { name: '*', isFactory: true }))
-    }
-  }
-})
 
 /**
  * Application options.

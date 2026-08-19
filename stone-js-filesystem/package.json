@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/filesystem",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "Stone.js Filesystem is a module that provides an interface for managing uploaded files in a Stone.js application.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "filesize": "^10.1.6",
+    "glob": "^13.0.0",
     "mime": "^4.0.7"
   },
   "devDependencies": {

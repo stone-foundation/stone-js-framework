@@ -11,7 +11,7 @@ import { basename, dirname, join } from 'node:path'
 import Dotenv, { DotenvPopulateInput } from 'dotenv'
 import { builder, BuilderConfig } from './options/BuilderConfig'
 import { IBlueprint, IncomingEvent, isNotEmpty } from '@stone-js/core'
-import { basePath, buildPath, importModule } from '@stone-js/filesystem'
+import { basePath, buildPath, importModule, appModuleFiles, DEFAULT_APP_MODULES_PATTERN } from '@stone-js/filesystem'
 import { DotenvConfig, DotenvFiles, DotenvOptions } from './options/DotenvConfig'
 
 const { readJsonSync, pathExistsSync, outputJsonSync, outputFileSync } = fsExtra
@@ -199,7 +199,7 @@ export function setupProcessSignalHandlers (getServerProcess: () => ChildProcess
  * @param config - The user configuration.
  * @returns The user configuration.
  */
-export const defineConfig = (config: Partial<BuilderConfig>): Partial<BuilderConfig> => config
+export const defineBuilderConfig = (config: Partial<BuilderConfig>): Partial<BuilderConfig> => config
 
 /**
  * Get the Stone.js builder configuration.
@@ -256,7 +256,7 @@ export const isReactApp = (blueprint: IBlueprint, event: IncomingEvent): boolean
  * @returns True if the application is using lazy loading.
  */
 export const isLazyViews = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
-  const files = glob.sync(basePath(blueprint.get('stone.builder.input.all', 'app/**/*.{ts,tsx,js,jsx,mjsx}')))
+  const files = appModuleFiles({ pattern: blueprint.get('stone.builder.input.all', DEFAULT_APP_MODULES_PATTERN) })
   if (!event.is('lazy', undefined)) return event.is('lazy', true)
   if (!blueprint.is('stone.builder.lazy', undefined)) return blueprint.is('stone.builder.lazy', true)
   return files.some((filePath) => {
@@ -273,13 +273,75 @@ export const isLazyViews = (blueprint: IBlueprint, event: IncomingEvent): boolea
  * @returns True if the application is using imperative API.
  */
 export const isDeclarative = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
-  const files = glob.sync(basePath(blueprint.get('stone.builder.input.all', 'app/**/*.{ts,tsx,js,jsx,mjsx}')))
+  const files = appModuleFiles({ pattern: blueprint.get('stone.builder.input.all', DEFAULT_APP_MODULES_PATTERN) })
   if (!event.is('imperative', undefined)) return event.is('imperative', false)
   if (!blueprint.is('stone.builder.imperative', undefined)) return blueprint.is('stone.builder.imperative', false)
   return files.some((filePath) => {
     const content = readFileSync(filePath, 'utf-8')
     return content.includes('@stone-js/core') && content.includes('@StoneApp')
   })
+}
+
+/**
+ * App-level decorator names whose presence in a .tsx/.jsx file makes the file require eager loading.
+ * These configure the application itself, not individual pages.
+ */
+const APP_LEVEL_DECORATORS = ['StoneApp', 'Browser', 'UseReact', 'Configuration', 'Provider']
+
+/**
+ * Matches an app-level decorator where one can actually appear: at the start of a line, before a
+ * class or an export, allowing indentation.
+ */
+const APP_LEVEL_DECORATOR_RE = new RegExp(
+  String.raw`^[ \t]*@[ \t]*(?:${APP_LEVEL_DECORATORS.join('|')})\b`,
+  'm'
+)
+
+/**
+ * Remove the parts of a source file where a decorator name is only ever *mentioned*.
+ *
+ * Template literals, block comments and line comments all carry decorator names in perfectly normal
+ * code: a page that documents Stone.js renders `@StoneApp` inside a fenced sample, and a JSDoc block
+ * refers to `@Configuration` in prose. Scanning raw text flags all of them. This repository's own
+ * documentation site is the proof: 51 of its `.tsx` files mention one of these names, and none of
+ * them declares one.
+ *
+ * @param content - The file's source.
+ * @returns The source with mentions blanked out, line structure preserved.
+ */
+export const stripNonDeclarations = (content: string): string => {
+  return content
+    .replace(/`(?:\\.|[^`\\])*`/g, (match) => match.replace(/[^\n]/g, ' '))
+    .replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, ' '))
+    .replace(/\/\/[^\n]*/g, (match) => ' '.repeat(match.length))
+}
+
+/**
+ * Whether a source file actually *declares* an app-level decorator.
+ *
+ * @param content - The file's source.
+ * @returns Whether the file carries an app-level declaration.
+ */
+export const declaresAppLevelDecorator = (content: string): boolean => {
+  return APP_LEVEL_DECORATOR_RE.test(stripNonDeclarations(content))
+}
+
+/**
+ * Scans .tsx and .jsx app source files for app-level decorators when lazy views are on.
+ *
+ * Returns the files that need eager loading because they carry application configuration rather than
+ * page-level declarations. A file that merely mentions one of the names, in a comment, a JSDoc block
+ * or a code sample rendered inside JSX, is not one of them.
+ *
+ * @param blueprint The blueprint object.
+ * @returns The list of .tsx/.jsx files that declare app-level decorators.
+ */
+export const checkAppLevelDecoratorsInTsx = (blueprint: IBlueprint): string[] => {
+  const tsxFiles = glob.sync(basePath(
+    blueprint.get('stone.builder.input.views', 'app/**/*.{tsx,jsx,mjsx}')
+  ))
+
+  return tsxFiles.filter((filePath) => declaresAppLevelDecorator(readFileSync(filePath, 'utf-8')))
 }
 
 /**
@@ -290,7 +352,7 @@ export const isDeclarative = (blueprint: IBlueprint, event: IncomingEvent): bool
  * @returns True if the application is using client-side rendering.
  */
 export const isCSR = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
-  const files = glob.sync(basePath(blueprint.get('stone.builder.input.all', 'app/**/*.{ts,tsx,js,jsx,mjsx}')))
+  const files = appModuleFiles({ pattern: blueprint.get('stone.builder.input.all', DEFAULT_APP_MODULES_PATTERN) })
   if (!event.is('rendering', undefined)) return event.is('rendering', 'csr')
   if (!blueprint.is('stone.builder.rendering', undefined)) return blueprint.is('stone.builder.rendering', 'csr')
   return files.some((filePath) => {
@@ -306,7 +368,7 @@ export const isCSR = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
  * @returns True if the application is using server-side rendering.
  */
 export const isSSR = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
-  const files = glob.sync(basePath(blueprint.get('stone.builder.input.all', 'app/**/*.{ts,tsx,js,jsx,mjsx}')))
+  const files = appModuleFiles({ pattern: blueprint.get('stone.builder.input.all', DEFAULT_APP_MODULES_PATTERN) })
   if (!event.is('rendering', undefined)) return event.is('rendering', 'ssr')
   if (!blueprint.is('stone.builder.rendering', undefined)) return blueprint.is('stone.builder.rendering', 'ssr')
   return files.some((filePath) => {

@@ -3,8 +3,7 @@ import * as path from 'path'
 import fsExtra from 'fs-extra'
 import * as crypto from 'crypto'
 import * as process from 'node:process'
-import {
-  isSSR,
+import { isSSR,
   isCSR,
   isSSG,
   dirPath,
@@ -15,7 +14,7 @@ import {
   isLazyViews,
   shouldBuild,
   getFileHash,
-  defineConfig,
+  defineBuilderConfig,
   isDeclarative,
   getEnvVariables,
   isTypescriptApp,
@@ -23,8 +22,8 @@ import {
   inferRenderingStrategy,
   setupProcessSignalHandlers,
   getDefaultPublicEnvOptions,
-  generatePublicEnvironmentsFile
-} from '../src/utils'
+  generatePublicEnvironmentsFile,
+  declaresAppLevelDecorator, stripNonDeclarations } from '../src/utils'
 import Dotenv from 'dotenv'
 import { importModule } from '@stone-js/filesystem'
 import { builder } from '../src/options/BuilderConfig'
@@ -42,7 +41,12 @@ vi.mock('@stone-js/filesystem', async (mod) => {
     ...actual,
     importModule: vi.fn(),
     basePath: (p: string) => path.resolve(__dirname, './.tmp-utils', p),
-    buildPath: (p: string) => path.resolve(__dirname, './.tmp-utils', p)
+    buildPath: (p: string) => path.resolve(__dirname, './.tmp-utils', p),
+    // The scan resolves paths internally, so pointing `basePath` at the temp dir is not enough:
+    // it has to be given the absolute pattern, which it accepts.
+    appModuleFiles: ({ pattern }: { pattern?: string } = {}) => actual.appModuleFiles({
+      pattern: path.resolve(__dirname, './.tmp-utils', pattern ?? actual.DEFAULT_APP_MODULES_PATTERN)
+    })
   }
 })
 
@@ -122,10 +126,10 @@ describe('utils: getFileHash', () => {
   })
 })
 
-describe('utils: defineConfig', () => {
+describe('utils: defineBuilderConfig', () => {
   it('should return the config as-is', () => {
     const config: any = { foo: 'bar' }
-    expect(defineConfig(config)).toBe(config)
+    expect(defineBuilderConfig(config)).toBe(config)
   })
 })
 
@@ -564,5 +568,40 @@ describe('setupProcessSignalHandlers', () => {
   it('should be a no-op when no process is present', () => {
     setupProcessSignalHandlers(() => undefined)
     expect(() => process.emit('SIGTERM')).not.toThrow()
+  })
+})
+
+describe('declaresAppLevelDecorator', () => {
+  it('finds a declaration where one can actually appear', () => {
+    expect(declaresAppLevelDecorator('@StoneApp({ name: \'x\' })\nexport class Application {}')).toBe(true)
+    expect(declaresAppLevelDecorator('  @Configuration()\n  export class C {}')).toBe(true)
+    expect(declaresAppLevelDecorator('@Provider()\nexport class P {}')).toBe(true)
+  })
+
+  it('ignores a name that is only mentioned', () => {
+    // This is the whole correction. Scanning raw text flagged 51 of this repository's own website
+    // files, none of which declares anything: a docs page renders `@StoneApp` inside a code sample,
+    // and a JSDoc block refers to `@Configuration` in prose. Failing those builds would be wrong.
+    expect(declaresAppLevelDecorator('// registered via @Provider elsewhere')).toBe(false)
+    expect(declaresAppLevelDecorator('/**\n * See @Configuration for options.\n */')).toBe(false)
+    expect(declaresAppLevelDecorator('export const D = () => <code>@UseReact</code>')).toBe(false)
+    expect(declaresAppLevelDecorator('const S = `@StoneApp({ name: 1 })\nexport class A {}`')).toBe(false)
+  })
+
+  it('ignores decorators that are not app-level', () => {
+    expect(declaresAppLevelDecorator('@Page(\'/home\')\nexport class Home {}')).toBe(false)
+    expect(declaresAppLevelDecorator('@EventHandler(\'/x\')\nexport class H {}')).toBe(false)
+  })
+})
+
+describe('stripNonDeclarations', () => {
+  it('blanks mentions while keeping the line structure, so line numbers stay true', () => {
+    const stripped = stripNonDeclarations('a\n// @StoneApp\nb\n/* @Provider */\nc')
+
+    expect(stripped.split('\n')).toHaveLength(5)
+    expect(stripped).not.toContain('@StoneApp')
+    expect(stripped).not.toContain('@Provider')
+    expect(stripped).toContain('a')
+    expect(stripped).toContain('c')
   })
 })

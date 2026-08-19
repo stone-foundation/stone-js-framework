@@ -25,6 +25,14 @@ export type AbilityResolver = (user: unknown) => AppAbility
 export interface AuthzOptions {
   /** Builds the ability for the current principal. Defaults to a deny-all ability. */
   resolveAbility?: AbilityResolver
+
+  /**
+   * Named policies a route or a handler can refer to by name.
+   *
+   * Filled by `@Policy`, and may be set by hand. Naming a policy that is not registered **denies**
+   * the request: a missing policy must never read as permission.
+   */
+  policies?: Record<string, unknown>
 }
 
 /**

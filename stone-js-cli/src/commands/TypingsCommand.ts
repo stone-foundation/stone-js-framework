@@ -13,7 +13,7 @@ import { isTypescriptApp, setupProcessSignalHandlers } from '../utils'
  */
 export const typingsCommandOptions: CommandOptions = {
   name: 'typings',
-  alias: 't',
+  alias: 'ty',
   desc: 'Check code typings for typescript',
   options: (yargs: Argv) => {
     return yargs

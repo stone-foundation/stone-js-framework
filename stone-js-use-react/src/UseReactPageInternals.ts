@@ -400,8 +400,44 @@ export const isServer = (): boolean => typeof window === 'undefined'
  */
 export const isClient = (): boolean => !isServer()
 
+/** Whether the missing-template warning has already been given, so it is said once, not per request. */
+let templateFallbackWarned = false
+
+/**
+ * The smallest document this renderer can render into.
+ *
+ * Server rendering needs a shell carrying the two placeholders it splices into, the element the client
+ * hydrates, and a `<title>` — a page's title is *replaced* in place rather than inserted, so a shell
+ * without one silently loses it. The real shell is generated from the project's `index.html` at build
+ * time and carries the stylesheet and the client bundle; this one carries nothing but the contract.
+ *
+ * It exists because there is a legitimate context with no build step: a test. Booting an application
+ * in memory and rendering a page is exactly what `@stone-js/testing` does, and refusing to render
+ * there served nobody — the shell is the renderer's own business, so the renderer can produce it.
+ *
+ * @param rootElementId - The element the client mounts on.
+ * @returns The minimal HTML template.
+ */
+export const defaultHtmlTemplate = (rootElementId: string = 'root'): string => `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <!--app-head-->
+  </head>
+  <body>
+    <div id="${rootElementId}"><!--app-html--></div>
+  </body>
+</html>
+`
+
 /**
  * Get the HTML template for the React application.
+ *
+ * Falls back to {@link defaultHtmlTemplate} when none is configured, warning once. A build always
+ * sets one, so reaching the fallback means either a test (where it is the point) or a build that did
+ * not run (where an unstyled page plus one warning beats a page that cannot render at all).
  *
  * @param blueprint - The blueprint.
  * @returns The HTML template.
@@ -410,11 +446,21 @@ export const htmlTemplate = (
   blueprint: IBlueprint
 ): string => {
   const content = blueprint.get<string>('stone.useReact.htmlTemplateContent')
+
   if (isNotEmpty<string>(content)) {
     return content
-  } throw new UseReactError(
-    'HTML template content is required for server-side rendering. Please provide the `htmlTemplateContent` in the blueprint configuration.'
-  )
+  }
+
+  if (!templateFallbackWarned) {
+    templateFallbackWarned = true
+    console.warn(
+      '[@stone-js/use-react] No `stone.useReact.htmlTemplateContent` was configured, rendering into a ' +
+      'minimal HTML shell. Expected outside a build (a test, for instance); inside one, it means the ' +
+      'template was not generated and the page will ship without its stylesheet or client bundle.'
+    )
+  }
+
+  return defaultHtmlTemplate(blueprint.get<string>('stone.useReact.rootElementId', 'root'))
 }
 
 /**

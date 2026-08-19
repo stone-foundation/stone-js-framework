@@ -1,6 +1,8 @@
 import { ValidationOptions } from '../declarations'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { ValidationServiceProvider } from '../ValidationServiceProvider'
+import { MetaValidateRouteMiddleware } from '../middleware/ValidateRouteMiddleware'
+import { MetaValidationSchemaMiddleware } from '../middleware/BlueprintMiddleware'
 
 /**
  * Validation configuration bucket (`stone.validation`).
@@ -24,14 +26,28 @@ export interface ValidationBlueprint extends StoneBlueprint {
 /**
  * Opt-in blueprint: import and register it to enable validation.
  *
- * It contributes the validation service provider. `stone.providers` is an array, so this merges
- * with the rest of the app rather than replacing anything.
+ * It contributes the validation service provider and the route middleware that validates what a
+ * route declared under `validation`. Both `stone.providers` and `stone.router.middleware` are
+ * arrays, so this merges with the rest of the app rather than replacing anything.
+ *
+ * The route middleware is a no-op on routes that declare nothing, so enabling validation costs an
+ * application that does not use it one function call per request.
  */
 export const validationBlueprint: ValidationBlueprint = {
   stone: {
     validation: {},
+    blueprint: {
+      middleware: [
+        MetaValidationSchemaMiddleware
+      ]
+    },
     providers: [
       ValidationServiceProvider
-    ]
+    ],
+    router: {
+      middleware: [
+        MetaValidateRouteMiddleware
+      ]
+    }
   }
 }

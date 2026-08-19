@@ -57,7 +57,7 @@ export class Rendering implements IPage<ReactIncomingEvent> {
         </Lead>
 
         <H2>Choosing a strategy</H2>
-        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+        <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   rendering: 'ssg'   // 'csr' | 'ssr' | 'ssg'
 })`}</Code>
         <PropsTable nameHeader='Strategy' rows={[
@@ -76,13 +76,31 @@ export class Rendering implements IPage<ReactIncomingEvent> {
 
         <H3>SSG routes</H3>
         <p>
-          Static generation pre-renders the routes you list. Parameterised routes are listed
-          explicitly. Everything hydrates on load, so the page is interactive after the first paint.
+          You do not list your routes. Static generation pre-renders the pages your app already
+          declares: the same scanned definitions that drive routing become the pre-render set.
+          Everything hydrates on load, so the page is interactive after the first paint.
         </p>
-        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+        <p>
+          Two settings cover what a declaration alone cannot say. <code>ssg.params</code> gives a
+          dynamic segment its values, so parameterised paths expand instead of being skipped; an
+          optional segment also yields the path without it. <code>ssg.routes</code> stays additive,
+          for paths no declaration can produce.
+        </p>
+        <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   rendering: 'ssg',
-  ssg: { routes: ['/', '/tasks', '/tasks/1', '/about'] }
+  ssg: {
+    // /:lang?/about  ->  /about, /en/about, /fr/about
+    params: { lang: ['en', 'fr'] },
+    // Anything data-driven, added on top of the derived set.
+    routes: ['/blog/hello-world']
+  }
 })`}</Code>
+        <Callout kind='note' title='A parameterised prefix is the case that matters'>
+          A localized site often puts <code>:lang</code> on the router prefix, which lands a dynamic
+          segment on <em>every</em> route. Without <code>ssg.params</code>, every route is skipped and
+          discovery yields nothing; with it, one line pre-renders the whole grid. Routes that still
+          cannot be expanded are reported at build time, with the segments they would need.
+        </Callout>
 
         <H2>SOR: server-only, zero client JS</H2>
         <p>

@@ -7,9 +7,11 @@ import {
   buildPath,
   getFileHash,
   importModule,
-  nodeModulesPath
+  appModuleFiles,
+  nodeModulesPath,
+  DEFAULT_APP_MODULES_PATTERN
 } from '../src/utils'
-import { join } from 'node:path'
+import { isAbsolute, join } from 'node:path'
 import { writeFileSync, rmSync } from 'node:fs'
 
 describe('Path Utilities', () => {
@@ -51,5 +53,30 @@ describe('Path Utilities', () => {
   it('should return undefined for missing import', async () => {
     const result = await importModule('non-existent-module.js')
     expect(result).toBeUndefined()
+  })
+})
+
+describe('appModuleFiles', () => {
+  // The shared definition of "the app's source files": the CLI decides how to build from it, and
+  // `@stone-js/testing` decides what to boot from it. A test suite booting a different set than the
+  // build ships is the failure this exists to prevent, so it is worth pinning.
+  it('lists matching files, absolute and sorted', () => {
+    const files = appModuleFiles({ pattern: 'tests/**/*.spec.ts' })
+
+    expect(files.length).toBeGreaterThan(0)
+    expect(files.every((file) => isAbsolute(file))).toBe(true)
+    expect([...files]).toEqual([...files].sort((a, b) => a.localeCompare(b)))
+  })
+
+  it('accepts an absolute pattern as given', () => {
+    const absolute = join(process.cwd(), 'tests/**/*.spec.ts')
+
+    expect(appModuleFiles({ pattern: absolute })).toEqual(appModuleFiles({ pattern: 'tests/**/*.spec.ts' }))
+  })
+
+  it('defaults to the app directory', () => {
+    // No `app/` in this package, so the default finds nothing rather than throwing.
+    expect(appModuleFiles()).toEqual([])
+    expect(DEFAULT_APP_MODULES_PATTERN).toBe('app/**/*.{ts,tsx,js,jsx,mjsx}')
   })
 })

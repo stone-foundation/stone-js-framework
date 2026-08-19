@@ -87,7 +87,7 @@ export class TasksPage {
           CSR, SSR and SSG are not three ways to write your app. They are three ways to
           <em> resolve</em> the same pages. You choose in configuration; the pages do not change.
         </p>
-        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+        <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   rendering: 'ssg'   // or 'ssr', or 'csr'
 })`}</Code>
         <H3>Which one when</H3>

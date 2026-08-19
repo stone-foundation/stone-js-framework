@@ -1,5 +1,25 @@
 # Change Log
 
+## 0.8.9
+
+### Patch Changes
+
+- Updated dependencies [d47b2ee]
+- Updated dependencies [995f2c7]
+- Updated dependencies [e149263]
+- Updated dependencies [5e01789]
+- Updated dependencies [298cff2]
+- Updated dependencies [5e01789]
+- Updated dependencies [97a6730]
+- Updated dependencies [0629318]
+- Updated dependencies [d458bc8]
+- Updated dependencies [f6d9fe4]
+- Updated dependencies [e22c9d5]
+- Updated dependencies [2ed390b]
+- Updated dependencies [2ed390b]
+- Updated dependencies [46572b2]
+  - @stone-js/cli@0.8.9
+
 ## 0.8.8
 
 ### Patch Changes

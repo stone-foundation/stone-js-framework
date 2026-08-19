@@ -1,4 +1,5 @@
 import { OpenApiConfig } from '../options/OpenApiBlueprint'
+import { OpenApiCommand, openApiCommandOptions } from '../commands/OpenApiCommand'
 import { BlueprintContext, IBlueprint, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { DEFAULT_DOCS_PATH, DEFAULT_SPEC_PATH, OpenApiHandler } from '../OpenApiHandler'
 
@@ -27,6 +28,14 @@ export const OpenApiRoutesMiddleware = async (
   const options = blueprint.get<OpenApiConfig>('stone.openapi', {})
   const specPath = options.specPath ?? DEFAULT_SPEC_PATH
   const docsPath = options.docsPath ?? DEFAULT_DOCS_PATH
+
+  // The console adapter boots the whole application before a command runs, which is the most complete
+  // place to produce the document: every schema class gets its services.
+  if (blueprint.get<string>('stone.adapter.platform') === 'node_console') {
+    blueprint.add('stone.adapter.commands', [
+      { options: openApiCommandOptions, isClass: true, module: OpenApiCommand }
+    ])
+  }
 
   blueprint.add('stone.router.definitions', [
     {

@@ -1,0 +1,30 @@
+import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
+
+/**
+ * The whole application, booted in memory and asked a real question.
+ *
+ * Nothing is mocked and nothing is listed: `createTestApp()` discovers `app/**`, and the event goes
+ * through the same kernel production runs. If this passes the application works; if it fails the
+ * application is broken. That is the only kind of test worth shipping in a starter — the previous one
+ * stubbed out the framework's own decorators, which meant it could pass while nothing worked.
+ */
+describe('Application', () => {
+  it('answers on the public welcome route', async () => {
+    const app = await createTestApp()
+
+    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/' }))
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toMatchObject({ message: expect.stringContaining('Stone.js') })
+  })
+
+  it('refuses an unauthenticated request to a protected route', async () => {
+    // Substitute a repository with `bindings` when a route needs data:
+    // createTestApp({ bindings: { userRepository: fakeRepository } })
+    const app = await createTestApp()
+
+    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/users' }))
+
+    expect(response.statusCode).toBeGreaterThanOrEqual(400)
+  })
+})

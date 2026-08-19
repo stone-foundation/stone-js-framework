@@ -60,12 +60,19 @@ dist/                the build output (a single, self-contained artifact)`}</Cod
           delete it and it is gone. No wiring file to keep in sync.
         </p>
 
-        <Code file='stone.config.mjs' lang='js'>{`import { defineConfig } from '@stone-js/cli'
+        <Code file='stone.config.mjs' lang='js'>{`import { defineBuilderConfig } from '@stone-js/cli'
 
-export default defineConfig({
+export default defineBuilderConfig({
   rendering: 'ssg',              // 'csr' | 'ssr' | 'ssg' (frontend)
   ssg: { routes: ['/', '/about'] }
 })`}</Code>
+
+        <Callout kind='note' title='This file configures the build, not the app'>
+          <code>defineBuilderConfig</code> comes from <code>@stone-js/cli</code> and shapes the
+          artifact: target, rendering, SSG, tests. Your <strong>application</strong> is configured with
+          {' '}<code>defineConfig</code> from <code>@stone-js/core</code>, which writes onto the
+          Blueprint. See <a href='/docs/essentials/configuration'>Configuration</a>.
+        </Callout>
 
         <Callout kind='note' title='.stone and dist are derived'>
           <code>.stone/</code> (codegen) and <code>dist/</code> (build output) are produced from your

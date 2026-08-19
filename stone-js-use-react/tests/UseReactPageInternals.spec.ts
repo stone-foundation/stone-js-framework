@@ -4,7 +4,7 @@ import { StonePage } from '../src/components/StonePage'
 import { StoneError } from '../src/components/StoneError'
 import { UseReactError } from '../src/errors/UseReactError'
 import { applyHeadToHtml } from '@stone-js/use-view'
-import { buildAdapterErrorComponent, buildAppComponent, buildLayoutComponent, buildPageComponent, executeHandler, executeHooks, getAppRootElement, getBrowserContent, getResponseSnapshot, getServerContent, htmlTemplate, hydrateReactApp, isClient, isServer, isSSR, mergeHead, renderReactApp, renderStoneSnapshot, resolveComponent, resolveLayoutHead, resolveLazyComponent, snapshotResponse } from '../src/UseReactPageInternals'
+import { buildAdapterErrorComponent, buildAppComponent, buildLayoutComponent, buildPageComponent, executeHandler, executeHooks, getAppRootElement, getBrowserContent, getResponseSnapshot, defaultHtmlTemplate, getServerContent, htmlTemplate, hydrateReactApp, isClient, isServer, isSSR, mergeHead, renderReactApp, renderStoneSnapshot, resolveComponent, resolveLayoutHead, resolveLazyComponent, snapshotResponse } from '../src/UseReactPageInternals'
 
 /* eslint-disable @typescript-eslint/no-extraneous-class */
 
@@ -543,11 +543,51 @@ describe('environment detection', () => {
 })
 
 describe('htmlTemplate', () => {
-  it('should throw an exception when the template is not defined', () => {
-    const blueprint: any = {
-      get: vi.fn().mockReturnValue(undefined)
-    }
-    expect(() => htmlTemplate(blueprint)).toThrow(UseReactError)
+  const blueprintWith = (values: Record<string, unknown>): any => ({
+    get: vi.fn((key: string, fallback?: unknown) => values[key] ?? fallback)
+  })
+
+  it('returns the configured template untouched', () => {
+    const blueprint = blueprintWith({ 'stone.useReact.htmlTemplateContent': '<html>mine</html>' })
+
+    expect(htmlTemplate(blueprint)).toBe('<html>mine</html>')
+  })
+
+  it('falls back to a minimal shell when a build never generated one', () => {
+    // Rendering a page with no build step is a real context — a test — and refusing to render there
+    // served nobody. The shell is this renderer's own contract, so it can produce one.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const template = htmlTemplate(blueprintWith({}))
+
+    expect(template).toContain('<!--app-head-->')
+    expect(template).toContain('<div id="root"><!--app-html--></div>')
+    warn.mockRestore()
+  })
+
+  it('honours a configured root element, so hydration still finds it', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const template = htmlTemplate(blueprintWith({ 'stone.useReact.rootElementId': 'app' }))
+
+    expect(template).toContain('<div id="app"><!--app-html--></div>')
+    warn.mockRestore()
+  })
+
+  it('says it once, not on every request', () => {
+    // An SSR server would otherwise repeat the warning for every page it renders.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    htmlTemplate(blueprintWith({}))
+    htmlTemplate(blueprintWith({}))
+
+    expect(warn).toHaveBeenCalledTimes(0)
+    warn.mockRestore()
+  })
+
+  it('exposes the shell on its own, for anything that needs to state it', () => {
+    expect(defaultHtmlTemplate('mount')).toContain('<div id="mount"><!--app-html--></div>')
+    expect(defaultHtmlTemplate()).toContain('<div id="root">')
   })
 })
 

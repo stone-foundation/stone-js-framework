@@ -7,7 +7,7 @@ vi.mock('../src/McpDevServer', () => ({ startMcpDevServer: vi.fn(async () => {})
 vi.mock('../src/mcpJson', () => ({ initMcpJson: vi.fn(() => ({ file: '/proj/.mcp.json', changed: true })) }))
 
 const makeContainer = (config: Record<string, unknown> = {}): any => {
-  const store: Record<string, unknown> = { 'stone.mcpDev': config }
+  const store: Record<string, unknown> = { 'stone.builder.mcpDev': config }
   const blueprint = { get: vi.fn((k: string, fb: unknown) => (k in store ? store[k] : fb)) }
   return { make: vi.fn(() => blueprint), blueprint }
 }

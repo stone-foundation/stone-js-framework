@@ -1,6 +1,6 @@
 import { glob } from 'glob'
 import fsExtra from 'fs-extra'
-import { runSsg, collectStaticTargets, RouteDefinitionLike } from './ssg'
+import { runSsg, collectStaticTargets, RouteDefinitionLike, SsgParams, SkippedTargets } from './ssg'
 import { CliError } from '../errors/CliError'
 import { relative } from 'node:path'
 import { existsSync } from 'node:fs'
@@ -12,7 +12,7 @@ import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 import { removeImportsVitePlugin } from './RemoveImportsVitePlugin'
 import { basePath, buildPath, distPath } from '@stone-js/filesystem'
 import { isNotEmpty, IBlueprint, ClassType, isStoneBlueprint } from '@stone-js/core'
-import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp } from '../utils'
+import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp, checkAppLevelDecoratorsInTsx } from '../utils'
 import { generateDeclarativeLazyPages, generateImperativeLazyPages, getViteConfig } from './react-utils'
 import { reactHtmlEntryPointTemplate, reactClientEntryPointTemplate, reactServerEntryPointTemplate } from './stubs'
 import { applyPluginInjections } from '../plugins/applyPluginInjections'
@@ -201,6 +201,22 @@ export const GenerateClientFileMiddleware = async (
   next: NextPipe<ConsoleContext, IBlueprint>
 ): Promise<IBlueprint> => {
   const isLazy = isLazyViews(context.blueprint, context.event)
+
+  if (isLazy) {
+    const offendingFiles = checkAppLevelDecoratorsInTsx(context.blueprint)
+    if (offendingFiles.length > 0) {
+      const fileList = offendingFiles.map(f => `  ${relative(basePath(), f)}`).join('\n')
+      throw new CliError(
+        'App-level configuration must live in a .ts file, not a .tsx file.\n' +
+        'Lazy views are on (detected from router usage). The following .tsx file(s) contain ' +
+        'app-level decorators (e.g. @StoneApp, @Browser, @UseReact):\n' +
+        `${fileList}\n` +
+        'Move the app-level configuration to a .ts file so it is eagerly loaded.\n' +
+        'You can also set lazy: false in your configuration to disable lazy views entirely.'
+      )
+    }
+  }
+
   const basePattern = basePath(!isLazy
     ? context.blueprint.get('stone.builder.input.all', 'app/**/*.**')
     : context.blueprint.get('stone.builder.input.app', 'app/**/*.{ts,js,mjs,json}'))
@@ -537,11 +553,22 @@ export const GenerateStaticSiteMiddleware = async (
   const output = context.blueprint.get<string>('stone.builder.output', 'server.mjs')
   const definitions = context.blueprint.get<RouteDefinitionLike[]>('stone.builder.ssg.definitions', [])
   const configured = context.blueprint.get<string[]>('stone.builder.ssg.routes', [])
+  const params = context.blueprint.get<SsgParams>('stone.builder.ssg.params', {})
   const adapterUrl = context.blueprint.get<string>('stone.adapter.url', 'http://localhost:8080')
+
+  // A path nobody can expand is not an error, but staying silent about it is how a site quietly
+  // pre-renders a fraction of itself. Reported once, with what it would take to fix.
+  const onSkipped = (skipped: SkippedTargets): void => {
+    const segments = skipped.segments.map((name) => '`:' + name + '`').join(', ')
+    context.commandOutput.info(
+      `SSG skipped ${skipped.paths.length} parameterized route(s). Declare values for ` +
+      `${segments} under \`ssg.params\` to pre-render them.`
+    )
+  }
 
   // Derived (auto) + configured (opt-in). Fall back to the root only when neither
   // the app nor the user named a single route to pre-render.
-  const derived = collectStaticTargets(definitions)
+  const derived = collectStaticTargets(definitions, { params })
   const extraTargets = configured.map((path) => ({ path }))
   if (derived.length === 0 && extraTargets.length === 0) extraTargets.push({ path: '/' })
 
@@ -553,6 +580,8 @@ export const GenerateStaticSiteMiddleware = async (
     const written = await runSsg({
       definitions,
       extraTargets,
+      params,
+      onSkipped,
       outDir: distPath(),
       render: async (target) => {
         try {

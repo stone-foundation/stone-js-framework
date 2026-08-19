@@ -1,5 +1,82 @@
 # Changelog
 
+## 0.8.9
+
+### Patch Changes
+
+- 97a6730: Clear the quality findings this cycle's work raised.
+
+  Two are worth naming because they were real, not stylistic. An authorization failure built its message
+  with `String(subject)`, so refusing a class or an instance said `Not allowed to read [object Object]`
+  — an error that names nothing. And two regular expressions could be made super-linear by their own
+  input: a trailing-slash strip in the test-module scan, and the declaration-rewriting pattern in the
+  shared build, both rewritten so no input can force them to backtrack.
+
+  The rest is shape: the SSG segment parser split into three named readers instead of one function
+  holding every case, a nested ternary unfolded in the OpenAPI plugin, a duplicated directory walk
+  shared in the build config, an escaped pattern read as `String.raw`, and a rejection path turned into
+  a single exit so the error is raised where its message lives.
+
+  `CORSHeadersMiddleware` and `MetaCORSHeadersMiddleware` are **removed**. They were deprecated with a
+  documented replacement (`@Cors()` or `corsBlueprint`, the two ways a module is enabled), nothing in
+  the framework used them, and a deprecated third activation path is worth deleting rather than keeping
+  around to trip over.
+
+- 0629318: Point every README link at somewhere that exists.
+
+  The per-module repositories were retired when the framework moved to a single one, so 36 links
+  across 18 READMEs answered with a 404: the exact links a newcomer clicks first, "Contributing"
+  and "API". The contributing guide now points at the monorepo, and the API reference at the
+  published one.
+
+  `docs/` was never a durable target either, retired repository or not: it is TypeDoc output, and
+  every build begins by deleting it.
+
+- 8b2bd5d: fix: CORS gets its two activation paths, and stops discarding the response it was meant to decorate
+
+  `@Cors()` and `corsBlueprint` are the new, and only, ways to enable CORS. Both install it on the two dimensions it actually needs, because a cross-origin failure can happen on either side of the kernel:
+
+  - **Kernel** (`HandleCorsMiddleware`): the normal path. Every response the kernel produces leaves with its CORS headers, and a preflight is answered outright with `preflightStop`.
+  - **Adapter** (`EnsureCorsHeadersHook`, on `onBuildingRawResponse`): the last resort. When a request dies before or around the kernel, no kernel middleware ever ran, and a response without `Access-Control-Allow-Origin` is not a status the browser can read: it is an opaque network error. This is the same reason the framework carries an error handler at both levels.
+
+  ```ts
+  @Cors({ origin: ["https://app.example.com"] })
+  @StoneApp({ name: "my-app" })
+  export class Application {}
+
+  // or, imperatively
+  export const Application = defineStoneApp(handler, { name: "my-app" }, [
+    corsBlueprint,
+  ]);
+  ```
+
+  Nothing is allowed until you name an origin: with none configured, no `Access-Control-Allow-Origin` header is emitted at all, so enabling CORS never opens an application by itself.
+
+  **`EnsureCorsHeadersHook` was replacing successful responses.** It handed its CORS middleware a `next` that unconditionally built a fresh `OutgoingHttpResponse.create({ statusCode: 500 })`, so `context.outgoingResponse` became an empty 500 (`content: undefined`, `prepared: false`) on **every** request, including the ones that succeeded. The wire response survived only by luck: every adapter's `ServerResponseMiddleware` copies the real response into the raw builder before this hook runs, and the hook's `addIf` will not overwrite a status that is already there. Anything reading `context.outgoingResponse` afterwards, a later hook, `onTerminate`, or an adapter that builds its response at that point, saw the empty 500 instead of the answer. It now decorates the response that exists and synthesizes one only when there is none, which is the case it was written for.
+
+  **Both starters activate CORS again**, through the decorator and the blueprint respectively. They previously reached it through `defineBlueprintMiddleware(CORSHeadersMiddleware)`; `CORSHeadersMiddleware` is deprecated in favour of the two paths above, and is now the only thing that helper was used for in first-party code.
+
+  **`BlueprintBuilder` asserts the pipeline still produced a blueprint** and otherwise throws a `SetupError` naming the broken contract. A build-phase middleware runs once, before any event, and must return `await next(context)`; registering a per-event middleware as one is the usual way to break that, since both shapes are `handle(context, next)` and neither the types nor the runtime object to it. The assertion is a private method on the builder it protects.
+
+- f6d9fe4: fix(build): published declarations carry explicit `.js` extensions
+
+  Our sources are bundler-style (extensionless relative imports) and `tsc` reproduces what they wrote. In a published ESM package with an `exports` map, a consumer on `moduleResolution: nodenext` cannot resolve those specifiers, so the types of everything they re-export become **invisible**. The reported symptom was misleading: `error TS2305: Module '"@stone-js/use-react"' has no exported member 'useContainer'`, which reads as "the hook does not exist" rather than "the module was not resolved". A pilot project hit it on `@stone-js/use-react` and worked around it with `moduleResolution: "bundler"`, which is right for bundled code but wrong for a pure Node ESM consumer.
+
+  The shared build now rewrites relative specifiers in every emitted declaration (`<file>.js`, or `<dir>/index.js` for a directory), and the generated barrel emits them the same way. `@stone-js/use-view`, which carries its own rollup config, was wired to the same plugin.
+
+  Verified across 635 declaration files: zero extensionless relative imports, and a `moduleResolution: nodenext` consumer importing `useContainer` / `useBlueprint` typechecks clean where it previously reported 138 errors. A `pnpm run check:dts` guard runs in CI right after the build so this cannot regress, including for a package that grows its own build config.
+
+- Updated dependencies [0629318]
+- Updated dependencies [8b2bd5d]
+- Updated dependencies [6584764]
+- Updated dependencies [caf14e3]
+- Updated dependencies [f6d9fe4]
+- Updated dependencies [e507985]
+- Updated dependencies [2ed390b]
+  - @stone-js/config@0.8.9
+  - @stone-js/core@0.8.9
+  - @stone-js/filesystem@0.8.9
+
 ## 0.8.8
 
 ### Patch Changes

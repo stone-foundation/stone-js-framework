@@ -27,15 +27,23 @@ npm i -D @stone-js/mcp-dev
 
 ## Usage
 
-Add the command to your app with the `@McpDev()` decorator (or register `mcpDevBlueprint`):
+Installing it is the setup. This is dev tooling: the CLI auto-discovers the plugin from your
+devDependencies, which registers `stone mcp` — there is **nothing to declare in `app/`**, no decorator
+and no blueprint, because a development tool has no business in an application's module graph.
 
-```ts
-import { McpDev } from '@stone-js/mcp-dev'
-import { StoneApp } from '@stone-js/core'
+Configure it, if you want to, in the file that already configures your build:
 
-@McpDev()
-@StoneApp({ name: 'my-app' })
-export class Application {}
+```js
+// stone.config.mjs
+import { defineBuilderConfig } from '@stone-js/cli'
+
+export default defineBuilderConfig({
+  mcpDev: {
+    name: 'my-app',              // the server name your agent sees
+    tools: [myOwnTool],          // your own tools, defined outside app/
+    publishContext: true         // default outside production
+  }
+})
 ```
 
 ### Register it for your agent
@@ -85,8 +93,8 @@ Or add the entry yourself (Claude Code, Cursor, Claude Desktop, …):
 
 ### App-introspection tools
 
-These read *your* app's resolved blueprint (read-only, secrets redacted), so the agent understands
-the app you are building, not just the framework:
+These read *your* app's resolved configuration (read-only, secrets redacted), so the agent
+understands the app you are building, not just the framework:
 
 | Tool | What it returns |
 |---|---|
@@ -98,6 +106,46 @@ the app you are building, not just the framework:
 | `stone_kernel` | The kernel pipeline: event handler, middleware, error handlers. |
 | `stone_key_routes` | Key-routing definitions (event-bus / realtime): key to handler. |
 | `stone_config` | A resolved `stone.*` config value by dotted key (secrets redacted); omit the key to list them. |
+| `stone_describes` | Which application the answers above describe, and how the server knows. |
+
+#### Which application, exactly
+
+`stone mcp` is a console command, so a blueprint it resolves itself is the one a **console** boot
+produces: its adapters, its response type and every platform-conditional contribution belong to a
+different application than the one you run under `stone dev`.
+
+The build arranges all of it — nothing is declared in your application:
+
+```bash
+npm i -D @stone-js/mcp-dev
+```
+
+That is the whole setup, and there is deliberately nothing to add to `app/`. Introspection is a
+development concern, so this package is **dev tooling only**: it ships a CLI plugin, the CLI
+auto-discovers first-party plugins from your direct dependencies, and the plugin both registers the
+`stone mcp` command and — on a development build (`dev`, `serve`, `preview`) — injects a hook that
+writes your running app's resolved configuration to `.stone/app-context.json`.
+
+Your application never imports this module, never declares it, and a production build carries none of
+it. There is no decorator and no blueprint to activate: a development tool has no business in an
+application's module graph, where it would make a production build depend on a package the app does
+not need.
+
+Run `stone dev` once and the agent sees the real thing: the platform you actually run, your adapters,
+your resolved config. Until then the MCP server answers from its own boot and says so through
+`stone_describes`, naming which answers not to trust rather than pretending.
+
+Configure it in `stone.config.mjs` under `mcpDev` (server name, instructions, your own tools).
+Opt out of publishing with `mcpDev: { publishContext: false }`: nothing is generated at all,
+rather than code that ships and decides not to run.
+
+A file rather than a dev endpoint, deliberately: the Blueprint is assembled once before the first
+event and then read, so publishing it at boot *is* the value, not a snapshot of something moving. It
+also needs no port to discover, adds no route to your application, and works for a CLI or an edge
+context that has no HTTP surface at all.
+
+Publishing is on outside production and off in it, since nothing there reads it. Override either way
+with `mcpDev: { publishContext: true | false }`.
 
 ### Your own tools
 

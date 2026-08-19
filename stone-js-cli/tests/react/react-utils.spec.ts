@@ -18,7 +18,7 @@ vi.mock('fs', async () => ({
 
 vi.mock('vite', async () => ({
   preview: vi.fn(),
-  defineConfig: vi.fn(),
+  defineBuilderConfig: vi.fn(),
   mergeConfig: vi.fn((a, b) => ({ ...a, ...b })),
   createServer: vi.fn(),
   loadConfigFromFile: vi.fn()

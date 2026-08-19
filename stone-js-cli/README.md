@@ -57,10 +57,10 @@ export function acmeCliPlugin (options = {}) {
 Load a plugin explicitly from `stone.config` (open to any package):
 
 ```ts
-import { defineConfig } from '@stone-js/cli'
+import { defineBuilderConfig } from '@stone-js/cli'
 import { acmeCliPlugin } from '@acme/stone-acme/cli'
 
-export default defineConfig({ plugins: [acmeCliPlugin()] })
+export default defineBuilderConfig({ plugins: [acmeCliPlugin()] })
 ```
 
 First-party `@stone-js/*` packages that advertise a `stone.cliPlugin` contract in their
@@ -96,8 +96,8 @@ Explore the full documentation: [https://stonejs.dev](https://stonejs.dev)
 
 ## API documentation
 
-* [API](https://github.com/stone-foundation/stone-js-cli/blob/main/docs)
+* [API](https://stonejs.dev/api)
 
 ## Contributing
 
-See [Contributing Guide](https://github.com/stone-foundation/stone-js-cli/blob/main/CONTRIBUTING.md)
+See [Contributing Guide](https://github.com/stone-foundation/stone-js-framework/blob/main/CONTRIBUTING.md)

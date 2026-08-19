@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/resources",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "Framework-agnostic API resources for Stone.js. Shape what your domain exposes — sparse fieldsets, conditional fields, includes and envelopes — decoupled from controllers, the same on backend and frontend.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
@@ -81,5 +81,11 @@
       "describe",
       "beforeEach"
     ]
+  },
+  "dependencies": {
+    "@stone-js/config": "workspace:*"
+  },
+  "peerDependencies": {
+    "@stone-js/core": "workspace:*"
   }
 }

@@ -1,0 +1,97 @@
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
+import { APP_CONTEXT_FILE, contextReader, publishAppContext, readAppContext } from '../src/appContext'
+import { createIntrospectionTools, resolveSource } from '../src/introspection'
+
+/** A blueprint answering dotted keys, as the running app's would. */
+const blueprintOf = (values: Record<string, unknown>): any => ({
+  get: <T>(key: string, fallback?: T): T => (values[key] ?? fallback) as T
+})
+
+describe('publishing what the running application resolved', () => {
+  let root: string
+
+  beforeEach(() => { root = mkdtempSync(join(tmpdir(), 'stone-mcp-')) })
+  afterEach(() => { rmSync(root, { recursive: true, force: true }) })
+
+  it('writes the platform the application actually booted as', () => {
+    // The whole point: the MCP server is a console command, so it cannot know this by booting.
+    publishAppContext(blueprintOf({
+      'stone.adapter.platform': 'node-http',
+      'stone.env': 'development',
+      'stone.name': 'tasks',
+      stone: { adapter: { platform: 'node-http' } }
+    }), root)
+
+    expect(readAppContext(root)).toMatchObject({ platform: 'node-http', env: 'development', name: 'tasks' })
+  })
+
+  it('redacts what looks secret before it reaches disk', () => {
+    // A resolved configuration holds credentials; publishing it must not leak them into a file an
+    // agent then reads.
+    publishAppContext(blueprintOf({ stone: { db: { password: 'hunter2', host: 'localhost' } } }), root)
+
+    const published: any = readAppContext(root)
+    expect(published.stone.db.password).not.toBe('hunter2')
+    expect(published.stone.db.host).toBe('localhost')
+  })
+
+  it('reports nothing when no application has run', () => {
+    expect(readAppContext(root)).toBeUndefined()
+  })
+
+  it('reports nothing rather than throwing on a file it cannot parse', () => {
+    // A half-written or hand-edited file must not take the MCP server down with it.
+    mkdirSync(join(root, '.stone'), { recursive: true })
+    writeFileSync(join(root, APP_CONTEXT_FILE), '{ not json', 'utf-8')
+
+    expect(readAppContext(root)).toBeUndefined()
+  })
+})
+
+describe('which application the tools describe', () => {
+  let root: string
+
+  beforeEach(() => { root = mkdtempSync(join(tmpdir(), 'stone-mcp-src-')) })
+  afterEach(() => { rmSync(root, { recursive: true, force: true }) })
+
+  it('prefers the running application once it has spoken', () => {
+    publishAppContext(blueprintOf({
+      'stone.adapter.platform': 'node-http',
+      stone: { adapter: { platform: 'node-http' }, router: { definitions: [{ path: '/tasks' }] } }
+    }), root)
+
+    const { source, describes } = resolveSource(blueprintOf({ 'stone.adapter.platform': 'console' }), root)
+
+    expect(describes).toMatchObject({ source: 'running-app', platform: 'node-http' })
+    expect(source.get('stone.router.definitions', [])).toEqual([{ path: '/tasks' }])
+  })
+
+  it('falls back to the console boot, and names what not to trust in it', () => {
+    // Answering from the wrong platform without saying so is what made this misleading.
+    const { describes } = resolveSource(blueprintOf({ 'stone.adapter.platform': 'console' }), root)
+
+    expect(describes).toMatchObject({ source: 'console-boot', platform: 'console' })
+    expect(describes.unreliable).toEqual(['stone_adapters', 'stone_config'])
+  })
+
+  it('answers the question through a tool, so an agent can ask it', () => {
+    const tools = createIntrospectionTools(blueprintOf({ 'stone.adapter.platform': 'console' }), root)
+    const describes: any = tools.find((tool) => tool.name === 'stone_describes')
+
+    expect(describes?.handler({})).toMatchObject({ source: 'console-boot' })
+  })
+
+  it('reads the app config through the published file, not the console one', () => {
+    publishAppContext(blueprintOf({
+      'stone.adapter.platform': 'node-http',
+      stone: { adapter: { platform: 'node-http' }, name: 'the-real-app' }
+    }), root)
+
+    const tools = createIntrospectionTools(blueprintOf({ stone: { name: 'console-boot' } }), root)
+    const app: any = tools.find((tool) => tool.name === 'stone_app')
+
+    expect(app?.handler({})).toMatchObject({ name: 'the-real-app', platform: 'node-http' })
+  })
+})
