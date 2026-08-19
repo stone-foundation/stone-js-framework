@@ -18,6 +18,22 @@ import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from '
  */
 
 /**
+ * Every file under a directory, recursively.
+ *
+ * Shared by both declaration plugins below: they walked the tree with identical local helpers, and two
+ * copies of a traversal is one copy too many.
+ *
+ * @param {string} dir
+ * @returns {string[]}
+ */
+function walkFiles (dir) {
+  return readdirSync(dir).flatMap((name) => {
+    const path = join(dir, name)
+    return statSync(path).isDirectory() ? walkFiles(path) : [path]
+  })
+}
+
+/**
  * Write `dist/index.d.ts` as `export * from './<file>'` for every emitted
  * declaration (mirroring what multi-entry does for the JS bundle, since these
  * packages have no `src/index.ts`). Runs after the typescript plugin emits the
@@ -30,11 +46,7 @@ export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [] } = 
     name: 'stone-dts-barrel',
     writeBundle () {
       if (!existsSync(dir)) return
-      const walk = (d) => readdirSync(d).flatMap((name) => {
-        const p = join(d, name)
-        return statSync(p).isDirectory() ? walk(p) : [p]
-      })
-      const rels = walk(dir)
+      const rels = walkFiles(dir)
         .filter((p) => p.endsWith('.d.ts'))
         .map((p) => relative(dir, p).replaceAll('\\', '/'))
         .filter((r) => r !== out && !exclude.some((e) => r.startsWith(e)))
@@ -66,15 +78,12 @@ export function dtsExtensions ({ dir = 'dist' } = {}) {
     writeBundle () {
       if (!existsSync(dir)) return
 
-      const walk = (d) => readdirSync(d).flatMap((name) => {
-        const p = join(d, name)
-        return statSync(p).isDirectory() ? walk(p) : [p]
-      })
-
-      for (const file of walk(dir).filter((p) => p.endsWith('.d.ts'))) {
+      for (const file of walkFiles(dir).filter((p) => p.endsWith('.d.ts'))) {
         const source = readFileSync(file, 'utf-8')
         const patched = source.replace(
-          /((?:from|import|export)\s*\(?\s*)'(\.[^']*)'/g,
+          // `\s*(?:\(\s*)?` rather than `\s*\(?\s*`: two adjacent runs of whitespace around an
+          // optional token can backtrack super-linearly on a long run of spaces.
+          /((?:from|import|export)\s*(?:\(\s*)?)'(\.[^']*)'/g,
           (match, head, specifier) => {
             if (/\.(js|mjs|cjs|jsx|json|css)$/.test(specifier)) return match
             const target = resolve(dirname(file), specifier)

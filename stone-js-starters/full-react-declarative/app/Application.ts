@@ -2,7 +2,6 @@ import { Routing } from '@stone-js/router'
 import { Browser } from '@stone-js/browser-adapter'
 import { Hook, UseReact } from '@stone-js/use-react'
 import { NodeHttp } from '@stone-js/node-http-adapter'
-import { NodeConsole } from '@stone-js/node-cli-adapter'
 import { IBlueprint, IContainer, ILogger, LogLevel, Promiseable, StoneApp } from '@stone-js/core'
 
 /**
@@ -13,8 +12,6 @@ import { IBlueprint, IContainer, ILogger, LogLevel, Promiseable, StoneApp } from
  * @StoneApp() is used to enable the Stone application, it is mandatory.
  * @Routing() is used to enable the routing feature.
  * @NodeHttp() is used to enable the Node HTTP adapter.
- * @NodeConsole() is used to enable the Node Console adapter.
- * @NodeConsole() requires the incoming event type.
  * BodyEventMiddleware is used to parse the incoming event body.
  * BodyEventMiddleware is imported because it is not installed by default.
  *
@@ -25,7 +22,6 @@ import { IBlueprint, IContainer, ILogger, LogLevel, Promiseable, StoneApp } from
 @Routing()
 @Browser()
 @UseReact()
-@NodeConsole()
 @NodeHttp({ default: true, url: 'http://localhost:3100' })
 @StoneApp({ name: 'My Stone', logger: { level: LogLevel.DEBUG } })
 export class Application {

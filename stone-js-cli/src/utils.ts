@@ -199,7 +199,7 @@ export function setupProcessSignalHandlers (getServerProcess: () => ChildProcess
  * @param config - The user configuration.
  * @returns The user configuration.
  */
-export const defineConfig = (config: Partial<BuilderConfig>): Partial<BuilderConfig> => config
+export const defineBuilderConfig = (config: Partial<BuilderConfig>): Partial<BuilderConfig> => config
 
 /**
  * Get the Stone.js builder configuration.
@@ -293,7 +293,7 @@ const APP_LEVEL_DECORATORS = ['StoneApp', 'Browser', 'UseReact', 'Configuration'
  * class or an export, allowing indentation.
  */
 const APP_LEVEL_DECORATOR_RE = new RegExp(
-  `^[ \\t]*@[ \\t]*(?:${APP_LEVEL_DECORATORS.join('|')})\\b`,
+  String.raw`^[ \t]*@[ \t]*(?:${APP_LEVEL_DECORATORS.join('|')})\b`,
   'm'
 )
 

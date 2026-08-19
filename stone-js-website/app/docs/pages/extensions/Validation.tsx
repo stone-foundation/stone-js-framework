@@ -108,6 +108,57 @@ const result = NewTask.safeParse(formValues)
 if (!result.success) setErrors(result.error.issues)`}</Code>
         <Aphorism>One schema. It guards the route and shapes the form. They can never disagree.</Aphorism>
 
+        <H2>Declaring it where the route is</H2>
+        <p>
+          A route can say what it accepts, once, next to itself. The middleware reads that, validates
+          before the handler runs, and publishes each <strong>parsed</strong> source in the event's
+          metadata under a predictable name.
+        </p>
+        <Code file='app/TasksController.ts'>{`@Post('/tasks', { validation: CreateTaskSchema })   // one schema means the body
+create (event: IncomingHttpEvent): Task {
+  // The parsed value, not the raw one: a schema coerces and strips, and re-reading the raw body is
+  // how an application validates one thing and uses another.
+  const task = event.get<CreateTask>('validatedBody')
+  return this.tasks.create(task)
+}`}</Code>
+        <p>
+          <code>validatedBody</code>, <code>validatedQuery</code>, <code>validatedParams</code>: the
+          name follows the source, so a handler needs no import and nothing to remember.
+        </p>
+
+        <H3>Without a router, and without the route</H3>
+        <p>
+          The same thing said on the handler, for a single-handler service, a CLI command or a browser
+          event — anything with no route to hang it on. <code>@Validate</code> owns its own key, so the
+          module works with a router and without one.
+        </p>
+        <Code file='app/CreateTask.ts'>{`@Validate({ body: CreateTaskSchema, query: ListQuerySchema })
+handle (event: IncomingEvent): Task { … }`}</Code>
+
+        <H3>Schemas as classes, registered by name</H3>
+        <p>
+          A schema that needs services — translated messages, a repository to check uniqueness against
+          — is a class the container resolves, so its <code>rules()</code> can use what it was given.
+          Register it once and refer to it by name from anywhere: the route stops importing schemas,
+          and a shared query filter is declared in exactly one place.
+        </p>
+        <Code file='app/schemas/ListQuerySchema.ts'>{`@ValidationSchema('listQuery')
+export class ListQuerySchema implements IValidationSchema {
+  constructor ({ i18n }) { this.i18n = i18n }
+
+  rules () {
+    return { query: z.object({ page: z.coerce.number().default(1) }) }
+  }
+}
+
+// Anywhere: @Get('/tasks', { validation: 'listQuery' }) or @Validate('listQuery')`}</Code>
+        <Callout kind='note' title='Why rules() and not messages()'>
+          A schema declares its rules, and its messages come from the schema library it already uses.
+          One method keeps the contract discoverable: <code>@stone-js/openapi</code> reads
+          {' '}<code>rules()</code> to publish the request shape, so the route stays the single
+          description of itself and nothing is said twice.
+        </Callout>
+
         <H3>Rules and sources</H3>
         <p>
           Rules are a map from a source (<code>body</code>, <code>query</code>, <code>params</code>) to

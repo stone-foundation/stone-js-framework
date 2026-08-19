@@ -1,7 +1,6 @@
 import { JSX } from 'react'
 import { browserAdapterBlueprint } from '@stone-js/browser-adapter'
-import { defineConfig, IBlueprint, ILogger, isNotEmpty, Promiseable } from '@stone-js/core'
-import { defineCommand, FactoryCommandHandler, NODE_CONSOLE_PLATFORM, nodeConsoleAdapterBlueprint } from '@stone-js/node-cli-adapter'
+import { ILogger, Promiseable } from '@stone-js/core'
 import { defineStoneReactApp, HeadContext, IPage, PageHeadContext, PageRenderContext, ReactIncomingEvent } from '@stone-js/use-react'
 
 /**
@@ -73,22 +72,8 @@ export const FactoryHandler = ({ logger }: AppOptions): IPage<ReactIncomingEvent
 export const Application = defineStoneReactApp(
   FactoryHandler,
   { debug: true, isFactory: true },
-  [browserAdapterBlueprint, nodeConsoleAdapterBlueprint]
+  [browserAdapterBlueprint]
 )
-
-/**
- * Application configuration.
- */
-export const AppConfig = defineConfig({
-  afterConfigure (blueprint: IBlueprint) {
-    if (
-      isNotEmpty<FactoryCommandHandler>(FactoryHandler) &&
-      blueprint.is('stone.adapter.platform', NODE_CONSOLE_PLATFORM)
-    ) {
-      blueprint.set(defineCommand(FactoryHandler, { name: '*', isFactory: true }))
-    }
-  }
-})
 
 /**
  * Application options.

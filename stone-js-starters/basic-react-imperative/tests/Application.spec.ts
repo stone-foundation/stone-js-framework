@@ -1,91 +1,30 @@
-import { renderToString } from 'react-dom/server'
-import { ILogger, IncomingEvent } from '@stone-js/core'
-import { FactoryHandler, AppConfig } from '../app/Application'
+import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
 
-vi.mock('@stone-js/core', async (mod) => {
-  const actual: any = await mod()
-  return {
-    ...actual,
-    isNotEmpty: vi.fn(() => true),
-    defineConfig: (config: any) => config
-  }
-})
+/**
+ * The whole application, booted in memory and asked a real question.
+ *
+ * Nothing is mocked and nothing is listed: `createTestApp()` discovers `app/**`, and the event goes
+ * through the same kernel production runs. If this passes the application works; if it fails the
+ * application is broken. That is the only kind of test worth shipping in a starter — the previous one
+ * stubbed out the framework's own decorators, which meant it could pass while nothing worked.
+ */
+describe('Pages', () => {
+  it('renders the home page, data included', async () => {
+    const app = await createTestApp()
 
-describe('Application', () => {
-  let app: any
-  let mockedLogger: ILogger
+    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/?name=Ada' }))
 
-  beforeEach(() => {
-    mockedLogger = {
-      info: vi.fn(),
-    } as unknown as ILogger
-
-    app = FactoryHandler({ logger: mockedLogger })
+    expect(response.statusCode).toBe(200)
+    // A page is a handler, so a rendered page is a response whose body is HTML. Query that HTML with
+    // whatever you already use (happy-dom, jsdom, Testing Library): none is bundled here.
+    expect(response.html()).toContain('Ada')
   })
 
-  it('should create an application instance', () => {
-    // Assert
-    expect(app).toBeInstanceOf(Object)
-  })
+  it('renders without a name', async () => {
+    const app = await createTestApp()
 
-  it('get head values', async () => {
-    // Arrange
-    const event = { get: () => 'World' } as unknown as IncomingEvent
+    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/' }))
 
-    // Act
-    const head = await app.head({ event })
-
-    // Assert
-    expect(head).toHaveProperty('metas')
-    expect(head.title).toContain('Welcome to Stone.js')
-    expect(head.title).toContain('World')
-    expect(head).toHaveProperty('description')
-  })
-
-  it('should handle incoming events', () => {
-    // Arrange
-    const expectedMessage = 'Hello World!'
-    const event = { get: () => 'World' } as unknown as IncomingEvent
-
-    // Act
-    const response = app.handle(event) as { message: string }
-
-    // Assert
-    expect(response.message).toBe(expectedMessage)
-    expect(mockedLogger.info).toHaveBeenCalledWith(expectedMessage)
-  })
-
-  it('should render the message', () => {
-    // Arrange
-    const message = 'Hello World!'
-
-    // Act
-    const response = renderToString(app.render({ data: { message } } as any))
-
-    // Assert
-    expect(response).toContain(message)
-  })
-
-  it('should render the Stone.js logo', () => {
-    // Act
-    const response = renderToString(app.render({ data: { message: 'Hello World!' } } as any))
-
-    // Assert
-    expect(response).toContain('/logo.svg')
-    expect(response).toContain('alt="Stone.js"')
-    expect(response).toContain('Welcome to')
-    expect(response).toContain('Stone.js')
-  })
-
-  it('should get config', () => {
-    // Arrange
-    const config: any = AppConfig
-    const blueprint: any = { is: () => true, set: vi.fn() }
-
-    // Act
-    config.afterConfigure(blueprint)
-
-    // Assert
-    expect(blueprint.set).toHaveBeenCalled()
+    expect(response.statusCode).toBe(200)
   })
 })
