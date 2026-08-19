@@ -148,10 +148,25 @@ export interface BuilderConfig {
    */
   ssg?: {
     /**
-     * The routes to pre-render to static HTML. Defaults to `['/']`.
-     * Parameterized routes should be listed explicitly (e.g. `/blog/hello`).
+     * Extra routes to pre-render, added to the ones derived from your pages.
+     * Use it for paths no declaration can produce (a CMS-driven slug, per-entry data).
      */
     routes?: string[]
+
+    /**
+     * The values a dynamic segment can take at build time, by segment name.
+     *
+     * A parameterized path cannot be pre-rendered until someone says what its segments contain.
+     * Declaring them here expands the path instead of skipping it, which matters most for a
+     * parameterized router prefix: one `:lang` on the prefix puts a dynamic segment on every route,
+     * and auto-discovery would otherwise collapse to nothing.
+     *
+     * An optional segment also yields the path without it, so `/:lang?/about` with
+     * `{ lang: ['en', 'fr'] }` pre-renders `/about`, `/en/about` and `/fr/about`.
+     *
+     * Only finite, enumerable segments belong here; anything data-driven stays in `routes`.
+     */
+    params?: Record<string, string[]>
   }
 
   /**
