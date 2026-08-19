@@ -16,11 +16,16 @@ The running application now publishes its resolved configuration to `.stone/app-
 MCP server reads it. A new `stone_describes` tool says which application the answers describe and how
 the server knows, so a fallback is visible rather than silently wrong.
 
-**Arranged by the build, not by your application.** Introspection is a development concern, so this
-package ships a CLI plugin: `npm i -D @stone-js/mcp-dev` and the CLI auto-discovers it, injecting the
-publishing hook on development builds only. Your app never imports this module, and a production build
-carries none of it. Opt out with `mcpDev: { publishContext: false }` in `stone.config.mjs`, which
-generates nothing rather than shipping code that decides not to run.
+**Dev tooling only, with nothing to declare in your application.** `@McpDev()`, `mcpDevBlueprint` and
+`defineMcpDev` are **removed**: introspection is a development concern, and a development tool in an
+application's module graph makes a production build depend on a package the app does not need, for a
+feature nobody uses in production.
+
+`npm i -D @stone-js/mcp-dev` is now the whole setup. The CLI auto-discovers the plugin, which registers
+`stone mcp` and — on a development build only — injects the publishing hook. Options move to
+`stone.config.mjs` under `mcpDev` (server name, instructions, your own tools, `publishContext`), where
+the rest of the build is already configured. The browser build goes too: it existed to keep an app-side
+decorator inert in a SPA, and there is no longer anything app-side to neutralise.
 
 A file rather than a dev endpoint, deliberately: the Blueprint is assembled once before the first event
 and then read, so publishing it at boot *is* the value. No port to discover, no route added to an

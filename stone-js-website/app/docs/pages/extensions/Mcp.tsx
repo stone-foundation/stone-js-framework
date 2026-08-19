@@ -32,17 +32,26 @@ export class Mcp implements IPage<ReactIncomingEvent> {
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i -D @stone-js/mcp-dev`}</Code>
 
-        <H2>Add the command</H2>
+        <H2>Nothing to declare</H2>
         <p>
-          Enable it with the <code>@McpDev()</code> decorator (or register <code>mcpDevBlueprint</code>).
-          Your app gains one command, <code>stone mcp</code>.
+          Installing it is the setup. This is dev tooling, so the CLI auto-discovers its plugin from
+          your devDependencies and that plugin registers <code>stone mcp</code>. There is
+          {' '}<strong>nothing to add to <code>app/</code></strong>: no decorator, no blueprint. A
+          development tool in an application's module graph would make a production build depend on a
+          package the application does not need, for a feature nobody uses in production.
         </p>
-        <Code file='app/Application.ts'>{`import { McpDev } from '@stone-js/mcp-dev'
-import { StoneApp } from '@stone-js/core'
+        <p>
+          Configure it where the build is configured, if you want to:
+        </p>
+        <Code file='stone.config.mjs' lang='js'>{`import { defineBuilderConfig } from '@stone-js/cli'
 
-@McpDev()
-@StoneApp({ name: 'my-app' })
-export class Application {}`}</Code>
+export default defineBuilderConfig({
+  mcpDev: {
+    name: 'my-app',        // the server name your agent sees
+    tools: [myOwnTool],    // your own tools, defined outside app/
+    publishContext: true   // default outside production
+  }
+})`}</Code>
 
         <H2>Register it for your agent</H2>
         <p>

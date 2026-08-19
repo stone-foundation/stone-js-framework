@@ -52,7 +52,7 @@ export class McpCommand {
       return
     }
 
-    const options = blueprint.get<McpDevOptions>('stone.mcpDev', {})
+    const options = blueprint.get<McpDevOptions>('stone.builder.mcpDev', {})
     const name = event.getMetadataValue<string | undefined>('name', options.name)
     const quiet = event.getMetadataValue<boolean>('quiet', options.quiet ?? false)
     const tools = [...createIntrospectionTools(blueprint), ...(options.tools ?? [])]

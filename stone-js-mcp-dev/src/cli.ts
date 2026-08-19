@@ -1,4 +1,35 @@
-import type { StoneCliPlugin, StonePluginContext } from '@stone-js/cli'
+import { NODE_CONSOLE_PLATFORM } from './constants'
+import { McpCommand, mcpCommandOptions } from './commands/McpCommand'
+import { BlueprintContext, ClassType, IBlueprint, NextMiddleware } from '@stone-js/core'
+import type { StoneCliPlugin, StonePluginBlueprintMiddleware, StonePluginContext } from '@stone-js/cli'
+
+/**
+ * Register the `mcp` command on the CLI.
+ *
+ * Contributed by the plugin rather than by the application, which is the whole point: introspection is
+ * a development concern, and an application should not have to declare a development tool to get one.
+ * The CLI runs plugin blueprint middleware in its own pipeline, and the CLI is itself a Stone.js app on
+ * the console platform, so the command lands exactly where every other command does.
+ *
+ * @param context - The blueprint context.
+ * @param next - The next middleware.
+ * @returns The blueprint.
+ */
+export const SetMcpCommandsMiddleware = async (
+  context: BlueprintContext<IBlueprint, ClassType>,
+  next: NextMiddleware<BlueprintContext<IBlueprint, ClassType>, IBlueprint>
+): Promise<IBlueprint> => {
+  if (context.blueprint.get<string>('stone.adapter.platform') === NODE_CONSOLE_PLATFORM) {
+    context.blueprint.add('stone.adapter.commands', [{ options: mcpCommandOptions, isClass: true, module: McpCommand }])
+  }
+
+  return await next(context)
+}
+
+/** The blueprint middleware this plugin contributes. */
+export const mcpDevPluginMiddleware: StonePluginBlueprintMiddleware[] = [
+  { module: SetMcpCommandsMiddleware, priority: 5 }
+]
 
 /** Where the plugin writes the module it injects, relative to the build's `.stone/tmp` directory. */
 export const GENERATED_MODULE: string = 'plugins/mcp-dev-context.mjs'
@@ -50,7 +81,9 @@ export function generatedModule (): string {
 export function mcpDevCliPlugin (): StoneCliPlugin {
   return {
     name: '@stone-js/mcp-dev',
-    description: 'Lets `stone mcp` introspect the app you are actually running',
+    description: 'Adds `stone mcp`, and lets it introspect the app you are actually running',
+
+    blueprintMiddleware: mcpDevPluginMiddleware,
 
     onPrepare: async (context: StonePluginContext): Promise<void> => {
       // Only while developing: a production artifact must carry none of this.

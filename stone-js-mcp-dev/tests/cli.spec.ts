@@ -1,4 +1,4 @@
-import { DEV_COMMANDS, GENERATED_MODULE, generatedModule, mcpDevCliPlugin } from '../src/cli'
+import { DEV_COMMANDS, GENERATED_MODULE, generatedModule, mcpDevCliPlugin, SetMcpCommandsMiddleware } from '../src/cli'
 
 const makeContext = (command: string): any => ({
   command,
@@ -57,5 +57,36 @@ describe('turning it off', () => {
     await mcpDevCliPlugin().onPrepare?.(context)
 
     expect(context.writeFile).not.toHaveBeenCalled()
+  })
+})
+
+describe('the command the plugin contributes', () => {
+  it('registers `stone mcp` on the console platform', async () => {
+    // Contributed by the build, not by the application: an app should not have to declare a
+    // development tool to get one.
+    const added: any[] = []
+    const blueprint: any = {
+      get: () => 'node_console',
+      add: (key: string, value: unknown[]) => { added.push([key, value]) }
+    }
+
+    await SetMcpCommandsMiddleware({ blueprint } as any, async () => blueprint)
+
+    expect(added[0][0]).toBe('stone.adapter.commands')
+    expect(added[0][1][0]).toEqual(expect.objectContaining({ isClass: true }))
+  })
+
+  it('registers nothing on any other platform', async () => {
+    const blueprint: any = { get: () => 'node_http', add: vi.fn() }
+
+    await SetMcpCommandsMiddleware({ blueprint } as any, async () => blueprint)
+
+    expect(blueprint.add).not.toHaveBeenCalled()
+  })
+
+  it('declares that middleware on the plugin itself', () => {
+    expect(mcpDevCliPlugin().blueprintMiddleware).toEqual([
+      { module: SetMcpCommandsMiddleware, priority: 5 }
+    ])
   })
 })

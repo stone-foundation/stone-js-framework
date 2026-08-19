@@ -116,9 +116,9 @@ export function resolveSource (
         why:
           'No running application has published its configuration, so this describes what a console ' +
           'boot resolves. Anything platform-dependent therefore belongs to the console platform, not ' +
-          'to the application you are running. Activate `@McpDev()` (or register `mcpDevBlueprint`) on ' +
-          `your app and start it once: it writes ${APP_CONTEXT_FILE}, and these tools then describe ` +
-          'that application.'
+          'to the application you are running. Install `@stone-js/mcp-dev` as a devDependency and run ' +
+          `the app once (\`stone dev\`): the build injects a publisher that writes ${APP_CONTEXT_FILE}, ` +
+          'and these tools then describe that application.'
       }
     }
   }
