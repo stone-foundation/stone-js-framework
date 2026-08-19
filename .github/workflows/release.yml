@@ -37,7 +37,7 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Create Release PR or Publish
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1
+        uses: changesets/action@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v1
         with:
           # Opens/updates a "Version Packages" PR; on merge, builds and publishes to npm.
           version: pnpm run version-packages
