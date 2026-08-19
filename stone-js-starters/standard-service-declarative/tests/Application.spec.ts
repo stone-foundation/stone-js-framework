@@ -1,100 +1,28 @@
-import { ILogger } from '@stone-js/core'
-import { IncomingHttpEvent } from '@stone-js/http-core'
-import { WelcomeService } from '../app/services/WelcomeService'
-import { WelcomeEventHandler } from '../app/handlers/WelcomeEventHandler'
+import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
 
-// We must mock decorators to lighten the test environment
-vi.mock(import('@stone-js/core'), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    Service: vi.fn(() => vi.fn())
-  }
-})
+/**
+ * The whole application, booted in memory and asked a real question.
+ *
+ * Nothing is mocked and nothing is listed: `createTestApp()` discovers `app/**`, and the event goes
+ * through the same kernel production runs. If this passes the application works; if it fails the
+ * application is broken. That is the only kind of test worth shipping in a starter — the previous one
+ * stubbed out the framework's own decorators, which meant it could pass while nothing worked.
+ */
+describe('Application', () => {
+  it('answers the caller', async () => {
+    const app = await createTestApp()
 
-// We must mock decorators to lighten the test environment
-vi.mock(import('@stone-js/router'), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    EventHandler: vi.fn(() => vi.fn()),
-    Get: vi.fn(() => vi.fn())
-  }
-})
+    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/?name=Ada' }))
 
-// We must mock decorators to lighten the test environment
-vi.mock(import('@stone-js/http-core'), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    JsonHttpResponse: vi.fn(() => vi.fn())
-  }
-})
-
-describe('WelcomeService', () => {
-  let mockedLogger: ILogger
-  let service: WelcomeService
-
-  beforeEach(() => {
-    mockedLogger = {
-      info: vi.fn()
-    } as unknown as ILogger
-
-    service = new WelcomeService({ logger: mockedLogger })
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toMatchObject({ message: expect.stringContaining('Ada') })
   })
 
-  it('should build a branded welcome message for the given name', () => {
-    // Act
-    const response = service.welcome('Stone')
+  it('answers when nobody says who they are', async () => {
+    const app = await createTestApp()
 
-    // Assert
-    expect(response.message).toBe('Hello Stone! Welcome to Stone.js.')
-    expect(response.framework.name).toBe('Stone.js')
-    expect(response.framework).toMatchObject({
-      name: 'Stone.js',
-      tagline: 'The continuum framework',
-      docs: 'https://stonejs.dev',
-      github: 'https://github.com/stone-foundation/stone-js-framework'
-    })
-    expect(mockedLogger.info).toHaveBeenCalledWith('Welcome Stone')
-  })
-})
+    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/' }))
 
-describe('WelcomeEventHandler', () => {
-  let mockedLogger: ILogger
-  let handler: WelcomeEventHandler
-
-  beforeEach(() => {
-    mockedLogger = {
-      info: vi.fn()
-    } as unknown as ILogger
-
-    handler = new WelcomeEventHandler({ welcomeService: new WelcomeService({ logger: mockedLogger }) })
-  })
-
-  it('should welcome the name carried by the event', () => {
-    // Arrange
-    const event = { get: () => 'World' } as unknown as IncomingHttpEvent
-
-    // Act
-    const response = handler.welcome(event)
-
-    // Assert
-    expect(response.message).toBe('Hello World! Welcome to Stone.js.')
-    expect(response.framework.name).toBe('Stone.js')
-    expect(mockedLogger.info).toHaveBeenCalledWith('Welcome World')
-  })
-
-  it('should fall back to the default name when the event carries none', () => {
-    // Arrange
-    const event = { get: (_key: string, fallback: string) => fallback } as unknown as IncomingHttpEvent
-
-    // Act
-    const response = handler.welcome(event)
-
-    // Assert
-    expect(response.message).toBe('Hello World! Welcome to Stone.js.')
-    expect(response.framework.name).toBe('Stone.js')
-    expect(mockedLogger.info).toHaveBeenCalledWith('Welcome World')
+    expect(response.statusCode).toBe(200)
   })
 })

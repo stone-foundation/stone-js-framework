@@ -14,8 +14,8 @@
     "build": "stone build",
     "preview": "stone preview",
     "typings": "stone typings",
-    "test": "vitest run",
-    "test:cvg": "npm run test -- --coverage"
+    "test": "stone test",
+    "test:cvg": "stone test --coverage"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -33,6 +33,7 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.27.0",
     "@stone-js/cli": "^0.8.9",
+    "@stone-js/testing": "^0.8.9",
     "@types/node": "^24.0.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
