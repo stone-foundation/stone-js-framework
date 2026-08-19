@@ -28,7 +28,11 @@ jobs:
         run: |
           name="$BRANCH_NAME"
           echo "Branch: $name"
-          if ! printf '%s' "$name" | grep -qE '^(changeset-release|feat|fix|chore|docs|refactor|perf|test|build|ci|style|revert)/[a-z0-9][a-z0-9._/-]*$'; then
+          # `changeset-release` and `dependabot` are bot-owned namespaces: neither tool lets you
+          # choose the branch name, so requiring <type>/<slug> of them would fail every one of their
+          # pull requests forever. Their titles still go through commitlint below, which is what
+          # actually lands on main.
+          if ! printf '%s' "$name" | grep -qE '^(changeset-release|dependabot|feat|fix|chore|docs|refactor|perf|test|build|ci|style|revert)/[a-z0-9][a-z0-9._/-]*$'; then
             echo "::error::Branch '$name' must be <type>/<slug> (types: feat, fix, chore, docs, refactor, perf, test, build, ci, style, revert), e.g. feat/mcp-dev."
             exit 1
           fi
@@ -45,7 +49,7 @@ jobs:
       # The PR title becomes the squash-merge commit on main, so it must pass the same commitlint
       # rules as any commit. Reuse the repo's commitlint config for a single source of truth.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 22
