@@ -98,7 +98,7 @@ expect(response.html()).toContain('<h1>Tasks</h1>')`}</Code>
           load sees it, and it hands the test process the same file set the build uses, so a suite
           cannot boot a different application than the one that ships.
         </p>
-        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+        <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   test: {
     envFile: '.env.test',                  // loaded before anything imports
     include: ['./tests/**/*.spec.ts'],

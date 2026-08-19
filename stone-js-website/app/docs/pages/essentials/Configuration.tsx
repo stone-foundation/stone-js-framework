@@ -122,12 +122,14 @@ export class Configuration implements IPage<ReactIncomingEvent> {
           the same scan. Export it from your app directory and it runs; nothing registers it by hand.
         </p>
 
-        <Callout kind='important' title='Two different defineConfig'>
-          <code>defineConfig</code> from <code>@stone-js/core</code> configures your
-          {' '}<strong>application</strong>, as above. <code>defineConfig</code> from
-          {' '}<code>@stone-js/cli</code> configures the <strong>build</strong>, in
-          {' '}<code>stone.config.mjs</code>. Same name, unrelated jobs: check which package an example
-          imports from.
+        <Callout kind='note' title='One name, one job'>
+          <code>defineConfig</code> configures your <strong>application</strong>, and comes from
+          {' '}<code>@stone-js/core</code>. The build is configured by
+          {' '}<code>defineBuilderConfig</code> from <code>@stone-js/cli</code>, in
+          {' '}<code>stone.config.mjs</code>. They used to share the name <code>defineConfig</code>,
+          which read fine in a document and badly in an editor: both packages sit in the same project,
+          so an auto-import could pick the build one inside <code>app/</code> and the app would simply
+          never read what it returned.
         </Callout>
 
         <H3>Ordering several configurations</H3>
