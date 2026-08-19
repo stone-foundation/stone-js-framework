@@ -333,7 +333,7 @@ describe('ReactBuildMiddleware', () => {
     vi.mocked(checkAppLevelDecoratorsInTsx).mockReturnValue(['app/Application.tsx'])
 
     await expect(GenerateClientFileMiddleware(context, mockNext)).rejects.toThrow(
-      /App-level configuration must live in a \\.ts file.*\\.tsx file/
+      /App-level configuration must live in a \.ts file, not a \.tsx file/
     )
   })
 
@@ -342,7 +342,7 @@ describe('ReactBuildMiddleware', () => {
     vi.mocked(checkAppLevelDecoratorsInTsx).mockReturnValue(['app/Application.tsx'])
 
     await expect(GenerateClientFileMiddleware(context, mockNext)).rejects.toThrow(
-      /Application\\.tsx/
+      /Application\.tsx/
     )
   })
 
@@ -358,14 +358,23 @@ describe('ReactBuildMiddleware', () => {
   it('should not throw when .tsx files have no app-level decorators', async () => {
     vi.mocked(isLazyViews).mockReturnValue(true)
     vi.mocked(checkAppLevelDecoratorsInTsx).mockReturnValue([])
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(readFileSync).mockReturnValue('// %concat%')
 
-    await expect(GenerateClientFileMiddleware(context, mockNext)).resolves.toBeDefined()
+    const result = await GenerateClientFileMiddleware(context, mockNext)
+
+    // `mockNext` is a bare `vi.fn()`, so the middleware resolves to undefined by design: what proves
+    // it did not throw is that the client file was still generated.
+    expect(result).toEqual(await mockNext(context))
+    expect(outputFileSync).toHaveBeenCalled()
   })
 
   it('should not check for app-level decorators when lazy views are off', async () => {
     vi.mocked(isLazyViews).mockReturnValue(false)
 
-    await expect(GenerateClientFileMiddleware(context, mockNext)).resolves.toBeDefined()
+    const result = await GenerateClientFileMiddleware(context, mockNext)
+
+    expect(result).toEqual(await mockNext(context))
     expect(checkAppLevelDecoratorsInTsx).not.toHaveBeenCalled()
   })
 })
