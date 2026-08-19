@@ -2,6 +2,8 @@ import { AuthzOptions } from '../declarations'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { AuthzServiceProvider } from '../AuthzServiceProvider'
 import { AbilityMiddleware } from '../middleware/AbilityMiddleware'
+import { MetaPolicyMiddleware } from '../middleware/BlueprintMiddleware'
+import { MetaCanRouteMiddleware } from '../middleware/CanRouteMiddleware'
 
 /**
  * Authorization configuration bucket (`stone.authz`).
@@ -40,6 +42,16 @@ export const authzBlueprint: AuthzBlueprint = {
     kernel: {
       middleware: [
         { module: AbilityMiddleware, isClass: true }
+      ]
+    },
+    blueprint: {
+      middleware: [
+        MetaPolicyMiddleware
+      ]
+    },
+    router: {
+      middleware: [
+        MetaCanRouteMiddleware
       ]
     }
   }
