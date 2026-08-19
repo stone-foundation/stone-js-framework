@@ -293,7 +293,7 @@ const APP_LEVEL_DECORATORS = ['StoneApp', 'Browser', 'UseReact', 'Configuration'
  * class or an export, allowing indentation.
  */
 const APP_LEVEL_DECORATOR_RE = new RegExp(
-  `^[ \\t]*@[ \\t]*(?:${APP_LEVEL_DECORATORS.join('|')})\\b`,
+  String.raw`^[ \t]*@[ \t]*(?:${APP_LEVEL_DECORATORS.join('|')})\b`,
   'm'
 )
 

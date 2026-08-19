@@ -36,6 +36,11 @@ describe('discoverAppModules', () => {
     await expect(discoverAppModules({ appDir: 'tests/fixtures/does-not-exist' })).resolves.toEqual([])
   })
 
+  it('tolerates a trailing slash on appDir, however it was typed', async () => {
+    // `src/` and `src` are the same directory to everyone except a string concatenation.
+    await expect(discoverAppModules({ appDir: 'tests/fixtures/app//' })).resolves.toHaveLength(3)
+  })
+
   it('derives its pattern from appDir', async () => {
     // `appDir` is the option a non-standard layout reaches for, so it has to actually scan there.
     const modules = await discoverAppModules({ appDir: 'tests/fixtures/app' })

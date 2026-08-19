@@ -9,6 +9,22 @@ import {
 } from '@stone-js/core'
 
 /**
+ * Name a subject for an error message.
+ *
+ * A subject is a string, a class or an instance, and `String(...)` on the last two yields
+ * `[object Object]` — an authorization failure that says nothing about what was refused.
+ *
+ * @param subject - What the rule was checked against.
+ * @returns Something worth reading.
+ */
+function describeSubject (subject: unknown): string {
+  if (typeof subject === 'string') { return subject }
+  if (typeof subject === 'function') { return subject.name }
+  if (typeof subject === 'object' && subject !== null) { return subject.constructor.name }
+  return String(subject)
+}
+
+/**
  * Route middleware: enforce what a route or a handler declared it authorizes.
  *
  * ```ts
@@ -72,7 +88,7 @@ export class CanRouteMiddleware {
     const ability = event.getMetadataValue<AppAbility>('ability')
 
     if (ability?.can === undefined || !ability.can(action as any, subject as any, field)) {
-      throw new AuthorizationError(`Not allowed to ${String(action)} ${String(subject)}.`)
+      throw new AuthorizationError(`Not allowed to ${String(action)} ${describeSubject(subject)}.`)
     }
   }
 
