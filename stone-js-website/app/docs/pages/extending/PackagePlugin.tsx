@@ -66,7 +66,8 @@ export class CacheServiceProvider {
 }`}</Code>
 
         <H2>How consumers add it</H2>
-        <Code file='app/Application.ts'>{`import { cacheBlueprint } from '@acme/stone-cache'
+        <Code file='app/Application.ts'>{`import { defineStoneApp } from '@stone-js/core'
+import { cacheBlueprint } from '@acme/stone-cache'
 
 // imperative:
 export const App = defineStoneApp({ name: 'app' }, [routerBlueprint, cacheBlueprint])

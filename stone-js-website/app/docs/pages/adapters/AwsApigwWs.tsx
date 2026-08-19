@@ -1,12 +1,12 @@
 import { JSX } from 'react'
-import { Code } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, H3, Callout, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/adapters/aws-apigw-ws'
 
-const ENABLE = `import { StoneApp } from '@stone-js/core'
+const ENABLE_DECL = `import { StoneApp } from '@stone-js/core'
 import { Realtime } from '@stone-js/realtime'
 import { ApiGatewayWs } from '@stone-js/aws-apigw-ws-adapter'
 
@@ -14,6 +14,17 @@ import { ApiGatewayWs } from '@stone-js/aws-apigw-ws-adapter'
 @Realtime({ driver: 'memory' })   // bootstraps the RealtimeManager
 @StoneApp({ name: 'chat' })
 export class Application {}`
+
+const ENABLE_IMP = `
+import { defineStoneApp } from '@stone-js/core'
+import { realtimeBlueprint } from '@stone-js/realtime'
+import { apiGatewayWsAdapterBlueprint } from '@stone-js/aws-apigw-ws-adapter'
+
+export const App = defineStoneApp(
+  { name: 'chat' },
+  [apiGatewayWsAdapterBlueprint, realtimeBlueprint]
+)
+`
 
 /**
  * Adapters: AWS API Gateway WebSocket.
@@ -49,7 +60,7 @@ npm i @aws-sdk/client-apigatewaymanagementapi @aws-sdk/client-dynamodb @aws-sdk/
           Add the adapter to the manifest, on top of <code>@stone-js/realtime</code>. The adapter is
           the default in a Lambda environment.
         </p>
-        <Code file='app/Application.ts'>{ENABLE}</Code>
+        <CodeTabs file='app/Application.ts' decl={ENABLE_DECL} imp={ENABLE_IMP} />
 
         <H3>Use the serverless broadcaster</H3>
         <p>
