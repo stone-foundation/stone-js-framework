@@ -77,3 +77,24 @@ counterpart, with the same dependencies.
 Nothing in either module touches HTTP, so the same schema class validates a form on the frontend:
 resolve it from the container and call `rules()`. One schema, both sides.
 
+## The schema engine comes from the container too
+
+An application declares what to make resolvable, and the provider binds it:
+
+```ts
+import { z } from 'zod'
+blueprint.set('stone.validation.engines', { zod: z })
+
+@ValidationSchema('createUser')
+export class CreateUserSchema implements IValidationSchema {
+  constructor ({ zod }: { zod: typeof z }) { this.z = zod }
+  rules () { return { body: this.z.object({ email: this.z.string().email() }) } }
+}
+```
+
+More elegant than importing the library at every schema, and more testable: a test hands the class a
+fake engine instead of mocking a module. The **application** names the engine and this module never
+imports one, which is what keeps it agnostic. Zod, Valibot and ArkType already arrive through Standard
+Schema, and a native schema needs no engine at all; binding a specific library here would make every
+application depend on it.
+
