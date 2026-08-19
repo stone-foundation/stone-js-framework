@@ -57,9 +57,37 @@ export const spec = OpenApiGenerator
 
         <H2>Serving it</H2>
         <p>
-          Expose the built document from a route. Tools, machines and agents read it directly; point any
-          OpenAPI viewer (Swagger UI, Scalar) at that URL for a human-friendly, interactive explorer, no
-          separate docs site to keep in sync.
+          You do not have to wire any of it. Enable the module the way every Stone.js module is
+          enabled, with its decorator or with its blueprint, and two routes appear:{' '}
+          <code>/openapi.json</code> for the document and <code>/docs</code> for its explorer. Both
+          paths are configurable under <code>stone.openapi</code>, and <code>docsPath: false</code>{' '}
+          serves the machine-readable contract alone, for when the explorer must not be public.
+        </p>
+        <CodeTabs
+          file='app/Application.ts'
+          decl={`import { OpenApi } from '@stone-js/openapi'
+import { StoneApp } from '@stone-js/core'
+
+@OpenApi({ info: { title: 'Tasks API', version: '1.0.0' } })
+@StoneApp({ name: 'my-app' })
+export class Application {}`}
+          imp={`import { defineStoneApp } from '@stone-js/core'
+import { openApiBlueprint } from '@stone-js/openapi'
+
+export const Application = defineStoneApp(handler, { name: 'my-app' }, [openApiBlueprint])`}
+        />
+        <Callout kind='note' title='The server URL is the host that answered'>
+          The document is assembled per request, so the server URL it advertises is the host that
+          actually served it. The same artefact documents itself correctly behind a local port, a load
+          balancer and an API Gateway stage, where a URL frozen at build time would be wrong for at
+          least two of them. Declare <code>servers</code> under <code>stone.openapi</code> to override it.
+        </Callout>
+
+        <H3>Serving it yourself</H3>
+        <p>
+          If your application assembles its own document, or must serve it from somewhere the module
+          does not reach, expose the built document from a route of your own. Tools, machines and agents
+          read it directly; point any OpenAPI viewer (Swagger UI, Scalar) at that URL.
         </p>
         <CodeTabs
           file='app/OpenApiController.ts'

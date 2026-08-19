@@ -56,6 +56,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@stone-js/config": "workspace:*",
     "openapi-typescript": "^7.13.0",
     "zod-to-json-schema": "^3.24.1"
   },
@@ -67,6 +68,7 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
     "@stone-js/cli": "workspace:*",
+    "@stone-js/core": "workspace:*",
     "@types/node": "^24.0.7",
     "@vitest/coverage-v8": "^3.2.4",
     "husky": "^9.1.7",
@@ -93,5 +95,8 @@
       "describe",
       "beforeEach"
     ]
+  },
+  "peerDependencies": {
+    "@stone-js/core": "workspace:*"
   }
 }
