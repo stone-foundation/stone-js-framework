@@ -3005,6 +3005,9 @@ importers:
 
   stone-js-openapi:
     dependencies:
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
       openapi-typescript:
         specifier: ^7.13.0
         version: 7.13.0(typescript@5.9.3)
@@ -3033,6 +3036,9 @@ importers:
       '@stone-js/cli':
         specifier: workspace:*
         version: link:../stone-js-cli
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../stone-js-core
       '@types/node':
         specifier: ^24.0.7
         version: 24.13.3
@@ -7239,6 +7245,7 @@ packages:
 
   ip-range-check@0.2.0:
     resolution: {integrity: sha512-oaM3l/3gHbLlt/tCWLvt0mj1qUaI+STuRFnUvARGCujK9vvU61+2JsDpmkMzR4VsJhuFXWWgeKKVnwwoFfzCqw==}
+    deprecated: Contains an SSRF filter-bypass vulnerability, upgrade to 0.2.1+ — see GHSA advisory
 
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
