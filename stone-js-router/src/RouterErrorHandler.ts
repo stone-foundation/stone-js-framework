@@ -1,5 +1,5 @@
 import { RouterError } from './errors/RouterError'
-import { ILogger, IErrorHandler, Promiseable, RuntimeError } from '@stone-js/core'
+import { ILogger, IErrorHandler, Promiseable, ResponseResolverOptions, RuntimeError } from '@stone-js/core'
 import { IOutgoingResponse, StoneIncomingEvent } from './declarations'
 
 /**
@@ -38,7 +38,7 @@ export class RouterErrorHandler<
    * @param event - The incoming http event.
    * @returns The outgoing http response.
    */
-  public handle (error: Error, event: StoneIncomingEvent): Promiseable<OutgoingResponseType> {
+  public handle (error: Error, event: StoneIncomingEvent): Promiseable<ResponseResolverOptions> {
     const types = ['json', 'html', 'xml', 'text']
     const message = (error: string): string | { error: string } => {
       return event.preferredType?.(types, 'html') === 'json' ? { error } : error
@@ -57,6 +57,6 @@ export class RouterErrorHandler<
       MethodNotAllowedError: { statusCode: 405, content: message('Method Not Allowed'), headers: allowHeader }
     })[error.name] ?? { statusCode: 500, content: message('Internal Server Error') }
 
-    return response as OutgoingResponseType
+    return response
   }
 }
