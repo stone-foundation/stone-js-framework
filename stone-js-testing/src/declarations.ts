@@ -47,6 +47,15 @@ export interface TestAppOptions {
    */
   bindings?: TestBindings
 
+  /**
+   * The platform to run the application as, when it stacks several.
+   *
+   * An app is one domain over many contexts, and a test may want a specific one: the HTTP context of
+   * an app that is also a CLI, or the browser context of a pure SPA (where nothing is the default, so
+   * nothing is selected). Omit it and the application's own default stands.
+   */
+  platform?: string
+
   /** A base blueprint to merge in (shorthand for a single blueprint module). */
   blueprint?: Partial<StoneBlueprint>
 }

@@ -125,3 +125,17 @@ describe('createTestApp, for a frontend app', () => {
     expect(response.text()).toBe(response.html())
   })
 })
+
+describe('createTestApp with a named context', () => {
+  it('boots the app as the platform the test asked for', async () => {
+    // An app that is both an HTTP service and a CLI is two contexts over one domain; a test picks one.
+    const app = await createTestApp({
+      platform: 'node-http',
+      modules: [{ stone: { kernel: { eventHandler: () => jsonHttpResponse({ ok: true }, 200) } } }] as any
+    })
+
+    const response = await app.send(makeIncomingHttpEvent({ url: '/' }))
+
+    expect(response.json()).toEqual({ ok: true })
+  })
+})

@@ -2399,6 +2399,9 @@ importers:
       '@stone-js/cli':
         specifier: workspace:*
         version: link:../../../stone-js-cli
+      '@stone-js/testing':
+        specifier: workspace:*
+        version: link:../../../stone-js-testing
       '@types/node':
         specifier: ^24.0.7
         version: 24.13.3
@@ -2408,6 +2411,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.3
         version: 19.2.3(@types/react@19.2.17)
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
 
   stone-js-lab/apps/spa-imperative:
     dependencies:
@@ -2494,6 +2500,9 @@ importers:
       '@stone-js/cli':
         specifier: workspace:*
         version: link:../../../stone-js-cli
+      '@stone-js/testing':
+        specifier: workspace:*
+        version: link:../../../stone-js-testing
       '@types/node':
         specifier: ^24.0.7
         version: 24.13.3
@@ -2503,6 +2512,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.3
         version: 19.2.3(@types/react@19.2.17)
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
 
   stone-js-lab/apps/ssg-imperative:
     dependencies:
@@ -2592,6 +2604,9 @@ importers:
       '@stone-js/cli':
         specifier: workspace:*
         version: link:../../../stone-js-cli
+      '@stone-js/testing':
+        specifier: workspace:*
+        version: link:../../../stone-js-testing
       '@types/node':
         specifier: ^24.0.7
         version: 24.13.3
@@ -2601,6 +2616,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.3
         version: 19.2.3(@types/react@19.2.17)
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
 
   stone-js-lab/apps/ssr-imperative:
     dependencies:

@@ -4,7 +4,7 @@ import { loadTestEnv } from './loadTestEnv'
 import { TestAppOptions } from './declarations'
 import { discoverAppModules } from './discoverModules'
 import { testBindingsProvider } from './bindingsProvider'
-import { testAdapterBlueprint } from './options/TestAdapterBlueprint'
+import { testAdapterBlueprint, testAdapterBlueprintFor } from './options/TestAdapterBlueprint'
 
 /**
  * Boots a Stone.js application in-memory for testing.
@@ -41,7 +41,7 @@ export async function createTestApp (options: TestAppOptions = {}): Promise<Test
   const appModules = options.modules ?? await discoverAppModules(options)
 
   const modules = [
-    testAdapterBlueprint,
+    options.platform === undefined ? testAdapterBlueprint : testAdapterBlueprintFor(options.platform),
     ...(options.blueprint !== undefined ? [options.blueprint] : []),
     ...appModules,
     // Last, so a substitution wins over the registration it replaces.
