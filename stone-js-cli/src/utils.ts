@@ -11,7 +11,7 @@ import { basename, dirname, join } from 'node:path'
 import Dotenv, { DotenvPopulateInput } from 'dotenv'
 import { builder, BuilderConfig } from './options/BuilderConfig'
 import { IBlueprint, IncomingEvent, isNotEmpty } from '@stone-js/core'
-import { basePath, buildPath, importModule } from '@stone-js/filesystem'
+import { basePath, buildPath, importModule, appModuleFiles, DEFAULT_APP_MODULES_PATTERN } from '@stone-js/filesystem'
 import { DotenvConfig, DotenvFiles, DotenvOptions } from './options/DotenvConfig'
 
 const { readJsonSync, pathExistsSync, outputJsonSync, outputFileSync } = fsExtra
@@ -256,7 +256,7 @@ export const isReactApp = (blueprint: IBlueprint, event: IncomingEvent): boolean
  * @returns True if the application is using lazy loading.
  */
 export const isLazyViews = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
-  const files = glob.sync(basePath(blueprint.get('stone.builder.input.all', 'app/**/*.{ts,tsx,js,jsx,mjsx}')))
+  const files = appModuleFiles({ pattern: blueprint.get('stone.builder.input.all', DEFAULT_APP_MODULES_PATTERN) })
   if (!event.is('lazy', undefined)) return event.is('lazy', true)
   if (!blueprint.is('stone.builder.lazy', undefined)) return blueprint.is('stone.builder.lazy', true)
   return files.some((filePath) => {
@@ -273,7 +273,7 @@ export const isLazyViews = (blueprint: IBlueprint, event: IncomingEvent): boolea
  * @returns True if the application is using imperative API.
  */
 export const isDeclarative = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
-  const files = glob.sync(basePath(blueprint.get('stone.builder.input.all', 'app/**/*.{ts,tsx,js,jsx,mjsx}')))
+  const files = appModuleFiles({ pattern: blueprint.get('stone.builder.input.all', DEFAULT_APP_MODULES_PATTERN) })
   if (!event.is('imperative', undefined)) return event.is('imperative', false)
   if (!blueprint.is('stone.builder.imperative', undefined)) return blueprint.is('stone.builder.imperative', false)
   return files.some((filePath) => {
@@ -352,7 +352,7 @@ export const checkAppLevelDecoratorsInTsx = (blueprint: IBlueprint): string[] =>
  * @returns True if the application is using client-side rendering.
  */
 export const isCSR = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
-  const files = glob.sync(basePath(blueprint.get('stone.builder.input.all', 'app/**/*.{ts,tsx,js,jsx,mjsx}')))
+  const files = appModuleFiles({ pattern: blueprint.get('stone.builder.input.all', DEFAULT_APP_MODULES_PATTERN) })
   if (!event.is('rendering', undefined)) return event.is('rendering', 'csr')
   if (!blueprint.is('stone.builder.rendering', undefined)) return blueprint.is('stone.builder.rendering', 'csr')
   return files.some((filePath) => {
@@ -368,7 +368,7 @@ export const isCSR = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
  * @returns True if the application is using server-side rendering.
  */
 export const isSSR = (blueprint: IBlueprint, event: IncomingEvent): boolean => {
-  const files = glob.sync(basePath(blueprint.get('stone.builder.input.all', 'app/**/*.{ts,tsx,js,jsx,mjsx}')))
+  const files = appModuleFiles({ pattern: blueprint.get('stone.builder.input.all', DEFAULT_APP_MODULES_PATTERN) })
   if (!event.is('rendering', undefined)) return event.is('rendering', 'ssr')
   if (!blueprint.is('stone.builder.rendering', undefined)) return blueprint.is('stone.builder.rendering', 'ssr')
   return files.some((filePath) => {

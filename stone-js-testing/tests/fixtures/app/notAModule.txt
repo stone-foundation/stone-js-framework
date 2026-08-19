@@ -1,0 +1,1 @@
+Not a source file: the scan must not try to import this.

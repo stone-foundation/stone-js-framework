@@ -11,8 +11,8 @@
     "dev": "stone dev",
     "build": "stone build",
     "preview": "stone preview dist/server.mjs",
-    "test": "vitest run",
-    "test:cvg": "vitest run --coverage"
+    "test": "stone test",
+    "test:cvg": "stone test --coverage"
   },
   "dependencies": {
     "@stone-js/core": "workspace:*",
@@ -26,8 +26,9 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.27.0",
     "@stone-js/cli": "workspace:*",
+    "@stone-js/testing": "workspace:*",
     "@types/node": "^24.0.7",
-    "vitest": "^3.0.9",
-    "@vitest/coverage-v8": "^3.0.9"
+    "@vitest/coverage-v8": "^3.0.9",
+    "vitest": "^3.0.9"
   }
 }

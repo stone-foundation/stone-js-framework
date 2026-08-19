@@ -5,6 +5,7 @@ import { LoadStonePluginsMiddleware } from '../plugins/LoadStonePluginsMiddlewar
 import { NODE_CONSOLE_PLATFORM } from '@stone-js/node-cli-adapter'
 import { BlueprintContext, ClassType, IBlueprint } from '@stone-js/core'
 import { ListCommand, listCommandOptions } from '../commands/ListCommand'
+import { TestCommand, testCommandOptions } from '../commands/TestCommand'
 import { InitCommand, initCommandOptions } from '../commands/InitCommand'
 import { BuildCommand, buildCommandOptions } from '../commands/BuildCommand'
 import { CacheCommand, cacheCommandOptions } from '../commands/CacheCommand'
@@ -85,7 +86,8 @@ export const SetCliCommandsMiddleware = async (
     { module: CustomCommand, options: customCommandOptions, isClass: true },
     { module: ExportCommand, options: exportCommandOptions, isClass: true },
     { module: TypingsCommand, options: typingsCommandOptions, isClass: true },
-    { module: PreviewCommand, options: previewCommandOptions, isClass: true }
+    { module: PreviewCommand, options: previewCommandOptions, isClass: true },
+    { module: TestCommand, options: testCommandOptions, isClass: true }
   ]
 
   if (context.blueprint.get<string>('stone.adapter.platform') === NODE_CONSOLE_PLATFORM) {

@@ -1,8 +1,8 @@
 import fsExtra from 'fs-extra'
-import { CliError } from '../errors/CliError'
 import { basePath } from '@stone-js/filesystem'
 import { ConsoleContext } from '../declarations'
 import { getAvailableStarters } from './StarterContract'
+import { CancellationError } from '../errors/CancellationError'
 
 const { pathExistsSync } = fsExtra
 
@@ -135,25 +135,24 @@ export class Questionnaire {
     const overwrite = this.context.blueprint.get<boolean>('stone.createApp.overwrite')
     const projectName = this.context.blueprint.get<string>('stone.createApp.projectName')
 
-    answers.projectName = projectName ??
+    answers.projectName = projectName ?? this.orCancel(
       await this.context.commandInput.ask(this.messages.projectName, 'stone-project')
+    )
 
     const projectPath = basePath(answers.projectName)
 
     if (pathExistsSync(projectPath)) {
-      answers.overwrite = overwrite ?? await this.context.commandInput.confirm(
-        this.getOverwriteMessage(answers.projectName)
+      answers.overwrite = overwrite ?? this.orCancel(
+        await this.context.commandInput.confirm(this.getOverwriteMessage(answers.projectName))
       )
 
-      if (!answers.overwrite) {
-        throw new CliError('Operation cancelled by the user.')
-      }
+      // Refusing to erase existing files is the answer the prompt asked for, and nothing has been
+      // written yet at this point, so there is nothing to clean up either.
+      if (!answers.overwrite) { this.cancel() }
     }
 
-    answers.typing = await this.context.commandInput.choice(
-      this.messages.typing,
-      this.typings,
-      [0]
+    answers.typing = this.orCancel(
+      await this.context.commandInput.choice(this.messages.typing, this.typings, [0])
     )
 
     // `--starter <id>` already answered this one: asking again would let the user contradict the
@@ -162,44 +161,61 @@ export class Questionnaire {
 
     answers.template = this.context.blueprint.get<boolean>('stone.createApp.templateExplicit', false)
       ? chosenTemplate
-      : await this.context.commandInput.choice(
-        this.messages.template,
-        await this.getTemplates(),
-        [0]
+      : this.orCancel(
+        await this.context.commandInput.choice(this.messages.template, await this.getTemplates(), [0])
       )
 
-    answers.packageManager = await this.context.commandInput.choice(
-      this.messages.packageManager,
-      this.packageManagers,
-      [0]
+    answers.packageManager = this.orCancel(
+      await this.context.commandInput.choice(this.messages.packageManager, this.packageManagers, [0])
     )
 
-    answers.modules = await this.context.commandInput.choice(
-      this.messages.modules,
-      this.stoneModules,
-      [],
-      true
+    // Selecting no module is a valid answer here, and comes back as an empty array rather than
+    // nothing at all, so it is not mistaken for an abandoned prompt.
+    answers.modules = this.orCancel(
+      await this.context.commandInput.choice(this.messages.modules, this.stoneModules, [], true)
     )
 
-    answers.testing = await this.context.commandInput.choice(
-      this.messages.testing,
-      this.testingFrameworks,
-      [0]
+    answers.testing = this.orCancel(
+      await this.context.commandInput.choice(this.messages.testing, this.testingFrameworks, [0])
     )
 
-    answers.initGit = await this.context.commandInput.confirm(
-      this.messages.initGit
+    answers.initGit = this.orCancel(await this.context.commandInput.confirm(this.messages.initGit))
+
+    answers.confirmation = this.orCancel(
+      await this.context.commandInput.confirm(this.getConfirmationMessage(answers))
     )
 
-    answers.confirmation = await this.context.commandInput.confirm(
-      this.getConfirmationMessage(answers)
-    )
-
-    if (!answers.confirmation) {
-      throw new CliError('Operation cancelled by the user.')
-    }
+    if (!answers.confirmation) { this.cancel() }
 
     return answers
+  }
+
+  /**
+   * An answer, or a cancellation when the prompt was abandoned.
+   *
+   * Interrupting a prompt with Ctrl-C does not end the process: the prompt resolves with nothing
+   * and the questionnaire would carry on asking, then scaffold from answers the user never gave.
+   * Submitting an empty value is different, and stays a real answer: an empty text answer comes
+   * back as `''` and an empty multi-select as `[]`, so only a genuinely abandoned prompt is
+   * `undefined`.
+   *
+   * @param answer - What the prompt returned.
+   * @returns The answer.
+   * @throws {CancellationError} When the prompt was abandoned.
+   */
+  private orCancel<T>(answer: T | undefined): T {
+    if (answer === undefined) { this.cancel() }
+    return answer
+  }
+
+  /**
+   * Stop the questionnaire because the user chose to.
+   *
+   * @throws {CancellationError} Always.
+   */
+  private cancel (): never {
+    // The second sentence is the one a user who just refused to overwrite a directory needs.
+    throw new CancellationError('Operation cancelled. Nothing was created.')
   }
 
   /**

@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "filesize": "^10.1.6",
+    "glob": "^13.0.0",
     "mime": "^4.0.7"
   },
   "devDependencies": {

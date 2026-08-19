@@ -97,6 +97,39 @@ describe('GenerateStaticSiteMiddleware (SSG)', () => {
     expect(received.extraTargets).toEqual([]) // nothing configured, and definitions exist -> no '/' fallback
   })
 
+  it('reads the declared segment values and reports what it still cannot expand', async () => {
+    // The wiring is the part a unit test cannot see: reading the right blueprint key, and giving
+    // the collector somewhere to report the routes it had to skip.
+    spawnMock.mockReturnValue(makeChild('url'))
+    let received: any
+    runSsgMock.mockImplementation(async (opts: any) => {
+      received = opts
+      opts.onSkipped({ paths: ['/blog/:slug'], segments: ['slug'] })
+      return ['x']
+    })
+    vi.stubGlobal('fetch', vi.fn(async () => ({ text: async () => 'x', status: 200 })))
+
+    const context: any = {
+      blueprint: {
+        get: vi.fn((key: string, fallback: any) => {
+          if (key === 'stone.builder.output') return 'server.mjs'
+          if (key === 'stone.builder.ssg.definitions') return [{ path: '/:lang?/about' }, { path: '/blog/:slug' }]
+          if (key === 'stone.builder.ssg.routes') return []
+          if (key === 'stone.builder.ssg.params') return { lang: ['en', 'fr'] }
+          if (key === 'stone.adapter.url') return 'http://localhost:8080'
+          return fallback
+        })
+      },
+      commandOutput: { info: vi.fn() }
+    }
+    await GenerateStaticSiteMiddleware(context, vi.fn().mockResolvedValue(context.blueprint))
+
+    expect(received.params).toEqual({ lang: ['en', 'fr'] })
+    expect(context.commandOutput.info).toHaveBeenCalledWith(
+      expect.stringContaining('SSG skipped 1 parameterized route(s). Declare values for `:slug`')
+    )
+  })
+
   it('resolves the base URL from stderr too', async () => {
     spawnMock.mockReturnValue(makeChild('stderr-url'))
     runSsgMock.mockImplementation(async (opts: any) => { await opts.render({ path: '/' }); return ['x'] })

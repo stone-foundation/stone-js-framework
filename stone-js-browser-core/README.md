@@ -63,8 +63,8 @@ Explore the full documentation: [https://stonejs.dev](https://stonejs.dev)
 
 ## API documentation
 
-* [API](https://github.com/stone-foundation/stone-js-browser-core/blob/main/docs)
+* [API](https://stonejs.dev/api)
 
 ## Contributing
 
-See [Contributing Guide](https://github.com/stone-foundation/stone-js-browser-core/blob/main/CONTRIBUTING.md)
+See [Contributing Guide](https://github.com/stone-foundation/stone-js-framework/blob/main/CONTRIBUTING.md)

@@ -5,6 +5,38 @@ import { StoneCliPlugin } from '../plugins/declarations'
 import { rollupBuildConfig, rollupBundleConfig } from '../server/rollup-config'
 
 /**
+ * Configuration for the test run, under `stone.builder.test`.
+ *
+ * Tests are a context like any other, so they are configured in the same file as the build: a project
+ * needs no second config file to keep in sync with the first.
+ */
+export interface TestConfig {
+  /**
+   * The files to treat as test suites.
+   * Defaults to `./tests/**` matching `.test.` / `.spec.` in js/ts, with or without JSX.
+   */
+  include?: string[]
+
+  /**
+   * The env file to load before the runner starts, so a value read at module load sees it.
+   * Defaults to `.env.test`. It takes precedence over `.env`, which is already loaded by then.
+   */
+  envFile?: string
+
+  /**
+   * The files `createTestApp()` discovers the application from.
+   * Defaults to whatever the build scans, which is the point: the suite boots what ships.
+   */
+  pattern?: string
+
+  /**
+   * Escape hatch: raw Vitest config, merged over the defaults, exactly as `vite` and `rollup` are.
+   * This is where a frontend project switches `environment` to `happy-dom` for component tests.
+   */
+  vitest?: Record<string, unknown>
+}
+
+/**
  * Configuration for automatically loading modules during buildtime.
  *
  * Specifies glob patterns to identify modules for transpilation.
@@ -104,6 +136,11 @@ export interface BuilderConfig {
   dotenv?: Partial<DotenvConfig>
 
   /**
+   * The test run configuration.
+   */
+  test?: TestConfig
+
+  /**
    * The HTTP server configuration for the application.
    */
   server?: {
@@ -148,10 +185,25 @@ export interface BuilderConfig {
    */
   ssg?: {
     /**
-     * The routes to pre-render to static HTML. Defaults to `['/']`.
-     * Parameterized routes should be listed explicitly (e.g. `/blog/hello`).
+     * Extra routes to pre-render, added to the ones derived from your pages.
+     * Use it for paths no declaration can produce (a CMS-driven slug, per-entry data).
      */
     routes?: string[]
+
+    /**
+     * The values a dynamic segment can take at build time, by segment name.
+     *
+     * A parameterized path cannot be pre-rendered until someone says what its segments contain.
+     * Declaring them here expands the path instead of skipping it, which matters most for a
+     * parameterized router prefix: one `:lang` on the prefix puts a dynamic segment on every route,
+     * and auto-discovery would otherwise collapse to nothing.
+     *
+     * An optional segment also yields the path without it, so `/:lang?/about` with
+     * `{ lang: ['en', 'fr'] }` pre-renders `/about`, `/en/about` and `/fr/about`.
+     *
+     * Only finite, enumerable segments belong here; anything data-driven stays in `routes`.
+     */
+    params?: Record<string, string[]>
   }
 
   /**
