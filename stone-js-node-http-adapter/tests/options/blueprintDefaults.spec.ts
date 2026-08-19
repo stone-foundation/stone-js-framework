@@ -1,4 +1,3 @@
-import { Pipeline } from '@stone-js/pipeline'
 import { nodeHttpAdapterBlueprint } from '../../src/options/NodeHttpAdapterBlueprint'
 import { MetaBodyEventMiddleware } from '../../src/middleware/BodyEventMiddleware'
 import { MetaIncomingEventMiddleware } from '../../src/middleware/IncomingEventMiddleware'
@@ -18,31 +17,15 @@ describe('nodeHttpAdapterBlueprint defaults', () => {
     ])
   })
 
-  it('appears exactly once, and a duplicate collapses in the pipeline', async () => {
+  it('appears exactly once in the defaults', () => {
     // Apps written before this default (the official starters among them) pass the middleware
-    // themselves. Reading a Node request stream twice would hang or yield an empty body, so what
-    // matters is that the duplicate collapses: the pipeline dedupes by module identity.
+    // themselves, and reading a Node request stream twice would hang or yield an empty body. What
+    // makes that safe is that the pipeline runs a duplicated module once, which is asserted where it
+    // belongs, in `@stone-js/pipeline` ("runs a module once when it is registered twice"). All this
+    // package has to guarantee is that it does not ship the duplicate itself.
     const [adapter] = (nodeHttpAdapterBlueprint.stone as any).adapters
     const occurrences = adapter.middleware.filter((m: unknown) => m === MetaBodyEventMiddleware)
+
     expect(occurrences).toHaveLength(1)
-
-    let runs = 0
-    const spy = {
-      module: class {
-        async handle (context: unknown, next: (c: unknown) => Promise<unknown>): Promise<unknown> {
-          runs++
-          return await next(context)
-        }
-      },
-      isClass: true
-    }
-
-    await Pipeline
-      .create<any, any>({ resolver: (meta: any) => new meta.module() })
-      .send({})
-      .through(spy, spy)
-      .then((v: unknown) => v)
-
-    expect(runs).toBe(1)
   })
 })
