@@ -1,5 +1,92 @@
 # Changelog
 
+## 0.8.9
+
+### Patch Changes
+
+- 0629318: Point every README link at somewhere that exists.
+
+  The per-module repositories were retired when the framework moved to a single one, so 36 links
+  across 18 READMEs answered with a 404: the exact links a newcomer clicks first, "Contributing"
+  and "API". The contributing guide now points at the monorepo, and the API reference at the
+  published one.
+
+  `docs/` was never a durable target either, retired repository or not: it is TypeDoc output, and
+  every build begins by deleting it.
+
+- 8b2bd5d: fix: CORS gets its two activation paths, and stops discarding the response it was meant to decorate
+
+  `@Cors()` and `corsBlueprint` are the new, and only, ways to enable CORS. Both install it on the two dimensions it actually needs, because a cross-origin failure can happen on either side of the kernel:
+
+  - **Kernel** (`HandleCorsMiddleware`): the normal path. Every response the kernel produces leaves with its CORS headers, and a preflight is answered outright with `preflightStop`.
+  - **Adapter** (`EnsureCorsHeadersHook`, on `onBuildingRawResponse`): the last resort. When a request dies before or around the kernel, no kernel middleware ever ran, and a response without `Access-Control-Allow-Origin` is not a status the browser can read: it is an opaque network error. This is the same reason the framework carries an error handler at both levels.
+
+  ```ts
+  @Cors({ origin: ["https://app.example.com"] })
+  @StoneApp({ name: "my-app" })
+  export class Application {}
+
+  // or, imperatively
+  export const Application = defineStoneApp(handler, { name: "my-app" }, [
+    corsBlueprint,
+  ]);
+  ```
+
+  Nothing is allowed until you name an origin: with none configured, no `Access-Control-Allow-Origin` header is emitted at all, so enabling CORS never opens an application by itself.
+
+  **`EnsureCorsHeadersHook` was replacing successful responses.** It handed its CORS middleware a `next` that unconditionally built a fresh `OutgoingHttpResponse.create({ statusCode: 500 })`, so `context.outgoingResponse` became an empty 500 (`content: undefined`, `prepared: false`) on **every** request, including the ones that succeeded. The wire response survived only by luck: every adapter's `ServerResponseMiddleware` copies the real response into the raw builder before this hook runs, and the hook's `addIf` will not overwrite a status that is already there. Anything reading `context.outgoingResponse` afterwards, a later hook, `onTerminate`, or an adapter that builds its response at that point, saw the empty 500 instead of the answer. It now decorates the response that exists and synthesizes one only when there is none, which is the case it was written for.
+
+  **Both starters activate CORS again**, through the decorator and the blueprint respectively. They previously reached it through `defineBlueprintMiddleware(CORSHeadersMiddleware)`; `CORSHeadersMiddleware` is deprecated in favour of the two paths above, and is now the only thing that helper was used for in first-party code.
+
+  **`BlueprintBuilder` asserts the pipeline still produced a blueprint** and otherwise throws a `SetupError` naming the broken contract. A build-phase middleware runs once, before any event, and must return `await next(context)`; registering a per-event middleware as one is the usual way to break that, since both shapes are `handle(context, next)` and neither the types nor the runtime object to it. The assertion is a private method on the builder it protects.
+
+- f6d9fe4: fix(build): published declarations carry explicit `.js` extensions
+
+  Our sources are bundler-style (extensionless relative imports) and `tsc` reproduces what they wrote. In a published ESM package with an `exports` map, a consumer on `moduleResolution: nodenext` cannot resolve those specifiers, so the types of everything they re-export become **invisible**. The reported symptom was misleading: `error TS2305: Module '"@stone-js/use-react"' has no exported member 'useContainer'`, which reads as "the hook does not exist" rather than "the module was not resolved". A pilot project hit it on `@stone-js/use-react` and worked around it with `moduleResolution: "bundler"`, which is right for bundled code but wrong for a pure Node ESM consumer.
+
+  The shared build now rewrites relative specifiers in every emitted declaration (`<file>.js`, or `<dir>/index.js` for a directory), and the generated barrel emits them the same way. `@stone-js/use-view`, which carries its own rollup config, was wired to the same plugin.
+
+  Verified across 635 declaration files: zero extensionless relative imports, and a `moduleResolution: nodenext` consumer importing `useContainer` / `useBlueprint` typechecks clean where it previously reported 138 errors. A `pnpm run check:dts` guard runs in CI right after the build so this cannot regress, including for a package that grows its own build config.
+
+- cfb1482: fix(adapters): parse the request body by default
+
+  Every HTTP adapter required adding **its own** `MetaBodyEventMiddleware`, two exports with the same name from two packages, both needed in a multi-platform app. Forget the Lambda one and the app worked locally, then received an empty body in production, with no error anywhere. Parsing the body of a POST is the default expectation, not an option.
+
+  Both HTTP adapters now include it in their default middleware, and the starters drop the line they no longer need (multipart handling stays opt-in through `MetaFilesEventMiddleware`, which has real costs).
+
+  **Safe for apps that already pass it**: the pipeline dedupes pipes by module identity, so a duplicate collapses to one execution rather than reading the request stream twice, which is asserted by a test.
+
+  Also, on Lambda, `hasBody()` needs `content-length` or `transfer-encoding`. API Gateway sends one in practice, but a synthetic event or a hand-rolled invoker may not, and the payload would then vanish without a trace: it is now logged at debug level.
+
+- 0a90944: Every starter tests its application instead of mocking the framework.
+
+  The test each starter shipped began by stubbing out the framework's own decorators "to lighten the
+  test environment". It was the first test a new user read, it taught them to mock `@StoneApp`, and it
+  could pass while nothing worked. Each starter now boots its real application with `createTestApp()`
+  and asks it a real question, through `stone test`.
+
+  One config file, too: `vitest.config.ts` is gone from all thirteen, since the CLI supplies the
+  runner's defaults and `stone.config.mjs` is where a project overrides them. The coverage threshold
+  those configs carried is gone with them — a scaffolded project failing `npm test` because the user's
+  own new code is not fully covered is hostile; the framework holds itself to that gauge, not its users.
+
+  The Node console adapter is removed where it declared nothing: both `basic-react` starters, both
+  `full-react` ones and `basic-service-declarative` registered a CLI adapter with no command to expose,
+  which put backend code in a frontend project's dependencies for no benefit. The `full-service`
+  starters keep it, because they declare real commands. `continuum-showcase` remains the place where one
+  domain over several contexts is demonstrated.
+
+  `drizzle-orm` moves to `^0.45.2` in both `full-service` starters, for the identifier-escaping advisory
+  (GHSA: quoted identifiers were not escaped before being wrapped, so untrusted input reaching
+  `sql.identifier()` or `.as()` could break out of the quotes).
+
+- d47b2ee: Ship the favicon every scaffolded React app was already asking for.
+
+  The generated HTML entry point links `/favicon.svg`, which no starter shipped, so the first thing a
+  new user saw was the browser's default globe in the tab, and a 404 in dev, in SSR and in the built
+  output. All seven React starters now ship `public/favicon.svg`: the Stone.js mark, with the
+  `prefers-color-scheme` rule that keeps it legible on a light or a dark tab strip.
+
 ## 0.8.8
 
 ## 0.8.7
