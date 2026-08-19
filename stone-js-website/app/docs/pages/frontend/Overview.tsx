@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { CodeTabs } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, Callout, Aphorism, SeeAlso, Pager } from '../../components/content'
@@ -53,7 +53,10 @@ export class Overview implements IPage<ReactIncomingEvent> {
           is the React incarnation of the view dimension, and this documentation site is built with it.
         </Lead>
 
-        <H2>Enable React</H2>
+        <H2>Install and enable React</H2>
+
+
+        <Code file='terminal' lang='bash'>{`npm i @stone-js/use-react react react-dom`}</Code>
         <p>
           Add the React view engine and a browser adapter to the manifest. Everything in this section
           assumes these are in place; where you render (CSR, SSR, SSG) is a separate choice covered on
