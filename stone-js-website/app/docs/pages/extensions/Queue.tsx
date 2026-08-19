@@ -17,9 +17,8 @@ export class Application {}
 
 const IMP = `
 import { defineConfig } from '@stone-js/core'
-import { defineQueue } from '@stone-js/queue'
 
-export const AppConfig = defineConfig(defineQueue({
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.queue', {
   default: 'redis',
   connections: [
     { name: 'redis', driver: 'redis', url: 'redis://localhost:6379', prefix: 'jobs' },
