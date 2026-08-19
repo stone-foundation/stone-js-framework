@@ -69,6 +69,33 @@ show (event) {
   return taskResource.item(this.tasks.find(event.get('id')), only(['id', 'title']))  // sparse
 }`}</Code>
 
+        <H2>Declaring it instead of calling it</H2>
+        <p>
+          A handler that returns its domain model and lets the route say how it is shaped keeps the
+          projection out of the business logic. The middleware applies it to whatever the handler
+          returned, so the handler goes back to answering the question it was asked.
+        </p>
+        <Code file='app/TasksController.ts'>{`@Get('/', { resource: TaskResource })
+list (): Task[] {
+  return this.tasks.list()        // the model, whole; the route decides what leaves
+}
+
+@Returns(TaskResource)            // the same thing, with no route to hang it on
+handle (): Task[] { … }`}</Code>
+        <p>
+          Sparse fieldsets still work from the request (<code>?fields=id,title</code>), and a resource
+          registered by name is referred to as a string, so a route imports nothing:
+        </p>
+        <Code file='app/resources/TaskResource.ts'>{`@ApiResource('task')
+export class TaskResource { … }
+
+// @Get('/', { resource: 'task' })`}</Code>
+        <Callout kind='note' title='Input is checked before output is shaped'>
+          Validation runs at priority 5 and this at 4, so a request is rejected before a response is
+          ever projected. The two modules do not know about each other: each owns its own key on the
+          route, which is also why either works without the router at all.
+        </Callout>
+
         <H3>Helpers</H3>
         <PropsTable nameHeader='Helper' rows={[
           { name: '.item(model, ctx?)', type: 'one', desc: 'Project a single model.' },

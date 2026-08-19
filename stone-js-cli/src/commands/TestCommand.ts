@@ -158,7 +158,7 @@ export class TestCommand {
       // reject it at run time. Pinned here rather than in every project's tsconfig, so the two
       // audiences each get what they need and nobody has to know why.
       `  esbuild: ${JSON.stringify(this.decoratorSemantics(), null, 2)},`,
-      `  test: ${JSON.stringify({ ...defaults, ...(config.vitest ?? {}) }, null, 2)}`,
+      `  test: ${JSON.stringify({ ...defaults, ...config.vitest }, null, 2)}`,
       '})',
       ''
     ].join('\n'), 'utf-8')
@@ -227,13 +227,19 @@ export class TestCommand {
    * @returns Its exit code.
    */
   private async run (bin: string, args: string[]): Promise<number> {
-    return await new Promise<number>((resolve, reject) => {
+    // One exit path: the runner either fails to launch or closes with a code, and both are values
+    // rather than a rejection, so the error is raised here where the message belongs.
+    const outcome = await new Promise<number | Error>((resolve) => {
       this.runner = spawn(bin, args, { stdio: 'inherit', cwd: basePath() })
-      this.runner.on('error', (error: Error) => {
-        const cause = isNotEmpty<string>(error.message) ? error.message : 'unknown error'
-        reject(new CliError(`Could not start the test runner: ${cause}`))
-      })
+      this.runner.on('error', (error: Error) => resolve(error))
       this.runner.on('close', (code: number | null) => resolve(code ?? 1))
     })
+
+    if (outcome instanceof Error) {
+      const cause = isNotEmpty<string>(outcome.message) ? outcome.message : 'unknown error'
+      throw new CliError(`Could not start the test runner: ${cause}`)
+    }
+
+    return outcome
   }
 }

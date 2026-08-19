@@ -19,6 +19,21 @@ export interface DiscoverModulesOptions {
 }
 
 /**
+ * Drop trailing slashes from a directory.
+ *
+ * Written as a scan rather than a regular expression: `/\/+$/` is super-linear on a long run of
+ * slashes, and a pattern that can be defeated by its own input has no business in a path helper.
+ *
+ * @param dir - The directory.
+ * @returns The directory without its trailing slashes.
+ */
+function withoutTrailingSlash (dir: string): string {
+  let end = dir.length
+  while (end > 0 && dir[end - 1] === '/') { end-- }
+  return dir.slice(0, end)
+}
+
+/**
  * Find every module an application exports.
  *
  * This is what production does, expressed for a test runner. A built app imports one bundle of all
@@ -36,7 +51,7 @@ export async function discoverAppModules (options: DiscoverModulesOptions = {}):
   // for the whole run must not quietly redirect it.
   const pattern = options.pattern ??
     (options.appDir !== undefined
-      ? `${options.appDir.replace(/\/+$/, '')}/**/*.{ts,tsx,js,jsx,mjsx}`
+      ? `${withoutTrailingSlash(options.appDir)}/**/*.{ts,tsx,js,jsx,mjsx}`
       : process.env[APP_MODULES_PATTERN_ENV] ?? DEFAULT_APP_MODULES_PATTERN)
   const files = appModuleFiles({ pattern })
   const modules: unknown[] = []

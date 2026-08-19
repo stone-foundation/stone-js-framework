@@ -559,9 +559,10 @@ export const GenerateStaticSiteMiddleware = async (
   // A path nobody can expand is not an error, but staying silent about it is how a site quietly
   // pre-renders a fraction of itself. Reported once, with what it would take to fix.
   const onSkipped = (skipped: SkippedTargets): void => {
+    const segments = skipped.segments.map((name) => '`:' + name + '`').join(', ')
     context.commandOutput.info(
       `SSG skipped ${skipped.paths.length} parameterized route(s). Declare values for ` +
-      `${skipped.segments.map((name) => `\`:${name}\``).join(', ')} under \`ssg.params\` to pre-render them.`
+      `${segments} under \`ssg.params\` to pre-render them.`
     )
   }
 
