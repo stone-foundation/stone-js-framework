@@ -48,9 +48,8 @@ Imperative / multi-connection via `stone.realtime`:
 
 ```ts
 import { defineConfig } from '@stone-js/core'
-import { defineRealtime } from '@stone-js/realtime'
 
-export const AppConfig = defineConfig(defineRealtime({
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.realtime', {
   default: 'redis',
   connections: [
     { name: 'redis', driver: 'redis', url: 'redis://localhost:6379', prefix: 'rt' },

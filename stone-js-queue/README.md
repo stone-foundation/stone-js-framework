@@ -45,9 +45,8 @@ Imperative / multi-connection via `stone.queue`:
 
 ```ts
 import { defineConfig } from '@stone-js/core'
-import { defineQueue } from '@stone-js/queue'
 
-export const AppConfig = defineConfig(defineQueue({
+export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.queue', {
   default: 'redis',
   connections: [
     { name: 'redis', driver: 'redis', url: 'redis://localhost:6379', prefix: 'jobs' },
@@ -94,7 +93,7 @@ export class Jobs {
 }
 ```
 
-Register handlers imperatively too: `defineQueue({ handlers: [ defineJobHandler('send-receipt', SendReceipt, { isClass: true }) ] })`.
+Register handlers imperatively too: `blueprint.set('stone.queue.handlers', [defineJobHandler('send-receipt', SendReceipt, { isClass: true }) ])`.
 
 ## Process jobs
 
