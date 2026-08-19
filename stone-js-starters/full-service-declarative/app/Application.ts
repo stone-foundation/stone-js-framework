@@ -6,7 +6,6 @@ import {
 } from '@stone-js/http-core'
 import {
   NodeHttp,
-  MetaBodyEventMiddleware,
   MetaFilesEventMiddleware
 } from '@stone-js/node-http-adapter'
 import {
@@ -47,7 +46,7 @@ import { PipelineHookContext } from '@stone-js/pipeline'
 @Routing()
 @NodeConsole()
 @StoneApp({ name: 'MyApps', logger: { level: LogLevel.INFO } })
-@NodeHttp({ default: true, middleware: [MetaBodyEventMiddleware, MetaFilesEventMiddleware], url: getString('BASE_URL', 'http://localhost:8080') })
+@NodeHttp({ default: true, middleware: [MetaFilesEventMiddleware], url: getString('BASE_URL', 'http://localhost:8080') })
 export class Application {
   /**
    * Run before the blueprint is prepared

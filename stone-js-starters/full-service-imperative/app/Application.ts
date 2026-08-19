@@ -22,7 +22,7 @@ import { getString } from '@stone-js/env'
 import { routerBlueprint } from '@stone-js/router'
 import { PipelineHookContext } from '@stone-js/pipeline'
 import { nodeConsoleAdapterBlueprint } from '@stone-js/node-cli-adapter'
-import { MetaBodyEventMiddleware, MetaFilesEventMiddleware, NODE_HTTP_PLATFORM, nodeHttpAdapterBlueprint } from '@stone-js/node-http-adapter'
+import { MetaFilesEventMiddleware, NODE_HTTP_PLATFORM, nodeHttpAdapterBlueprint } from '@stone-js/node-http-adapter'
 
 /**
  * Run before the blueprint is prepared
@@ -317,7 +317,7 @@ export const AppConfig = defineConfig({
     if (blueprint.is('stone.adapter.platform', NODE_HTTP_PLATFORM)) {
       blueprint
         .set('stone.adapter.url', getString('BASE_URL', 'http://localhost:8080'))
-        .add('stone.adapter.middleware', [MetaBodyEventMiddleware, MetaFilesEventMiddleware])
+        .add('stone.adapter.middleware', [MetaFilesEventMiddleware])
     }
   }
 })

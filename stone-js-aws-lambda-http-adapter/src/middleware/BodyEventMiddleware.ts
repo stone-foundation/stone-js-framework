@@ -3,7 +3,7 @@ import typeIs from 'type-is'
 import { IncomingMessage } from 'node:http'
 import { getRawBody, normalizeHeaders } from '../event-normalizer'
 import { isMultipart, getCharset } from '@stone-js/http-core'
-import { IBlueprint, isNotEmpty, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
+import { IBlueprint, isNotEmpty, Logger, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
 import { AwsLambdaHttpAdapterError } from '../errors/AwsLambdaHttpAdapterError'
 import { AwsLambdaHttpAdapterContext, AwsLambdaHttpAdapterResponseBuilder, AwsLambdaHttpEvent } from '../declarations'
 
@@ -107,6 +107,15 @@ export class BodyEventMiddleware {
    */
   private getBody (message: IncomingMessage, rawEvent: AwsLambdaHttpEvent): unknown {
     if (!typeIs.hasBody(message)) {
+      // `hasBody` needs `content-length` or `transfer-encoding`. API Gateway sends one in practice,
+      // but a synthetic event or a hand-rolled invoker may not, and the payload would then vanish
+      // without a trace. Say so instead of returning an empty body in silence.
+      if (isNotEmpty(rawEvent.body)) {
+        Logger.getInstance().debug(
+          'A request body was present but ignored: the event carries neither `content-length` nor ' +
+          '`transfer-encoding`, so it cannot be read. Set `content-length` on the event.'
+        )
+      }
       return {}
     }
 
