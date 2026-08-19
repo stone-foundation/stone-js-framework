@@ -33,7 +33,7 @@ export class Assets implements IPage<ReactIncomingEvent> {
           The main stylesheet is auto-linked into the document, so a single import point styles the
           whole app. Its path is a config key; the default is <code>/assets/css/index.css</code>.
         </p>
-        <Code file='stone.config.mjs' lang='js'>{`export default defineConfig({
+        <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   builder: { input: { mainCSS: '/assets/css/index.css' } }   // auto-linked
 })`}</Code>
 

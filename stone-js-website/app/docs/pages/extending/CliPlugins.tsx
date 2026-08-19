@@ -113,10 +113,10 @@ export default acmeCliPlugin()`}</Code>
           The primary path, open to every package. List the plugins your app uses. This is always
           available and always safe: the developer sees exactly what runs at build time.
         </p>
-        <Code file='stone.config.mjs'>{`import { defineConfig } from '@stone-js/cli'
+        <Code file='stone.config.mjs'>{`import { defineBuilderConfig } from '@stone-js/cli'
 import { acmeCliPlugin } from '@acme/stone-acme/cli'
 
-export default defineConfig({
+export default defineBuilderConfig({
   plugins: [acmeCliPlugin({ greeting: 'bonjour' })]
 })`}</Code>
 
