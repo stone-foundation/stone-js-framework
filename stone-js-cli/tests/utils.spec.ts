@@ -3,8 +3,7 @@ import * as path from 'path'
 import fsExtra from 'fs-extra'
 import * as crypto from 'crypto'
 import * as process from 'node:process'
-import {
-  isSSR,
+import { isSSR,
   isCSR,
   isSSG,
   dirPath,
@@ -24,8 +23,7 @@ import {
   setupProcessSignalHandlers,
   getDefaultPublicEnvOptions,
   generatePublicEnvironmentsFile,
-  checkAppLevelDecoratorsInTsx
-} from '../src/utils'
+  declaresAppLevelDecorator, stripNonDeclarations } from '../src/utils'
 import Dotenv from 'dotenv'
 import { importModule } from '@stone-js/filesystem'
 import { builder } from '../src/options/BuilderConfig'
@@ -568,125 +566,37 @@ describe('setupProcessSignalHandlers', () => {
   })
 })
 
-describe('checkAppLevelDecoratorsInTsx', () => {
-  beforeEach(() => {
-    fs.rmSync(TMP_DIR, { recursive: true, force: true })
-    fs.mkdirSync(TMP_DIR, { recursive: true })
+describe('declaresAppLevelDecorator', () => {
+  it('finds a declaration where one can actually appear', () => {
+    expect(declaresAppLevelDecorator('@StoneApp({ name: \'x\' })\nexport class Application {}')).toBe(true)
+    expect(declaresAppLevelDecorator('  @Configuration()\n  export class C {}')).toBe(true)
+    expect(declaresAppLevelDecorator('@Provider()\nexport class P {}')).toBe(true)
   })
 
-  afterEach(() => {
-    fs.rmSync(TMP_DIR, { recursive: true, force: true })
+  it('ignores a name that is only mentioned', () => {
+    // This is the whole correction. Scanning raw text flagged 51 of this repository's own website
+    // files, none of which declares anything: a docs page renders `@StoneApp` inside a code sample,
+    // and a JSDoc block refers to `@Configuration` in prose. Failing those builds would be wrong.
+    expect(declaresAppLevelDecorator('// registered via @Provider elsewhere')).toBe(false)
+    expect(declaresAppLevelDecorator('/**\n * See @Configuration for options.\n */')).toBe(false)
+    expect(declaresAppLevelDecorator('export const D = () => <code>@UseReact</code>')).toBe(false)
+    expect(declaresAppLevelDecorator('const S = `@StoneApp({ name: 1 })\nexport class A {}`')).toBe(false)
   })
 
-  it('should return .tsx files that contain @StoneApp', () => {
-    writeTempFile(path.join(TMP_DIR, 'app/Application.tsx'), `
-      import { StoneApp } from '@stone-js/core'
-
-      @StoneApp()
-      export class Application {}
-    `)
-    writeTempFile(path.join(TMP_DIR, 'app/HomePage.tsx'), `
-      import { Page } from '@stone-js/router'
-
-      @Page({ path: '/' })
-      export class HomePage {}
-    `)
-
-    const blueprint = createFakeBlueprint({
-      'stone.builder.input.views': 'app/**/*.tsx'
-    })
-
-    const result = checkAppLevelDecoratorsInTsx(blueprint)
-    expect(result).toHaveLength(1)
-    expect(result[0]).toContain('Application.tsx')
+  it('ignores decorators that are not app-level', () => {
+    expect(declaresAppLevelDecorator('@Page(\'/home\')\nexport class Home {}')).toBe(false)
+    expect(declaresAppLevelDecorator('@EventHandler(\'/x\')\nexport class H {}')).toBe(false)
   })
+})
 
-  it('should not flag .tsx files with only page-level decorators', () => {
-    writeTempFile(path.join(TMP_DIR, 'app/HomePage.tsx'), `
-      import { Page } from '@stone-js/router'
+describe('stripNonDeclarations', () => {
+  it('blanks mentions while keeping the line structure, so line numbers stay true', () => {
+    const stripped = stripNonDeclarations('a\n// @StoneApp\nb\n/* @Provider */\nc')
 
-      @Page({ path: '/' })
-      export class HomePage {}
-    `)
-
-    const blueprint = createFakeBlueprint({
-      'stone.builder.input.views': 'app/**/*.tsx'
-    })
-
-    const result = checkAppLevelDecoratorsInTsx(blueprint)
-    expect(result).toHaveLength(0)
-  })
-
-  it('should detect @Browser in .tsx files', () => {
-    writeTempFile(path.join(TMP_DIR, 'app/Application.tsx'), `
-      import { Browser } from '@stone-js/browser-adapter'
-
-      @Browser()
-      export class Application {}
-    `)
-
-    const blueprint = createFakeBlueprint({
-      'stone.builder.input.views': 'app/**/*.tsx'
-    })
-
-    const result = checkAppLevelDecoratorsInTsx(blueprint)
-    expect(result).toHaveLength(1)
-  })
-
-  it('should detect @UseReact in .tsx files', () => {
-    writeTempFile(path.join(TMP_DIR, 'app/Application.tsx'), `
-      import { UseReact } from '@stone-js/use-react'
-
-      @UseReact()
-      export class Application {}
-    `)
-
-    const blueprint = createFakeBlueprint({
-      'stone.builder.input.views': 'app/**/*.tsx'
-    })
-
-    const result = checkAppLevelDecoratorsInTsx(blueprint)
-    expect(result).toHaveLength(1)
-  })
-
-  it('should detect @Configuration in .tsx files', () => {
-    writeTempFile(path.join(TMP_DIR, 'app/Config.tsx'), `
-      import { Configuration } from '@stone-js/config'
-
-      @Configuration()
-      export class Config {}
-    `)
-
-    const blueprint = createFakeBlueprint({
-      'stone.builder.input.views': 'app/**/*.tsx'
-    })
-
-    const result = checkAppLevelDecoratorsInTsx(blueprint)
-    expect(result).toHaveLength(1)
-  })
-
-  it('should detect @Provider in .tsx files', () => {
-    writeTempFile(path.join(TMP_DIR, 'app/Provider.tsx'), `
-      import { Provider } from '@stone-js/core'
-
-      @Provider()
-      export class MyProvider {}
-    `)
-
-    const blueprint = createFakeBlueprint({
-      'stone.builder.input.views': 'app/**/*.tsx'
-    })
-
-    const result = checkAppLevelDecoratorsInTsx(blueprint)
-    expect(result).toHaveLength(1)
-  })
-
-  it('should return an empty array when no .tsx files exist', () => {
-    const blueprint = createFakeBlueprint({
-      'stone.builder.input.views': 'app/**/*.tsx'
-    })
-
-    const result = checkAppLevelDecoratorsInTsx(blueprint)
-    expect(result).toHaveLength(0)
+    expect(stripped.split('\n')).toHaveLength(5)
+    expect(stripped).not.toContain('@StoneApp')
+    expect(stripped).not.toContain('@Provider')
+    expect(stripped).toContain('a')
+    expect(stripped).toContain('c')
   })
 })

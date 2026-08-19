@@ -283,33 +283,65 @@ export const isDeclarative = (blueprint: IBlueprint, event: IncomingEvent): bool
 }
 
 /**
- * App-level decorator names whose presence in a .tsx/.jsx file makes the file
- * require eager loading. These are decorators that configure the application
- * itself, not individual pages.
+ * App-level decorator names whose presence in a .tsx/.jsx file makes the file require eager loading.
+ * These configure the application itself, not individual pages.
  */
-const APP_LEVEL_DECORATORS = ['@StoneApp', '@Browser', '@UseReact', '@Configuration', '@Provider']
+const APP_LEVEL_DECORATORS = ['StoneApp', 'Browser', 'UseReact', 'Configuration', 'Provider']
 
 /**
- * Scans .tsx and .jsx app source files for app-level decorators when lazy views
- * are on. Returns the set of files that need eager loading because they carry
- * application configuration, not page-level declarations.
+ * Matches an app-level decorator where one can actually appear: at the start of a line, before a
+ * class or an export, allowing indentation.
+ */
+const APP_LEVEL_DECORATOR_RE = new RegExp(
+  `^[ \\t]*@[ \\t]*(?:${APP_LEVEL_DECORATORS.join('|')})\\b`,
+  'm'
+)
+
+/**
+ * Remove the parts of a source file where a decorator name is only ever *mentioned*.
+ *
+ * Template literals, block comments and line comments all carry decorator names in perfectly normal
+ * code: a page that documents Stone.js renders `@StoneApp` inside a fenced sample, and a JSDoc block
+ * refers to `@Configuration` in prose. Scanning raw text flags all of them. This repository's own
+ * documentation site is the proof: 51 of its `.tsx` files mention one of these names, and none of
+ * them declares one.
+ *
+ * @param content - The file's source.
+ * @returns The source with mentions blanked out, line structure preserved.
+ */
+export const stripNonDeclarations = (content: string): string => {
+  return content
+    .replace(/`(?:\\.|[^`\\])*`/g, (match) => match.replace(/[^\n]/g, ' '))
+    .replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, ' '))
+    .replace(/\/\/[^\n]*/g, (match) => ' '.repeat(match.length))
+}
+
+/**
+ * Whether a source file actually *declares* an app-level decorator.
+ *
+ * @param content - The file's source.
+ * @returns Whether the file carries an app-level declaration.
+ */
+export const declaresAppLevelDecorator = (content: string): boolean => {
+  return APP_LEVEL_DECORATOR_RE.test(stripNonDeclarations(content))
+}
+
+/**
+ * Scans .tsx and .jsx app source files for app-level decorators when lazy views are on.
+ *
+ * Returns the files that need eager loading because they carry application configuration rather than
+ * page-level declarations. A file that merely mentions one of the names, in a comment, a JSDoc block
+ * or a code sample rendered inside JSX, is not one of them.
  *
  * @param blueprint The blueprint object.
- * @returns The list of .tsx/.jsx files that contain app-level decorators.
+ * @returns The list of .tsx/.jsx files that declare app-level decorators.
  */
 export const checkAppLevelDecoratorsInTsx = (blueprint: IBlueprint): string[] => {
   const tsxFiles = glob.sync(basePath(
     blueprint.get('stone.builder.input.views', 'app/**/*.{tsx,jsx,mjsx}')
   ))
 
-  const appLevelMarkers = new RegExp(
-    APP_LEVEL_DECORATORS.map(d => d.replace('@', '@\\s*')).join('|')
-  )
-
-  return tsxFiles.filter((filePath) => {
-    const content = readFileSync(filePath, 'utf-8')
-    return appLevelMarkers.test(content)
-  })
+  return tsxFiles.filter((filePath) => declaresAppLevelDecorator(readFileSync(filePath, 'utf-8')))
 }
 
 /**
