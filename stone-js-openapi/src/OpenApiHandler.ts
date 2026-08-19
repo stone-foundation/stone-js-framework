@@ -1,5 +1,6 @@
 import { OpenApiGenerator } from './OpenApiGenerator'
-import { IBlueprint, IncomingEvent } from '@stone-js/core'
+import { RouterLike } from './fromRouter'
+import { IBlueprint, IContainer, IncomingEvent } from '@stone-js/core'
 import { swaggerUiHtml, SwaggerUiOptions } from './serve'
 import { OpenApiDocument, OpenApiInfo, OpenApiRoute } from './declarations'
 
@@ -13,8 +14,25 @@ export interface OpenApiServeOptions {
   specPath?: string
   /** Where the explorer is served (default `/docs`). Set to `false` to serve only the JSON. */
   docsPath?: string | false
-  /** Routes to describe, until the contract derives itself from the router. */
+  /**
+   * Routes to describe by hand.
+   *
+   * Rarely needed: the contract derives itself from the router. Anything declared here is added on
+   * top of what was derived, for an endpoint the router does not own.
+   */
   routes?: OpenApiRoute[]
+
+  /**
+   * The security scheme name a protected route requires. Default `'bearerAuth'`.
+   */
+  securityScheme?: string
+
+  /**
+   * Stop deriving from the router and describe only what `routes` declares.
+   *
+   * Off by default, because deriving is the point.
+   */
+  deriveFromRouter?: boolean
   /** A pre-built document, when the application assembles its own. */
   document?: OpenApiDocument
   /** Swagger UI rendering options. */
@@ -33,12 +51,14 @@ export interface OpenApiServeOptions {
  */
 export class OpenApiHandler {
   private readonly blueprint: IBlueprint
+  private readonly container?: IContainer
 
   /**
    * @param dependencies - Auto-wired container services.
    */
-  constructor ({ blueprint }: { blueprint: IBlueprint }) {
+  constructor ({ blueprint, container }: { blueprint: IBlueprint, container?: IContainer }) {
     this.blueprint = blueprint
+    this.container = container
   }
 
   /**
@@ -60,6 +80,13 @@ export class OpenApiHandler {
       generator.addServer(server.url, server.description)
     }
 
+    if (options.deriveFromRouter !== false) {
+      generator.addRouter(this.router(), {
+        schemas: this.blueprint.get<Record<string, unknown>>('stone.validation.schemas', {}),
+        securityScheme: options.securityScheme
+      })
+    }
+
     return generator.addRoutes(options.routes ?? []).build()
   }
 
@@ -75,6 +102,32 @@ export class OpenApiHandler {
       title: options.info?.title,
       ...options.swaggerUi
     })
+  }
+
+  /**
+   * The application's router.
+   *
+   * No router means no routes, and no routes means there is no contract to publish. That is not a
+   * degraded case to paper over with an empty document, so it fails and says what to do.
+   *
+   * @returns The router.
+   * @throws {TypeError} When no router is bound.
+   */
+  private router (): RouterLike {
+    const router = this.container?.has?.('router') === true
+      ? this.container.make<RouterLike>('router')
+      : undefined
+
+    if (router?.getRoutes === undefined) {
+      throw new TypeError(
+        'Cannot publish an OpenAPI contract without a router: there are no routes to describe. ' +
+        'Enable the router on the application with `@Routing()`, or with `routerBlueprint` on the ' +
+        'manifest. To publish a hand-written document instead, set `stone.openapi.document`, or ' +
+        '`stone.openapi.deriveFromRouter` to false and declare `stone.openapi.routes` yourself.'
+      )
+    }
+
+    return router
   }
 
   /** The `stone.openapi` bucket. */
