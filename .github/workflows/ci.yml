@@ -34,6 +34,10 @@ jobs:
         run: pnpm audit --audit-level=high
       - name: Build (packages)
         run: pnpm run build:ci
+      # Types are only useful if a consumer can resolve them: an extensionless relative import in a
+      # published declaration makes everything it re-exports invisible under `nodenext`.
+      - name: Check published declarations
+        run: pnpm run check:dts
       - name: Upload dist
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
