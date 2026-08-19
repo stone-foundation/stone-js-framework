@@ -5,7 +5,8 @@
   "description": "The Continuum framework. Write your TypeScript domain once; it runs anywhere: Node, serverless, edge, browser, CLI and AI agents. Build once, deploy anywhere.",
   "type": "module",
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22.22.1",
+    "pnpm": ">=10"
   },
   "packageManager": "pnpm@10.12.3",
   "scripts": {
