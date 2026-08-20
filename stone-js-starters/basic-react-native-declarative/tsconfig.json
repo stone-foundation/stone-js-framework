@@ -1,0 +1,16 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "experimentalDecorators": true,
+    "types": ["vitest/globals"]
+  },
+  "include": [
+    "app",
+    "adapter",
+    "tests",
+    "App.tsx",
+    "index.ts",
+    "vitest.config.ts"
+  ]
+}
