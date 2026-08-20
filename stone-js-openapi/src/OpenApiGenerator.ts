@@ -154,7 +154,9 @@ export class OpenApiGenerator {
     const parameters = [
       ...this.parametersFrom('path', operation.request?.params),
       ...this.parametersFrom('query', operation.request?.query),
-      ...this.parametersFrom('header', operation.request?.headers)
+      ...this.parametersFrom('header', operation.request?.headers),
+      // Stated outright, for what a schema cannot express: a closed set of fragment names.
+      ...(operation.parameters ?? [])
     ]
     if (parameters.length > 0) { result.parameters = parameters }
 

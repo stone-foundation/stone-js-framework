@@ -19,7 +19,10 @@ const CORE_KEYS = [
   { key: 'stone.providers', type: 'array', desc: 'Service providers loaded into the container.' },
   { key: 'stone.services / listeners / subscribers', type: 'array', desc: 'Modules auto-registered at startup.' },
   { key: 'stone.aliases', type: 'object', desc: 'Class aliases registered when the app starts.' },
-  { key: 'stone.router', type: 'object', desc: 'Router options (base path, strict matching); from @stone-js/router.' }
+  { key: 'stone.router', type: 'object', desc: 'Router options (base path, strict matching); from @stone-js/router.' },
+  { key: 'stone.resources.registry', type: 'object', desc: 'Named resources a route can refer to by name; filled by @ApiResource discovery.' },
+  { key: 'stone.resources.params', type: 'object', desc: 'Query parameters a caller shapes a response with: { fields, include, fragment }. Defaults to fields, include, view.' },
+  { key: 'stone.resources.onViolation', type: "'throw' | 'warn'", desc: 'What to do when a projection breaks the contract its resource publishes. Throwing is the default.' }
 ]
 
 const BUILD_KEYS = [

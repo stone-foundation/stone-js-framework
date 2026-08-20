@@ -1,3 +1,4 @@
+import { Concern, declaredOn } from './declaredOn'
 import { OpenApiOperation, OpenApiRoute } from './declarations'
 
 /**
@@ -34,6 +35,23 @@ export interface DerivationRegistries {
   resolve?: (target: any) => unknown
 
   /**
+   * Told when a declaration could not be read, so an absent payload is visible rather than silent.
+   *
+   * Omitting a contract we could not build is the right call — a wrong contract is worse than a
+   * missing one — but doing it without a word means an endpoint quietly ships undocumented. This is
+   * how the CLI and the handler report it.
+   */
+  onSkipped?: (skipped: { route: string, concern: Concern, reason: string }) => void
+
+  /**
+   * The query parameter a caller selects a fragment with, as the application named it.
+   *
+   * Read from `stone.resources.params.fragment`, so a contract never advertises a parameter the
+   * application does not answer to. Defaults to `view`.
+   */
+  fragmentParam?: string
+
+  /**
    * Named resources, so a route saying `resource: 'user'` can be read.
    *
    * Comes from `stone.resources.registry`, the same registry the runtime projects through, so the
@@ -41,6 +59,21 @@ export interface DerivationRegistries {
    */
   resources?: Record<string, unknown>
 }
+
+/**
+ * The route option carrying what a route publishes about itself.
+ *
+ * `contract`, not `openapi`: a route describes itself, and OpenAPI is one way of *rendering* that
+ * description. Naming the option after a specification would put that specification's name in the
+ * router's vocabulary, and every application would have to rename its routes the day the framework
+ * renders the same contract as something else.
+ *
+ * ```ts
+ * @Get('/tasks', { contract: { summary: 'List tasks' } })
+ * @Get('/internal', { contract: false })            // documented nowhere
+ * ```
+ */
+export const CONTRACT_OPTION = 'contract'
 
 /** Whether a value exposes `rules()`, i.e. is a schema class instance or a schema class. */
 function hasRules (value: any): boolean {
@@ -111,12 +144,32 @@ function hasSchema (value: any): boolean {
  */
 export function readResource (
   declared: unknown,
-  registries: DerivationRegistries = {}
+  registries: DerivationRegistries = {},
+  route: string = '(unknown route)'
 ): { schema: unknown, fragments?: Record<string, unknown> } | undefined {
   const { resources = {} } = registries
+
+  if (declared === undefined || declared === null) { return undefined }
+
   const resolved = typeof declared === 'string' ? resources[declared] : declared
 
-  if (resolved === undefined || resolved === null || !hasSchema(resolved)) { return undefined }
+  if (resolved === undefined) {
+    registries.onSkipped?.({
+      route,
+      concern: 'resource',
+      reason: `no resource is registered as '${String(declared)}', so its response is undocumented`
+    })
+    return undefined
+  }
+
+  if (!hasSchema(resolved)) {
+    registries.onSkipped?.({
+      route,
+      concern: 'resource',
+      reason: 'the declared resource publishes no schema() to derive a response from'
+    })
+    return undefined
+  }
 
   try {
     const ResourceClass = resolved as any
@@ -125,13 +178,24 @@ export function readResource (
       : registries.resolve?.(ResourceClass) ?? new ResourceClass({})
 
     const schema = instance.schema({})
-    if (schema === undefined || schema === null) { return undefined }
+
+    if (schema === undefined || schema === null) {
+      registries.onSkipped?.({ route, concern: 'resource', reason: 'schema() returned nothing' })
+      return undefined
+    }
 
     const fragments = typeof instance.fragments === 'function' ? instance.fragments({}) : undefined
 
     return fragments === undefined ? { schema } : { schema, fragments }
-  } catch {
-    // Nothing could build it, and inventing a response shape is worse than omitting one.
+  } catch (error: any) {
+    // Nothing could build it, and inventing a response shape is worse than omitting one — but saying
+    // so is better than both. A schema needing a real context is the common cause: it is read with an
+    // empty one, because a contract describes what any caller may see.
+    registries.onSkipped?.({
+      route,
+      concern: 'resource',
+      reason: `its schema could not be read (${String(error?.message ?? error)})`
+    })
     return undefined
   }
 }
@@ -139,21 +203,41 @@ export function readResource (
 /**
  * Turn what a resource publishes into the operation's responses.
  *
- * The full contract is the success response. Fragments are named in its description rather than
- * invented as separate status codes: they are alternate shapes of the same answer, selected by a
- * query parameter, and a reader needs to know they exist without the document pretending they are
- * different outcomes.
+ * The full contract is the success response. Fragments are not separate status codes — they are
+ * alternate shapes of the same answer, chosen by the caller — so they are documented as the parameter
+ * that selects them rather than as different outcomes.
  *
  * @param read - The schema and fragments read from the resource.
  * @returns The responses, keyed by status.
  */
-function responsesFrom (read: { schema: unknown, fragments?: Record<string, unknown> }): Record<string | number, any> {
-  const names = Object.keys(read.fragments ?? {})
-  const description = names.length > 0
-    ? `The resource, as published by its schema. Fragments available through the view parameter: ${names.join(', ')}.`
-    : 'The resource, as published by its schema.'
+function responsesFrom (read: { schema: unknown }): Record<string | number, any> {
+  return { 200: { description: 'The resource, as published by its schema.', schema: read.schema } }
+}
 
-  return { 200: { description, schema: read.schema } }
+/**
+ * Document the fragments a resource exposes as what they are: a closed set of names a caller may ask
+ * for.
+ *
+ * Naming them in prose left them invisible to everything that reads a contract rather than a page — a
+ * generated client, a form, a test. An enumerated parameter is what a specification can carry, so a
+ * caller discovers `?view=summary` from the document instead of from a sentence.
+ *
+ * @param fragments - The fragments the resource published.
+ * @param name - The parameter the application answers to.
+ * @returns The parameter, or nothing when there is nothing to select.
+ */
+function fragmentParameter (fragments: Record<string, unknown> | undefined, name: string): Array<Record<string, unknown>> {
+  const names = Object.keys(fragments ?? {})
+
+  if (names.length === 0) { return [] }
+
+  return [{
+    name,
+    in: 'query',
+    required: false,
+    description: 'Select a named subset of the response. Omit it for the full contract.',
+    schema: { type: 'string', enum: names }
+  }]
 }
 
 /**
@@ -168,16 +252,19 @@ function responsesFrom (read: { schema: unknown, fragments?: Record<string, unkn
  * @returns The operation.
  */
 export function operationFromRoute (route: RouteLike, registries: DerivationRegistries = {}): OpenApiOperation {
-  const explicit = route.getOption<OpenApiOperation>('openapi') ?? {}
-  const request = readValidation(route.getOption('validation'), registries)
-  const response = readResource(route.getOption('resource'), registries)
-  const protectedBy = route.getOption('auth') ?? route.getOption('authz')
+  const explicit = route.getOption<OpenApiOperation>(CONTRACT_OPTION) ?? {}
+  const request = readValidation(declaredOn(route, 'validation'), registries)
+  const response = readResource(declaredOn(route, 'resource'), registries, `${route.method} ${route.path}`)
+  const protectedBy = declaredOn(route, 'auth') ?? declaredOn(route, 'authz')
   const scheme = registries.securityScheme ?? 'bearerAuth'
 
   return {
     operationId: route.getOption<string>('name'),
     ...(request !== undefined ? { request } : {}),
     ...(response !== undefined ? { responses: responsesFrom(response) } : {}),
+    ...(response?.fragments !== undefined
+      ? { parameters: fragmentParameter(response.fragments, registries.fragmentParam ?? 'view') }
+      : {}),
     ...(protectedBy !== undefined ? { security: [{ [scheme]: [] }] } : {}),
     ...explicit
   }
@@ -198,7 +285,7 @@ export function routesFromRouter (router: RouterLike, registries: DerivationRegi
   return router
     .getRoutes()
     .getRoutes()
-    .filter((route) => route.getOption('openapi') !== false) // an opt-out for internal endpoints
+    .filter((route) => route.getOption(CONTRACT_OPTION) !== false) // an opt-out for internal endpoints
     .map((route) => ({
       path: route.path,
       method: route.method,
