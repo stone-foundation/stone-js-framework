@@ -1,6 +1,7 @@
 import { NAVIGATION_EVENT } from '../src/constants'
 import { browserNavigator } from '../src/navigators'
 import { RouterError } from '../src/errors/RouterError'
+import { routerBlueprint } from '../src/options/RouterBlueprint'
 
 describe('browserNavigator', () => {
   beforeEach(() => {
@@ -42,5 +43,16 @@ describe('browserNavigator', () => {
     global.window = undefined
 
     expect(() => browserNavigator({ path: '/fail', replace: false, options: {} })).toThrow(RouterError)
+  })
+})
+
+describe('the router blueprint and the navigator', () => {
+  it('leaves the navigator unset, so a platform can claim it', () => {
+    // The fallback lives in `Router.navigate()`, not in the blueprint, and that is the whole
+    // point: pinning the browser navigator here would make "not configured" indistinguishable
+    // from "configured to be the browser", and an adapter for another platform could never
+    // tell whether it was free to install its own. It could not, and `navigate()` on a phone
+    // threw "browser environment" instead of navigating.
+    expect(routerBlueprint.stone.router?.navigator).toBeUndefined()
   })
 })

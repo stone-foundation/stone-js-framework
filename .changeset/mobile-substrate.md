@@ -18,10 +18,15 @@ export type RouterNavigator = (context: NavigationContext) => void
 ```
 
 The router still does the platform-independent work before calling it, so a navigator receives a
-resolved path and performs one effect. The default is `browserNavigator`, the exact behaviour that
-was inlined before (push or replace a History entry, then announce it so the adapter re-enters the
-kernel), which means **nothing changes for a web application**: it is configured by the router's own
-blueprint, and a `navigate()` outside a browser still throws the same `RouterError`.
+resolved path and performs one effect. `browserNavigator` is the fallback when none is configured,
+and it is the exact behaviour that was inlined before (push or replace a History entry, then
+announce it so the adapter re-enters the kernel), which means **nothing changes for a web
+application**: a `navigate()` outside a browser still throws the same `RouterError`.
+
+The fallback lives in `Router.navigate()` and deliberately **not** in the router's blueprint. Pinning
+it there would make "not configured" indistinguishable from "configured to be the browser", and an
+adapter for another platform could never tell whether it was free to install its own: it could not,
+and `navigate()` on a phone threw "browser environment" instead of navigating.
 
 One ordering nuance for the curious: with a route name and no browser, the missing-route error now
 surfaces before the missing-browser one, because resolving the path no longer waits behind a
