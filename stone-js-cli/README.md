@@ -33,6 +33,7 @@ Whether you're developing a backend microservice, a frontend SPA, a fullstack SS
 - Type checking and cache clearing
 - Discover and run custom commands defined in your app or installed libraries
 - Let any package participate in the build with an agnostic plugin system
+- Let any package own a build target outright, so a module decides how its applications are built
 
 ## Plugins: participate in the build
 
@@ -69,6 +70,36 @@ Third-party plugins always go through `stone.config`, and every auto-discovered 
 on each build. Opt out with `autoDiscoverPlugins: false`.
 
 Full guide: [Participate in the build](https://stonejs.dev/docs/extending/cli-plugins).
+
+## Build targets: own your build
+
+A plugin can go further and own a build outright. The CLI knows *when* to call a builder and
+nothing about what it does, so a module decides how its own applications are built:
+
+```ts
+import { defineBuilderConfig } from '@stone-js/cli'
+
+export default defineBuilderConfig({
+  builders: {
+    acme: {
+      target: 'acme',
+      priority: 20,
+      match: (blueprint, event) => true,      // detection only; --target wins over this
+      resolver: (context) => new AcmeBuilder(context),
+      devMode: 'self-hosted',                  // your dev server reloads itself
+      previewEntry: (blueprint) => 'dist/acme.mjs'
+    }
+  }
+})
+```
+
+Then `stone build --target acme`, `stone serve acme`, `stone preview acme` all drive it. Every
+step (`build`, `dev`, `preview`, `console`, `export`, `watchFiles`) is optional, and a command
+tells the user plainly when a target does not support the one it needs.
+
+The two targets the CLI ships with, `react` and `server`, are registered through this exact key.
+Precedence when nobody names one: `--target`, then `stone.builder.target`, then each target's
+`match` in priority order, with the backend target answering last.
 
 ## Installation
 

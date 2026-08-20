@@ -6,13 +6,12 @@ vi.mock('../../src/utils', async () => {
   return {
     ...actual,
     shouldBuild: vi.fn(),
-    isReactApp: vi.fn(),
     setupProcessSignalHandlers: vi.fn()
   }
 })
 
-const ReactBuilderConsole = vi.fn()
-const ServerBuilderConsole = vi.fn()
+const consoleStep = vi.fn()
+const fallbackStep = vi.fn()
 
 vi.doMock('../../src/react/ReactBuilder', () => ({
   ReactBuilder: class {
@@ -57,18 +56,28 @@ describe('ListCommand (dynamic import workaround)', async () => {
 
     const utils = await import('../../src/utils')
     vi.mocked(utils.shouldBuild).mockReturnValue(true)
-    vi.mocked(utils.isReactApp).mockReturnValue(true)
     buildPath.mockReturnValue('/dist/console.mjs')
 
     context = {
       blueprint: {
-        get: vi.fn().mockReturnValue('pattern')
+        get: vi.fn((key: string) => {
+          if (key === 'stone.builder.builders') {
+            return {
+              react: { target: 'react', priority: 10, match: () => true, resolver: () => ({ console: consoleStep }) },
+              server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ console: fallbackStep }) }
+            }
+          }
+          if (key === 'stone.builder.target') { return undefined }
+          return 'pattern'
+        })
       }
     }
 
     event = {
       type: 'cli',
-      payload: {}
+      payload: {},
+      get: vi.fn(),
+      is: vi.fn()
     } as unknown as IncomingEvent
   })
 
@@ -85,8 +94,8 @@ describe('ListCommand (dynamic import workaround)', async () => {
       'app/**/*.**'
     )
 
-    expect(ReactBuilderConsole).toHaveBeenCalledWith(event)
-    expect(ServerBuilderConsole).not.toHaveBeenCalled()
+    expect(consoleStep).toHaveBeenCalledWith(event)
+    expect(fallbackStep).not.toHaveBeenCalled()
 
     expect(spawnMock).toHaveBeenCalledWith(
       'node',
@@ -95,15 +104,23 @@ describe('ListCommand (dynamic import workaround)', async () => {
     )
   })
 
-  it('should handle server build if not react', async () => {
-    const utils = await import('../../src/utils')
-    vi.mocked(utils.isReactApp).mockReturnValue(false)
+  it('falls through to the target that answers anything', async () => {
+    context.blueprint.get = vi.fn((key: string) => {
+      if (key === 'stone.builder.builders') {
+        return {
+          react: { target: 'react', priority: 10, match: () => false, resolver: () => ({ console: consoleStep }) },
+          server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ console: fallbackStep }) }
+        }
+      }
+      if (key === 'stone.builder.target') { return undefined }
+      return 'pattern'
+    })
 
     const cmd = new ListCommand(context)
     await cmd.handle(event)
 
-    expect(ServerBuilderConsole).toHaveBeenCalledWith(event)
-    expect(ReactBuilderConsole).not.toHaveBeenCalled()
+    expect(fallbackStep).toHaveBeenCalledWith(event)
+    expect(consoleStep).not.toHaveBeenCalled()
   })
 
   it('should skip build but still spawn --help if shouldBuild is false', async () => {
@@ -113,8 +130,8 @@ describe('ListCommand (dynamic import workaround)', async () => {
     const cmd = new ListCommand(context)
     await cmd.handle(event)
 
-    expect(ReactBuilderConsole).not.toHaveBeenCalled()
-    expect(ServerBuilderConsole).not.toHaveBeenCalled()
+    expect(consoleStep).not.toHaveBeenCalled()
+    expect(fallbackStep).not.toHaveBeenCalled()
     expect(spawnMock).toHaveBeenCalled()
   })
 

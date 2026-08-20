@@ -1,69 +1,45 @@
 import { Argv } from 'yargs'
-import { isReactApp } from '../../src/utils'
 import { IncomingEvent } from '@stone-js/core'
 import { ExportCommand, exportCommandOptions } from '../../src/commands/ExportCommand'
+import { makeContext, makeEvent } from './builderTestHelpers'
 
-// Mocks
-vi.mock('../../src/utils', async (mod) => {
-  const actual: any = await mod()
-  return {
-    ...actual,
-    isReactApp: vi.fn()
-  }
-})
-
-const ReactBuilderExport = vi.fn()
-const ServerBuilderExport = vi.fn()
-
-vi.mock('../../src/react/ReactBuilder', () => ({
-  ReactBuilder: class {
-    export = ReactBuilderExport
-  }
-}))
-
-vi.mock('../../src/server/ServerBuilder', () => ({
-  ServerBuilder: class {
-    export = ServerBuilderExport
-  }
-}))
 
 describe('ExportCommand', () => {
-  let context: any
-  let event: IncomingEvent
+  beforeEach(() => { vi.clearAllMocks() })
 
-  beforeEach(() => {
-    vi.clearAllMocks()
+  it('asks the target that matched to export', async () => {
+    const exportStep = vi.fn()
+    const context = makeContext({
+      react: { target: 'react', priority: 10, match: () => true, resolver: () => ({ export: exportStep }) },
+      server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ export: vi.fn() }) }
+    })
+    const event = makeEvent({ module: 'app' })
 
-    context = {
-      blueprint: { meta: {} }
-    }
+    await new ExportCommand(context).handle(event)
 
-    event = {
-      type: 'cli',
-      payload: { module: 'app' }
-    } as unknown as IncomingEvent
+    expect(exportStep).toHaveBeenCalledWith(event)
   })
 
-  it('should call ReactBuilder.export if isReactApp is true', async () => {
-    vi.mocked(isReactApp).mockReturnValue(true)
+  it('asks the fallback target when nothing else matched', async () => {
+    const exportStep = vi.fn()
+    const context = makeContext({
+      react: { target: 'react', priority: 10, match: () => false, resolver: () => ({ export: vi.fn() }) },
+      server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ export: exportStep }) }
+    })
+    const event = makeEvent({ module: 'app' })
 
-    const command = new ExportCommand(context)
-    await command.handle(event)
+    await new ExportCommand(context).handle(event)
 
-    expect(isReactApp).toHaveBeenCalledWith(context.blueprint, event)
-    expect(ReactBuilderExport).toHaveBeenCalledWith(event)
-    expect(ServerBuilderExport).not.toHaveBeenCalled()
+    expect(exportStep).toHaveBeenCalledWith(event)
   })
 
-  it('should call ServerBuilder.export if isReactApp is false', async () => {
-    vi.mocked(isReactApp).mockReturnValue(false)
+  it('says so when a target has nothing to export', async () => {
+    const context = makeContext({
+      native: { target: 'native', match: () => true, resolver: () => ({}) }
+    })
 
-    const command = new ExportCommand(context)
-    await command.handle(event)
-
-    expect(isReactApp).toHaveBeenCalledWith(context.blueprint, event)
-    expect(ServerBuilderExport).toHaveBeenCalledWith(event)
-    expect(ReactBuilderExport).not.toHaveBeenCalled()
+    await expect(new ExportCommand(context).handle(makeEvent()))
+      .rejects.toThrow(/"export" step is not supported/)
   })
 })
 

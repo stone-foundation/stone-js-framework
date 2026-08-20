@@ -5,26 +5,27 @@ vi.mock('../../src/utils', async () => {
   const actual = await vi.importActual<any>('../../src/utils')
   return {
     ...actual,
-    isReactApp: vi.fn()
   }
 })
 
-const ReactBuilderDev = vi.fn()
-const ServerBuilderDev = vi.fn()
-const ServerBuilderWatchFiles = vi.fn()
+const selfHostedDev = vi.fn()
+const supervisedDev = vi.fn()
+const supervisedWatchFiles = vi.fn()
 
-vi.mock('../../src/react/ReactBuilder', () => ({
-  ReactBuilder: class {
-    dev = ReactBuilderDev
+/**
+ * Two registered targets, one of each supervision kind. The command must branch on the
+ * declared capability, never on a target's name, which is what these two cover.
+ */
+const builderRegistry = (devMode: 'self-hosted' | 'supervised'): any => ({
+  only: {
+    target: devMode === 'self-hosted' ? 'react' : 'server',
+    devMode,
+    match: () => true,
+    resolver: () => devMode === 'self-hosted'
+      ? { dev: selfHostedDev }
+      : { dev: supervisedDev, watchFiles: supervisedWatchFiles }
   }
-}))
-
-vi.mock('../../src/server/ServerBuilder', () => ({
-  ServerBuilder: class {
-    dev = ServerBuilderDev
-    watchFiles = ServerBuilderWatchFiles
-  }
-}))
+})
 
 const pmStart = vi.fn()
 const pmRestart = vi.fn()
@@ -47,7 +48,7 @@ const createContext = (): any => {
   const spinner = { succeed: vi.fn(), fail: vi.fn() }
   return {
     spinner,
-    blueprint: { get: vi.fn(() => '') },
+    blueprint: { get: vi.fn((key: string) => key === 'stone.builder.builders' ? builderRegistry('self-hosted') : '') },
     commandOutput: {
       show: vi.fn(),
       breakLine: vi.fn(),
@@ -74,18 +75,15 @@ describe('ServeCommand', () => {
     ServeCommand = mod.ServeCommand
     serveCommandOptions = mod.serveCommandOptions
 
-    const utils = await import('../../src/utils')
-    vi.mocked(utils.isReactApp).mockReturnValue(true)
-
     context = createContext()
-    event = { type: 'cli', payload: {} } as unknown as IncomingEvent
+    event = { type: 'cli', payload: {}, get: vi.fn(), is: vi.fn() } as unknown as IncomingEvent
   })
 
-  it('should start the react dev server and launch the supervised process', async () => {
+  it('launches a self-hosted dev server and follows it', async () => {
     const cmd = new ServeCommand(context)
     await cmd.handle(event)
 
-    expect(ReactBuilderDev).toHaveBeenCalledWith(event)
+    expect(selfHostedDev).toHaveBeenCalledWith(event)
     expect(pmCreate).toHaveBeenCalledWith(expect.objectContaining({
       command: 'node',
       args: ['/dist/server.mjs', ...process.argv.slice(2)]
@@ -93,17 +91,16 @@ describe('ServeCommand', () => {
     expect(pmStart).toHaveBeenCalled()
   })
 
-  it('should build, launch and watch for the backend dev server', async () => {
-    const utils = await import('../../src/utils')
-    vi.mocked(utils.isReactApp).mockReturnValue(false)
+  it('builds, launches and watches a supervised dev server', async () => {
+    context.blueprint.get = vi.fn((key: string) => key === 'stone.builder.builders' ? builderRegistry('supervised') : '')
 
     const cmd = new ServeCommand(context)
     await cmd.handle(event)
 
-    expect(ServerBuilderDev).toHaveBeenCalledWith(event)
+    expect(supervisedDev).toHaveBeenCalledWith(event)
     expect(context.commandOutput.spin).toHaveBeenCalledWith('Building application…')
     expect(context.spinner.succeed).toHaveBeenCalled()
-    expect(ServerBuilderWatchFiles).toHaveBeenCalled()
+    expect(supervisedWatchFiles).toHaveBeenCalled()
     expect(pmStart).toHaveBeenCalled()
 
     // Backend onExit: a crash keeps the watcher alive with a warning; a clean exit is silent.
@@ -115,9 +112,9 @@ describe('ServeCommand', () => {
     expect(context.commandOutput.warn).not.toHaveBeenCalled()
   })
 
-  it('should mirror the child exit code for the react dev server', async () => {
+  it('mirrors the child exit code for a self-hosted dev server', async () => {
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((): never => undefined as never))
-    context.blueprint.get.mockReturnValueOnce(undefined) // version resolves to '' via ?? fallback
+    // version resolves to '' via the ?? fallback; the registry still has to answer.
 
     const cmd = new ServeCommand(context)
     await cmd.handle(event)
@@ -131,35 +128,33 @@ describe('ServeCommand', () => {
   })
 
   it('should report a failed first build and not watch', async () => {
-    const utils = await import('../../src/utils')
-    vi.mocked(utils.isReactApp).mockReturnValue(false)
-    ServerBuilderDev.mockRejectedValueOnce('boom') // non-Error → exercises the `?? error` fallback
+    context.blueprint.get = vi.fn((key: string) => key === 'stone.builder.builders' ? builderRegistry('supervised') : '')
+    supervisedDev.mockRejectedValueOnce('boom') // non-Error → exercises the `?? error` fallback
 
     const cmd = new ServeCommand(context)
     await cmd.handle(event)
 
     expect(context.spinner.fail).toHaveBeenCalled()
     expect(context.commandOutput.error).toHaveBeenCalledWith('boom')
-    expect(ServerBuilderWatchFiles).not.toHaveBeenCalled()
+    expect(supervisedWatchFiles).not.toHaveBeenCalled()
   })
 
   it('should rebuild and restart on a file change, and report a rebuild error', async () => {
-    const utils = await import('../../src/utils')
-    vi.mocked(utils.isReactApp).mockReturnValue(false)
+    context.blueprint.get = vi.fn((key: string) => key === 'stone.builder.builders' ? builderRegistry('supervised') : '')
 
     const cmd = new ServeCommand(context)
     await cmd.handle(event)
 
-    const cb = ServerBuilderWatchFiles.mock.calls[0][0]
+    const cb = supervisedWatchFiles.mock.calls[0][0]
 
     // Successful live-reload cycle
     await cb('app/User.ts', 1)
-    expect(ServerBuilderDev).toHaveBeenCalledWith(event, true)
+    expect(supervisedDev).toHaveBeenCalledWith(event, true)
     expect(pmRestart).toHaveBeenCalled()
     expect(context.commandOutput.succeed).toHaveBeenCalled()
 
     // Failed live-reload cycle (non-Error rejection → `?? error` fallback)
-    ServerBuilderDev.mockRejectedValueOnce('fail')
+    supervisedDev.mockRejectedValueOnce('fail')
     await cb('app/User.ts', 2)
     expect(context.commandOutput.error).toHaveBeenCalledWith(expect.stringContaining('Rebuild failed: fail'))
   })
@@ -180,10 +175,11 @@ describe('ServeCommand', () => {
     const fn = serveCommandOptions.options as ((args: Argv<any>) => Argv<any>)
     const result = fn(yargs as any)
 
+    // No `choices`: any registered target is accepted, and an unknown one is rejected by the
+    // resolver, which can name the real list.
     expect(yargs.positional).toHaveBeenCalledWith('target', {
       type: 'string',
-      desc: 'app target to serve',
-      choices: ['server', 'react']
+      desc: 'app target to serve'
     })
     expect(yargs.option).toHaveBeenCalledWith('language', {
       alias: 'lang',

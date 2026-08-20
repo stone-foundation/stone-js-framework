@@ -3,6 +3,8 @@ import { RollupOptions } from 'rollup'
 import { dotenv, DotenvConfig } from './DotenvConfig'
 import { StoneCliPlugin } from '../plugins/declarations'
 import { rollupBuildConfig, rollupBundleConfig } from '../server/rollup-config'
+import { StoneBuilderDefinition } from '../builders/declarations'
+import { defaultBuilderDefinitions } from '../builders/builders'
 
 /**
  * Configuration for the test run, under `stone.builder.test`.
@@ -113,7 +115,7 @@ export interface BuilderConfig {
   /**
    * The application target.
    */
-  target?: 'react' | 'service'
+  target?: string
 
   /**
    * Whether the application is using lazy loading for pages, error pages and layouts.
@@ -250,6 +252,16 @@ export interface BuilderConfig {
    * {@link plugins}. Set to `false` to opt out entirely and load every plugin explicitly.
    */
   autoDiscoverPlugins?: boolean
+
+  /**
+   * The registered build targets, keyed by name.
+   *
+   * The CLI drives whichever one answers and knows nothing about what it does, so a module
+   * owns its own build: add a target here (or from a plugin's `blueprintMiddleware`) and
+   * `stone build --target <name>` drives it. The two the CLI ships with are registered the
+   * same way.
+   */
+  builders?: Record<string, StoneBuilderDefinition>
 }
 
 /**
@@ -258,6 +270,7 @@ export interface BuilderConfig {
 export const builder: BuilderConfig = {
   dotenv,
   plugins: [],
+  builders: defaultBuilderDefinitions,
   lazy: true, // Lazy pages by default: per-route code splitting, and the scanned route definitions feed zero-config SSG.
   public: 'public',
   autoDiscoverPlugins: true, // First-party `@stone-js/*` plugins are zero-config; third-party plugins go through `plugins`.

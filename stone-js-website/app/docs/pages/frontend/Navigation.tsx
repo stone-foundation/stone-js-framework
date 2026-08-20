@@ -64,6 +64,27 @@ async function onSubmit (values: NewTask) {
           read a param, or branch on the page. It updates as navigation happens.
         </p>
 
+        <H3>Where the navigation actually happens</H3>
+        <p>
+          Resolving a destination is the same everywhere: a route name plus params becomes a path.
+          Performing it is not. The browser pushes a History entry and announces it, so the adapter
+          hears the change and the kernel resolves the new page. A native application drives a
+          navigation stack instead, and has no History API at all.
+        </p>
+        <p>
+          So only that last step is pluggable, under <code>stone.router.navigator</code>. You will
+          not set it in a web application, where the browser navigator is already the default. A
+          platform integration sets it once, and every <code>navigate()</code> call in your pages
+          keeps working untouched: that is what lets the same pages run on another platform.
+        </p>
+        <Code file='app/config.ts'>{`import { defineConfig } from '@stone-js/core'
+
+export const AppConfig = defineConfig((blueprint) => {
+  blueprint.set('stone.router.navigator', ({ path, replace, options }) => {
+    // Perform the platform's effect. The path is already resolved.
+  })
+})`}</Code>
+
         <H2>Scroll restoration</H2>
         <p>
           Client navigation restores scroll position the way users expect: to the top on a new page,
