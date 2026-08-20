@@ -1,8 +1,8 @@
 import { StoneError } from './components/StoneError'
 import { IContainer, IBlueprint } from '@stone-js/core'
 import { IncomingBrowserEvent } from '@stone-js/browser-core'
-import { ReactOutgoingResponse, ResponseSnapshotType, IPage, ReactIncomingEvent, IErrorPage, MetaErrorPage } from './declarations'
-import { resolveComponent, executeHandler, executeHooks, buildPageComponent, buildAppComponent, isSSR, getServerContent, getBrowserContent, resolveLayoutHead, mergeHead } from './UseReactPageInternals'
+import { getServerContent, getBrowserContent } from './UseReactPageInternals'
+import { ReactOutgoingResponse, ResponseSnapshotType, IPage, ReactIncomingEvent, IErrorPage, MetaErrorPage, resolveComponent, executeHandler, executeHooks, buildPageComponent, buildAppComponent, isSSR, resolveLayoutHead, mergeHead } from '@stone-js/use-react-core'
 
 /**
  * Prepare the page to render.

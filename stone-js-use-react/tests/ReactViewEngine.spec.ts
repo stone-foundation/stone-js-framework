@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createElement } from 'react'
 import { ReactViewEngine } from '../src/ReactViewEngine'
 import { prerenderPage } from '../src/prerender'
-import { createHead } from '../src/head'
+import { createHead } from '@stone-js/use-react-core'
 
 async function collect (stream: ReadableStream<Uint8Array>): Promise<string> {
   const reader = stream.getReader()
@@ -68,6 +68,51 @@ describe('ReactViewEngine — client mount/hydrate', () => {
     await new Promise((r) => setTimeout(r, 30))
     expect(container.textContent).toContain('Mounted')
     root.unmount?.()
+  })
+
+  it('updates a mounted root in place', async () => {
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = await ReactViewEngine.mount(createElement('p', null, 'First'), container)
+    await new Promise((r) => setTimeout(r, 30))
+
+    root.update?.(createElement('p', null, 'Second'))
+    await new Promise((r) => setTimeout(r, 30))
+
+    expect(container.textContent).toContain('Second')
+    root.unmount?.()
+  })
+
+  it('hydrates server-rendered markup instead of replacing it', async () => {
+    const container = document.createElement('div')
+    container.innerHTML = await ReactViewEngine.renderToString(createElement('p', null, 'Hydrated'))
+    document.body.appendChild(container)
+
+    const root = await ReactViewEngine.hydrate(createElement('p', null, 'Hydrated'), container)
+    await new Promise((r) => setTimeout(r, 30))
+
+    expect(container.textContent).toContain('Hydrated')
+    root.unmount?.()
+  })
+})
+
+describe('ReactViewEngine — stream lifecycle', () => {
+  it('cancels the underlying React stream when the consumer walks away', async () => {
+    const stream = await ReactViewEngine.renderToStream?.(createElement('p', null, 'Body'), { head: '<head>' })
+    const reader = stream?.getReader()
+
+    // A client that disconnects mid-response: the wrapper must pass the cancellation down
+    // rather than leave React producing into nothing.
+    await expect(reader?.cancel('client gone')).resolves.toBeUndefined()
+  })
+
+  it('rejects rather than returning a stream when the shell itself fails', async () => {
+    const Boom = (): never => { throw new Error('render exploded') }
+    const onShellError = vi.fn()
+
+    // React rejects the stream promise when the shell errors, so the caller learns about it
+    // instead of receiving a stream that never produces anything.
+    await expect(ReactViewEngine.renderToStream?.(createElement(Boom), { onShellError })).rejects.toThrow('render exploded')
   })
 })
 

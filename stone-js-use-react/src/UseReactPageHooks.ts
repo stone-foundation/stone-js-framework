@@ -1,8 +1,7 @@
-import { ReactOutgoingResponse } from './declarations'
-import { getResponseSnapshot } from './UseReactPageInternals'
 import { IncomingBrowserEvent } from '@stone-js/browser-core'
 import { IContainer, isFunction, isNotEmpty } from '@stone-js/core'
 import { prepareFallbackErrorPage, prepareErrorPage, preparePage } from './UseReactPageRenderer'
+import { ReactOutgoingResponse, getResponseSnapshot } from '@stone-js/use-react-core'
 
 /**
  * Options for onPreparingResponse hook.

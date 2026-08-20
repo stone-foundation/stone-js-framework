@@ -8,10 +8,9 @@ import {
   FunctionComponent,
   AnchorHTMLAttributes
 } from 'react'
-import { StoneContext } from '../StoneContext'
-import { IRouter, IRoute } from '../declarations'
 import { NavigateOptions, RouteEvent, Router } from '@stone-js/router'
 import { isEmpty, isNotEmpty, isObjectLikeModule, Logger } from '@stone-js/core'
+import { StoneContext, IRouter, IRoute } from '@stone-js/use-react-core'
 
 interface BaseProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   noRel?: boolean

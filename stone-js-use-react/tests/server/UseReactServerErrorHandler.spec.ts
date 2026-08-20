@@ -1,12 +1,17 @@
 import { renderToString } from 'react-dom/server'
-import * as Utils from '../../src/UseReactPageInternals'
+import * as CoreUtils from '@stone-js/use-react-core'
+import * as WebUtils from '../../src/UseReactPageInternals'
 import { Logger, AdapterErrorContext, IBlueprint, ILogger } from '@stone-js/core'
 import { UseReactServerErrorHandler } from '../../src/server/UseReactServerErrorHandler'
 
 // Mocks
-vi.mock('../../src/UseReactPageInternals', () => ({
-  htmlTemplate: vi.fn(),
+vi.mock('@stone-js/use-react-core', async (mod) => ({
+  ...(await mod() as any),
   buildAdapterErrorComponent: vi.fn()
+}))
+vi.mock('../../src/UseReactPageInternals', async (mod) => ({
+  ...(await mod() as any),
+  htmlTemplate: vi.fn()
 }))
 vi.mock('react-dom/server', () => ({
   renderToString: vi.fn()
@@ -79,15 +84,15 @@ describe('UseReactServerErrorHandler', () => {
     const fakeComponent = (): any => null
     const rendered = '<div>Rendered</div>'
 
-    vi.mocked(Utils.htmlTemplate).mockReturnValue(fakeTemplate)
-    vi.mocked(Utils.buildAdapterErrorComponent).mockResolvedValue(fakeComponent as any)
+    vi.mocked(WebUtils.htmlTemplate).mockReturnValue(fakeTemplate)
+    vi.mocked(CoreUtils.buildAdapterErrorComponent).mockResolvedValue(fakeComponent as any)
 
     vi.mocked(renderToString).mockReturnValue(rendered)
 
     const result = await (handler as any).getErrorBody(error, context)
 
-    expect(Utils.htmlTemplate).toHaveBeenCalledWith(blueprint)
-    expect(Utils.buildAdapterErrorComponent).toHaveBeenCalledWith(blueprint, context, 500, error)
+    expect(WebUtils.htmlTemplate).toHaveBeenCalledWith(blueprint)
+    expect(CoreUtils.buildAdapterErrorComponent).toHaveBeenCalledWith(blueprint, context, 500, error)
     expect(renderToString).toHaveBeenCalledWith(fakeComponent)
     expect(result).toBe('<html><div>Rendered</div></html>')
   })

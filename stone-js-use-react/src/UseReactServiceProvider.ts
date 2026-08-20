@@ -1,8 +1,7 @@
 import { Config } from '@stone-js/config'
-import { STONE_SNAPSHOT } from './constants'
 import { ReactRuntime } from './ReactRuntime'
-import { isSSR } from './UseReactPageInternals'
 import { IContainer, IServiceProvider, Promiseable, type MetaServiceProvider } from '@stone-js/core'
+import { STONE_SNAPSHOT, isSSR } from '@stone-js/use-react-core'
 
 /**
  * Options for configuring the use-react service provider.

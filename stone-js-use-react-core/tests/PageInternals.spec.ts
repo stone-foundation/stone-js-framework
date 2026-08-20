@@ -1,0 +1,570 @@
+import { ReactElement } from 'react'
+import { StonePage } from '../src/components/StonePage'
+import { UseReactError } from '../src/errors/UseReactError'
+import { buildAdapterErrorComponent, buildAppComponent, buildLayoutComponent, buildPageComponent, executeHandler, executeHooks, getResponseSnapshot, isClient, isServer, isSSR, mergeHead, resolveComponent, resolveLayoutHead, resolveLazyComponent } from '../src/PageInternals'
+
+/* eslint-disable @typescript-eslint/no-extraneous-class */
+
+describe('buildAppComponent', () => {
+  it('renders page inside and wraps in <StonePage>', async () => {
+    const event = {} as any
+
+    const container: any = {
+      make: vi.fn().mockReturnValue({
+        get: vi.fn().mockReturnValue({})
+      })
+    }
+
+    const PageComponent = (): string => 'Page'
+
+    const data = { msg: 'hello' }
+    const component = PageComponent
+
+    const result = await buildAppComponent(event, container, component, undefined, data) as ReactElement<any, any>
+
+    expect(result.type).toBe(StonePage)
+    expect(result.props.children.type).toBe(PageComponent)
+    expect(result.props.context).toEqual({ event, container, data })
+  })
+
+  it('renders layout with page inside and wraps in <StonePage>', async () => {
+    const event = {} as any
+    const Layout = (props: any): string => `Layout(${String(props.children)})`
+    const pageLayout = (): any => ({ render: Layout })
+
+    const container: any = {
+      make: vi.fn().mockReturnValue({
+        get: vi.fn().mockReturnValue({ module: pageLayout, isFactory: true })
+      })
+    }
+
+    const PageComponent = (): string => 'Page'
+
+    const layout = 'default'
+    const data = { msg: 'hello' }
+    const component = PageComponent
+
+    const result = await buildAppComponent(event, container, component, layout, data) as ReactElement<any, any>
+
+    expect(result.type).toBe(StonePage)
+    expect(result.props.children.type({ children: PageComponent })).toBe(Layout({ children: PageComponent }))
+    expect(result.props.context).toEqual({ event, container, data })
+    expect(result.props.children.props.children.type).toBe(PageComponent)
+  })
+})
+
+describe('buildLayoutComponent', () => {
+  it('returns undefined if no layout is found', async () => {
+    const container: any = {
+      make: vi.fn().mockReturnValue({
+        get: vi.fn().mockReturnValue(undefined)
+      })
+    }
+
+    const layout = await buildLayoutComponent(container, 'CHILDREN', 'unknown')
+    expect(layout).toBeUndefined()
+  })
+
+  // it('renders layout component with children', async () => {
+  //   const Layout = vi.fn((props: any) => `Layout(${props.children})`)
+  //   const handler = { render: vi.fn().mockReturnValue(Layout) }
+
+  //   const container = {
+  //     make: vi.fn().mockReturnValue({
+  //       get: vi.fn().mockReturnValue({ module: Layout })
+  //     }),
+  //     resolve: vi.fn().mockReturnValue(handler)
+  //   }
+
+  //   const layout = await buildLayoutComponent(container as any, 'CHILDREN', 'main') as ReactElement<any, any>
+  //   // expect(layout?.type).toBe(Layout)
+  //   expect(layout?.props.children).toBe('CHILDREN')
+  //   expect(layout?.props['data-layout']).toBe('main')
+  // })
+})
+
+describe('resolveLayoutHead', () => {
+  it('returns undefined when no layout is registered or it defines no head', async () => {
+    const container: any = {
+      make: vi.fn().mockReturnValue({ get: vi.fn().mockReturnValue(undefined) }),
+      resolve: vi.fn()
+    }
+
+    await expect(resolveLayoutHead(container, 'unknown')).resolves.toBeUndefined()
+  })
+
+  it('reads the layout from stone.useReact.layouts.<name> and returns its head()', async () => {
+    const layoutHead = { metas: [{ property: 'og:image', content: 'https://x/default.png' }] }
+    const get = vi.fn().mockReturnValue({
+      isFactory: true,
+      module: () => ({ head: () => layoutHead, render: () => null })
+    })
+    const container: any = { make: vi.fn().mockReturnValue({ get }), resolve: vi.fn() }
+
+    const result = await resolveLayoutHead(container, 'site')
+
+    expect(get).toHaveBeenCalledWith('stone.useReact.layouts.site')
+    expect(result).toEqual(layoutHead)
+  })
+})
+
+describe('mergeHead', () => {
+  it('returns whichever side is defined when only one is provided', () => {
+    const page = { title: 'P' }
+    const layout = { title: 'L' }
+    expect(mergeHead(undefined, page)).toBe(page)
+    expect(mergeHead(layout, undefined)).toBe(layout)
+    expect(mergeHead(undefined, undefined)).toBeUndefined()
+  })
+
+  it('merges the layout head under the page head, the page winning on conflicts', () => {
+    const layoutHead = {
+      metas: [
+        { property: 'og:image', content: 'default.png' },
+        { property: 'og:site_name', content: 'Stone.js' }
+      ]
+    }
+    const pageHead = {
+      title: 'Article',
+      metas: [{ property: 'og:image', content: 'article.png' }]
+    }
+
+    const merged = mergeHead(layoutHead, pageHead)
+
+    expect(merged?.title).toBe('Article')
+    // The page's og:image replaces the layout default; the layout-only og:site_name survives.
+    expect(merged?.metas).toContainEqual({ property: 'og:image', content: 'article.png' })
+    expect(merged?.metas).toContainEqual({ property: 'og:site_name', content: 'Stone.js' })
+    expect(merged?.metas?.filter((m: any) => m.property === 'og:image')).toHaveLength(1)
+  })
+})
+
+describe('buildPageComponent', () => {
+  const event: any = { type: 'browser' }
+  const container = {}
+  const data = { msg: 'ok' }
+  const error = { code: 500 }
+
+  it('renders provided component with props', () => {
+    const PageComponent = vi.fn(() => 'Page')
+
+    const result = buildPageComponent(event, container as any, PageComponent, data, 200, error) as ReactElement<any, any>
+    expect(result.type).toBe(PageComponent)
+    expect(result.props).toEqual({ event, container, data, statusCode: 200, error })
+  })
+
+  it('returns empty div if no component is passed', () => {
+    const result = buildPageComponent(event, container as any) as ReactElement<any, any>
+    expect(result.type).toBe('div')
+  })
+})
+
+describe('buildAdapterErrorComponent', () => {
+  let blueprint: any
+  let context: any
+  const error = new Error('Oops')
+  const statusCode = 500
+
+  beforeEach(() => {
+    context = { rawResponseBuilder: { add: vi.fn() } }
+  })
+
+  it('returns full layout with component as children (factory modules)', async () => {
+    const handler = {
+      handle: vi.fn(),
+      render: () => 'ErrorComponent'
+    }
+    const layoutHandler = {
+      render: () => 'LayoutComponent'
+    }
+
+    const handlerMeta = {
+      lazy: false,
+      isFactory: true,
+      module: () => handler
+    }
+    const layoutMeta = {
+      lazy: false,
+      isFactory: true,
+      module: () => layoutHandler
+    }
+
+    blueprint = {
+      get: vi.fn()
+        .mockReturnValueOnce(handlerMeta) // error handler
+        .mockReturnValueOnce(layoutMeta) // layout handler
+    }
+
+    const result = await buildAdapterErrorComponent(blueprint, context, statusCode, error) as ReactElement<any, any>
+
+    expect(result?.type()).toBe(layoutHandler.render())
+    expect(result?.props.children.type()).toBe(handler.render())
+  })
+
+  it('returns full layout with component as children (class modules)', async () => {
+    class Handler {
+      handle = vi.fn()
+      render = (): string => 'ErrorComponent'
+    }
+
+    class LayoutHandler {
+      render = (): string => 'LayoutComponent'
+    }
+
+    const handlerMeta = {
+      lazy: false,
+      isClass: true,
+      module: Handler
+    }
+    const layoutMeta = {
+      lazy: false,
+      isClass: true,
+      module: LayoutHandler
+    }
+
+    // @ts-expect-error
+    error.name = undefined
+
+    blueprint = {
+      get: vi.fn()
+        .mockReturnValueOnce(handlerMeta) // error handler
+        .mockReturnValueOnce(layoutMeta) // layout handler
+    }
+
+    const result = await buildAdapterErrorComponent(blueprint, context, statusCode, error) as ReactElement<any, any>
+
+    expect(result?.type()).toBe(new LayoutHandler().render())
+    expect(result?.props.children.type()).toBe(new Handler().render())
+  })
+
+  it('returns component alone if layout is missing', async () => {
+    class Handler {
+      handle = vi.fn()
+      render = (): string => 'ErrorComponent'
+    }
+
+    const handlerMeta = {
+      lazy: false,
+      isClass: true,
+      module: Handler
+    }
+
+    blueprint = {
+      get: vi.fn()
+        .mockReturnValueOnce(handlerMeta) // error handler
+        .mockReturnValueOnce(undefined) // layout handler not found
+    }
+
+    const result = await buildAdapterErrorComponent(blueprint, context, statusCode, error) as ReactElement<any, any>
+
+    expect(result?.type()).toBe(new Handler().render())
+  })
+
+  it('renders the fallback the renderer supplied when nothing was declared', async () => {
+    blueprint = {
+      get: vi.fn().mockReturnValue(undefined)
+    }
+    const Fallback = (): null => null
+
+    const result = await buildAdapterErrorComponent(blueprint, context, statusCode, error, Fallback) as ReactElement<any, any>
+
+    expect(result?.type).toBe(Fallback)
+    expect(result?.props).toEqual({ blueprint, error, statusCode })
+  })
+
+  it('renders nothing when neither a page nor a fallback exists', async () => {
+    // The fallback is injected rather than imported: this package cannot reach for an HTML
+    // component, since the renderer that supplies it may be rendering native views.
+    blueprint = {
+      get: vi.fn().mockReturnValue(undefined)
+    }
+
+    const result = await buildAdapterErrorComponent(blueprint, context, statusCode, error)
+
+    expect(result).toBeUndefined()
+  })
+
+  // it('calls handler.handle if defined', async () => {
+  //   const handler = {
+  //     render: vi.fn(),
+  //     handle: vi.fn()
+  //   }
+  //   const handlerMeta = {
+  //     module: function () {},
+  //     lazy: false
+  //   }
+  //   handlerMeta.module.prototype = { constructor: vi.fn(() => handler) }
+
+  //   blueprint = {
+  //     get: vi.fn()
+  //       .mockReturnValueOnce(handlerMeta) // error handler
+  //       .mockReturnValueOnce(undefined)   // layout
+  //   }
+
+  //   await buildAdapterErrorComponent(blueprint, context, statusCode, error)
+  //   expect(handler.handle).toHaveBeenCalledWith(error, context)
+  // })
+})
+
+describe('resolveLazyComponent', () => {
+  it('resolves lazy modules without mutating the shared meta object', async () => {
+    const resolved = { foo: 'bar' }
+    const factory = vi.fn().mockResolvedValue(resolved)
+
+    const meta = {
+      lazy: true,
+      module: factory
+    }
+
+    const result = await resolveLazyComponent(meta)
+
+    // The result is a fresh, fully-resolved meta...
+    expect(result).not.toBe(meta)
+    expect(result?.lazy).toBe(false)
+    expect(result?.module).toBe(resolved)
+
+    // ...and the shared (blueprint-owned) meta is left untouched (no cross-request race).
+    expect(meta.lazy).toBe(true)
+    expect(meta.module).toBe(factory)
+  })
+
+  it('memoizes resolution so the import factory runs once across calls', async () => {
+    const resolved = { foo: 'bar' }
+    const factory = vi.fn().mockResolvedValue(resolved)
+    const meta = { lazy: true, module: factory }
+
+    const first = await resolveLazyComponent(meta)
+    const second = await resolveLazyComponent(meta)
+
+    expect(factory).toHaveBeenCalledTimes(1)
+    expect(first?.module).toBe(resolved)
+    expect(second?.module).toBe(resolved)
+  })
+
+  it('returns original if not lazy', async () => {
+    const meta = {
+      lazy: false,
+      module: vi.fn()
+    }
+
+    const result = await resolveLazyComponent(meta)
+
+    expect(result).toBe(meta)
+  })
+})
+
+describe('resolveComponent', () => {
+  let container: any
+
+  beforeEach(() => {
+    container = {
+      resolve: vi.fn()
+    }
+  })
+
+  it('resolves a class-based meta module', async () => {
+    const PageClass: any = class {}
+    const meta = {
+      lazy: false,
+      isClass: true,
+      module: PageClass
+    }
+
+    container.resolve.mockReturnValue(new PageClass())
+
+    const result = await resolveComponent(container, meta)
+
+    expect(result).toBeInstanceOf(PageClass)
+    expect(container.resolve).toHaveBeenCalledWith(PageClass)
+  })
+
+  it('resolves a factory-based meta module', async () => {
+    const factoryFn: any = vi.fn().mockReturnValue('FactoryInstance')
+
+    const meta = {
+      lazy: false,
+      isFactory: true,
+      module: factoryFn
+    }
+
+    const result = await resolveComponent(container, meta)
+
+    expect(result).toBe('FactoryInstance')
+  })
+
+  it('returns undefined if format not supported', async () => {
+    const meta = {
+      lazy: false,
+      module: {}
+    }
+
+    const result = await resolveComponent(container, meta as any)
+
+    expect(result).toBeUndefined()
+  })
+})
+
+describe('environment detection', () => {
+  const originalWindow = global.window
+
+  afterEach(() => {
+    global.window = originalWindow
+  })
+
+  describe('isServer', () => {
+    it('returns true when window is undefined', () => {
+      // @ts-expect-error
+      delete global.window
+      expect(isServer()).toBe(true)
+    })
+
+    it('returns false when window is defined', () => {
+      global.window = {} as any
+      expect(isServer()).toBe(false)
+    })
+  })
+
+  describe('isClient', () => {
+    it('returns false when server', () => {
+      // @ts-expect-error
+      delete global.window
+      expect(isClient()).toBe(false)
+    })
+
+    it('returns true when client', () => {
+      global.window = {} as any
+      expect(isClient()).toBe(true)
+    })
+  })
+
+  describe('isSSR', () => {
+    it('returns true when window is undefined', () => {
+      // @ts-expect-error
+      delete global.window
+      expect(isSSR()).toBe(true)
+    })
+
+    it('returns false when window is defined', () => {
+      global.window = {} as any
+      expect(isSSR()).toBe(false)
+    })
+  })
+})
+
+describe('getResponseSnapshot', () => {
+  it('returns snapshot from container with fingerprint', () => {
+    const snapshot = { ssr: false }
+    const container = {
+      make: vi.fn().mockReturnValue({
+        get: vi.fn().mockReturnValue(snapshot)
+      })
+    }
+
+    const event = { fingerprint: vi.fn().mockReturnValue('fp') }
+
+    const result = getResponseSnapshot(event as any, container as any)
+    expect(result).toBe(snapshot)
+  })
+})
+
+describe('executeHandler', () => {
+  let response: any
+  let snapshot: any
+  const event = {} as any
+
+  beforeEach(() => {
+    response = {
+      setStatus: vi.fn(),
+      setHeaders: vi.fn()
+    }
+    snapshot = { ssr: false }
+  })
+
+  it('returns undefined when no error nor handler are defined', async () => {
+    snapshot = { data: 'static' }
+
+    const result = await executeHandler(event, response, snapshot)
+    expect(result).toBeUndefined()
+  })
+
+  it('returns snapshot directly in SSR mode', async () => {
+    snapshot = { ssr: true, data: 'static' }
+
+    const result = await executeHandler(event, response, snapshot)
+    expect(result).toBe('static')
+  })
+
+  it('calls page.handle(event) on client', async () => {
+    const handler = {
+      handle: vi.fn().mockResolvedValue({ data: 'fromPage' })
+    }
+
+    const result = await executeHandler(event, response, snapshot, handler as any)
+    expect(handler.handle).toHaveBeenCalledWith(event)
+    expect(result).toBe('fromPage')
+  })
+
+  it('calls errorPage.handle(error, event)', async () => {
+    const error = new Error('Oops')
+    const handler = {
+      handle: vi.fn().mockResolvedValue({ content: 'fallback' })
+    }
+
+    const result = await executeHandler(event, response, snapshot, handler as any, error)
+    expect(handler.handle).toHaveBeenCalledWith(error, event)
+    expect(result).toBe('fallback')
+  })
+
+  it('sets status and headers if provided', async () => {
+    const handler = {
+      handle: vi.fn().mockResolvedValue({
+        statusCode: 404,
+        headers: { 'X-Custom': 'yes' },
+        content: 'data'
+      })
+    }
+
+    const result = await executeHandler(event, response, snapshot, handler as any)
+    expect(response.setStatus).toHaveBeenCalledWith(404)
+    expect(response.setHeaders).toHaveBeenCalledWith({ 'X-Custom': 'yes' })
+    expect(result).toBe('data')
+  })
+})
+
+describe('executeHooks', () => {
+  it('executes hooks if array is present', async () => {
+    const hook1 = vi.fn()
+    const hook2 = vi.fn()
+
+    const blueprint = {
+      get: vi.fn().mockReturnValue({
+        onPreparingPage: [hook1, hook2]
+      })
+    }
+
+    const context = {
+      container: {
+        make: vi.fn().mockReturnValue(blueprint)
+      }
+    }
+
+    await executeHooks('onPreparingPage', context as any)
+
+    expect(hook1).toHaveBeenCalledWith(context)
+    expect(hook2).toHaveBeenCalledWith(context)
+  })
+
+  it('does nothing if no hooks', async () => {
+    const blueprint = {
+      get: vi.fn().mockReturnValue({})
+    }
+
+    const context = {
+      container: {
+        make: vi.fn().mockReturnValue(blueprint)
+      }
+    }
+
+    await executeHooks('onPreparingPage', context as any) // no error = pass
+  })
+})

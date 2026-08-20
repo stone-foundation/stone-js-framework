@@ -38,7 +38,7 @@ describe('applyHeadToHtml with createHead (SSR)', () => {
   it('inserts a title containing $ literally (no String.replace pattern corruption)', () => {
     const head = createHead().title("Price: $& and $'").toContext()
     const html = applyHeadToHtml(head, TEMPLATE)
-    expect(html).toContain("<title>Price: $&amp; and $&#39;</title>")
+    expect(html).toContain('<title>Price: $&amp; and $&#39;</title>')
   })
 
   it('applies html/body attributes', () => {

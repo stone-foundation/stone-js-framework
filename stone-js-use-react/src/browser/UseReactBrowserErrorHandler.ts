@@ -6,10 +6,8 @@ import {
   IAdapterErrorHandler,
   AdapterEventBuilderType
 } from '@stone-js/core'
-import {
-  renderReactApp,
-  buildAdapterErrorComponent
-} from '../UseReactPageInternals'
+import { renderReactApp } from '../UseReactPageInternals'
+import { buildAdapterErrorComponent } from '@stone-js/use-react-core'
 
 /**
  * UseReactBrowserErrorHandler options.

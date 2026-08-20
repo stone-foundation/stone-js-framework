@@ -1,16 +1,16 @@
 import { NAVIGATION_EVENT } from '@stone-js/router'
 import { applyHeadToDocument } from '@stone-js/use-view'
-import { STONE_PAGE_EVENT_OUTLET } from '../../../src/constants'
-import { UseReactError } from '../../../src/errors/UseReactError'
 import { hydrateReactApp, renderReactApp } from '../../../src/UseReactPageInternals'
 import { BrowserResponseMiddleware } from '../../../src/browser/middleware/BrowserResponseMiddleware'
+import { STONE_PAGE_EVENT_OUTLET, UseReactError } from '@stone-js/use-react-core'
 
 vi.mock('@stone-js/use-view', async mod => ({
   ...(await mod()),
   applyHeadToDocument: vi.fn()
 }))
 
-vi.mock('../../../src/UseReactPageInternals', () => ({
+vi.mock('../../../src/UseReactPageInternals', async (mod) => ({
+  ...(await mod() as any),
   hydrateReactApp: vi.fn(),
   renderReactApp: vi.fn()
 }))

@@ -1,13 +1,12 @@
 import { ReactNode } from 'react'
-import { STONE_PAGE_EVENT_OUTLET } from '../../constants'
-import { UseReactError } from '../../errors/UseReactError'
 import { HeadContext, applyHeadToDocument } from '@stone-js/use-view'
 import { NAVIGATION_EVENT } from '@stone-js/router'
 import { BrowserAdapterResponseBuilder } from '@stone-js/browser-adapter'
 import { hydrateReactApp, renderReactApp } from '../../UseReactPageInternals'
 import { IBlueprint, isEmpty, isNotEmpty, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
-import { BrowserResponseContent, ReactBrowserAdapterContext } from '../../declarations'
+import { ReactBrowserAdapterContext } from '../../declarations'
 import { OutgoingBrowserResponse, RedirectBrowserResponse } from '@stone-js/browser-core'
+import { STONE_PAGE_EVENT_OUTLET, UseReactError, BrowserResponseContent } from '@stone-js/use-react-core'
 
 /**
  * Adapter Middleware for handling outgoing responses and rendering them in the browser.

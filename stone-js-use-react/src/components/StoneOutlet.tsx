@@ -1,6 +1,6 @@
 import { isNotEmpty } from '@stone-js/core'
-import { STONE_PAGE_EVENT_OUTLET } from '../constants'
 import { ReactNode, useEffect, useState, FunctionComponent, HTMLAttributes } from 'react'
+import { STONE_PAGE_EVENT_OUTLET } from '@stone-js/use-react-core'
 
 /**
  * Stone Outlet options.

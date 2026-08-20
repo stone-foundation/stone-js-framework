@@ -1,9 +1,14 @@
 import { Logger } from '@stone-js/core'
 import { UseReactBrowserErrorHandler } from '../../src/browser/UseReactBrowserErrorHandler'
-import { buildAdapterErrorComponent, renderReactApp } from '../../src/UseReactPageInternals'
+import { renderReactApp } from '../../src/UseReactPageInternals'
+import { buildAdapterErrorComponent } from '@stone-js/use-react-core'
 
-vi.mock('../../src/UseReactPageInternals', () => ({
-  buildAdapterErrorComponent: vi.fn(),
+vi.mock('@stone-js/use-react-core', async (mod) => ({
+  ...(await mod() as any),
+  buildAdapterErrorComponent: vi.fn()
+}))
+vi.mock('../../src/UseReactPageInternals', async (mod) => ({
+  ...(await mod() as any),
   renderReactApp: vi.fn()
 }))
 

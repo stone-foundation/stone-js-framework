@@ -1,8 +1,7 @@
-import { AdapterErrorPageOptions } from '../declarations'
-import { REACT_ADAPTER_ERROR_PAGE_KEY } from '../decorators/constants'
 import { UseReactServerErrorHandler } from '../server/UseReactServerErrorHandler'
 import { UseReactBrowserErrorHandler } from '../browser/UseReactBrowserErrorHandler'
 import { ClassType, BlueprintContext, IBlueprint, hasMetadata, getMetadata, isMatchedAdapter } from '@stone-js/core'
+import { AdapterErrorPageOptions, REACT_ADAPTER_ERROR_PAGE_KEY } from '@stone-js/use-react-core'
 
 /**
  * Sets the error handler for the React adapter and registers error pages.

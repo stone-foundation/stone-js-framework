@@ -1,8 +1,8 @@
 import { Config } from '@stone-js/config'
 import { IContainer } from '@stone-js/core'
-import { STONE_SNAPSHOT } from '../src/constants'
+import { STONE_SNAPSHOT } from '@stone-js/use-react-core'
 import { ReactRuntime } from '../src/ReactRuntime'
-import * as Utils from '../src/UseReactPageInternals'
+import * as Utils from '@stone-js/use-react-core'
 import { UseReactServiceProvider } from '../src/UseReactServiceProvider'
 
 vi.mock('@stone-js/config', () => ({

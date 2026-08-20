@@ -1,4 +1,4 @@
-import { isServer } from '../UseReactPageInternals'
+import { isServer } from '../PageInternals'
 import { FunctionComponent, ReactNode } from 'react'
 
 /**

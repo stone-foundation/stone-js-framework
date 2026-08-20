@@ -1,7 +1,6 @@
-import { UseReactConfig } from '../../options/UseReactBlueprint'
-import { STONE_REACT_APP_KEY } from '../../decorators/constants'
 import { useReactBlueprint } from '../options/ServerUseReactBlueprint'
 import { addBlueprint, classDecoratorLegacyWrapper, ClassType, setMetadata } from '@stone-js/core'
+import { STONE_REACT_APP_KEY, UseReactConfig } from '@stone-js/use-react-core'
 
 /**
  * UseReact decorator options.

@@ -1,7 +1,7 @@
 import { HeadContext, applyHeadToDocument } from '@stone-js/use-view'
-import { IErrorPage, ISnapshot, MetaErrorPage, ReactIncomingEvent } from './declarations'
 import { IBlueprint, IContainer, isEmpty, isObjectLikeModule, Promiseable, type MetaService } from '@stone-js/core'
-import { buildAppComponent, isServer, renderReactApp, resolveComponent } from './UseReactPageInternals'
+import { renderReactApp } from './UseReactPageInternals'
+import { IErrorPage, ISnapshot, MetaErrorPage, ReactIncomingEvent, buildAppComponent, isServer, resolveComponent } from '@stone-js/use-react-core'
 
 /**
  * ReactRuntimeOptions

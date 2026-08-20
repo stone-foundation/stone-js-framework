@@ -6,17 +6,11 @@ import {
   MetaMiddleware,
   BlueprintContext
 } from '@stone-js/core'
-import {
-  SetUseReactHooksMiddleware,
-  SetReactPageLayoutMiddleware,
-  SetReactViewProvidersMiddleware,
-  SetUseReactEventHandlerMiddleware,
-  SetReactKernelErrorPageMiddleware,
-  SetReactRouteDefinitionsMiddleware
-} from '../../middleware/BlueprintMiddleware'
+import { SetUseReactHooksMiddleware } from '../../middleware/BlueprintMiddleware'
 import { setUseReactAdapterErrorHandler } from '../../middleware/utils'
 import { UseReactServerErrorHandler } from '../UseReactServerErrorHandler'
 import { MetaCompressionMiddleware, MetaStaticFileMiddleware } from '@stone-js/http-core'
+import { SetReactPageLayoutMiddleware, SetReactViewProvidersMiddleware, SetUseReactEventHandlerMiddleware, SetReactKernelErrorPageMiddleware, SetReactRouteDefinitionsMiddleware } from '@stone-js/use-react-core'
 
 /**
  * Blueprint middleware to process and register adapter error page definitions from modules.
