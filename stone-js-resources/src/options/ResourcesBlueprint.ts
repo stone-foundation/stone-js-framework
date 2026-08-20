@@ -8,6 +8,23 @@ import { MetaApiResourceMiddleware } from '../middleware/BlueprintMiddleware'
  */
 export interface ResourcesConfig {
   /**
+   * The query parameters a caller uses to ask for a shape.
+   *
+   * Configuration rather than convention: an API that already answers `?only=` keeps its vocabulary
+   * instead of gaining a second one. Defaults: `fields`, `include`, `view`.
+   */
+  params?: { fields?: string, include?: string, fragment?: string }
+
+  /**
+   * What to do when a projection breaks the contract its resource publishes.
+   *
+   * `throw` (the default) refuses to answer, because a caller cannot detect a broken contract and a
+   * consumer generated from it breaks on the field that is missing. `warn` chooses availability over
+   * integrity, explicitly, and puts the breach in the log.
+   */
+  onViolation?: 'throw' | 'warn'
+
+  /**
    * Named resources a route can refer to by name, instead of importing them at the route.
    *
    * ```ts

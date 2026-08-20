@@ -7,7 +7,6 @@ vi.mock('../../src/utils', async () => {
   return {
     ...actual,
     shouldBuild: vi.fn(),
-    isReactApp: vi.fn(),
     setupProcessSignalHandlers: vi.fn()
   }
 })
@@ -20,8 +19,8 @@ describe('CustomCommand (dynamic import workaround)', async () => {
   let context: any
   let event: any
 
-  const ReactBuilderConsole = vi.fn()
-  const ServerBuilderConsole = vi.fn()
+  const consoleStep = vi.fn()
+  const fallbackStep = vi.fn()
 
   beforeEach(async () => {
     vi.resetModules()
@@ -35,17 +34,7 @@ describe('CustomCommand (dynamic import workaround)', async () => {
       default: spawnMock
     }))
 
-    vi.doMock('../../src/react/ReactBuilder', () => ({
-      ReactBuilder: class {
-        console = ReactBuilderConsole
-      }
-    }))
 
-    vi.doMock('../../src/server/ServerBuilder', () => ({
-      ServerBuilder: class {
-        console = ServerBuilderConsole
-      }
-    }))
 
     const mod = await import('../../src/commands/CustomCommand')
     CustomCommand = mod.CustomCommand
@@ -56,12 +45,20 @@ describe('CustomCommand (dynamic import workaround)', async () => {
 
     const utils = await import('../../src/utils')
     vi.mocked(utils.shouldBuild).mockReturnValue(true)
-    vi.mocked(utils.isReactApp).mockReturnValue(true)
     buildPath.mockReturnValue('/dist/console.mjs')
 
     context = {
       blueprint: {
-        get: vi.fn().mockReturnValue('pattern')
+        get: vi.fn((key: string) => {
+          if (key === 'stone.builder.builders') {
+            return {
+              react: { target: 'react', priority: 10, match: () => true, resolver: () => ({ console: consoleStep }) },
+              server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ console: fallbackStep }) }
+            }
+          }
+          if (key === 'stone.builder.target') { return undefined }
+          return 'pattern'
+        })
       },
       commandOutput: {
         show: vi.fn(),
@@ -71,14 +68,14 @@ describe('CustomCommand (dynamic import workaround)', async () => {
       }
     }
 
-    event = { type: 'cli', payload: {} }
+    event = { type: 'cli', payload: {}, get: vi.fn(), is: vi.fn() }
   })
 
   it('should handle react build and start process', async () => {
     const cmd = new CustomCommand(context)
     await cmd.handle(event)
 
-    expect(ReactBuilderConsole).toHaveBeenCalledWith(event)
+    expect(consoleStep).toHaveBeenCalledWith(event)
     expect(spawnMock).toHaveBeenCalledWith(
       'node',
       ['/dist/console.mjs', ...process.argv.slice(2)],
@@ -86,14 +83,23 @@ describe('CustomCommand (dynamic import workaround)', async () => {
     )
   })
 
-  it('should handle server build if not react', async () => {
-    const utils = await import('../../src/utils')
-    vi.mocked(utils.isReactApp).mockReturnValue(false)
+  it('falls through to the target that answers anything', async () => {
+    context.blueprint.get = vi.fn((key: string) => {
+      if (key === 'stone.builder.builders') {
+        return {
+          react: { target: 'react', priority: 10, match: () => false, resolver: () => ({ console: consoleStep }) },
+          server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ console: fallbackStep }) }
+        }
+      }
+      if (key === 'stone.builder.target') { return undefined }
+      return 'pattern'
+    })
 
     const cmd = new CustomCommand(context)
     await cmd.handle(event)
 
-    expect(ServerBuilderConsole).toHaveBeenCalledWith(event)
+    expect(fallbackStep).toHaveBeenCalledWith(event)
+    expect(consoleStep).not.toHaveBeenCalled()
   })
 
   it('should skip build and only start process', async () => {
@@ -103,8 +109,8 @@ describe('CustomCommand (dynamic import workaround)', async () => {
     const cmd = new CustomCommand(context)
     await cmd.handle(event)
 
-    expect(ReactBuilderConsole).not.toHaveBeenCalled()
-    expect(ServerBuilderConsole).not.toHaveBeenCalled()
+    expect(consoleStep).not.toHaveBeenCalled()
+    expect(fallbackStep).not.toHaveBeenCalled()
     expect(spawnMock).toHaveBeenCalled()
   })
 

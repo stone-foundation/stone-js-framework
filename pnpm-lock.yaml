@@ -3451,6 +3451,9 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
 
   stone-js-router:
     dependencies:

@@ -14,7 +14,7 @@ export class Resources implements IPage<ReactIncomingEvent> {
   head (): HeadContext {
     return {
       title: 'Resources',
-      description: 'Shape what leaves your API: a deliberate projection from internal model to public representation, with sparse fields, envelopes and collections handled.'
+      description: 'Declare what leaves your API as a schema: the same declaration projects the response, validates it before it is sent, and documents it in the published contract.'
     }
   }
 
@@ -24,50 +24,108 @@ export class Resources implements IPage<ReactIncomingEvent> {
         <ArticleTop eyebrow='Extensions' title='Resources' />
         <Lead>
           Your internal model and your public representation are not the same thing. A resource is the
-          deliberate projection between them: the place where you decide, once, what the world sees and
-          what stays private.
+          deliberate projection between them — declared as a <strong>schema</strong>, which is what lets
+          one declaration project the response, hold it against its own promise before sending, and
+          document it in the published contract.
         </Lead>
 
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i @stone-js/resources`}</Code>
 
-        <H2>Define the projection</H2>
+        <H2>Declare what leaves</H2>
         <Principle
           principle={
             <p>
-              Returning raw models leaks internals and couples your API to your storage. A resource
-              draws a stable line between the two, so the model can change without breaking the contract,
-              and secrets never slip out by accident.
+              A projection written as code answers "what does this endpoint return?" only to someone
+              who reads it and trusts it. Nothing checks it, nothing documents it, and a field added to
+              the model later leaks because a mapping was not updated.
             </p>
           }
           incarnation={
             <p>
-              <code>defineResource(transform)</code> declares the projection. Use <code>.item()</code>
-              for one model and <code>.collection()</code> for many; sparse fieldsets, conditional
-              fields and the <code>{'{ data, meta }'}</code> envelope are handled for you.
+              A resource declares a schema instead. The schema <em>is</em> the projection — what it does
+              not describe is not exposed — and the same declaration validates the response before it is
+              sent and gives <code>@stone-js/openapi</code> the exact output contract.
             </p>
           }
         />
-        <Code file='app/resources.ts'>{`import { defineResource, only } from '@stone-js/resources'
+        <Code file='app/resources/TaskResource.ts'>{`import { ApiResource, Resource } from '@stone-js/resources'
+import { z } from 'zod'
 
-export const taskResource = defineResource((task) => ({
-  id: task.id,
-  title: task.title,
-  done: task.done,
-  createdAt: task.createdAt.toISOString()
-  // note: no ownerId, no internal flags. The projection is the contract.
-}))`}</Code>
+@ApiResource('task')
+export class TaskResource extends Resource<Task> {
+  schema () {
+    return z.object({
+      id: z.number(),
+      title: z.string(),
+      done: z.boolean()
+      // no ownerId, no internal flags: the schema is the contract, in both directions.
+    })
+  }
+}`}</Code>
+        <p>
+          The imperative form declares exactly the same things, because neither paradigm may do
+          something the other cannot:
+        </p>
+        <Code file='app/resources/task.ts'>{`export const taskResource = defineResource<Task>({
+  schema: z.object({ id: z.number(), title: z.string(), done: z.boolean() })
+})`}</Code>
 
-        <H2>Using it in a handler</H2>
-        <Code file='app/Tasks.ts'>{`@Get('/')
-list () {
-  return taskResource.collection(this.tasks.list())         // many
+        <H3>Completing the model first</H3>
+        <p>
+          A projection often needs more than the model it was handed: a relation to fetch, a label to
+          translate, a total to compute. <code>data()</code> is that step, and it is asynchronous and
+          resolved from the container, so it may reach any service. Whatever it returns is what the
+          schema then validates.
+        </p>
+        <Code file='app/resources/TaskResource.ts'>{`constructor ({ validator, comments }) {
+  super({ validator })
+  this.comments = comments
 }
 
-@Get('/:id')
-show (event) {
-  return taskResource.item(this.tasks.find(event.get('id')), only(['id', 'title']))  // sparse
+async data (task: Task) {
+  return { ...task, commentCount: await this.comments.countFor(task.id) }
 }`}</Code>
+
+        <H3>The contract is protected, not merely published</H3>
+        <p>
+          Data that breaks the schema does not go out. A caller cannot detect a broken contract, and a
+          client generated from it breaks on the field that was supposed to be there, so a breach raises
+          {' '}<code>ResourceContractError</code> carrying which field failed.
+        </p>
+        <p>
+          It fires on a genuine breach, not on a difference: a schema strips what it does not describe,
+          so extra fields are simply not exposed. An application that would rather answer than be
+          correct can say so, explicitly, with{' '}<code>onViolation: 'warn'</code> — the breach then
+          reaches the log instead of the caller.
+        </p>
+
+        <H3>Fragments a caller may ask for</H3>
+        <p>
+          A named subset is a contract of its own, with its own schema, which is what makes exposing one
+          safe. Declare them and a caller selects one with a query parameter; the contract names them
+          too, so nothing is discovered by guessing.
+        </p>
+        <Code file='app/resources/TaskResource.ts'>{`fragments () {
+  return { summary: z.object({ id: z.number(), title: z.string() }) }
+}
+
+// GET /tasks?view=summary`}</Code>
+        <p>
+          The parameter names are configuration, not convention — an API that already answers
+          {' '}<code>?only=</code> keeps its vocabulary:
+        </p>
+        <Code file='app/Application.ts'>{`@Resources({ params: { fragment: 'only' }, onViolation: 'throw' })
+export class Application {}`}</Code>
+
+        <H2>Using it directly</H2>
+        <p>
+          Every projection is asynchronous, because completing a model may reach a service and pretending
+          otherwise is how a promise ends up serialised as an empty object.
+        </p>
+        <Code file='app/Tasks.ts'>{`const one = await taskResource.item(task)
+const many = await taskResource.collection(tasks)
+const page = await taskResource.response(tasks, {}, { total: 120 })   // { data, meta }`}</Code>
 
         <H2>Declaring it instead of calling it</H2>
         <p>
@@ -96,19 +154,25 @@ export class TaskResource { … }
           route, which is also why either works without the router at all.
         </Callout>
 
-        <H3>Helpers</H3>
-        <PropsTable nameHeader='Helper' rows={[
-          { name: '.item(model, ctx?)', type: 'one', desc: 'Project a single model.' },
-          { name: '.collection(models, ctx?)', type: 'many', desc: 'Project an array of models.' },
-          { name: '.envelope(...)', type: 'wrap', desc: 'Wrap the result in a { data, meta } envelope.' },
-          { name: 'only([...]) / except([...])', type: 'fields', desc: 'Sparse fieldsets: include or drop fields.' },
-          { name: 'whenIncluded(ctx, key, fn)', type: 'conditional', desc: 'Include related data only when requested.' }
+        <H3>The API</H3>
+        <PropsTable nameHeader='Member' rows={[
+          { name: 'schema(ctx)', type: 'contract', desc: 'What this resource exposes. Required: it is the projection, the validation and the documentation.' },
+          { name: 'fragments(ctx)', type: 'contracts', desc: 'Named subsets a caller may select, each with its own schema.' },
+          { name: 'data(model, ctx)', type: 'async', desc: 'Optional: complete or reshape the model before it meets the schema. May reach any service.' },
+          { name: 'item / collection / response', type: 'async', desc: 'Project one, many, or into a { data, meta } envelope.' },
+          { name: 'when / whenIncluded', type: 'conditional', desc: 'Drop a field unless a condition holds, or unless the caller asked for the relation.' }
         ]} />
+        <Callout kind='note' title='What the context carries'>
+          <code>fields</code> and <code>include</code> from the request, the <code>fragment</code> the
+          caller selected, and the authenticated <code>principal</code> — because deciding what a caller
+          may see is the most common reason two callers get different shapes, and a resource that cannot
+          see who is asking has to be told by the handler.
+        </Callout>
 
-        <Callout kind='future' title='One source, three consumers'>
-          The same shape now serves three audiences: the resource that leaves your API, the OpenAPI
-          contract derived from it, and the agent tools that call it. Write the projection once; it
-          feeds them all.
+        <Callout kind='future' title='One declaration, three consumers'>
+          The schema serves the response that leaves your API, the OpenAPI contract derived from it, and
+          the resource itself, which holds the response against it before sending. Written once, it
+          cannot drift from itself — which is the failure mode of every hand-written contract.
         </Callout>
 
         <SeeAlso links={[
