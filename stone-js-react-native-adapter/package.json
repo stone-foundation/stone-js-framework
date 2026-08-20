@@ -55,14 +55,10 @@
   "peerDependencies": {
     "@stone-js/browser-core": "workspace:*",
     "@stone-js/core": "workspace:*",
-    "@stone-js/router": "workspace:*",
-    "react-native": ">=0.74.0"
+    "@stone-js/router": "workspace:*"
   },
   "peerDependenciesMeta": {
     "@stone-js/router": {
-      "optional": true
-    },
-    "react-native": {
       "optional": true
     }
   },

@@ -14,13 +14,15 @@ The domain does not change. A handler that answers `/tasks/:id` behind an HTTP a
 - **One navigation loop**: `router.navigate('/tasks')` from a screen re-enters the kernel exactly like a link would, with no History API anywhere.
 - **The same event as the browser**: an `IncomingBrowserEvent`, so pages and middleware move between web and native untouched.
 - **Testable without a device**: the platform's linking module is resolved, not imported, so the whole chain runs under a plain Node test runner.
-- **Zero configuration**: in-app paths resolve against `stone://app`, cookies are kept in memory, and `react-native` is an optional peer.
+- **Zero configuration**: in-app paths resolve against `stone://app`, cookies are kept in memory, and `react-native` is never imported statically.
 
 ## Installation
 
 ```bash
 npm i @stone-js/core @stone-js/browser-core @stone-js/react-native-adapter
 ```
+
+Inside a React Native application, so `react-native` is already there. It is deliberately **not** a peer dependency: this package never imports it statically (deep links are resolved at runtime, and their absence is a supported case), and declaring it would pull the whole Metro toolchain into every workspace that merely builds against this package, for a requirement no real application can fail to meet.
 
 React Native's `URL` is a stub without a usable `pathname`, which the router needs on every event, so a polyfill is required before anything from Stone.js loads:
 

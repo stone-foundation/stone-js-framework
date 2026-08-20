@@ -27,8 +27,16 @@ happens once, before any event, and not at runtime.
 **Deep links are the platform's, but the module is not imported.** `Linking` is resolved
 through a `LinkingResolver` that imports `react-native` lazily and returns nothing when it is
 absent. That is what makes the whole chain, adapter and kernel included, run under a plain
-Node test runner: `react-native` is an optional peer, and a server-side suite that pulls this
-package in transitively still works.
+Node test runner, and why a server-side suite that pulls this package in transitively still
+works.
+
+`react-native` is deliberately **not** a peer dependency either. Nothing here imports it
+statically, and any application that could satisfy such a peer is a React Native application,
+where it is already a direct dependency: the declaration would inform nobody, while pulling
+the entire Metro toolchain into the install of every workspace that merely builds against this
+package. Metro still needs a literal specifier to bundle the real module on a device, so the
+lookup keeps one and a local ambient declaration keeps the compiler satisfied when the package
+is absent, which in this repository is always.
 
 Enabled the two usual ways: `@ReactNative()` or `reactNativeAdapterBlueprint` on the
 manifest. Zero configuration by default: in-app paths resolve against `stone://app` (settable
