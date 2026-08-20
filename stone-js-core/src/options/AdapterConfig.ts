@@ -9,6 +9,14 @@ import { OutgoingResponse } from '../events/OutgoingResponse'
 import { IncomingEvent, IncomingEventOptions } from '../events/IncomingEvent'
 
 /**
+ * The category of platform an adapter integrates.
+ *
+ * The four known ones are named so editors can complete them, and any other string is
+ * accepted: the core must not hold a closed list of the platforms that will ever exist.
+ */
+export type AdapterVariant = 'server' | 'browser' | 'console' | 'native' | (string & {})
+
+/**
  * AdapterConfig Interface.
  *
  * This interface defines the configuration options for an adapter within the Stone.js framework.
@@ -30,10 +38,15 @@ export interface AdapterConfig<
   platform: string
 
   /**
-   * The class type of the adapter.
-   * This is used to identify the category of the adapter.
+   * The category of platform this adapter integrates, for grouping and reporting.
+   *
+   * Open by design: the core cannot hold the list of platforms that will ever exist, and a
+   * closed union would mean every new one needs a core release before it can name itself.
+   * The known categories are listed for completion; nothing in the framework branches on
+   * this value, which is what makes widening it safe. Match on `platform` instead when you
+   * need to identify a specific integration.
    */
-  variant: 'server' | 'browser' | 'console'
+  variant: AdapterVariant
 
   /**
    * The class type resolver used to create instances of the adapter.
