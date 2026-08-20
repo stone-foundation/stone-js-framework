@@ -1,10 +1,8 @@
 import { Argv } from 'yargs'
-import { isReactApp } from '../utils'
 import { IncomingEvent } from '@stone-js/core'
 import { ConsoleContext } from '../declarations'
-import { ReactBuilder } from '../react/ReactBuilder'
-import { ServerBuilder } from '../server/ServerBuilder'
 import { CommandOptions } from '@stone-js/node-cli-adapter'
+import { runBuilderStep } from '../builders/resolveBuilder'
 
 /**
  * The build command options.
@@ -18,8 +16,7 @@ export const buildCommandOptions: CommandOptions = {
     return yargs
       .positional('target', {
         type: 'string',
-        desc: 'app target to build',
-        choices: ['server', 'react']
+        desc: 'app target to build (any registered target; run without it to let the project decide)'
       })
       .option('language', {
         alias: 'lang',
@@ -67,10 +64,6 @@ export class BuildCommand {
    * @returns The blueprint.
    */
   async handle (event: IncomingEvent): Promise<void> {
-    if (isReactApp(this.context.blueprint, event)) {
-      await new ReactBuilder(this.context).build(event)
-    } else {
-      await new ServerBuilder(this.context).build(event)
-    }
+    await runBuilderStep(this.context, event, 'build')
   }
 }
