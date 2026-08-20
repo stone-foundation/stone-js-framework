@@ -2,7 +2,7 @@ import { JwtClaims } from '../declarations'
 import { normalizeScopes } from './guards'
 import { PROTECT_KEY } from '../decorators/constants'
 import { ProtectInput, ProtectMetadata } from '../decorators/Protect'
-import { AuthenticationError, AuthorizationError } from '../errors/AuthErrors'
+import { AuthenticationError, InsufficientScopeError } from '../errors/AuthErrors'
 import {
   ClassType, IBlueprint, IncomingEvent, NextMiddleware, OutgoingResponse,
   getMetadata, hasMetadata, type MetaMiddleware
@@ -22,7 +22,7 @@ import {
  * the same fact serves both the runtime and the documentation.
  *
  * Anonymous callers get an `AuthenticationError` (401); an authenticated caller missing a scope gets
- * an `AuthorizationError` (403). Routes that declare nothing pass straight through.
+ * an `InsufficientScopeError` (403). Routes that declare nothing pass straight through.
  */
 export class ProtectRouteMiddleware {
   private readonly blueprint: IBlueprint
@@ -56,7 +56,7 @@ export class ProtectRouteMiddleware {
       const missing = scopes.filter((scope) => !granted.includes(scope))
 
       if (missing.length > 0) {
-        throw new AuthorizationError(`Missing required scope(s): ${missing.join(', ')}.`)
+        throw new InsufficientScopeError(`Missing required scope(s): ${missing.join(', ')}.`)
       }
     }
 

@@ -1,5 +1,5 @@
-import { IResource } from '../declarations'
 import { contextFromEvent } from '../helpers'
+import { IResource } from '../declarations'
 import { RETURNS_KEY } from '../decorators/constants'
 import { ReturnsMetadata } from '../decorators/Returns'
 import { ResourcesConfig } from '../options/ResourcesBlueprint'
@@ -9,10 +9,16 @@ import {
 } from '@stone-js/core'
 
 /**
- * The shape a route's `resource` option may take: the resource itself, or the name of one
- * registered under `stone.resources.registry`.
+ * The shape a route's `resource` option may take: the resource itself, a class to resolve, or the
+ * name of one registered under `stone.resources.registry`.
  */
 export type RouteResource = IResource<any, any> | string
+
+/** A response whose payload can be read and replaced without disturbing the rest of it. */
+interface ContentBearing {
+  content: unknown
+  setContent: (content: unknown) => unknown
+}
 
 /**
  * Route middleware: shapes what a route returns, after its handler ran.
@@ -20,17 +26,12 @@ export type RouteResource = IResource<any, any> | string
  * A route says what it exposes, once, where the route is defined:
  *
  * ```ts
- * @Get('/users/:id', { resource: userResource })
+ * @Get('/users/:id', { resource: UserResource })
  * ```
  *
- * The handler then returns its domain model, whole, and this middleware applies the resource on the
- * way out. That is the point: a service should not have to know which fields are public, and a
- * handler should not have to remember to strip them. Whatever the model gains later, a password
- * hash, an internal flag, is not exposed by accident, because the resource decides what leaves.
- *
- * It runs on the raw value the handler returned, before any response wrapping, so it knows nothing
- * of HTTP and works in every context. Sparse fieldsets are read from the event, so `?fields=id,name`
- * narrows the output without the route changing.
+ * The handler returns its domain model, whole, and this applies the resource on the way out. That is
+ * the point: a service should not have to know which fields are public, and a handler should not have
+ * to remember to strip them.
  */
 export class ResourceRouteMiddleware {
   private readonly blueprint: IBlueprint
@@ -47,6 +48,13 @@ export class ResourceRouteMiddleware {
   /**
    * Run the handler, then shape what it returned.
    *
+   * It handles both of the things a handler may hand back, which is the part that used to be wrong. A
+   * handler carrying a response decorator (`@JsonHttpResponse(201)`) has already been turned into a
+   * response by the time any route middleware runs, because that decorator wraps the method itself.
+   * Projecting the response object produced an empty payload and dropped the status with it. So a
+   * response is now projected **through its content**, in place: the payload is shaped and the status,
+   * the headers and everything else the handler chose are left exactly as they were.
+   *
    * @param event - The incoming event.
    * @param next - The next middleware.
    * @returns The shaped output, or the untouched result when the route declares no resource.
@@ -57,11 +65,50 @@ export class ResourceRouteMiddleware {
 
     if (resource === undefined || result === undefined || result === null) { return result }
 
-    const context = contextFromEvent(event as any)
+    const context = contextFromEvent(event as any, this.blueprint, {
+      // The projection holds itself against its own contract, and the engine that does it is the one
+      // the application already validates input with.
+      validator: this.container?.make?.('validator'),
+      onViolation: this.blueprint.get<ResourcesConfig>('stone.resources', {}).onViolation
+    })
 
-    return (
-      Array.isArray(result) ? resource.collection(result, context) : resource.item(result, context)
-    ) as unknown as OutgoingResponse
+    if (this.isContentBearing(result)) {
+      const shaped = await this.shape(resource, result.content, context)
+      result.setContent(shaped)
+      return result
+    }
+
+    return await this.shape(resource, result, context) as OutgoingResponse
+  }
+
+  /**
+   * Project a value, whether it is one model or many.
+   *
+   * @param resource - The resource to apply.
+   * @param value - The value the handler produced.
+   * @param context - The resource context.
+   * @returns The projected value.
+   */
+  private async shape (resource: IResource<any, any>, value: unknown, context: any): Promise<unknown> {
+    if (value === undefined || value === null) { return value }
+
+    return Array.isArray(value)
+      ? await resource.collection(value, context)
+      : await resource.item(value, context)
+  }
+
+  /**
+   * Whether a value is a response carrying a payload this can replace.
+   *
+   * Duck-typed: the kernel is agnostic, and each platform has its own response type.
+   *
+   * @param value - The value to test.
+   * @returns Whether it carries content.
+   */
+  private isContentBearing (value: unknown): value is ContentBearing {
+    return typeof value === 'object' && value !== null &&
+      typeof (value as ContentBearing).setContent === 'function' &&
+      'content' in value
   }
 
   /**
@@ -141,7 +188,8 @@ export class ResourceRouteMiddleware {
 
   /**
    * Resolve a registered entry: a resource class goes through the container, so its constructor gets
-   * the services it asked for and `toArray` can use them, i18n included.
+   * the services it asked for — the validator it holds its own contract against, and whatever its
+   * `data()` needs to complete a model.
    *
    * @param entry - A resource, or a class to resolve into one.
    * @returns The resource.

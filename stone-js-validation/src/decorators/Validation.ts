@@ -23,7 +23,7 @@ export interface ValidationDecoratorOptions extends ValidationConfig {}
  * ```typescript
  * import { Validation } from '@stone-js/validation'
  *
- * @Validation({ abortEarly: false })
+ * @Validation({ schemas: { listQuery: ListQuerySchema } })
  * @StoneApp({ name: 'my-app' })
  * export class Application {}
  * ```

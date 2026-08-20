@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/resources",
   "version": "0.8.9",
-  "description": "Framework-agnostic API resources for Stone.js. Shape what your domain exposes — sparse fieldsets, conditional fields, includes and envelopes — decoupled from controllers, the same on backend and frontend.",
+  "description": "Framework-agnostic API resources for Stone.js. Shape what your domain exposes \u2014 sparse fieldsets, conditional fields, includes and envelopes \u2014 decoupled from controllers, the same on backend and frontend.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -70,7 +70,8 @@
     "typedoc": "^0.28.6",
     "typedoc-plugin-markdown": "^4.7.0",
     "typescript": "^5.6.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "zod": "^3.25.76"
   },
   "ts-standard": {
     "globals": [
