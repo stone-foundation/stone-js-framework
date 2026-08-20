@@ -171,6 +171,19 @@
         "path": "full-react-imperative"
       },
       {
+        "value": "basic-react-native-declarative",
+        "title": "Basic · React Native · declarative (Expo)",
+        "description": "Native mobile app with React Native and Expo, decorator API.",
+        "tags": [
+          "react-native",
+          "expo",
+          "mobile",
+          "basic",
+          "declarative"
+        ],
+        "path": "basic-react-native-declarative"
+      },
+      {
         "value": "continuum-showcase",
         "title": "Continuum showcase",
         "description": "One domain served over HTTP, edge, CLI and agent tools, both paradigms side by side.",
@@ -217,6 +230,7 @@
     "full-service-imperative",
     "full-react-declarative",
     "full-react-imperative",
+    "basic-react-native-declarative",
     "continuum-showcase"
   ],
   "publishConfig": {
