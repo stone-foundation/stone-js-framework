@@ -1,14 +1,24 @@
+import { IContainer } from '@stone-js/core'
 import { StoneError } from './components/StoneError'
-import { IContainer, IBlueprint } from '@stone-js/core'
 import { IncomingBrowserEvent } from '@stone-js/browser-core'
 import { getServerContent, getBrowserContent } from './UseReactPageInternals'
-import { ReactOutgoingResponse, ResponseSnapshotType, IPage, ReactIncomingEvent, IErrorPage, MetaErrorPage, resolveComponent, executeHandler, executeHooks, buildPageComponent, buildAppComponent, isSSR, resolveLayoutHead, mergeHead } from '@stone-js/use-react-core'
+import {
+  PreparedPage,
+  preparePageParts,
+  ReactOutgoingResponse,
+  ResponseSnapshotType,
+  prepareErrorPageParts,
+  applyFallbackErrorContent,
+  isSSR
+} from '@stone-js/use-react-core'
 
 /**
  * Prepare the page to render.
  *
- * Here we prepare the page to render by resolving
- * the handler, handler the event, and rendering the component.
+ * Resolving the route into displayable pieces is `@stone-js/use-react-core`'s work, shared with
+ * the native renderer: the same component resolution, the same loader, the same layout wrapping,
+ * the same head merge, the same view hooks. What is web-specific is what happens to the result,
+ * which is the last line: a full HTML document on the server, or content for the live one.
  *
  * @param event - The incoming HTTP event.
  * @param response - The outgoing HTTP response.
@@ -21,32 +31,17 @@ export async function preparePage (
   container: IContainer,
   snapshot: ResponseSnapshotType
 ): Promise<void> {
-  const { layout = 'default' } = response.content
-  const page = await resolveComponent<IPage<ReactIncomingEvent>>(container, response.content)
-  const data = await executeHandler(event, response, snapshot, page)
-  const componentType = page?.render.bind(page)
-  const pageHead = await page?.head?.({ event, data, statusCode: response.statusCode })
-  const layoutHead = await resolveLayoutHead(container, layout)
-  const head = mergeHead(layoutHead, pageHead)
+  const parts = await preparePageParts(event, response, container, snapshot)
 
-  await executeHooks('onPreparingPage', { event, response, container, snapshot, data, componentType, head })
-
-  const snapshotData = { data, layout, statusCode: response.statusCode }
-  const component = await buildPageComponent(event, container, componentType, data, response.statusCode)
-  const appComponent = await buildAppComponent(event, container, componentType, layout, data, response.statusCode)
-
-  response.setContent(isSSR()
-    ? getServerContent(appComponent, snapshotData, container, event, head)
-    : getBrowserContent(appComponent, component, layout, snapshot, head)
-  )
+  response.setContent(toWebContent(parts, container, event, snapshot))
 }
 
 /**
  * Prepare the error page to render.
  *
- * Error pages are prepared sepatately because their handler
- * is different from the normal page handler.
- * Their handler takes an error as the first argument and the event as the second.
+ * Error pages are prepared separately because their handler is different from the normal page
+ * handler: it takes an error as the first argument and the event as the second. `StoneError` is
+ * handed over as the fallback, for an error the application declared no page for.
  *
  * @param event - The incoming HTTP event.
  * @param response - The outgoing HTTP response.
@@ -59,24 +54,9 @@ export async function prepareErrorPage (
   container: IContainer,
   snapshot: ResponseSnapshotType
 ): Promise<void> {
-  const { error = {}, layout } = response.content
-  const errorPage = await resolveComponent<IErrorPage<ReactIncomingEvent>>(container, response.content)
-  const data = await executeHandler(event, response, snapshot, errorPage, error)
-  const componentType = errorPage?.render.bind(errorPage) ?? StoneError
-  const pageHead = await errorPage?.head?.({ event, data, statusCode: response.statusCode, error })
-  const layoutHead = await resolveLayoutHead(container, layout)
-  const head = mergeHead(layoutHead, pageHead)
+  const parts = await prepareErrorPageParts(event, response, container, snapshot, StoneError)
 
-  await executeHooks('onPreparingPage', { event, response, container, snapshot, data, componentType, head, error })
-
-  const snapshotData = { data, layout, statusCode: response.statusCode, error: { name: error.name } }
-  const component = await buildPageComponent(event, container, componentType, data, response.statusCode, error)
-  const appComponent = await buildAppComponent(event, container, componentType, layout, data, response.statusCode, error)
-
-  response.setContent(isSSR()
-    ? getServerContent(appComponent, snapshotData, container, event, head)
-    : getBrowserContent(appComponent, component, layout, snapshot, head)
-  )
+  response.setContent(toWebContent(parts, container, event, snapshot))
 }
 
 /**
@@ -95,22 +75,27 @@ export async function prepareFallbackErrorPage (
   container: IContainer,
   snapshot: ResponseSnapshotType
 ): Promise<void> {
-  const { layout, error, statusCode = 500 } = snapshot
-  const blueprint = container.make<IBlueprint>('blueprint')
-  const metavalue = blueprint.get<MetaErrorPage<ReactIncomingEvent>>(
-    `stone.useReact.errorPages.${String(error?.name)}`,
-    blueprint.get<MetaErrorPage<ReactIncomingEvent>>(
-      'stone.useReact.errorPages.default',
-      {} as any
-    )
-  )
-  const content = { ...metavalue, layout }
-
-  content.error = error ?? (response.content instanceof Error ? response.content : new Error('An error occurred.'))
-
-  response
-    .setContent(content)
-    .setStatus(statusCode)
+  applyFallbackErrorContent(response, container, snapshot)
 
   await prepareErrorPage(event, response, container, snapshot)
+}
+
+/**
+ * Turn the prepared pieces into browser or server content.
+ *
+ * @param parts - The prepared page.
+ * @param container - The service container.
+ * @param event - The event being answered.
+ * @param snapshot - The response snapshot.
+ * @returns The content to set on the response.
+ */
+function toWebContent (
+  parts: PreparedPage,
+  container: IContainer,
+  event: IncomingBrowserEvent,
+  snapshot: ResponseSnapshotType
+): unknown {
+  return isSSR()
+    ? getServerContent(parts.app, parts.snapshotData as any, container, event, parts.head)
+    : getBrowserContent(parts.app, parts.component, parts.layout, snapshot, parts.head)
 }
