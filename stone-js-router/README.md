@@ -23,7 +23,8 @@ Stone.js router for both Node.js and browser environments, designed for serverle
 
 ## Key Features
 
-- **Universal**: Works on both backend and frontend (Node.js, browsers, SSR apps).
+- **Universal**: Works on both backend and frontend (Node.js, browsers, SSR apps, native mobile).
+- **Pluggable navigation**: matching and path generation are platform-independent; only the navigation effect is delegated, under `stone.router.navigator`, so the History API is a default rather than a requirement.
 - **Composable**: Supports route builders, chaining, and nested route structures.
 - **Context-Aware**: Routes are designed to respond to the execution context.
 - **Type-Safe & Declarative**: Built with TypeScript-first principles.
