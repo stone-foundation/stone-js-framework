@@ -1,10 +1,8 @@
 import { Argv } from 'yargs'
-import { isReactApp } from '../utils'
 import { IncomingEvent } from '@stone-js/core'
 import { ConsoleContext } from '../declarations'
-import { ReactBuilder } from '../react/ReactBuilder'
-import { ServerBuilder } from '../server/ServerBuilder'
 import { CommandOptions } from '@stone-js/node-cli-adapter'
+import { runBuilderStep } from '../builders/resolveBuilder'
 
 /**
  * The export command options.
@@ -40,10 +38,6 @@ export class ExportCommand {
    * Handle the incoming event.
    */
   async handle (event: IncomingEvent): Promise<void> {
-    if (isReactApp(this.context.blueprint, event)) {
-      await new ReactBuilder(this.context).export(event)
-    } else {
-      await new ServerBuilder(this.context).export(event)
-    }
+    await runBuilderStep(this.context, event, 'export')
   }
 }
