@@ -61,13 +61,13 @@ importers:
         version: 19.8.1
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-alibaba-fc-adapter:
     dependencies:
@@ -104,7 +104,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -134,7 +134,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-alibaba-fc-http-adapter:
     dependencies:
@@ -180,7 +180,7 @@ importers:
         version: 2.0.6
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -210,7 +210,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-auth:
     dependencies:
@@ -250,7 +250,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -280,7 +280,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-authz:
     dependencies:
@@ -320,7 +320,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -350,7 +350,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-aws-apigw-ws-adapter:
     dependencies:
@@ -399,7 +399,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -429,7 +429,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-aws-lambda-adapter:
     dependencies:
@@ -466,7 +466,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -496,7 +496,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-aws-lambda-http-adapter:
     dependencies:
@@ -578,7 +578,7 @@ importers:
         version: 1.6.7
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -608,7 +608,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-azure-functions-adapter:
     dependencies:
@@ -645,7 +645,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -675,7 +675,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-azure-functions-http-adapter:
     dependencies:
@@ -721,7 +721,7 @@ importers:
         version: 2.0.6
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -751,7 +751,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-blog-starters:
     devDependencies:
@@ -809,7 +809,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -839,7 +839,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-browser-core:
     dependencies:
@@ -873,7 +873,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -903,7 +903,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-cache:
     dependencies:
@@ -940,7 +940,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -973,7 +973,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-cli:
     dependencies:
@@ -1033,7 +1033,7 @@ importers:
         version: link:../stone-js-use-react
       '@vitejs/plugin-react':
         specifier: ^4.3.4
-        version: 4.7.0(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0))
+        version: 4.7.0(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0))
       browserslist:
         specifier: ^4.28.2
         version: 4.28.6
@@ -1078,10 +1078,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^6.0.5
-        version: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0)
+        version: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)
       vite-plugin-babel:
         specifier: ^1.3.0
-        version: 1.7.3(@babel/core@7.29.7)(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0))
+        version: 1.7.3(@babel/core@7.29.7)(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0))
       yargs:
         specifier: ^17.7.2
         version: 17.7.3
@@ -1112,7 +1112,7 @@ importers:
         version: 17.0.35
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1139,7 +1139,7 @@ importers:
         version: 4.12.0(typedoc@0.28.20(typescript@5.9.3))
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-cloud-file:
     dependencies:
@@ -1194,7 +1194,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1224,7 +1224,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-config:
     devDependencies:
@@ -1251,7 +1251,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1281,7 +1281,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-config-source:
     dependencies:
@@ -1327,7 +1327,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1360,7 +1360,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-core:
     dependencies:
@@ -1397,7 +1397,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1427,7 +1427,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-edge-adapter:
     devDependencies:
@@ -1463,7 +1463,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1493,7 +1493,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-env:
     dependencies:
@@ -1524,7 +1524,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1554,7 +1554,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-event-bus:
     dependencies:
@@ -1594,7 +1594,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1624,7 +1624,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-fetch-adapter:
     dependencies:
@@ -1670,7 +1670,7 @@ importers:
         version: 2.0.6
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1700,7 +1700,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-filesystem:
     dependencies:
@@ -1740,7 +1740,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1770,7 +1770,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-gcp-cloud-functions-adapter:
     dependencies:
@@ -1807,7 +1807,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1837,7 +1837,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-gcp-cloud-functions-http-adapter:
     dependencies:
@@ -1928,7 +1928,7 @@ importers:
         version: 1.6.7
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -1958,7 +1958,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-http-core:
     dependencies:
@@ -2082,7 +2082,7 @@ importers:
         version: 1.1.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -2112,7 +2112,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-i18n:
     dependencies:
@@ -2155,7 +2155,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -2185,7 +2185,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-lab/apps/rest-api:
     dependencies:
@@ -2228,10 +2228,10 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.0.9
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       vitest:
         specifier: ^3.0.9
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-lab/apps/rest-api-imperative:
     dependencies:
@@ -2416,7 +2416,7 @@ importers:
         version: 19.2.3(@types/react@19.2.17)
       vitest:
         specifier: ^3.0.9
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-lab/apps/spa-imperative:
     dependencies:
@@ -2517,7 +2517,7 @@ importers:
         version: 19.2.3(@types/react@19.2.17)
       vitest:
         specifier: ^3.0.9
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-lab/apps/ssg-imperative:
     dependencies:
@@ -2621,7 +2621,7 @@ importers:
         version: 19.2.3(@types/react@19.2.17)
       vitest:
         specifier: ^3.0.9
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-lab/apps/ssr-imperative:
     dependencies:
@@ -2710,7 +2710,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -2740,7 +2740,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-node-cli-adapter:
     dependencies:
@@ -2804,7 +2804,7 @@ importers:
         version: 17.0.35
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -2834,7 +2834,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-node-http-adapter:
     dependencies:
@@ -2931,7 +2931,7 @@ importers:
         version: 1.6.7
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -2961,7 +2961,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-node-ws-adapter:
     dependencies:
@@ -3001,7 +3001,7 @@ importers:
         version: 8.18.1
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3031,7 +3031,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
       ws:
         specifier: ^8.0.0
         version: 8.21.1
@@ -3077,7 +3077,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3107,7 +3107,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
       zod:
         specifier: ^3.24.1
         version: 3.25.76
@@ -3137,7 +3137,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3167,7 +3167,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-queue:
     dependencies:
@@ -3207,7 +3207,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3240,7 +3240,77 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
+
+  stone-js-react-native-adapter:
+    dependencies:
+      '@stone-js/browser-core':
+        specifier: workspace:*
+        version: link:../stone-js-browser-core
+      '@stone-js/config':
+        specifier: workspace:*
+        version: link:../stone-js-config
+      '@stone-js/core':
+        specifier: workspace:*
+        version: link:../stone-js-core
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../stone-js-router
+    devDependencies:
+      '@commitlint/cli':
+        specifier: ^19.8.1
+        version: 19.8.1(@types/node@24.13.3)(typescript@5.9.3)
+      '@commitlint/config-conventional':
+        specifier: ^19.8.1
+        version: 19.8.1
+      '@rollup/plugin-commonjs':
+        specifier: ^28.0.6
+        version: 28.0.9(rollup@4.62.2)
+      '@rollup/plugin-multi-entry':
+        specifier: ^6.0.1
+        version: 6.0.1(rollup@4.62.2)
+      '@rollup/plugin-node-resolve':
+        specifier: ^16.0.1
+        version: 16.0.3(rollup@4.62.2)
+      '@rollup/plugin-typescript':
+        specifier: ^12.1.4
+        version: 12.3.0(rollup@4.62.2)(tslib@2.8.1)(typescript@5.9.3)
+      '@types/node':
+        specifier: ^24.0.7
+        version: 24.13.3
+      '@vitest/coverage-v8':
+        specifier: ^3.2.4
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      rollup:
+        specifier: ^4.44.1
+        version: 4.62.2
+      rollup-plugin-node-externals:
+        specifier: ^8.0.1
+        version: 8.1.2(rollup@4.62.2)
+      ts-standard:
+        specifier: ^12.0.2
+        version: 12.0.2(typescript@5.9.3)
+      tslib:
+        specifier: ^2.8.1
+        version: 2.8.1
+      typedoc:
+        specifier: ^0.28.6
+        version: 0.28.20(typescript@5.9.3)
+      typedoc-plugin-markdown:
+        specifier: ^4.7.0
+        version: 4.12.0(typedoc@0.28.20(typescript@5.9.3))
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-realtime:
     dependencies:
@@ -3280,7 +3350,7 @@ importers:
         version: 8.18.1
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3313,7 +3383,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
       ws:
         specifier: ^8.0.0
         version: 8.21.1
@@ -3350,7 +3420,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3380,7 +3450,10 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
 
   stone-js-router:
     dependencies:
@@ -3414,7 +3487,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3444,7 +3517,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-service-container:
     devDependencies:
@@ -3471,7 +3544,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3501,7 +3574,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-starters:
     devDependencies:
@@ -3556,7 +3629,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3586,7 +3659,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-telemetry:
     dependencies:
@@ -3620,7 +3693,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3650,7 +3723,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-tencent-scf-adapter:
     dependencies:
@@ -3687,7 +3760,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3717,7 +3790,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-tencent-scf-http-adapter:
     dependencies:
@@ -3799,7 +3872,7 @@ importers:
         version: 1.6.7
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3829,7 +3902,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-testing:
     dependencies:
@@ -3872,7 +3945,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -3902,7 +3975,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-use-react:
     dependencies:
@@ -3969,7 +4042,7 @@ importers:
         version: 19.2.3(@types/react@19.2.17)
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -4002,7 +4075,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-use-react-core:
     dependencies:
@@ -4118,7 +4191,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -4151,7 +4224,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
 
   stone-js-validation:
     dependencies:
@@ -4185,7 +4258,7 @@ importers:
         version: 24.13.3
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))
+        version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -4215,7 +4288,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.4
-        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
       zod:
         specifier: ^3.24.1
         version: 3.25.76
@@ -5522,6 +5595,9 @@ packages:
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
     engines: {node: '>=6.0.0'}
 
+  '@jridgewell/source-map@0.3.11':
+    resolution: {integrity: sha512-ZMp1V8ZFcPG5dIWnQLr3NSI1MiCU7UETdS/A0G8V/XWHvJv3ZsFqutJn1Y5RPmAPX6F3BiE397OqveU/9NCuIA==}
+
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
@@ -6410,6 +6486,9 @@ packages:
   buffer-equal-constant-time@1.0.1:
     resolution: {integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==}
 
+  buffer-from@1.1.2:
+    resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
+
   builtins@5.1.0:
     resolution: {integrity: sha512-SW9lzGTLvWTP1AY8xeAMZimqDrIaSdLQUcVr9DMef51niJ022Ri87SwRRKYm4A6iHfkPaiVUu/Duw2Wc4J7kKg==}
 
@@ -6514,6 +6593,9 @@ packages:
   commander@13.1.0:
     resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
     engines: {node: '>=18'}
+
+  commander@2.20.3:
+    resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
 
   commondir@1.0.1:
     resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
@@ -8652,6 +8734,13 @@ packages:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
+  source-map-support@0.5.21:
+    resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
+
+  source-map@0.6.1:
+    resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
+    engines: {node: '>=0.10.0'}
+
   spawndamnit@3.0.1:
     resolution: {integrity: sha512-MmnduQUuHCoFckZoWnXsTg7JaiLBJrKFj9UI2MbRPGaJeVpsLcVBu6P/IGZovziM/YBsellCmsprgNA+w0CzVg==}
 
@@ -8790,6 +8879,11 @@ packages:
   term-size@2.2.1:
     resolution: {integrity: sha512-wK0Ri4fOGjv/XPy8SBHZChl8CM7uMc5VML7SqiQ0zG7+J5Vr+RMQDoHa2CNT6KHUnTGIXH34UDMkPzAUyapBZg==}
     engines: {node: '>=8'}
+
+  terser@5.50.0:
+    resolution: {integrity: sha512-CN9BVxWhgS/hRxtUMjtC2uRWSTcSfQFHMDWma6sKKfIivCD91sM+FOPfvwoaRMqCSrUpe1nv3jDamd9eEQ4y+w==}
+    engines: {node: '>=10'}
+    hasBin: true
 
   test-exclude@7.0.2:
     resolution: {integrity: sha512-u9E6A+ZDYdp7a4WnarkXPZOx8Ilz46+kby6p1yZ8zsGTz9gYa6FIS7lj2oezzNKmtdyyJNNmmXDppga5GB7kSw==}
@@ -10972,6 +11066,12 @@ snapshots:
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
+  '@jridgewell/source-map@0.3.11':
+    dependencies:
+      '@jridgewell/gen-mapping': 0.3.13
+      '@jridgewell/trace-mapping': 0.3.31
+    optional: true
+
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
   '@jridgewell/trace-mapping@0.3.31':
@@ -11606,7 +11706,7 @@ snapshots:
 
   '@ungap/structured-clone@1.3.3': {}
 
-  '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0))':
+  '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
@@ -11614,11 +11714,11 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0)
+      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0))':
+  '@vitest/coverage-v8@3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -11633,7 +11733,7 @@ snapshots:
       std-env: 3.10.0
       test-exclude: 7.0.2
       tinyrainbow: 2.0.0
-      vitest: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0)
+      vitest: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -11645,13 +11745,13 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.7(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0))':
+  '@vitest/mocker@3.2.7(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 3.2.7
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0)
+      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)
 
   '@vitest/pretty-format@3.2.7':
     dependencies:
@@ -11958,6 +12058,9 @@ snapshots:
 
   buffer-equal-constant-time@1.0.1: {}
 
+  buffer-from@1.1.2:
+    optional: true
+
   builtins@5.1.0:
     dependencies:
       semver: 7.8.5
@@ -12066,6 +12169,9 @@ snapshots:
       delayed-stream: 1.0.0
 
   commander@13.1.0: {}
+
+  commander@2.20.3:
+    optional: true
 
   commondir@1.0.1: {}
 
@@ -14444,6 +14550,15 @@ snapshots:
 
   source-map-js@1.2.1: {}
 
+  source-map-support@0.5.21:
+    dependencies:
+      buffer-from: 1.1.2
+      source-map: 0.6.1
+    optional: true
+
+  source-map@0.6.1:
+    optional: true
+
   spawndamnit@3.0.1:
     dependencies:
       cross-spawn: 7.0.6
@@ -14600,6 +14715,14 @@ snapshots:
       - supports-color
 
   term-size@2.2.1: {}
+
+  terser@5.50.0:
+    dependencies:
+      '@jridgewell/source-map': 0.3.11
+      acorn: 8.17.0
+      commander: 2.20.3
+      source-map-support: 0.5.21
+    optional: true
 
   test-exclude@7.0.2:
     dependencies:
@@ -14822,13 +14945,13 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-node@3.2.4(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0):
+  vite-node@3.2.4(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.3(supports-color@10.2.2)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0)
+      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -14843,12 +14966,12 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-babel@1.7.3(@babel/core@7.29.7)(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0)):
+  vite-plugin-babel@1.7.3(@babel/core@7.29.7)(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)):
     dependencies:
       '@babel/core': 7.29.7
-      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0)
+      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)
 
-  vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0):
+  vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.5)
@@ -14860,13 +14983,14 @@ snapshots:
       '@types/node': 24.13.3
       fsevents: 2.3.3
       jiti: 2.6.1
+      terser: 5.50.0
       yaml: 2.9.0
 
-  vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(yaml@2.9.0):
+  vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0):
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.7
-      '@vitest/mocker': 3.2.7(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0))
+      '@vitest/mocker': 3.2.7(vite@6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0))
       '@vitest/pretty-format': 3.2.7
       '@vitest/runner': 3.2.7
       '@vitest/snapshot': 3.2.7
@@ -14884,8 +15008,8 @@ snapshots:
       tinyglobby: 0.2.17
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
-      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0)
-      vite-node: 3.2.4(@types/node@24.13.3)(jiti@2.6.1)(yaml@2.9.0)
+      vite: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)
+      vite-node: 3.2.4(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.13.3

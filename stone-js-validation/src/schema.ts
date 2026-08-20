@@ -1,10 +1,10 @@
 import { fromZod, isZodLike } from './adapters/zod'
 import { ValidationError } from './errors/ValidationError'
 import { fromStandard, isStandardSchema } from './adapters/standardSchema'
-import { SchemaInput, ValidationSchema } from './declarations'
+import { NativeSchema, SchemaInput } from './declarations'
 
 /**
- * Normalises any supported schema input into a Stone.js {@link ValidationSchema}.
+ * Normalises any supported schema input into a Stone.js {@link NativeSchema}.
  *
  * Resolution order: a Standard Schema (`~standard`) is preferred (canonical, covers Zod 3.24+,
  * Valibot, ArkType), then a Zod-like `safeParse`, then a native Stone.js schema (`validate`).
@@ -13,7 +13,7 @@ import { SchemaInput, ValidationSchema } from './declarations'
  * @returns A Stone.js validation schema.
  * @throws {ValidationError} When the input is not a recognisable schema.
  */
-export function resolveSchema<T> (input: SchemaInput<T>): ValidationSchema<T> {
+export function resolveSchema<T> (input: SchemaInput<T>): NativeSchema<T> {
   if (isStandardSchema(input)) {
     return fromStandard(input)
   }
@@ -30,11 +30,11 @@ export function resolveSchema<T> (input: SchemaInput<T>): ValidationSchema<T> {
 }
 
 /**
- * Whether a value is already a native Stone.js {@link ValidationSchema}.
+ * Whether a value is already a native Stone.js {@link NativeSchema}.
  *
  * @param value - The value to test.
  * @returns True when it exposes a `validate` function.
  */
-export function isNativeSchema<T> (value: unknown): value is ValidationSchema<T> {
-  return typeof (value as ValidationSchema<T> | undefined)?.validate === 'function'
+export function isNativeSchema<T> (value: unknown): value is NativeSchema<T> {
+  return typeof (value as NativeSchema<T> | undefined)?.validate === 'function'
 }

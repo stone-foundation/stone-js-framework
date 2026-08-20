@@ -4,10 +4,9 @@ import { IncomingEvent } from '@stone-js/core'
 import { buildPath } from '@stone-js/filesystem'
 import { ConsoleContext } from '../declarations'
 import { ChildProcess } from 'node:child_process'
-import { ReactBuilder } from '../react/ReactBuilder'
-import { ServerBuilder } from '../server/ServerBuilder'
 import { CommandOptions } from '@stone-js/node-cli-adapter'
-import { shouldBuild, setupProcessSignalHandlers, isReactApp } from '../utils'
+import { shouldBuild, setupProcessSignalHandlers } from '../utils'
+import { runBuilderStep } from '../builders/resolveBuilder'
 
 /**
  * The custom command options.
@@ -48,11 +47,7 @@ export class CustomCommand {
       this.context.commandOutput.show(
         this.context.commandOutput.format.yellow('⚡ Building application...')
       )
-      if (isReactApp(this.context.blueprint, event)) {
-        await new ReactBuilder(this.context).console(event)
-      } else {
-        await new ServerBuilder(this.context).console(event)
-      }
+      await runBuilderStep(this.context, event, 'console')
     }
 
     this.startProcess()

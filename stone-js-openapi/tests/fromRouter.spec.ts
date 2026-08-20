@@ -120,3 +120,73 @@ describe('routesFromRouter', () => {
     expect(derived[0].path).toBe('/users')
   })
 })
+
+describe('the response comes from the resource that shapes it', () => {
+  const userSchema = { safeParse: (v: unknown) => ({ success: true, data: v }) }
+  const summarySchema = { safeParse: (v: unknown) => ({ success: true, data: v }) }
+
+  const resource = {
+    schema: () => userSchema,
+    fragments: () => ({ summary: summarySchema })
+  }
+
+  const routeWith = (options: Record<string, unknown>): any => ({
+    path: '/users',
+    method: 'GET',
+    getOption: <T>(key: string): T => options[key] as T
+  })
+
+  it('documents what the endpoint will actually return', async () => {
+    // The half of a contract usually written twice: the projection the code performs, and the response
+    // the document claims. One declaration now feeds both.
+    const operation = operationFromRoute(routeWith({ resource }))
+
+    expect(operation.responses?.[200]).toMatchObject({ schema: userSchema })
+  })
+
+  it('names the fragments a caller may ask for', async () => {
+    const operation = operationFromRoute(routeWith({ resource }))
+
+    expect(operation.responses?.[200].description).toContain('summary')
+  })
+
+  it('reads a resource the route named, through the registry the runtime uses', async () => {
+    const operation = operationFromRoute(routeWith({ resource: 'user' }), { resources: { user: resource } })
+
+    expect(operation.responses?.[200]).toMatchObject({ schema: userSchema })
+  })
+
+  it('builds a resource class through the container, so an injected schema is readable', async () => {
+    class UserResource {
+      schema (): unknown { return userSchema }
+    }
+
+    const operation = operationFromRoute(
+      routeWith({ resource: UserResource }),
+      { resolve: (Klass: any) => new Klass() }
+    )
+
+    expect(operation.responses?.[200]).toMatchObject({ schema: userSchema })
+  })
+
+  it('omits the response rather than inventing one it could not read', async () => {
+    // A wrong contract is worse than a missing one: a client is generated from this.
+    class Unbuildable {
+      constructor () { throw new Error('needs a service nobody gave it') }
+      schema (): unknown { return userSchema }
+    }
+
+    expect(operationFromRoute(routeWith({ resource: Unbuildable })).responses).toBeUndefined()
+    expect(operationFromRoute(routeWith({ resource: 'unknown' })).responses).toBeUndefined()
+    expect(operationFromRoute(routeWith({})).responses).toBeUndefined()
+  })
+
+  it('lets an explicit declaration win, because an author who wrote it meant it', async () => {
+    const operation = operationFromRoute(routeWith({
+      resource,
+      openapi: { responses: { 204: { description: 'No content' } } }
+    }))
+
+    expect(operation.responses).toEqual({ 204: { description: 'No content' } })
+  })
+})

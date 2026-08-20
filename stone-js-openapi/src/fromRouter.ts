@@ -32,6 +32,14 @@ export interface DerivationRegistries {
    * a wrong contract is worse than a missing one.
    */
   resolve?: (target: any) => unknown
+
+  /**
+   * Named resources, so a route saying `resource: 'user'` can be read.
+   *
+   * Comes from `stone.resources.registry`, the same registry the runtime projects through, so the
+   * documented response and the sent response are derived from one declaration.
+   */
+  resources?: Record<string, unknown>
 }
 
 /** Whether a value exposes `rules()`, i.e. is a schema class instance or a schema class. */
@@ -81,6 +89,73 @@ export function readValidation (
   return isSchema ? { body: resolved } : (resolved as Record<string, unknown>)
 }
 
+/** Whether a value exposes `schema()`, i.e. is a resource or a resource class. */
+function hasSchema (value: any): boolean {
+  return typeof value?.schema === 'function' || typeof value?.prototype?.schema === 'function'
+}
+
+/**
+ * Read what a route promises to return, from the resource that will shape it.
+ *
+ * This is the half of a contract that usually has to be written twice: once as the projection the
+ * code performs, once as the response the document claims. A resource publishes its schema, the
+ * runtime validates against it, and this reads the same declaration — so the document cannot say one
+ * thing while the endpoint answers another.
+ *
+ * Fragments come with it. A resource exposing `summary` is exposing a second documented shape, not a
+ * private convenience, so the contract names it too.
+ *
+ * @param declared - What the route declared under `resource`.
+ * @param registries - The registry to resolve a name against, and how to build a class.
+ * @returns The response schema and its fragments, or `undefined` when nothing could be read.
+ */
+export function readResource (
+  declared: unknown,
+  registries: DerivationRegistries = {}
+): { schema: unknown, fragments?: Record<string, unknown> } | undefined {
+  const { resources = {} } = registries
+  const resolved = typeof declared === 'string' ? resources[declared] : declared
+
+  if (resolved === undefined || resolved === null || !hasSchema(resolved)) { return undefined }
+
+  try {
+    const ResourceClass = resolved as any
+    const instance = typeof resolved !== 'function'
+      ? ResourceClass
+      : registries.resolve?.(ResourceClass) ?? new ResourceClass({})
+
+    const schema = instance.schema({})
+    if (schema === undefined || schema === null) { return undefined }
+
+    const fragments = typeof instance.fragments === 'function' ? instance.fragments({}) : undefined
+
+    return fragments === undefined ? { schema } : { schema, fragments }
+  } catch {
+    // Nothing could build it, and inventing a response shape is worse than omitting one.
+    return undefined
+  }
+}
+
+/**
+ * Turn what a resource publishes into the operation's responses.
+ *
+ * The full contract is the success response. Fragments are named in its description rather than
+ * invented as separate status codes: they are alternate shapes of the same answer, selected by a
+ * query parameter, and a reader needs to know they exist without the document pretending they are
+ * different outcomes.
+ *
+ * @param read - The schema and fragments read from the resource.
+ * @returns The responses, keyed by status.
+ */
+function responsesFrom (read: { schema: unknown, fragments?: Record<string, unknown> }): Record<string | number, any> {
+  const names = Object.keys(read.fragments ?? {})
+  const description = names.length > 0
+    ? `The resource, as published by its schema. Fragments available through the view parameter: ${names.join(', ')}.`
+    : 'The resource, as published by its schema.'
+
+  return { 200: { description, schema: read.schema } }
+}
+
 /**
  * Derive one operation from what a route declares.
  *
@@ -95,12 +170,14 @@ export function readValidation (
 export function operationFromRoute (route: RouteLike, registries: DerivationRegistries = {}): OpenApiOperation {
   const explicit = route.getOption<OpenApiOperation>('openapi') ?? {}
   const request = readValidation(route.getOption('validation'), registries)
+  const response = readResource(route.getOption('resource'), registries)
   const protectedBy = route.getOption('auth') ?? route.getOption('authz')
   const scheme = registries.securityScheme ?? 'bearerAuth'
 
   return {
     operationId: route.getOption<string>('name'),
     ...(request !== undefined ? { request } : {}),
+    ...(response !== undefined ? { responses: responsesFrom(response) } : {}),
     ...(protectedBy !== undefined ? { security: [{ [scheme]: [] }] } : {}),
     ...explicit
   }

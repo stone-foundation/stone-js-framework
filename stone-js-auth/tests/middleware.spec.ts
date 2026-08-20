@@ -1,6 +1,6 @@
 import { AuthenticateMiddleware } from '../src/middleware/AuthenticateMiddleware'
 import { requireAuth, requireScopes, normalizeScopes } from '../src/middleware/guards'
-import { AuthenticationError, AuthorizationError } from '../src/errors/AuthErrors'
+import { AuthenticationError, InsufficientScopeError } from '../src/errors/AuthErrors'
 
 const eventStub = (over: any = {}): any => {
   const meta: Record<string, unknown> = { ...over.meta }
@@ -94,7 +94,7 @@ describe('guards', () => {
     const next = vi.fn(async () => 'ok' as any)
     const event = eventStub({ meta: { auth: { scope: 'read write' } } })
     await expect(requireScopes('read')(event, next as any)).resolves.toBe('ok')
-    await expect(requireScopes('read', 'delete')(event, next as any)).rejects.toThrow(AuthorizationError)
+    await expect(requireScopes('read', 'delete')(event, next as any)).rejects.toThrow(InsufficientScopeError)
   })
 
   it('requireScopes throws when anonymous', async () => {

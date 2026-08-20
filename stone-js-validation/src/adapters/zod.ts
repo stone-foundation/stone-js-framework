@@ -1,14 +1,14 @@
-import { ValidationSchema, ValidationIssue, ZodLikeSchema } from '../declarations'
+import { NativeSchema, ValidationIssue, ZodLikeSchema } from '../declarations'
 
 /**
  * Adapts a Zod-style schema (anything exposing a synchronous `safeParse`) to the Stone.js
- * {@link ValidationSchema} contract. Structural — never imports Zod, so it works with any
+ * {@link NativeSchema} contract. Structural — never imports Zod, so it works with any
  * compatible engine and keeps the module dependency-free.
  *
  * @param schema - The Zod-like schema.
  * @returns A Stone.js validation schema.
  */
-export function fromZod<T> (schema: ZodLikeSchema<T>): ValidationSchema<T> {
+export function fromZod<T> (schema: ZodLikeSchema<T>): NativeSchema<T> {
   return {
     validate: (data: unknown) => {
       const result = schema.safeParse(data)

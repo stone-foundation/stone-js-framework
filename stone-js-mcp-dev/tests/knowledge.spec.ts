@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getConcept, searchKnowledge, knowledgeBase } from '../src/knowledge'
@@ -18,6 +18,9 @@ describe('knowledge base', () => {
       readdirSync(workspaceRoot, { withFileTypes: true })
         .filter((entry) => entry.isDirectory() && entry.name.startsWith('stone-js-'))
         .map((entry) => resolve(workspaceRoot, entry.name, 'package.json'))
+        // A directory is not yet a package: one being scaffolded has no manifest, and this test asks
+        // which packages *ship*, not which folders exist.
+        .filter((packageJson) => existsSync(packageJson))
         .map((packageJson) => JSON.parse(readFileSync(packageJson, 'utf8')).name as string)
         .filter((name) => name?.startsWith('@stone-js/'))
         .map((name) => name.slice('@stone-js/'.length))

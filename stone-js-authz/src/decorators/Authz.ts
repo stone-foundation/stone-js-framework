@@ -23,7 +23,7 @@ export interface AuthzDecoratorOptions extends AuthzConfig {}
  * ```typescript
  * import { Authz } from '@stone-js/authz'
  *
- * @Authz({ abilities: { 'post:update': ({ user, post }) => post.authorId === user.id } })
+ * @Authz({ resolveAbility: ({ user }) => buildAbilityFor(user) })
  * @StoneApp({ name: 'my-app' })
  * export class Application {}
  * ```

@@ -1,7 +1,7 @@
 import { getMetadata, hasMetadata } from '@stone-js/core'
 import { Protect } from '../../src/decorators/Protect'
 import { PROTECT_KEY } from '../../src/decorators/constants'
-import { AuthenticationError, AuthorizationError } from '../../src/errors/AuthErrors'
+import { AuthenticationError, InsufficientScopeError } from '../../src/errors/AuthErrors'
 import { MetaProtectRouteMiddleware, ProtectRouteMiddleware } from '../../src/middleware/ProtectRouteMiddleware'
 
 const makeEvent = (claims?: unknown, route?: unknown, handler?: unknown): any => ({
@@ -44,7 +44,7 @@ describe('ProtectRouteMiddleware', () => {
     const middleware = new ProtectRouteMiddleware({ blueprint: blueprint() })
     const event = makeEvent({ sub: '1', scope: 'tasks:read' }, 'tasks:write')
 
-    await expect(middleware.handle(event, next)).rejects.toThrow(AuthorizationError)
+    await expect(middleware.handle(event, next)).rejects.toThrow(InsufficientScopeError)
     await expect(middleware.handle(event, next)).rejects.toThrow(/tasks:write/)
   })
 
@@ -89,7 +89,7 @@ describe('@Protect: the requirement is declared, not wired', () => {
     const middleware = new ProtectRouteMiddleware({ blueprint: blueprint() })
     const event = makeEvent({ sub: '1', scope: 'tasks:read' }, undefined, { module: Controller, action: 'create' })
 
-    await expect(middleware.handle(event, next)).rejects.toThrow(AuthorizationError)
+    await expect(middleware.handle(event, next)).rejects.toThrow(InsufficientScopeError)
   })
 
   it('is enforced with no router at all, from the application event handler', async () => {

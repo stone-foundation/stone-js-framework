@@ -16,9 +16,10 @@ import { RouteMapper } from './RouteMapper'
 import { RouteEvent } from './events/RouteEvent'
 import { RouterError } from './errors/RouterError'
 import { RouteCollection } from './RouteCollection'
+import { browserNavigator } from './navigators'
 import { RouteNotFoundError } from './errors/RouteNotFoundError'
 import { FunctionalEventListener, isObjectLikeModule } from '@stone-js/core'
-import { DELETE, GET, MAX_URI_LENGTH, NAVIGATION_EVENT, OPTIONS, PATCH, POST, PUT } from './constants'
+import { DELETE, GET, MAX_URI_LENGTH, OPTIONS, PATCH, POST, PUT } from './constants'
 import { isAliasPipe, isClassPipe, isFactoryPipe, MetaPipe, MixedPipe, PipeInstance, Pipeline, PipelineOptions } from '@stone-js/pipeline'
 
 /**
@@ -473,19 +474,19 @@ export class Router<
   }
 
   /**
-   * Navigates to a specific route in the browser environment.
+   * Navigates to a specific route.
+   *
+   * Resolving the destination is platform-independent (a route name becomes a path here);
+   * performing the effect is not, so it is delegated to the configured
+   * {@link RouterNavigator}. The default one drives the browser's History API, which is
+   * why this throws outside a browser unless another navigator is configured under
+   * `stone.router.navigator`.
    *
    * @param pathOrOptions - The path or navigation options, including route name and parameters.
    * @param replace - Whether to replace the current history entry instead of adding a new one.
-   * @throws {RouterError} If called outside a browser environment.
+   * @throws {RouterError} If no navigator is configured and this runs outside a browser.
    */
   navigate (pathOrOptions: string | NavigateOptions, replace?: boolean): void {
-    // `typeof` guard: referencing a bare, undeclared `window` in Node throws a
-    // ReferenceError before the check runs, defeating the universality guard.
-    if (typeof window === 'undefined') {
-      throw new RouterError('This method can only be used in a browser environment')
-    }
-
     let path = typeof pathOrOptions === 'string' ? pathOrOptions : ''
     const options = (isObjectLikeModule(pathOrOptions) ? pathOrOptions : {}) as NavigateOptions
 
@@ -493,11 +494,9 @@ export class Router<
       path = this.generate({ ...options, withDomain: false })
     }
 
-    replace === true
-      ? window.history.replaceState({ ...options, path }, '', path)
-      : window.history.pushState({ ...options, path }, '', path)
+    const navigator = this.routerOptions.navigator ?? browserNavigator
 
-    window.dispatchEvent(new CustomEvent(NAVIGATION_EVENT, { detail: { ...options, path } }))
+    navigator({ path, replace: replace === true, options })
   }
 
   /**

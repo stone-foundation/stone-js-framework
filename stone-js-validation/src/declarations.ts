@@ -25,7 +25,7 @@ export type ValidationResult<T> =
  * implement the Standard Schema spec, or expose `safeParse`), so you write the schema once and
  * use it identically on the backend and the frontend.
  */
-export interface ValidationSchema<T = unknown> {
+export interface NativeSchema<T = unknown> {
   /** Validate a value, returning a normalised result. */
   validate: (data: unknown) => ValidationResult<T>
 }
@@ -65,10 +65,10 @@ export type ZodSafeParseResult<T> =
   | { success: false, error: { issues: ReadonlyArray<{ message: string, path: readonly PropertyKey[], code?: string }> } }
 
 /**
- * Anything that can be resolved into a {@link ValidationSchema}: a native Stone.js schema, a
+ * Anything that can be resolved into a {@link NativeSchema}: a native Stone.js schema, a
  * Standard Schema, or a Zod-like schema.
  */
-export type SchemaInput<T = unknown> = ValidationSchema<T> | StandardSchemaV1<T> | ZodLikeSchema<T>
+export type SchemaInput<T = unknown> = NativeSchema<T> | StandardSchemaV1<T> | ZodLikeSchema<T>
 
 /**
  * The telemetry-free validation service contract.

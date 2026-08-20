@@ -4,12 +4,12 @@ import spawn from 'cross-spawn'
 import { parse } from 'node:path'
 import { ConsoleContext } from '../declarations'
 import { ChildProcess } from 'node:child_process'
-import { ReactBuilder } from '../react/ReactBuilder'
-import { ServerBuilder } from '../server/ServerBuilder'
 import { IncomingEvent, isNotEmpty } from '@stone-js/core'
 import { CommandOptions } from '@stone-js/node-cli-adapter'
-import { isReactApp, setupProcessSignalHandlers } from '../utils'
-import { basePath, buildPath, distPath } from '@stone-js/filesystem'
+import { basePath } from '@stone-js/filesystem'
+import { CliError } from '../errors/CliError'
+import { setupProcessSignalHandlers } from '../utils'
+import { resolveBuilderDefinition, runBuilderStep } from '../builders/resolveBuilder'
 
 const { pathExistsSync } = fsExtra
 
@@ -62,13 +62,18 @@ export class PreviewCommand {
     if (isNotEmpty<string>(filename) && pathExistsSync(basePath(filename))) {
       const parsed = parse(basePath(filename))
       this.startProcess(parsed.base, parsed.dir)
-    } else if (isReactApp(this.context.blueprint, event)) {
-      await new ReactBuilder(this.context).preview(event)
-      this.startProcess(buildPath('preview.mjs'))
     } else {
-      new ServerBuilder(this.context).preview(event)
-      const output = this.context.blueprint.get<string>('stone.builder.output', 'server.mjs')
-      this.startProcess(distPath(output))
+      const definition = resolveBuilderDefinition(this.context, event)
+
+      await runBuilderStep(this.context, event, 'preview')
+
+      const entry = definition.previewEntry?.(this.context.blueprint)
+
+      if (entry === undefined) {
+        throw new CliError(`The "${definition.target}" target cannot be previewed: it declares no preview entry.`)
+      }
+
+      this.startProcess(entry)
     }
   }
 
