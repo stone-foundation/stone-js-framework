@@ -126,8 +126,11 @@ export interface ViewRoot {
  *
  * @template VNode - The engine's node type.
  * @template Root - The engine's root handle (defaults to {@link ViewRoot}).
+ * @template Host - Where the engine mounts. A DOM `Element` on the web, but a native
+ * platform has no element tree, so the host stays generic: React Native registers a root
+ * component instead, and its engine names its own host type.
  */
-export interface ViewEngine<VNode = unknown, Root extends ViewRoot = ViewRoot> {
+export interface ViewEngine<VNode = unknown, Root extends ViewRoot = ViewRoot, Host = Element> {
   /** Create an element/vnode from a component and props. */
   createElement: (component: unknown, props?: Record<string, unknown> | null, ...children: VNode[]) => VNode
   /** Render a node to an HTML string (SSR/SSG, buffered). May be sync or async. */
@@ -139,10 +142,10 @@ export interface ViewEngine<VNode = unknown, Root extends ViewRoot = ViewRoot> {
    * piping (Node, edge/WinterCG).
    */
   renderToStream?: (node: VNode, options?: StreamRenderOptions) => Promise<ReadableStream<Uint8Array>>
-  /** Mount a node into a container (client, fresh render). May be async (lazy client runtime). */
-  mount: (node: VNode, container: Element) => Root | Promise<Root>
-  /** Hydrate server-rendered markup in a container (client, after SSR/SSG). May be async. */
-  hydrate: (node: VNode, container: Element) => Root | Promise<Root>
+  /** Mount a node into a host (client, fresh render). May be async (lazy client runtime). */
+  mount: (node: VNode, container: Host) => Root | Promise<Root>
+  /** Hydrate server-rendered markup in a host (client, after SSR/SSG). May be async. */
+  hydrate: (node: VNode, container: Host) => Root | Promise<Root>
   /** Wrap the application tree with the engine's context/providers. */
   wrapApp?: (node: VNode, context: unknown) => VNode
 }
