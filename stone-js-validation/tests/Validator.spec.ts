@@ -89,7 +89,7 @@ describe('adapters/standardSchema', () => {
 
 describe('resolveSchema', () => {
   it('prefers standard schema, then zod, then native', () => {
-    const native: ValidationSchema<number> = { validate: (d) => ({ success: true, value: d as number }) }
+    const native: NativeSchema<number> = { validate: (d) => ({ success: true, value: d as number }) }
     expect(resolveSchema(native).validate(5)).toEqual({ success: true, value: 5 })
     expect(resolveSchema(z.string()).validate('x')).toEqual({ success: true, value: 'x' })
     const zodLike: ZodLikeSchema<string> = { safeParse: (d) => ({ success: true, data: d as string }) }

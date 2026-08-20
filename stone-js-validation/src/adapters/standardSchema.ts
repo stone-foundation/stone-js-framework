@@ -1,15 +1,15 @@
-import { ValidationSchema, ValidationIssue, StandardSchemaV1 } from '../declarations'
+import { NativeSchema, ValidationIssue, StandardSchemaV1 } from '../declarations'
 import { ValidationError } from '../errors/ValidationError'
 
 /**
  * Adapts a [Standard Schema](https://standardschema.dev) (Zod 3.24+, Valibot, ArkType, …) to the
- * Stone.js {@link ValidationSchema} contract. Only the synchronous path is supported here; an
+ * Stone.js {@link NativeSchema} contract. Only the synchronous path is supported here; an
  * async schema throws a clear {@link ValidationError} so the misuse is obvious.
  *
  * @param schema - The Standard Schema.
  * @returns A Stone.js validation schema.
  */
-export function fromStandard<T> (schema: StandardSchemaV1<T>): ValidationSchema<T> {
+export function fromStandard<T> (schema: StandardSchemaV1<T>): NativeSchema<T> {
   return {
     validate: (data: unknown) => {
       const result = schema['~standard'].validate(data)

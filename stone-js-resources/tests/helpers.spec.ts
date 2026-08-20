@@ -21,11 +21,34 @@ describe('helpers', () => {
 
   it('contextFromEvent parses fields/include CSV and merges extra', () => {
     const event = { get: (k: string, fb?: unknown) => ({ fields: 'id, name', include: 'posts' }[k] ?? fb) as any }
-    expect(contextFromEvent(event, { self: true })).toEqual({ self: true, fields: ['id', 'name'], include: ['posts'] })
+    expect(contextFromEvent(event, undefined, { self: true })).toMatchObject({
+      self: true, fields: ['id', 'name'], include: ['posts']
+    })
   })
 
   it('contextFromEvent yields undefined for empty params', () => {
-    const event = { get: (_k: string, fb?: unknown) => fb as any }
-    expect(contextFromEvent(event)).toEqual({ fields: undefined, include: undefined })
+    const event: any = { get: (_k: string, fallback?: unknown) => fallback ?? '' }
+    const context = contextFromEvent(event)
+
+    expect(context.fields).toBeUndefined()
+    expect(context.include).toBeUndefined()
+    expect(context.fragment).toBeUndefined()
+  })
+
+  it('contextFromEvent carries the event and the principal', () => {
+    // A resource deciding what a caller may see needs to know who is asking; before this it had to be
+    // told by the handler, which is the plumbing the module exists to remove.
+    const event: any = { get: (_k: string, fallback?: unknown) => fallback ?? '', getUser: () => ({ id: 7 }) }
+    const context = contextFromEvent(event)
+
+    expect(context.principal).toEqual({ id: 7 })
+    expect(context.event).toBe(event)
+  })
+
+  it('contextFromEvent reads the parameter names the application configured', () => {
+    const event: any = { get: (key: string, fallback?: unknown) => (key === 'only' ? 'summary' : fallback ?? '') }
+    const blueprint: any = { get: (key: string, fallback: unknown) => (key === 'stone.resources.params' ? { fragment: 'only' } : fallback) }
+
+    expect(contextFromEvent(event, blueprint).fragment).toBe('summary')
   })
 })

@@ -60,28 +60,51 @@ export function applyFields<T extends ResourceOutput> (output: T, fields?: strin
 }
 
 /**
- * Builds a {@link ResourceContext} from an incoming event's `fields` and `include` query
- * parameters (comma-separated). Agnostic: the event only needs a `get(key)` method.
+ * Build a {@link ResourceContext} from an incoming event.
+ *
+ * The parameter names are configuration, not convention: an API that already answers `?view=` or
+ * `?only=` keeps its own vocabulary instead of gaining a second one. Defaults are `fields`, `include`
+ * and `view`.
+ *
+ * The authenticated principal is read too, because deciding what a caller may see is the most common
+ * reason two callers get different shapes — and a resource that cannot see who is asking has to be
+ * told by the handler, which is exactly the plumbing this module exists to remove.
+ *
+ * Agnostic: the event only needs `get(key)`.
  *
  * @param event - Anything with `get(key)` (an `IncomingHttpEvent`, a URL search wrapper, …).
+ * @param blueprint - The blueprint carrying the parameter names, when there is one.
  * @param extra - Extra context to merge in.
  * @returns The resource context.
  */
-export function contextFromEvent (event: { get: <T>(key: string, fallback?: T) => T }, extra: ResourceContext = {}): ResourceContext {
+export function contextFromEvent (
+  event: { get: <T>(key: string, fallback?: T) => T, getUser?: <T>() => T },
+  blueprint?: { get: <T>(key: string, fallback?: T) => T },
+  extra: ResourceContext = {}
+): ResourceContext {
+  const names = blueprint?.get<Record<string, string>>('stone.resources.params', {}) ?? {}
+  const fragment = event.get<string>(names.fragment ?? 'view', '')
+
   return {
     ...extra,
-    fields: splitCsv(event.get<string>('fields', '')),
-    include: splitCsv(event.get<string>('include', ''))
+    event,
+    // `getUser()` and not `get('user')`: the principal is set through a resolver, not as metadata, so
+    // the generic accessor never reaches it. Duck-typed, because the kernel is agnostic and an event
+    // without a user simply has no such method.
+    principal: event.getUser?.(),
+    fields: splitCsv(event.get<string>(names.fields ?? 'fields', '')),
+    include: splitCsv(event.get<string>(names.include ?? 'include', '')),
+    fragment: fragment.length > 0 ? fragment : undefined
   }
 }
 
 /**
- * Splits a comma-separated string into a trimmed, non-empty list (or `undefined` when empty).
+ * Split a comma-separated string into a trimmed, non-empty list (or `undefined` when empty).
  *
  * @param value - The CSV string.
  * @returns The list, or `undefined`.
  */
 function splitCsv (value: string): string[] | undefined {
-  const parts = value.split(',').map((part) => part.trim()).filter((part) => part.length > 0)
+  const parts = String(value).split(',').map((part) => part.trim()).filter((part) => part.length > 0)
   return parts.length > 0 ? parts : undefined
 }

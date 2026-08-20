@@ -133,27 +133,27 @@ export class AuthConfiguration implements IConfiguration {
         <H3>Reading the principal</H3>
         <Code file='app/Tasks.ts'>{`@Get('/mine', { middleware: [requireAuth()] })
 mine (event: IncomingHttpEvent) {
-  const user = event.get('user')          // the authenticated principal
+  const user = event.getUser()           // the authenticated principal
   return this.tasks.ownedBy(user.id)
 }`}</Code>
 
-        <H3>Custom strategies</H3>
+        <H3>Turning a token into your own principal</H3>
         <p>
-          The built-in verification covers JWT and OAuth. When you need something else, an API key, a
-          session, a bespoke provider, implement an <code>Authenticator</code>: it turns a request into
-          a principal (or rejects it), and the same <code>requireAuth</code>/<code>requireScopes</code>
-          guards work on top of it unchanged.
+          Verification produces claims. Which <em>user</em> those claims mean is your application's
+          question, so <code>resolveUser</code> answers it: it receives the verified claims and returns
+          whatever your code should see, and the same <code>requireAuth</code> /
+          {' '}<code>requireScopes</code> guards work on top of it unchanged.
         </p>
-        <Code file='app/ApiKeyAuthenticator.ts'>{`import { Authenticator } from '@stone-js/auth'
-
-export class ApiKeyAuthenticator extends Authenticator {
-  async authenticate (event: IncomingHttpEvent) {
-    const key = event.getHeader('x-api-key')
-    const user = await this.keys.resolve(key)
-    if (user === undefined) throw new AuthenticationError('Invalid API key')  // -> 401
-    return user                                    // becomes event.get('user')
-  }
-}`}</Code>
+        <Code file='app/Application.ts'>{`@Auth({
+  resolveUser: async (claims) => await users.findById(claims.sub)   // awaited: a store lookup
+})
+export class Application {}`}</Code>
+        <p>
+          The principal is then read with <code>event.getUser()</code>. Not
+          {' '}<code>event.get('user')</code>: it travels through a resolver rather than as metadata, so
+          the generic accessor does not reach it.
+        </p>
+        <Code file='app/TasksController.ts'>{`const user = event.getUser<User>()   // the authenticated principal, or undefined`}</Code>
 
         <Callout kind='note' title='Stateless by design'>
           Nothing here touches a session table. The token is verified on each request, which is what

@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { Resource } from '../src/Resource'
 import { getMetadata, hasMetadata } from '@stone-js/core'
 import { Returns } from '../src/decorators/Returns'
@@ -10,7 +11,19 @@ import { ResourceRouteMiddleware } from '../src/middleware/ResourceRouteMiddlewa
 interface User { id: number, name: string, passwordHash: string }
 
 const ada: User = { id: 1, name: 'Ada', passwordHash: 'do-not-leak' }
-const userResource = defineResource<User>((user) => ({ id: user.id, name: user.name }))
+const userResource = defineResource<User>({ schema: z.object({ id: z.number(), name: z.string() }) })
+
+const validator = {
+  validate: <T>(schema: any, data: unknown) => {
+    const result = schema.safeParse(data)
+    return result.success
+      ? { success: true, value: result.data as T }
+      : { success: false, issues: result.error.issues.map((i: any) => ({ message: i.message, path: i.path })) }
+  }
+}
+
+/** The container the runtime hands the middleware, carrying that engine. */
+const container = { make: (key: string) => (key === 'validator' ? validator : undefined) } as any
 
 /** A resource class whose shape depends on an injected service, which is why classes exist. */
 @ApiResource('user')
@@ -21,7 +34,11 @@ class UserResource extends Resource<User> {
     this.locale = i18n.getLocale()
   }
 
-  toArray (user: User): any {
+  schema (): unknown {
+    return z.object({ id: z.number(), name: z.string(), locale: z.string() })
+  }
+
+  async data (user: User): Promise<unknown> {
     return { id: user.id, name: user.name, locale: this.locale }
   }
 }
@@ -59,7 +76,7 @@ describe('@Returns: the module owns its key, so it needs no router', () => {
       show (): void {}
     }
 
-    const middleware = new ResourceRouteMiddleware({ blueprint: blueprint() })
+    const middleware = new ResourceRouteMiddleware({ blueprint: blueprint(), container })
     const event = makeEvent(undefined, { module: UserController, action: 'show' })
 
     const output: any = await middleware.handle(event, async () => ada as any)
@@ -75,7 +92,8 @@ describe('@Returns: the module owns its key, so it needs no router', () => {
     }
 
     const middleware = new ResourceRouteMiddleware({
-      blueprint: blueprint(undefined, { module: Handler, action: 'handle' })
+      blueprint: blueprint(undefined, { module: Handler, action: 'handle' }),
+      container
     })
 
     await expect(middleware.handle(makeEvent(), async () => ada as any))
@@ -88,7 +106,7 @@ describe('@Returns: the module owns its key, so it needs no router', () => {
       handle (): void {}
     }
 
-    const middleware = new ResourceRouteMiddleware({ blueprint: blueprint(undefined, { module: Handler }) })
+    const middleware = new ResourceRouteMiddleware({ blueprint: blueprint(undefined, { module: Handler }), container })
 
     await expect(middleware.handle(makeEvent(), async () => ada as any))
       .resolves.toEqual({ id: 1, name: 'Ada' })
@@ -100,7 +118,7 @@ describe('@Returns: the module owns its key, so it needs no router', () => {
       show (): void {}
     }
 
-    const middleware = new ResourceRouteMiddleware({ blueprint: blueprint() })
+    const middleware = new ResourceRouteMiddleware({ blueprint: blueprint(), container })
     const event = makeEvent(userResource, { module: UserController, action: 'show' })
 
     await expect(middleware.handle(event, async () => ada as any))
@@ -124,7 +142,7 @@ describe('resource classes', () => {
 
   it('falls back to the class name when no alias is given', async () => {
     @ApiResource()
-    class AddressResource extends Resource<any> { toArray (a: any): any { return a } }
+    class AddressResource extends Resource<any> { schema (): unknown { return z.any() } }
 
     const set = vi.fn()
     const context: any = { modules: [AddressResource], blueprint: { set, get: (_k: string, f: unknown) => f } }
@@ -143,9 +161,12 @@ describe('resource classes', () => {
     expect(set).not.toHaveBeenCalled()
   })
 
-  it('are resolved through the container, so toArray can use injected services', async () => {
+  it('are resolved through the container, so a projection can use injected services', async () => {
     // A resource that formats for the caller's locale needs i18n, and this is how it gets it.
-    const container: any = { resolve: (Class: any) => new Class({ i18n: { getLocale: () => 'fr' } }) }
+    const container: any = {
+      make: (key: string) => (key === 'validator' ? validator : undefined),
+      resolve: (Class: any) => new Class({ i18n: { getLocale: () => 'fr' } })
+    }
     const middleware = new ResourceRouteMiddleware({ blueprint: blueprint({ user: UserResource }), container })
 
     await expect(middleware.handle(makeEvent('user'), async () => ada as any))
@@ -153,10 +174,13 @@ describe('resource classes', () => {
   })
 
   it('still work with no container, so the same class serves any context', async () => {
+    // No container to resolve from, and none needed: the class is constructed with what it was given,
+    // and the validator travels with the projection rather than with the instance.
     const middleware = new ResourceRouteMiddleware({
       blueprint: blueprint({ plain: class extends Resource<User> {
-        toArray (user: User): any { return { id: user.id } }
-      } })
+        schema (): unknown { return z.object({ id: z.number() }) }
+      } }),
+      container
     })
 
     await expect(middleware.handle(makeEvent('plain'), async () => ada as any))
@@ -164,8 +188,11 @@ describe('resource classes', () => {
   })
 
   it('accepts a class declared inline on the route, not only a registered name', async () => {
-    const container: any = { resolve: (Class: any) => new Class({ i18n: { getLocale: () => 'ht' } }) }
-    const middleware = new ResourceRouteMiddleware({ blueprint: blueprint(), container })
+    const inline: any = {
+      make: (key: string) => (key === 'validator' ? validator : undefined),
+      resolve: (Class: any) => new Class({ i18n: { getLocale: () => 'ht' } })
+    }
+    const middleware = new ResourceRouteMiddleware({ blueprint: blueprint(), container: inline })
 
     await expect(middleware.handle(makeEvent(UserResource), async () => ada as any))
       .resolves.toEqual({ id: 1, name: 'Ada', locale: 'ht' })

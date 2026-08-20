@@ -1,15 +1,32 @@
 /**
- * The context that shapes a transformation: which fields the client asked for, which relations to
- * include, and any extra data (the current user, the event, …) a resource may consult.
+ * A schema, in whatever shape the application already writes them.
  *
- * It is intentionally open so resources can read whatever they need while staying agnostic.
+ * Anything `@stone-js/validation` accepts is accepted here: a Standard Schema (Zod, Valibot, ArkType
+ * and others), a Zod-like `safeParse`, or a native Stone.js schema. Resources do not define a schema
+ * language; they use the one the application already validates its input with, so a contract is
+ * written once in one dialect on both sides of the boundary.
+ */
+export type ResourceSchema = unknown
+
+/**
+ * The context a projection is given.
+ *
+ * Open on purpose: a resource reads whatever it needs, and the middleware fills in what the request
+ * carried. The authenticated principal is part of it, because deciding what a caller may see is the
+ * most common reason a projection differs between two callers.
  */
 export interface ResourceContext {
-  /** Requested sparse fieldset — when set, the output is limited to these top-level keys. */
+  /** Requested sparse fieldset — narrows the output to these top-level keys. */
   fields?: string[]
   /** Requested relations to embed. */
   include?: string[]
-  /** Anything else a resource needs (e.g. the authenticated principal). */
+  /** The requested fragment, when the caller asked for one by name. */
+  fragment?: string
+  /** The authenticated principal, when the application has one. */
+  principal?: unknown
+  /** The event being answered, for a resource that needs more than the parameters above. */
+  event?: unknown
+  /** Anything else a resource needs. */
   [key: string]: unknown
 }
 
@@ -17,7 +34,7 @@ export interface ResourceContext {
 export type ResourceOutput = Record<string, unknown>
 
 /**
- * A `{ data, meta }` envelope around a transformed item or collection.
+ * A `{ data, meta }` envelope around a projected item or collection.
  */
 export interface ResourceEnvelope<T> {
   data: T
@@ -25,15 +42,41 @@ export interface ResourceEnvelope<T> {
 }
 
 /**
- * The resource contract: transform a model (or a collection) into its public representation.
+ * What a resource does: turn a domain model into the shape a caller is allowed to see, and say what
+ * that shape is.
+ *
+ * Saying it is the point. A projection written as code answers "what does this return?" only by being
+ * read and trusted; a projection written as a schema answers it to a person, to `@stone-js/openapi`,
+ * and to the resource itself, which validates against it before anything leaves. One declaration, three
+ * consumers, and no way for the documentation to drift from the response.
  */
-export interface IResource<Model = unknown, Output extends ResourceOutput = ResourceOutput> {
-  /** Transform one model into its public shape (before field filtering). */
-  toArray: (model: Model, context: ResourceContext) => Output
-  /** Transform one model, applying sparse fieldsets and dropping undefined fields. */
-  item: (model: Model, context?: ResourceContext) => Partial<Output>
-  /** Transform a collection. */
-  collection: (models: Model[], context?: ResourceContext) => Array<Partial<Output>>
-  /** Wrap a model or collection in a `{ data, meta }` envelope. */
-  response: (models: Model | Model[], context?: ResourceContext, meta?: Record<string, unknown>) => ResourceEnvelope<Partial<Output> | Array<Partial<Output>>>
+export interface IResource<Model = unknown, Output = ResourceOutput> {
+  /** The contract: the schema every projection is validated against and documented from. */
+  schema: (context: ResourceContext) => ResourceSchema | Promise<ResourceSchema>
+
+  /**
+   * Named subsets a caller may ask for, each with its own schema.
+   *
+   * A fragment is not a filter: it is a contract of its own, documented and validated like the full
+   * one. That is what makes `?view=summary` safe to expose.
+   */
+  fragments?: (context: ResourceContext) => Record<string, ResourceSchema> | Promise<Record<string, ResourceSchema>>
+
+  /**
+   * Optional hook to shape or complete the model before it meets the schema.
+   *
+   * Asynchronous, and resolved from the container, so it may reach any service: fetch a relation,
+   * translate a label, compute a total. Whatever it returns is what the schema then validates.
+   */
+  data?: (model: Model, context: ResourceContext) => unknown | Promise<unknown>
+
+  /** Project one model. */
+  item: (model: Model, context?: ResourceContext) => Promise<Output>
+  /** Project a collection. */
+  collection: (models: Model[], context?: ResourceContext) => Promise<Output[]>
+  /** Project into a `{ data, meta }` envelope. */
+  response: (models: Model | Model[], context?: ResourceContext, meta?: Record<string, unknown>) => Promise<ResourceEnvelope<Output | Output[]>>
 }
+
+/** What to do when the data does not match the contract the resource published. */
+export type ContractViolationPolicy = 'throw' | 'warn'
