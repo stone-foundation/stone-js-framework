@@ -1,5 +1,5 @@
 import { onPreparingResponse } from '../src/UseReactPageHooks'
-import { getResponseSnapshot } from '../src/UseReactPageInternals'
+import { getResponseSnapshot } from '@stone-js/use-react-core'
 import { prepareFallbackErrorPage, prepareErrorPage, preparePage } from '../src/UseReactPageRenderer'
 
 // 1. Mock first!
@@ -9,7 +9,8 @@ vi.mock('../src/UseReactPageRenderer', () => ({
   prepareFallbackErrorPage: vi.fn()
 }))
 
-vi.mock('../src/UseReactPageInternals', () => ({
+vi.mock('@stone-js/use-react-core', async (mod) => ({
+  ...(await mod() as any),
   getResponseSnapshot: vi.fn()
 }))
 

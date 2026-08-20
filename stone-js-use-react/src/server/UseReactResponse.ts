@@ -1,7 +1,6 @@
 import { isNotEmpty } from '@stone-js/core'
 import { OutgoingHttpResponse, RedirectResponseOptions, RedirectResponse } from '@stone-js/http-core'
-import { ReactOutgoingResponse, ReactRedirectResponseOptions, ReactResponseOptions } from '../declarations'
-
+import { ReactOutgoingResponse, ReactRedirectResponseOptions, ReactResponseOptions } from '@stone-js/use-react-core'
 /**
  * Create an UseReact response.
  *

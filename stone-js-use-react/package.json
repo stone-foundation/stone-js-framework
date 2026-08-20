@@ -59,6 +59,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@stone-js/use-react-core": "workspace:*",
     "@stone-js/use-view": "workspace:*"
   },
   "peerDependencies": {

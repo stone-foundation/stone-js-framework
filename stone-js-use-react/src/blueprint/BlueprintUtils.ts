@@ -1,6 +1,6 @@
-import { FactoryPage, PageClass, PageType, ReactIncomingEvent } from '../declarations'
-import { UseReactAppConfig, internalUseReactBlueprint } from '../options/UseReactBlueprint'
+import { internalUseReactBlueprint } from '../options/UseReactBlueprint'
 import { isFunctionModule, isNotEmpty, isObjectLikeModule, mergeBlueprints, stoneBlueprint, StoneBlueprint } from '@stone-js/core'
+import { FactoryPage, PageClass, PageType, ReactIncomingEvent, UseReactAppConfig } from '@stone-js/use-react-core'
 
 /**
  * Defines a Stone React app using a factory-based main handler.

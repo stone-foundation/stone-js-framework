@@ -1,7 +1,7 @@
 import { JSX } from 'react'
 import { Logger } from '@stone-js/core'
 import { Router } from '@stone-js/router'
-import { StoneContext } from '../../src/StoneContext'
+import { StoneContext } from '@stone-js/use-react-core'
 import { StoneLink } from '../../src/components/StoneLink'
 import { render, fireEvent, RenderResult } from '@testing-library/react'
 

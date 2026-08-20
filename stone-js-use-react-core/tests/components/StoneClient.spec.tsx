@@ -1,9 +1,9 @@
 import { render } from '@testing-library/react'
-import { isClient } from '../../src/UseReactPageInternals'
+import { isClient } from '../../src/PageInternals'
 import { StoneClient } from '../../src/components/StoneClient'
 
-// Mock isClient from UseReactPageInternals
-vi.mock('../../src/UseReactPageInternals', async (mod) => {
+// Mock isClient from PageInternals
+vi.mock('../../src/PageInternals', async (mod) => {
   const actual: any = await mod()
   return {
     ...actual,

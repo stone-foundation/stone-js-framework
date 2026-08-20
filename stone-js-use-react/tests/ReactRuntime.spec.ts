@@ -1,13 +1,18 @@
 import { ReactRuntime } from '../src/ReactRuntime'
 import { applyHeadToDocument } from '@stone-js/use-view'
-import { isServer, resolveComponent, buildAppComponent, renderReactApp } from '../src/UseReactPageInternals'
+import { renderReactApp } from '../src/UseReactPageInternals'
+import { isServer, resolveComponent, buildAppComponent } from '@stone-js/use-react-core'
 
-vi.mock('../src/UseReactPageInternals', async mod => ({
-  ...(await mod()),
+vi.mock('@stone-js/use-react-core', async mod => ({
+  ...(await mod() as any),
   isServer: vi.fn(),
-  renderReactApp: vi.fn(),
   buildAppComponent: vi.fn().mockResolvedValue('AppComponent'),
   resolveComponent: vi.fn()
+}))
+
+vi.mock('../src/UseReactPageInternals', async mod => ({
+  ...(await mod() as any),
+  renderReactApp: vi.fn()
 }))
 
 vi.mock('@stone-js/use-view', async mod => ({

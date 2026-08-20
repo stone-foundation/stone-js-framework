@@ -6,17 +6,11 @@ import {
   MetaMiddleware,
   BlueprintContext
 } from '@stone-js/core'
-import {
-  SetUseReactHooksMiddleware,
-  SetReactPageLayoutMiddleware,
-  SetReactViewProvidersMiddleware,
-  SetUseReactEventHandlerMiddleware,
-  SetReactKernelErrorPageMiddleware,
-  SetReactRouteDefinitionsMiddleware
-} from '../../middleware/BlueprintMiddleware'
+import { SetUseReactHooksMiddleware } from '../../middleware/BlueprintMiddleware'
 import { setUseReactAdapterErrorHandler } from '../../middleware/utils'
 import { MetaBrowserResponseMiddleware } from './BrowserResponseMiddleware'
 import { UseReactBrowserErrorHandler } from '../UseReactBrowserErrorHandler'
+import { SetReactPageLayoutMiddleware, SetReactViewProvidersMiddleware, SetUseReactEventHandlerMiddleware, SetReactKernelErrorPageMiddleware, SetReactRouteDefinitionsMiddleware } from '@stone-js/use-react-core'
 
 /**
  * Blueprint middleware to set BrowserResponseMiddleware for the Browser adapter.

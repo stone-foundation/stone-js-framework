@@ -1,4 +1,4 @@
-import { UseReactBlueprint } from '../../src/options/UseReactBlueprint'
+import { UseReactBlueprint } from '@stone-js/use-react-core'
 import { defineStoneReactApp } from '../../src/blueprint/BlueprintUtils'
 
 describe('defineStoneReactApp', () => {

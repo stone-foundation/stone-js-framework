@@ -1,5 +1,5 @@
 import { act } from 'react'
-import { STONE_PAGE_EVENT_OUTLET } from '../../src/constants'
+import { STONE_PAGE_EVENT_OUTLET } from '@stone-js/use-react-core'
 import { StoneOutlet } from '../../src/components/StoneOutlet'
 import { render, screen, cleanup } from '@testing-library/react'
 

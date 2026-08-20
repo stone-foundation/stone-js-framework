@@ -1,5 +1,4 @@
-import { ResponseSnapshotType } from '../src/declarations'
-import { isSSR, resolveComponent } from '../src/UseReactPageInternals'
+import { ResponseSnapshotType, isSSR, resolveComponent } from '@stone-js/use-react-core'
 import { prepareErrorPage, prepareFallbackErrorPage, preparePage } from '../src/UseReactPageRenderer'
 
 const createMockContainer = (): any => ({
@@ -42,8 +41,8 @@ const createSnapshot = (): ResponseSnapshotType => ({
   statusCode: 500
 })
 
-vi.mock('../src/UseReactPageInternals', async () => {
-  const actual = await vi.importActual<any>('../src/UseReactPageInternals')
+vi.mock('@stone-js/use-react-core', async () => {
+  const actual = await vi.importActual<any>('@stone-js/use-react-core')
   return {
     ...actual,
     resolveComponent: vi.fn().mockResolvedValue({
@@ -55,11 +54,15 @@ vi.mock('../src/UseReactPageInternals', async () => {
     executeHooks: vi.fn().mockResolvedValue(undefined),
     buildPageComponent: vi.fn().mockResolvedValue('<div>Page</div>'),
     buildAppComponent: vi.fn().mockResolvedValue('<div>App</div>'),
-    getServerContent: vi.fn().mockReturnValue('<html>SSR</html>'),
-    getBrowserContent: vi.fn().mockReturnValue({ head: {}, app: '<div>App</div>' }),
     isSSR: vi.fn().mockReturnValue(false)
   }
 })
+
+vi.mock('../src/UseReactPageInternals', async (mod) => ({
+  ...(await mod() as any),
+  getServerContent: vi.fn().mockReturnValue('<html>SSR</html>'),
+  getBrowserContent: vi.fn().mockReturnValue({ head: {}, app: '<div>App</div>' })
+}))
 
 describe('UseReactPageRenderer', () => {
   beforeEach(() => {
