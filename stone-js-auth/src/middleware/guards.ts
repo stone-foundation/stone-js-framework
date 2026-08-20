@@ -1,5 +1,5 @@
 import { JwtClaims } from '../declarations'
-import { AuthenticationError, AuthorizationError } from '../errors/AuthErrors'
+import { AuthenticationError, InsufficientScopeError } from '../errors/AuthErrors'
 import { IncomingEvent, NextMiddleware, OutgoingResponse, FunctionalMiddleware } from '@stone-js/core'
 
 /**
@@ -33,7 +33,7 @@ export function requireAuth (): FunctionalMiddleware<IncomingEvent, OutgoingResp
  *
  * @param required - The required scopes.
  * @returns A functional middleware that throws `AuthenticationError` (401) when anonymous or
- *          `AuthorizationError` (403) when a scope is missing.
+ *          `InsufficientScopeError` (403) when a scope is missing.
  */
 export function requireScopes (...required: string[]): FunctionalMiddleware<IncomingEvent, OutgoingResponse> {
   return async (event: IncomingEvent, next: NextMiddleware<IncomingEvent, OutgoingResponse>): Promise<OutgoingResponse> => {
@@ -47,7 +47,7 @@ export function requireScopes (...required: string[]): FunctionalMiddleware<Inco
     const missing = required.filter((scope) => !granted.includes(scope))
 
     if (missing.length > 0) {
-      throw new AuthorizationError(`Missing required scope(s): ${missing.join(', ')}.`)
+      throw new InsufficientScopeError(`Missing required scope(s): ${missing.join(', ')}.`)
     }
 
     return await next(event)

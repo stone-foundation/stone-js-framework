@@ -5,25 +5,12 @@ vi.mock('../../src/utils', async () => {
   const actual = await vi.importActual<any>('../../src/utils')
   return {
     ...actual,
-    isReactApp: vi.fn(),
     setupProcessSignalHandlers: vi.fn()
   }
 })
 
-const ReactBuilderPreview = vi.fn()
-const ServerBuilderPreview = vi.fn()
-
-vi.mock('../../src/react/ReactBuilder', () => ({
-  ReactBuilder: class {
-    preview = ReactBuilderPreview
-  }
-}))
-
-vi.mock('../../src/server/ServerBuilder', () => ({
-  ServerBuilder: class {
-    preview = ServerBuilderPreview
-  }
-}))
+const previewStep = vi.fn()
+const fallbackPreviewStep = vi.fn()
 
 vi.mock('@stone-js/filesystem', () => ({
   basePath: vi.fn(),
@@ -71,14 +58,33 @@ describe('PreviewCommand', async () => {
     pathExistsSync = fsExtra.default.pathExistsSync
 
     const utils = await import('../../src/utils')
-    vi.mocked(utils.isReactApp).mockReturnValue(true)
     buildPath.mockReturnValue('/build/preview.mjs')
     distPath.mockReturnValue('/dist/index.mjs')
 
     context = {
       blueprint: {
         meta: {},
-        get: vi.fn((_key: string, fallback?: unknown) => fallback)
+        get: vi.fn((key: string, fallback?: unknown) => {
+          if (key === 'stone.builder.builders') {
+            return {
+              react: {
+                target: 'react',
+                priority: 10,
+                match: () => true,
+                previewEntry: () => '/build/preview.mjs',
+                resolver: () => ({ preview: previewStep })
+              },
+              server: {
+                target: 'server',
+                priority: 100,
+                match: () => true,
+                previewEntry: () => '/dist/index.mjs',
+                resolver: () => ({ preview: fallbackPreviewStep })
+              }
+            }
+          }
+          return fallback
+        })
       }
     }
 
@@ -109,23 +115,30 @@ describe('PreviewCommand', async () => {
     })
   })
 
-  it('should preview react app if no valid file and isReactApp is true', async () => {
+  it('previews the target that matched, and starts what it named', async () => {
     event.get = vi.fn().mockReturnValue(undefined)
     pathExistsSync.mockReturnValue(false)
 
     const cmd = new PreviewCommand(context)
     await cmd.handle(event)
 
-    expect(ReactBuilderPreview).toHaveBeenCalledWith(event)
+    expect(previewStep).toHaveBeenCalledWith(event)
     expect(spawnMock).toHaveBeenCalledWith('node', ['/build/preview.mjs'], {
       stdio: 'inherit',
       cwd: undefined
     })
   })
 
-  it('should preview server app if isReactApp is false', async () => {
-    const utils = await import('../../src/utils')
-    vi.mocked(utils.isReactApp).mockReturnValue(false)
+  it('previews the fallback target when nothing else matched', async () => {
+    context.blueprint.get = vi.fn((key: string, fallback?: unknown) => {
+      if (key === 'stone.builder.builders') {
+        return {
+          react: { target: 'react', priority: 10, match: () => false, previewEntry: () => '/build/preview.mjs', resolver: () => ({ preview: previewStep }) },
+          server: { target: 'server', priority: 100, match: () => true, previewEntry: () => '/dist/index.mjs', resolver: () => ({ preview: fallbackPreviewStep }) }
+        }
+      }
+      return fallback
+    })
 
     event.get = vi.fn().mockReturnValue(undefined)
     pathExistsSync.mockReturnValue(false)
@@ -133,7 +146,7 @@ describe('PreviewCommand', async () => {
     const cmd = new PreviewCommand(context)
     await cmd.handle(event)
 
-    expect(ServerBuilderPreview).toHaveBeenCalledWith(event)
+    expect(fallbackPreviewStep).toHaveBeenCalledWith(event)
     expect(spawnMock).toHaveBeenCalledWith('node', ['/dist/index.mjs'], {
       stdio: 'inherit',
       cwd: undefined

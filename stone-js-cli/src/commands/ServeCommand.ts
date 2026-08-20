@@ -1,13 +1,11 @@
 import { Argv } from 'yargs'
-import { isReactApp } from '../utils'
 import { IncomingEvent } from '@stone-js/core'
 import { buildPath } from '@stone-js/filesystem'
 import { ConsoleContext } from '../declarations'
 import { StoneReporter } from '../StoneReporter'
-import { ReactBuilder } from '../react/ReactBuilder'
-import { ServerBuilder } from '../server/ServerBuilder'
 import { ProcessManager } from '../server/ProcessManager'
 import { CommandOptions } from '@stone-js/node-cli-adapter'
+import { resolveBuilder, resolveBuilderDefinition, runBuilderStep } from '../builders/resolveBuilder'
 
 /**
  * The serve command options.
@@ -21,8 +19,7 @@ export const serveCommandOptions: CommandOptions = {
     return yargs
       .positional('target', {
         type: 'string',
-        desc: 'app target to serve',
-        choices: ['server', 'react']
+        desc: 'app target to serve'
       })
       .option('language', {
         alias: 'lang',
@@ -74,23 +71,27 @@ export class ServeCommand {
    * @param event - The incoming event.
    */
   async handle (event: IncomingEvent): Promise<void> {
-    if (isReactApp(this.context.blueprint, event)) {
-      await this.startReactServer(event)
+    // Which target answers, and how it wants to be supervised, are the target's business.
+    // This command only knows the two ways a dev server can be run.
+    const definition = resolveBuilderDefinition(this.context, event)
+
+    if (definition.devMode === 'self-hosted') {
+      await this.startSelfHostedServer(event)
     } else {
       await this.startServerAndWatchFiles(event)
     }
   }
 
   /**
-   * Start the React dev server. Vite owns HMR, so no process restart is wired here — the child
-   * (the generated Vite dev server) hot-reloads on its own; we only launch and supervise it.
+   * Start a dev server that reloads itself (Vite's HMR, Expo's dev server), so no process
+   * restart is wired here: the child hot-reloads on its own, and we only launch and follow it.
    *
    * @param event - The incoming event.
    */
-  private async startReactServer (event: IncomingEvent): Promise<void> {
-    this.reporter.step('Starting Vite dev server…')
+  private async startSelfHostedServer (event: IncomingEvent): Promise<void> {
+    this.reporter.step('Starting dev server…')
 
-    await new ReactBuilder(this.context).dev(event)
+    await runBuilderStep(this.context, event, 'dev')
 
     // Vite owns HMR; if its dev server exits on its own there is nothing left to do, so mirror
     // its exit code.
@@ -105,14 +106,14 @@ export class ServeCommand {
    * @param event - The incoming event.
    */
   private async startServerAndWatchFiles (event: IncomingEvent): Promise<void> {
-    const server = new ServerBuilder(this.context)
+    const builder = resolveBuilder(this.context, event)
 
     this.reporter.step('Starting dev server…')
     const spinner = this.reporter.spin('Building application…')
     const startedAt = Date.now()
 
     try {
-      await server.dev(event)
+      await builder.dev?.(event)
       const elapsed = `(${Date.now() - startedAt}ms)`
       spinner.succeed(this.context.commandOutput.format.greenBright(
         `Built ${this.context.commandOutput.format.gray(elapsed)}`
@@ -132,11 +133,11 @@ export class ServeCommand {
     })
     this.reporter.hint('Watching for changes — press Ctrl+C to stop')
 
-    server.watchFiles(async (path, count) => {
+    builder.watchFiles?.(async (path, count) => {
       this.reporter.changed(path, count)
       const rebuiltAt = Date.now()
       try {
-        await server.dev(event, true) // restart cycle: printUrls=false (URLs already shown)
+        await builder.dev?.(event, true) // restart cycle: printUrls=false (URLs already shown)
         await this.processManager?.restart()
         this.reporter.success('Rebuilt · server restarted', Date.now() - rebuiltAt)
       } catch (error: any) {

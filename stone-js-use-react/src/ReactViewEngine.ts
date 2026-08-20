@@ -11,13 +11,16 @@ import { ViewEngine, ViewRoot, StreamRenderOptions } from '@stone-js/use-view'
  * runtime-agnostic Web `ReadableStream`), client mount and hydration.
  */
 
-const encoder = new TextEncoder()
-
 /**
  * Wrap a React output stream with a head prefix and a tail suffix, producing a single
  * Web `ReadableStream` for the full document. The prefix (open tags + serialized head) is
  * flushed first for fast TTFB, then the app shell streams, then the tail (hydration snapshot
  * + closing tags).
+ *
+ * The encoder is created here rather than at module scope: importing this module must not
+ * require `TextEncoder` to exist. Streaming is a server concern and every runtime that
+ * streams provides it, while a client engine (an older React Native one, for instance) may
+ * import this module and never stream at all.
  *
  * @param head - Markup emitted before the app shell.
  * @param stream - The React-produced Web stream.
@@ -25,6 +28,7 @@ const encoder = new TextEncoder()
  * @returns A combined Web ReadableStream.
  */
 function wrapStream (head: string | undefined, stream: ReadableStream<Uint8Array>, tail: string | undefined): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder()
   const reader = stream.getReader()
   return new ReadableStream<Uint8Array>({
     async start (controller) {

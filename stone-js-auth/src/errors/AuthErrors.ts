@@ -15,15 +15,19 @@ export class AuthenticationError extends IntegrationError {
 }
 
 /**
- * Thrown when an authenticated principal lacks the required scope/permission. Carries
- * `statusCode = 403` for a `403 Forbidden`.
+ * Thrown when an authenticated principal lacks a required scope. Carries `statusCode = 403`.
+ *
+ * Named for what happened rather than for the category it belongs to. It used to be
+ * `AuthorizationError`, which `@stone-js/authz` also exports for a policy denial — two packages, one
+ * name, and an application mapping errors had to map both and hope it had guessed which was which.
+ * Both throw sites here say "missing required scope", so this says it too.
  */
-export class AuthorizationError extends IntegrationError {
+export class InsufficientScopeError extends IntegrationError {
   readonly statusCode = 403
 
   constructor (message: string, options: ErrorOptions = {}) {
     super(message, options)
-    this.name = 'AuthorizationError'
+    this.name = 'InsufficientScopeError'
   }
 }
 

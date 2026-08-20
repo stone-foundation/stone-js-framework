@@ -1,59 +1,85 @@
 import { Argv } from 'yargs'
-import { isReactApp } from '../../src/utils'
-import { IncomingEvent } from '@stone-js/core'
 import { BuildCommand, buildCommandOptions } from '../../src/commands/BuildCommand'
-
-const ReactBuilderBuild = vi.fn()
-const ServerBuilderBuild = vi.fn()
-
-vi.mock('../../src/react/ReactBuilder', () => ({
-  ReactBuilder: class {
-    build = ReactBuilderBuild
-  }
-}))
-
-vi.mock('../../src/server/ServerBuilder', () => ({
-  ServerBuilder: class {
-    build = ServerBuilderBuild
-  }
-}))
-
-vi.mock('../../src/utils', async (mod) => {
-  const actual: any = await mod()
-  return {
-    ...actual,
-    isReactApp: vi.fn()
-  }
-})
+import { makeContext, makeEvent } from './builderTestHelpers'
 
 describe('BuildCommand', () => {
-  let context: any
-  let event: IncomingEvent
+  beforeEach(() => { vi.clearAllMocks() })
 
-  beforeEach(() => {
-    vi.clearAllMocks()
-    context = { blueprint: { meta: {} } }
-    event = { type: 'cli', payload: {} } as unknown as IncomingEvent
+  it('drives the target that matched, and only that one', async () => {
+    const react = vi.fn()
+    const server = vi.fn()
+    const context = makeContext({
+      react: { target: 'react', priority: 10, match: () => true, resolver: () => ({ build: react }) },
+      server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ build: server }) }
+    })
+    const event = makeEvent()
+
+    await new BuildCommand(context).handle(event)
+
+    expect(react).toHaveBeenCalledWith(event)
+    expect(server).not.toHaveBeenCalled()
   })
 
-  it('should call ReactBuilder if isReactApp returns true', async () => {
-    vi.mocked(isReactApp).mockReturnValue(true)
-    const command = new BuildCommand(context)
-    await command.handle(event)
+  it('falls through to the target that answers anything', async () => {
+    const react = vi.fn()
+    const server = vi.fn()
+    const context = makeContext({
+      react: { target: 'react', priority: 10, match: () => false, resolver: () => ({ build: react }) },
+      server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ build: server }) }
+    })
+    const event = makeEvent()
 
-    expect(ServerBuilderBuild).not.toHaveBeenCalled()
-    expect(ReactBuilderBuild).toHaveBeenCalledWith(event)
-    expect(isReactApp).toHaveBeenCalledWith(context.blueprint, event)
+    await new BuildCommand(context).handle(event)
+
+    expect(server).toHaveBeenCalledWith(event)
+    expect(react).not.toHaveBeenCalled()
   })
 
-  it('should call ServerBuilder if isReactApp returns false', async () => {
-    (isReactApp as any).mockReturnValue(false)
-    const command = new BuildCommand(context)
-    await command.handle(event)
+  it('lets --target override what detection would have chosen', async () => {
+    const react = vi.fn()
+    const server = vi.fn()
+    const context = makeContext({
+      react: { target: 'react', priority: 10, match: () => true, resolver: () => ({ build: react }) },
+      server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ build: server }) }
+    })
 
-    expect(ReactBuilderBuild).not.toHaveBeenCalled()
-    expect(ServerBuilderBuild).toHaveBeenCalledWith(event)
-    expect(isReactApp).toHaveBeenCalledWith(context.blueprint, event)
+    await new BuildCommand(context).handle(makeEvent({ target: 'server' }))
+
+    expect(server).toHaveBeenCalled()
+    expect(react).not.toHaveBeenCalled()
+  })
+
+  it('honours a configured target when the command line names none', async () => {
+    const server = vi.fn()
+    const context = makeContext(
+      {
+        react: { target: 'react', priority: 10, match: () => true, resolver: () => ({ build: vi.fn() }) },
+        server: { target: 'server', priority: 100, match: () => true, resolver: () => ({ build: server }) }
+      },
+      { 'stone.builder.target': 'server' }
+    )
+
+    await new BuildCommand(context).handle(makeEvent())
+
+    expect(server).toHaveBeenCalled()
+  })
+
+  it('names the registered targets when asked for one that does not exist', async () => {
+    const context = makeContext({
+      react: { target: 'react', match: () => true, resolver: () => ({ build: vi.fn() }) }
+    })
+
+    await expect(new BuildCommand(context).handle(makeEvent({ target: 'wat' })))
+      .rejects.toThrow(/Unknown build target "wat".*react/s)
+  })
+
+  it('says so when a target cannot build', async () => {
+    const context = makeContext({
+      native: { target: 'native', match: () => true, resolver: () => ({}) }
+    })
+
+    await expect(new BuildCommand(context).handle(makeEvent()))
+      .rejects.toThrow(/"build" step is not supported/)
   })
 })
 
@@ -65,7 +91,7 @@ describe('buildCommandOptions', () => {
     expect(buildCommandOptions.desc).toBe('Build project for production')
   })
 
-  it('should configure yargs with all options', () => {
+  it('accepts any registered target rather than a closed list', () => {
     const mockYargs: any = {
       positional: vi.fn().mockReturnThis(),
       option: vi.fn().mockReturnThis()
@@ -74,14 +100,12 @@ describe('buildCommandOptions', () => {
     const result = (buildCommandOptions.options as ((args: Argv<any>) => Argv<any>))(mockYargs)
 
     expect(result).toBe(mockYargs)
-    expect(mockYargs.positional).toHaveBeenCalledWith('target', expect.objectContaining({
-      type: 'string',
-      desc: 'app target to build',
-      choices: ['server', 'react']
-    }))
+    // No `choices`: the CLI cannot know at option-parsing time which targets a project
+    // registered, and an unknown one is rejected by the resolver, which can name the real list.
+    expect(mockYargs.positional).toHaveBeenCalledWith('target', expect.objectContaining({ type: 'string' }))
+    expect(mockYargs.positional.mock.calls[0][1]).not.toHaveProperty('choices')
 
-    const optionKeys = ['language', 'rendering', 'lazy', 'imperative']
-    for (const key of optionKeys) {
+    for (const key of ['language', 'rendering', 'lazy', 'imperative']) {
       expect(mockYargs.option).toHaveBeenCalledWith(
         key,
         expect.objectContaining({ type: expect.any(String), desc: expect.any(String) })

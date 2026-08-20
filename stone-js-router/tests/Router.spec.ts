@@ -308,6 +308,50 @@ describe('Router', () => {
     })
   })
 
+  describe('Navigation on a platform that is not the browser', () => {
+    // No `global.window` here, on purpose: a platform with its own navigator must never
+    // touch the History API, and the absence of a browser must not be an error anymore.
+    it('should hand the resolved intent to the configured navigator', () => {
+      const navigator = vi.fn()
+      const nativeRouter = Router.create({
+        navigator,
+        eventEmitter,
+        dependencyResolver,
+        definitions: [],
+        maxDepth: 3,
+        matchers: [],
+        dispatchers: {} as any
+      })
+
+      nativeRouter.navigate('/dashboard')
+
+      expect(navigator).toHaveBeenCalledWith({ path: '/dashboard', replace: false, options: {} })
+    })
+
+    it('should resolve a named route into a path before the navigator runs', () => {
+      const navigator = vi.fn()
+      const route = { generate: vi.fn(() => '/profile/42') }
+      routeCollection.getByName = vi.fn(() => route)
+      const nativeRouter = Router.create({
+        navigator,
+        eventEmitter,
+        dependencyResolver,
+        definitions: [],
+        maxDepth: 3,
+        matchers: [],
+        dispatchers: {} as any
+      })
+
+      nativeRouter.navigate({ name: 'profile', params: { id: 42 } }, true)
+
+      expect(navigator).toHaveBeenCalledWith({
+        path: '/profile/42',
+        replace: true,
+        options: { name: 'profile', params: { id: 42 } }
+      })
+    })
+  })
+
   describe('Route access and getters', () => {
     beforeEach(() => {
       // @ts-expect-error

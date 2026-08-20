@@ -2,7 +2,7 @@ import { Authenticator } from '../src/Authenticator'
 import { authBlueprint } from '../src/options/AuthBlueprint'
 import { AuthServiceProvider } from '../src/AuthServiceProvider'
 import { AuthenticateMiddleware } from '../src/middleware/AuthenticateMiddleware'
-import { AuthConfigError, AuthenticationError, AuthorizationError } from '../src/errors/AuthErrors'
+import { AuthConfigError, AuthenticationError, InsufficientScopeError } from '../src/errors/AuthErrors'
 
 describe('AuthServiceProvider', () => {
   it('registers the Authenticator singleton from stone.auth with aliases', () => {
@@ -29,7 +29,7 @@ describe('authBlueprint', () => {
 describe('auth errors', () => {
   it('carry the right HTTP status codes', () => {
     expect(new AuthenticationError('x').statusCode).toBe(401)
-    expect(new AuthorizationError('x').statusCode).toBe(403)
+    expect(new InsufficientScopeError('x').statusCode).toBe(403)
     expect(new AuthConfigError('x').name).toBe('AuthConfigError')
   })
 })

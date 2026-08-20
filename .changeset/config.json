@@ -54,7 +54,8 @@
       "@stone-js/create",
       "@stone-js/starters",
       "@stone-js/blog-starters",
-      "@stone-js/i18n"
+      "@stone-js/i18n",
+      "@stone-js/react-native-adapter"
     ]
   ],
   "linked": [],
