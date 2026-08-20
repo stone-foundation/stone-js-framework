@@ -553,6 +553,12 @@ export interface RouterOptions<
 
   /** List of middleware applied during route resolution. */
   middleware?: Array<MixedPipe<IncomingEventType, OutgoingResponseType>>
+
+  /**
+   * Performs the platform's navigation effect. Defaults to the browser navigator
+   * (History API plus a navigation event); a native application supplies its own.
+   */
+  navigator?: RouterNavigator
 }
 
 /**
@@ -564,6 +570,35 @@ export interface NavigateOptions {
   query?: Record<string, string | number | boolean>
   params?: Record<string, string | number | boolean>
 }
+
+/**
+ * The resolved navigation intent handed to a {@link RouterNavigator}.
+ *
+ * The router has already done the platform-independent work: a named route has been
+ * generated into a path, so the navigator only performs the platform's effect.
+ */
+export interface NavigationContext {
+  /** The resolved path to navigate to. */
+  path: string
+
+  /** Whether to replace the current entry instead of pushing a new one. */
+  replace: boolean
+
+  /** The original navigation options (route name, params, query, hash). */
+  options: Partial<NavigateOptions>
+}
+
+/**
+ * Performs the navigation effect for one platform.
+ *
+ * Navigation is the one router operation that is not platform-independent: the browser
+ * pushes onto the History API and dispatches an event, while a native application drives
+ * a navigation stack instead. Everything before the effect (matching, generating a path
+ * from a route name) is shared, so only this last step is delegated.
+ *
+ * @param context - The resolved navigation intent.
+ */
+export type RouterNavigator = (context: NavigationContext) => void
 
 /**
  * Options for generating routes.

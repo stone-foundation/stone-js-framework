@@ -1,4 +1,5 @@
 import { RouterErrorHandler } from '../RouterErrorHandler'
+import { browserNavigator } from '../navigators'
 import { RouterServiceProvider } from '../RouterServiceProvider'
 import { ClassDispatcher } from '../dispatchers/ClassDispatcher'
 import { RouterOptions, StoneIncomingEvent } from '../declarations'
@@ -81,6 +82,7 @@ export const routerBlueprint: RouterBlueprint = {
       ],
       middleware: [],
       definitions: [],
+      navigator: browserNavigator,
       dispatchers: {
         class: ClassDispatcher,
         redirect: RedirectDispatcher,
