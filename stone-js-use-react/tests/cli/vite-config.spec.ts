@@ -1,5 +1,6 @@
+// @vitest-environment node
 import builtins from 'module'
-import { viteConfig as getViteConfig } from '../../src/react/vite-config'
+import { viteConfig as getViteConfig } from '../../src/cli/vite-config'
 
 vi.mock('vite-plugin-babel', () => ({
   default: vi.fn(v => v)

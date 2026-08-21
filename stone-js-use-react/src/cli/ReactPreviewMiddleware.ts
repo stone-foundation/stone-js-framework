@@ -2,7 +2,7 @@ import fsExtra from 'fs-extra'
 import { IBlueprint } from '@stone-js/core'
 import { viteDevServerTemplate } from './stubs'
 import { buildPath } from '@stone-js/filesystem'
-import { ConsoleContext } from '../declarations'
+import { ConsoleContext } from '@stone-js/cli'
 import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 
 const { outputFileSync } = fsExtra

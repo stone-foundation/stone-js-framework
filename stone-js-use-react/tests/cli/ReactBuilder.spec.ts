@@ -1,30 +1,30 @@
+// @vitest-environment node
 import { Pipeline } from '@stone-js/pipeline'
-import { CliError } from '../../src/errors/CliError'
-import { ReactBuilder } from '../../src/react/ReactBuilder'
-import { isCSR, isSSR, isSSG, isTypescriptApp } from '../../src/utils'
+import { CliError, isCSR, isSSR, isSSG, isTypescriptApp } from '@stone-js/cli'
+import { ReactBuilder } from '../../src/cli/ReactBuilder'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 
 vi.mock('node:fs')
 
 vi.mock('@stone-js/filesystem')
 
-vi.mock('../../src/react/ReactBuildMiddleware', () => ({
+vi.mock('../../src/cli/ReactBuildMiddleware', () => ({
   ReactCSRBuildMiddleware: ['csr'],
   ReactSSRBuildMiddleware: ['ssr'],
   ReactSSGBuildMiddleware: ['ssg']
 }))
 
-vi.mock('../../src/react/ReactDevMiddleware', () => ({
+vi.mock('../../src/cli/ReactDevMiddleware', () => ({
   ReactDevMiddleware: ['dev'],
   ReactConsoleMiddleware: ['console']
 }))
 
-vi.mock('../../src/react/ReactPreviewMiddleware', () => ({
+vi.mock('../../src/cli/ReactPreviewMiddleware', () => ({
   ReactPreviewMiddleware: ['preview']
 }))
 
-vi.mock('../../src/utils', async () => {
-  const actual = await vi.importActual<typeof import('../../src/utils')>('../../src/utils')
+vi.mock('@stone-js/cli', async () => {
+  const actual = await vi.importActual<typeof import('@stone-js/cli')>('@stone-js/cli')
   return {
     ...actual,
     isCSR: vi.fn(),

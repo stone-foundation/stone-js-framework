@@ -1,23 +1,19 @@
 import { glob } from 'glob'
 import fsExtra from 'fs-extra'
 import { runSsg, collectStaticTargets, RouteDefinitionLike, SsgParams, SkippedTargets } from './ssg'
-import { CliError } from '../errors/CliError'
+import { CliError, ConsoleContext, generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp, checkAppLevelDecoratorsInTsx, applyPluginInjections, RunStonePluginsBundleMiddleware } from '@stone-js/cli'
 import { relative } from 'node:path'
 import { existsSync } from 'node:fs'
 import { build, mergeConfig } from 'vite'
-import { ConsoleContext } from '../declarations'
 import { spawn, ChildProcess } from 'node:child_process'
 import { PageRouteDefinition } from '@stone-js/router'
 import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 import { removeImportsVitePlugin } from './RemoveImportsVitePlugin'
 import { basePath, buildPath, distPath } from '@stone-js/filesystem'
 import { isNotEmpty, IBlueprint, ClassType, isStoneBlueprint } from '@stone-js/core'
-import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp, checkAppLevelDecoratorsInTsx } from '../utils'
 import { generateDeclarativeLazyPages, generateImperativeLazyPages, getViteConfig } from './react-utils'
 import { reactHtmlEntryPointTemplate, reactClientEntryPointTemplate, reactServerEntryPointTemplate } from './stubs'
-import { applyPluginInjections } from '../plugins/applyPluginInjections'
-import { RunStonePluginsBundleMiddleware } from '../plugins/RunStonePluginsMiddleware'
-import { MetaAdapterErrorPage, MetaErrorPage, MetaPageLayout, ReactIncomingEvent, UseReactBlueprint } from '@stone-js/use-react'
+import { MetaAdapterErrorPage, MetaErrorPage, MetaPageLayout, ReactIncomingEvent, UseReactBlueprint } from '@stone-js/use-react-core'
 
 const { outputFileSync, moveSync, removeSync, readFileSync } = fsExtra
 
@@ -572,7 +568,9 @@ export const GenerateStaticSiteMiddleware = async (
   const extraTargets = configured.map((path) => ({ path }))
   if (derived.length === 0 && extraTargets.length === 0) extraTargets.push({ path: '/' })
 
-  const child = spawn('node', [distPath(output)], { stdio: ['ignore', 'pipe', 'pipe'] })
+  // `process.execPath`, not `'node'`: the SSR server has to run on the same Node that is building,
+  // and a bare command name is resolved through `PATH`, which decides neither of those things.
+  const child = spawn(process.execPath, [distPath(output)], { stdio: ['ignore', 'pipe', 'pipe'] })
 
   try {
     const baseUrl = await waitForServer(child, adapterUrl)

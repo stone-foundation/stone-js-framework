@@ -1,7 +1,8 @@
+// @vitest-environment node
 import fsExtra from 'fs-extra'
 import { buildPath } from '@stone-js/filesystem'
-import { viteDevServerTemplate } from '../../src/react/stubs'
-import { ReactPreviewMiddleware } from '../../src/react/ReactPreviewMiddleware'
+import { viteDevServerTemplate } from '../../src/cli/stubs'
+import { ReactPreviewMiddleware } from '../../src/cli/ReactPreviewMiddleware'
 
 const { outputFileSync } = fsExtra
 
@@ -15,7 +16,7 @@ vi.mock('@stone-js/filesystem', async () => ({
   buildPath: vi.fn(() => '/dist/preview.mjs')
 }))
 
-vi.mock('../../src/react/stubs', async () => ({
+vi.mock('../../src/cli/stubs', async () => ({
   viteDevServerTemplate: vi.fn(() => '// vite server stub')
 }))
 

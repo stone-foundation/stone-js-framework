@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mkdtempSync, rmSync, readFileSync, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -12,7 +13,7 @@ import {
   targetToFilePath,
   writePrerendered,
   runSsg
-} from '../../src/react/ssg'
+} from '../../src/cli/ssg'
 
 describe('collectStaticTargets', () => {
   it('keeps only static GET routes and dedupes', () => {

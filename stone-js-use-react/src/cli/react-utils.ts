@@ -20,11 +20,10 @@ import {
   REACT_PAGE_LAYOUT_KEY,
   AdapterErrorPageOptions,
   REACT_ADAPTER_ERROR_PAGE_KEY
-} from '@stone-js/use-react'
+} from '@stone-js/use-react-core'
 import { existsSync } from 'node:fs'
 import { viteConfig } from './vite-config'
-import { AssetsConfig } from '../options/BuilderConfig'
-import { getStoneBuilderConfig } from '../utils'
+import { AssetsConfig, getStoneBuilderConfig } from '@stone-js/cli'
 import { removeImportsVitePlugin } from './RemoveImportsVitePlugin'
 import { basePath, buildPath, distPath } from '@stone-js/filesystem'
 import { PageRouteDefinition, GET, RouterBlueprint } from '@stone-js/router'

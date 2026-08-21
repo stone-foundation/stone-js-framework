@@ -1,13 +1,14 @@
+// @vitest-environment node
 import {
   getViteConfig,
   runDevServer,
   runPreviewServer,
   generateImperativeLazyPages,
   generateDeclarativeLazyPages
-} from '../../src/react/react-utils'
+} from '../../src/cli/react-utils'
 import { existsSync } from 'fs'
 import { getMetadata } from '@stone-js/core'
-import { getStoneBuilderConfig } from '../../src/utils'
+import { getStoneBuilderConfig } from '@stone-js/cli'
 import { loadConfigFromFile, preview, createServer } from 'vite'
 
 /* eslint-disable @typescript-eslint/no-extraneous-class */
@@ -24,18 +25,20 @@ vi.mock('vite', async () => ({
   loadConfigFromFile: vi.fn()
 }))
 
-vi.mock('../../src/react/vite-config', async () => ({
+vi.mock('../../src/cli/vite-config', async () => ({
   viteConfig: vi.fn().mockImplementation(({ command, mode }) => ({
     command,
     mode
   }))
 }))
 
-vi.mock('../../src/react/RemoveImportsVitePlugin', async () => ({
+vi.mock('../../src/cli/RemoveImportsVitePlugin', async () => ({
   removeImportsVitePlugin: vi.fn().mockImplementation(() => 'plugin')
 }))
 
-vi.mock('../../src/utils', async () => ({
+// A partial mock: only the build configuration is stubbed, the rest of the CLI stays real.
+vi.mock('@stone-js/cli', async (mod) => ({
+  ...(await mod<Record<string, unknown>>()),
   getStoneBuilderConfig: vi.fn().mockResolvedValue({
     server: { printUrls: true },
     browser: { excludedModules: ['a'] },

@@ -1,5 +1,6 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest'
-import { buildAssetAliases } from '../../src/react/react-utils'
+import { buildAssetAliases } from '../../src/cli/react-utils'
 
 describe('buildAssetAliases', () => {
   it('maps aliases to absolute subfolders of the assets dir', () => {

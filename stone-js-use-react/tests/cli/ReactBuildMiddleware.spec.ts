@@ -1,3 +1,4 @@
+// @vitest-environment node
 import * as vite from 'vite'
 import fsExtra from 'fs-extra'
 import * as globModule from 'glob'
@@ -13,10 +14,9 @@ import {
   GenerateIndexHtmlFileMiddleware,
   GeneratePublicEnvFileMiddleware,
   GenerateReactServerFileMiddleware
-} from '../../src/react/ReactBuildMiddleware'
-import { stoneCliBlueprint } from '../../src/options/StoneCliBlueprint'
-import { generateImperativeLazyPages, generateDeclarativeLazyPages } from '../../src/react/react-utils'
-import { generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp, checkAppLevelDecoratorsInTsx } from '../../src/utils'
+} from '../../src/cli/ReactBuildMiddleware'
+import { generateImperativeLazyPages, generateDeclarativeLazyPages } from '../../src/cli/react-utils'
+import { stoneCliBlueprint, generatePublicEnvironmentsFile, isDeclarative, isLazyViews, isTypescriptApp, checkAppLevelDecoratorsInTsx } from '@stone-js/cli'
 
 const { outputFileSync, moveSync, removeSync, readFileSync } = fsExtra
 
@@ -68,7 +68,10 @@ vi.mock('@stone-js/filesystem', async () => ({
   distPath: (p: string) => `./dist/${p ?? ''}`
 }))
 
-vi.mock('../../src/utils', async () => ({
+// A partial mock: `applyPluginInjections` and `RunStonePluginsBundleMiddleware` must stay real,
+// so only the predicates this middleware branches on are stubbed.
+vi.mock('@stone-js/cli', async (mod) => ({
+  ...(await mod<Record<string, unknown>>()),
   generatePublicEnvironmentsFile: vi.fn().mockReturnValue(true),
   isDeclarative: vi.fn().mockReturnValue(false),
   isLazyViews: vi.fn().mockReturnValue(true),
@@ -76,13 +79,13 @@ vi.mock('../../src/utils', async () => ({
   checkAppLevelDecoratorsInTsx: vi.fn().mockReturnValue([])
 }))
 
-vi.mock('../../src/react/react-utils', async () => ({
+vi.mock('../../src/cli/react-utils', async () => ({
   getViteConfig: vi.fn().mockResolvedValue({ test: true }),
   generateDeclarativeLazyPages: vi.fn(() => ({ definitions: [], layouts: {}, errorPages: {}, adapterErrorPages: {} })),
   generateImperativeLazyPages: vi.fn(() => ({ definitions: [], layouts: {}, errorPages: {}, adapterErrorPages: {} }))
 }))
 
-vi.mock('../../src/react/stubs', async () => ({
+vi.mock('../../src/cli/stubs', async () => ({
   reactHtmlEntryPointTemplate: vi.fn(() => '<html><!--main-js--><!--main-css--></html>'),
   reactClientEntryPointTemplate: vi.fn(() => '// client %pattern%\n// %concat%'),
   reactServerEntryPointTemplate: vi.fn(() => '// server %pattern%\n// %blueprint%')

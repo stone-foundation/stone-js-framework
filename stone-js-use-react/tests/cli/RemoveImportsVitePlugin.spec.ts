@@ -1,5 +1,6 @@
+// @vitest-environment node
 import { readFileSync } from 'node:fs'
-import { removeImportsVitePlugin } from '../../src/react/RemoveImportsVitePlugin'
+import { removeImportsVitePlugin } from '../../src/cli/RemoveImportsVitePlugin'
 
 // Create a spy on readFileSync
 vi.mock('node:fs', () => ({
