@@ -477,6 +477,20 @@ export class Kernel<
       return await responseResolver(options)
     }
 
+    // The agnostic response, exactly: a module that stays platform-neutral builds `OutgoingResponse`,
+    // and every platform has its own subclass to actually answer with. Handing the base class straight
+    // to an adapter fails where it writes, with an error about a chunk that names nothing. Its options
+    // go through the platform's resolver instead, which is the same translation a bare value gets.
+    // A platform subclass is already what the adapter wants and passes through untouched.
+    if (returnedValue.constructor === OutgoingResponse && !isEmpty(responseResolver)) {
+      const options: ResponseResolverOptions = {
+        content: returnedValue.content,
+        statusCode: returnedValue.statusCode,
+        statusMessage: returnedValue.statusMessage
+      }
+      return await responseResolver(options)
+    }
+
     return returnedValue as OutgoingResponseType
   }
 

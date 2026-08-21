@@ -48,7 +48,7 @@ export interface ICommandHandler<
   X = unknown
 > {
   handle: FunctionalCommandHandler<W, X>
-  match?: (event: IncomingEvent) => boolean
+  match?: (event: W) => boolean
 }
 
 /**

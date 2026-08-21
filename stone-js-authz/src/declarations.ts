@@ -38,13 +38,13 @@ export interface AuthzOptions {
 /**
  * The authorization service contract.
  */
-export interface IAuthorizer {
+export interface IAuthorizer<UserType = unknown> {
   /** Build the ability for a principal. */
-  abilityFor: (user: unknown) => AppAbility
+  abilityFor: (user: UserType) => AppAbility
   /** Whether the principal may perform `action` on `subject`. */
-  can: (user: unknown, action: Action, subject: Subject, field?: string) => boolean
+  can: (user: UserType, action: Action, subject: Subject, field?: string) => boolean
   /** Whether the principal may NOT perform `action` on `subject`. */
-  cannot: (user: unknown, action: Action, subject: Subject, field?: string) => boolean
+  cannot: (user: UserType, action: Action, subject: Subject, field?: string) => boolean
   /** Assert the principal may perform `action` on `subject`, or throw. */
-  authorize: (user: unknown, action: Action, subject: Subject, field?: string) => void
+  authorize: (user: UserType, action: Action, subject: Subject, field?: string) => void
 }
