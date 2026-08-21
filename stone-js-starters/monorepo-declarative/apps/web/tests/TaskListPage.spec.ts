@@ -23,12 +23,15 @@ describe('TaskListPage', () => {
   it('toggles a task through the domain, and says how many are left', async () => {
     const app = await createTestApp()
 
+    // Asserted through the head rather than the body: React's server renderer splits the text
+    // around `{data.remaining}` into separate nodes, so the body reads `1<!-- --> left to do`.
+    // `head` builds one string, which is also what a browser tab and a navigator show.
     const before = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/' }))
-    expect(before.html()).toContain('1 left to do')
+    expect(before.html()).toContain('<title>1 left · Acme tasks</title>')
 
     const after = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/?toggle=3' }))
 
     expect(after.statusCode).toBe(200)
-    expect(after.html()).toContain('0 left to do')
+    expect(after.html()).toContain('<title>0 left · Acme tasks</title>')
   })
 })
