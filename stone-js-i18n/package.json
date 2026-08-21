@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/i18n",
-  "version": "0.8.9",
+  "version": "0.8.10",
   "description": "Framework-agnostic, cloud-native i18n for Stone.js. Zero-config: drop your translations in app/i18n/<lang>/ and use them identically on the backend and the frontend. Powered by i18next.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

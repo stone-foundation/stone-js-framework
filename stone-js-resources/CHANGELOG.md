@@ -1,5 +1,90 @@
 # @stone-js/resources
 
+## 0.8.10
+
+### Patch Changes
+
+- d01d92b: Resources stand alone, and a contract is derived from everything a route declares.
+
+  **Resources no longer depend on a validation module.** Exposing data required enabling
+  `@stone-js/validation` and throwing without it — coupling with nothing to show for it. The module now
+  carries its own `ContractChecker`, which reads _specifications_ rather than one library's API:
+  Standard Schema first (Zod, Valibot, ArkType and others), then `safeParse`, `parse` or `validate`.
+  Pass your own `checker` to teach it another dialect. A schema it cannot run raises rather than
+  reporting success, and an asynchronous schema says so instead of serialising a promise.
+
+  **The route option is `contract`, not `openapi`.** A route describes itself; OpenAPI is one way of
+  rendering that description, and naming the option after a specification put that specification's name
+  in the router's vocabulary. `contract: { summary }` states what the derivation cannot know, and
+  `contract: false` keeps an endpoint out of the document.
+
+  **Everything a route declares is now discovered, wherever it was written.** The document reads the
+  route option _and_ the handler's own decorator — `@Validate`, `@Returns`, `@Protect`, `@Can` — for all
+  four concerns. Both modules advertise working without a router, and a contract that only read route
+  options documented half of such an application: endpoints listed, payloads missing. The keys are read
+  as strings, so `@stone-js/openapi` still depends on none of those packages.
+
+  **A named resource is documented.** Neither call site passed the resource registry, so
+  `{ resource: 'task' }` — the recommended style — produced no documented response while an inline
+  resource did. Both now hand over `stone.resources.registry`.
+
+  **Fragments are part of the contract, not prose.** They were named in a description, invisible to a
+  generated client, a form or a test. They are now an enumerated query parameter, under the name the
+  application actually answers to (`stone.resources.params.fragment`), so a document never advertises a
+  parameter the app does not have.
+
+  **A declaration that could not be read is reported.** Omitting a contract we cannot build stays the
+  rule — a wrong contract is worse than a missing one — but silence meant an endpoint shipped
+  undocumented inside a document that looked complete. `stone openapi` prints one line per skipped
+  declaration, naming the route and the reason, and the served handler logs the same.
+
+- 35c159b: Resources declare what leaves as a schema, and hold themselves to it.
+
+  A projection written as code answered "what does this endpoint return?" only to someone who read it
+  and trusted it: nothing checked it, nothing documented it, and a field added to the model later leaked
+  because a mapping was not updated. A resource now declares a **schema**, in whatever dialect the
+  application already validates input with, and that one declaration does three jobs — it _is_ the
+  projection (what it does not describe is not exposed), it validates the response before it is sent,
+  and `@stone-js/openapi` derives the output contract from it.
+
+  - `schema(context)` is the contract. `fragments(context)` names subsets a caller may select through a
+    configurable query parameter (`?view=summary` by default), each a documented contract of its own
+    rather than an ad-hoc filter.
+  - `data(model, context)` is an optional, asynchronous hook resolved from the container: fetch a
+    relation, translate a label, compute a total. Whatever it returns is what the schema validates.
+  - `item`, `collection` and `response` are asynchronous. The previous synchronous path turned an async
+    projection into `{}` without a word.
+  - A breach raises `ResourceContractError` naming the field that failed. It fires on a genuine breach,
+    never on a difference, since a schema strips what it does not describe. `onViolation: 'warn'` trades
+    integrity for availability, explicitly.
+  - The context now carries the authenticated principal and the event, so a resource deciding what a
+    caller may see no longer has to be told by the handler.
+
+  **Fixes a defect that made route-declared resources unusable with a response decorator.**
+  `@JsonHttpResponse(201)` wraps the method itself, so by the time route middleware ran the handler had
+  already produced a response; projecting that object produced an empty payload and dropped the status.
+  The payload is now shaped in place, and the status, headers and everything else the handler chose are
+  left alone.
+
+  Also fixed, all found by consumers rather than by us:
+
+  - `@ValidationSchema` was **invisible to TypeScript**: the barrel exported an interface and a decorator
+    of the same name, and TypeScript drops a name two `export *` both provide. The interface is now
+    `NativeSchema`, matching the `isNativeSchema` guard that already existed.
+  - `@stone-js/auth`'s `AuthorizationError` is now `InsufficientScopeError`. It is thrown for a missing
+    scope, and it shared a name with `@stone-js/authz`'s error for a policy denial, so an application
+    mapping errors had to map two identical names from two packages.
+  - The auth documentation described an `Authenticator` with `authenticate(event)` that was never
+    shipped; it now documents `resolveUser`, which is the real extension point, and `event.getUser()`
+    rather than `event.get('user')` — the principal travels through a resolver, so the generic accessor
+    never reached it. The same mistake was in this module's own code.
+  - Two decorator examples showed options that do not exist (`@Validation({ abortEarly })`,
+    `@Authz({ abilities })`); they now show `schemas` and `resolveAbility`.
+
+- Updated dependencies [9f074f8]
+  - @stone-js/core@0.8.10
+  - @stone-js/config@0.8.10
+
 ## 0.8.9
 
 ### Patch Changes
