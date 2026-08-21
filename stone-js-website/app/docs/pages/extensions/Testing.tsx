@@ -48,7 +48,8 @@ export class Testing implements IPage<ReactIncomingEvent> {
             </p>
           }
         />
-        <Code file='tests/tasks.test.ts'>{`import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
+        <Code file='tests/tasks.test.ts'>{`import { createTestApp } from '@stone-js/testing'
+import { makeIncomingHttpEvent } from '@stone-js/testing/http'
 
 it('creates a task', async () => {
   // No module list: your app is discovered from app/**, the same files the CLI builds.

@@ -36,6 +36,10 @@
     "./browser": {
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "default": "./dist/http.js"
     }
   },
   "engines": {
@@ -100,6 +104,9 @@
   },
   "peerDependenciesMeta": {
     "@stone-js/browser-core": {
+      "optional": true
+    },
+    "@stone-js/http-core": {
       "optional": true
     }
   }

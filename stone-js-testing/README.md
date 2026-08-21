@@ -30,7 +30,8 @@ npm i @stone-js/testing
 Nothing to list: your application is discovered from `app/**`, the same files the CLI builds.
 
 ```ts
-import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
+import { createTestApp } from '@stone-js/testing'
+import { makeIncomingHttpEvent } from '@stone-js/testing/http'
 
 const app = await createTestApp()                 // boots the REAL app in-memory, no port
 const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/tasks' }))

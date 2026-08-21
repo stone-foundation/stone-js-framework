@@ -2,7 +2,7 @@
   "name": "@stone-js/lab-ssr",
   "private": true,
   "version": "0.0.0",
-  "description": "Lab app: React server-side rendering with client hydration (isomorphic). Same pages as spa/ssg — only the rendering strategy differs.",
+  "description": "Lab app: React server-side rendering with client hydration (isomorphic). Same pages as spa/ssg \u2014 only the rendering strategy differs.",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
@@ -29,6 +29,7 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.27.0",
     "@stone-js/cli": "workspace:*",
+    "@stone-js/http-core": "workspace:*",
     "@stone-js/testing": "workspace:*",
     "@types/node": "^24.0.7",
     "@types/react": "^19.0.7",

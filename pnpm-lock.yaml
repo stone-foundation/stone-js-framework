@@ -2525,6 +2525,9 @@ importers:
       '@stone-js/cli':
         specifier: workspace:*
         version: link:../../../stone-js-cli
+      '@stone-js/http-core':
+        specifier: workspace:*
+        version: link:../../../stone-js-http-core
       '@stone-js/testing':
         specifier: workspace:*
         version: link:../../../stone-js-testing
@@ -2629,6 +2632,9 @@ importers:
       '@stone-js/cli':
         specifier: workspace:*
         version: link:../../../stone-js-cli
+      '@stone-js/http-core':
+        specifier: workspace:*
+        version: link:../../../stone-js-http-core
       '@stone-js/testing':
         specifier: workspace:*
         version: link:../../../stone-js-testing

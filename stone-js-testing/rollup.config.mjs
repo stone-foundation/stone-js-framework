@@ -12,9 +12,14 @@ export default createRollupConfig({
   nodeResolve,
   nodeExternals,
   builds: [
-    { input: ['src/**/*.ts', '!src/browser.ts'], file: 'dist/index.js', barrel: { exclude: ['browser'] } },
-    // `./browser` on its own, so `@stone-js/browser-core` is only imported by a project that
-    // renders. A service testing its handlers never loads this file.
+    // The agnostic half: `createTestApp`, the client, the bindings, the generic event. It imports no
+    // platform package, which is what lets both of the others be optional.
+    {
+      input: ['src/**/*.ts', '!src/http.ts', '!src/browser.ts'],
+      file: 'dist/index.js',
+      barrel: { exclude: ['http', 'browser'] }
+    },
+    { input: ['src/http.ts'], file: 'dist/http.js', multiEntry: false },
     { input: ['src/browser.ts'], file: 'dist/browser.js', multiEntry: false }
   ]
 })
