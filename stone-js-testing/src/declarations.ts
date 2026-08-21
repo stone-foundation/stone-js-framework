@@ -56,6 +56,20 @@ export interface TestAppOptions {
    */
   platform?: string
 
-  /** A base blueprint to merge in (shorthand for a single blueprint module). */
+  /**
+   * Blueprint values to force, whatever the application says.
+   *
+   * Merged after the application's own modules, so it wins. That is the only ordering a test can
+   * use: `@StoneApp` carries the default blueprint, which sets nearly every key, so anything merged
+   * before it is overwritten and the option would do nothing.
+   *
+   * This is the configuration counterpart of `bindings`: one replaces a service, the other replaces
+   * a value.
+   *
+   * @example
+   * ```ts
+   * const app = await createTestApp({ blueprint: { stone: { debug: true } } })
+   * ```
+   */
   blueprint?: Partial<StoneBlueprint>
 }

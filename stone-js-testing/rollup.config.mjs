@@ -5,4 +5,21 @@ import nodeResolve from '@rollup/plugin-node-resolve'
 import nodeExternals from 'rollup-plugin-node-externals'
 import { createRollupConfig } from '../rollup.config.base.mjs'
 
-export default createRollupConfig({ multi, commonjs, typescript, nodeResolve, nodeExternals })
+export default createRollupConfig({
+  multi,
+  commonjs,
+  typescript,
+  nodeResolve,
+  nodeExternals,
+  builds: [
+    // The agnostic half: `createTestApp`, the client, the bindings, the generic event. It imports no
+    // platform package, which is what lets both of the others be optional.
+    {
+      input: ['src/**/*.ts', '!src/http.ts', '!src/browser.ts'],
+      file: 'dist/index.js',
+      barrel: { exclude: ['http', 'browser'] }
+    },
+    { input: ['src/http.ts'], file: 'dist/http.js', multiEntry: false },
+    { input: ['src/browser.ts'], file: 'dist/browser.js', multiEntry: false }
+  ]
+})

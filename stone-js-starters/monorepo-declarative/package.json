@@ -1,0 +1,28 @@
+{
+  "name": "acme",
+  "private": true,
+  "version": "1.0.0",
+  "description": "One domain, two applications: a Stone.js monorepo starter.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "pnpm --filter @acme/domain build && pnpm --filter @acme/web build",
+    "dev:web": "pnpm --filter @acme/web dev",
+    "dev:mobile": "pnpm --filter @acme/mobile start",
+    "test": "pnpm -r run test",
+    "typecheck": "pnpm -r run typecheck",
+    "domain": "pnpm --filter @acme/domain"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.2.3",
+      "react-dom": "19.2.3"
+    }
+  }
+}

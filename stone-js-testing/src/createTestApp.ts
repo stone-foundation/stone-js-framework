@@ -42,8 +42,10 @@ export async function createTestApp (options: TestAppOptions = {}): Promise<Test
 
   const modules = [
     options.platform === undefined ? testAdapterBlueprint : testAdapterBlueprintFor(options.platform),
-    ...(options.blueprint !== undefined ? [options.blueprint] : []),
     ...appModules,
+    // After the application's own modules, so a test can force a value. Merged before it, the option
+    // did nothing: `@StoneApp` carries the default blueprint, which sets nearly every key.
+    ...(options.blueprint !== undefined ? [options.blueprint] : []),
     // Last, so a substitution wins over the registration it replaces.
     ...(options.bindings !== undefined ? [testBindingsProvider(options.bindings)] : [])
   ]

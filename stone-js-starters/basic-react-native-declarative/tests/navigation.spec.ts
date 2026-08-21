@@ -1,22 +1,25 @@
 import { stoneApp } from '@stone-js/core'
 import { Application } from '../app/Application'
-import { HomeScreenBlueprint } from '../app/HomeScreen'
+import { HomeScreen } from '../app/HomeScreen'
 import { ScreenStack } from '@stone-js/use-react-native'
 import { NavigationSource } from '@stone-js/react-native-adapter'
 
 /**
- * The whole application, booted under Node and asked real questions.
+ * Navigation, with the real adapter this time.
  *
- * Nothing is mocked. The kernel, the router, the adapter and the renderer are the ones a phone
- * runs; what a device adds is a screen to draw on, and this asserts what the framework resolved
- * before drawing. Two things are supplied rather than discovered, both through documented
- * configuration: the navigation source, so the test can send a deep link, and the screen stack, so
- * it can read what landed on it.
+ * `HomeScreen.spec.ts` asks what a route resolves to, which is the same question on every platform
+ * and needs no adapter. This asks the native question instead: what lands on the navigation stack,
+ * and in what order. So nothing is substituted here. The kernel, the router, the React Native adapter
+ * and the renderer are the ones a phone runs; what a device adds is a screen to draw on.
+ *
+ * Two things are supplied rather than discovered, both through documented configuration: the
+ * navigation source, so the test can send a deep link, and the screen stack, so it can read what
+ * landed on it.
  *
  * Screens are listed here because the generated manifest (`.stone/modules.ts`) is Metro's, written
  * when Metro starts. Under a test runner the modules are imported directly, which is the same set.
  */
-describe('Screens', () => {
+describe('Navigation', () => {
   const screens = ScreenStack.create()
   const navigation = NavigationSource.create({ baseUrl: 'stone://app' })
 
@@ -26,7 +29,7 @@ describe('Screens', () => {
     await stoneApp({
       modules: [
         Application,
-        HomeScreenBlueprint,
+        HomeScreen,
         { stone: { reactNative: { navigationSource: navigation }, useReactNative: { screenStack: screens } } }
       ]
     }).run()

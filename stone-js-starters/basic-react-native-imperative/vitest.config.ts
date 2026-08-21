@@ -22,6 +22,12 @@ export default defineConfig({
     }
   },
   test: {
+    // `createTestApp()` discovers the application's modules by importing them at run time. Vitest
+    // externalises dependencies from `node_modules`, and an externalised module's `import()` is
+    // Node's, which cannot load a `.ts` file. Inlining the package puts those imports back through
+    // Vite's transform. `stone test` does this for you; a project running Vitest directly, as an
+    // Expo project does, states it here.
+    server: { deps: { inline: ['@stone-js/testing'] } },
     globals: true,
     environment: 'node',
     include: ['./tests/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
