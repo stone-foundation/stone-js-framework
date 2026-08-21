@@ -6,6 +6,14 @@ import { MetaResourceRouteMiddleware } from '../middleware/ResourceRouteMiddlewa
 /**
  * Resources configuration bucket (`stone.resources`).
  */
+/**
+ * The envelope an application wraps its payloads in.
+ */
+export interface ResourceEnvelopeConfig {
+  /** The key, or keys, that hold the payload to shape. */
+  payload: string | string[]
+}
+
 export interface ResourcesConfig {
   /**
    * The query parameters a caller uses to ask for a shape.
@@ -36,6 +44,23 @@ export interface ResourcesConfig {
    * model unshaped, because an unshaped model is exactly what a resource exists to prevent.
    */
   registry?: Record<string, IResource<any, any>>
+
+  /**
+   * The envelope this application wraps its payloads in, if it wraps them at all.
+   *
+   * A handler answering a page returns something like `{ items: [...], meta: { total } }`, and `items`
+   * and `meta` are not fields of a model: shaping that object would publish the wrapper as if it were
+   * the thing. Naming the word once is enough, and everything around the payload is left as it was,
+   * counts and cursors included.
+   *
+   * ```ts
+   * blueprint.set('stone.resources.envelope', { payload: 'items' })
+   * ```
+   *
+   * Undeclared by default, because guessing which key holds the payload would quietly mangle a model
+   * that happens to have one by that name.
+   */
+  envelope?: ResourceEnvelopeConfig
 }
 
 /**

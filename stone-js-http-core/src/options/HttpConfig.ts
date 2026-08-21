@@ -1,6 +1,7 @@
 import { Encoding } from 'node:crypto'
 import { CookieOptions } from '../declarations'
 import { HttpErrorHandler } from '../HttpErrorHandler'
+import { MetaRouteResponseMiddleware } from '../middleware/RouteResponseMiddleware'
 import { IncomingHttpEvent } from '../IncomingHttpEvent'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { OutgoingHttpResponse } from '../OutgoingHttpResponse'
@@ -227,6 +228,12 @@ export const httpCoreBlueprint: HttpCoreBlueprint = {
       errorHandlers: {
         default: { module: HttpErrorHandler, isClass: true }
       }
+    },
+    // Inert until a route declares a `response`, and then it is what builds it. On the router layer
+    // because only there is a route matched, and outermost because it produces the final answer: the
+    // payload has been shaped and the guards have spoken by the time it runs.
+    router: {
+      middleware: [MetaRouteResponseMiddleware]
     },
     http: {
       hosts: {

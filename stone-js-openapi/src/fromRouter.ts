@@ -242,11 +242,17 @@ function responsesFrom (read: { schema: unknown }, status: number): Record<strin
  * @returns The success status.
  */
 function successStatus (route: RouteLike): number {
+  // A route that declares what it answers with has already said the status, and that declaration is
+  // what builds the response at run time: reading it here is what keeps the document and the answer
+  // the same statement.
+  const declaredResponse = route.getOption<{ status?: number }>('response')
+  if (typeof declaredResponse?.status === 'number') { return declaredResponse.status }
+
   const onRoute = route.getOption<number>('statusCode')
   if (typeof onRoute === 'number') { return onRoute }
 
-  const declared = declaredOn(route, 'status')
-  return typeof declared === 'number' ? declared : 200
+  const fromDecorator = declaredOn(route, 'status')
+  return typeof fromDecorator === 'number' ? fromDecorator : 200
 }
 
 /**
