@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    /* What a strict application turns on, and exactly what the type parameters exist to survive: a
+       property-typed hook is contravariant on its parameters, so narrowing the context in a subclass
+       was rejected outright before they were threaded through. Checked against the published types,
+       the way a consumer sees them, rather than against the sources. */
+    "strict": true,
+    "strictFunctionTypes": true,
+    "exactOptionalPropertyTypes": true,
+    "paths": { "@stone-js/resources": ["./dist/index.d.ts"] }
+  },
+  "include": ["types-tests/**/*.ts"]
+}

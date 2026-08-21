@@ -16,6 +16,15 @@ export class CompressionMiddleware {
   async handle (event: IncomingHttpEvent, next: NextMiddleware<IncomingHttpEvent, OutgoingHttpResponse>): Promise<OutgoingHttpResponse> {
     const response = await next(event)
 
+    // Compression is a transport concern, and this middleware is global: in an application that
+    // renders rather than serves, the response coming back is a browser or a native one, which has
+    // no headers to set because nothing is going over a wire. Reaching for `setHeader` there threw
+    // `response.removeHeader is not a function`, and only above 1 kB of content, so a small page
+    // worked and a real one did not.
+    if (!(response instanceof OutgoingHttpResponse)) {
+      return response
+    }
+
     if (this.isCompressibleContent(response.content)) {
       const { content, encoding } = await this.compressContent(
         response.content,
