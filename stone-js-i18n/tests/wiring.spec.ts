@@ -12,14 +12,15 @@ const resources = {
 }
 
 /** A chainable, spy-able container. */
-function makeContainer (config: object): { container: any, blueprint: any } {
+function makeContainer (config: object): { container: any, blueprint: any, logger: any } {
   const blueprint = { get: vi.fn().mockReturnValue(config) }
+  const logger = { warn: vi.fn(), info: vi.fn() }
   const container: any = {
-    make: vi.fn().mockReturnValue(blueprint),
+    make: vi.fn((key: unknown) => (key === 'logger' ? logger : blueprint)),
     instanceIf: vi.fn(() => container),
     alias: vi.fn(() => container)
   }
-  return { container, blueprint }
+  return { container, blueprint, logger }
 }
 
 describe('I18nServiceProvider', () => {
@@ -32,6 +33,38 @@ describe('I18nServiceProvider', () => {
     expect(container.alias).toHaveBeenCalledWith(I18nManager, ['i18n', 'I18n'])
     expect(container.instanceIf).toHaveBeenCalledWith('i18next', expect.objectContaining({ t: expect.any(Function) }))
     expect(I18nManager.getInstance().getLocale()).toBe('fr')
+  })
+
+  it('warns at boot when nothing was registered to translate with', () => {
+    // The failure this ends: with no catalogs, `t('SOME_KEY')` answers `SOME_KEY`, which reads like a
+    // missing entry rather than a missing module. It passes every in-process test, passes the build,
+    // and reaches production in the user's language. One line at boot is the whole point.
+    const { container, logger } = makeContainer({ locale: 'fr' })
+
+    new I18nServiceProvider(container).register()
+
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('No catalogs registered'))
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('autoDiscover'))
+  })
+
+  it('says nothing when catalogs are registered eagerly', () => {
+    const { container, logger } = makeContainer({ locale: 'fr', resources })
+
+    new I18nServiceProvider(container).register()
+
+    expect(logger.warn).not.toHaveBeenCalled()
+  })
+
+  it('says nothing when lazy loaders are registered', () => {
+    // Lazy is the default, and a lazy catalog is a registered catalog.
+    const { container, logger } = makeContainer({
+      locale: 'fr',
+      loaders: { './fr/errors.json': async () => ({ default: {} }) }
+    })
+
+    new I18nServiceProvider(container).register()
+
+    expect(logger.warn).not.toHaveBeenCalled()
   })
 })
 

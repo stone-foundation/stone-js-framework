@@ -350,8 +350,33 @@ export function i18nCliPlugin (options: I18nCliPluginOptions = {}): StoneCliPlug
       const files = resolveTranslationFiles(process.cwd(), { ...options, root, dirname: catalogueDir }, extensions)
       context.writeFile(GENERATED_MODULE, generateI18nModule(moduleDir, files, lazy))
       context.addModule(`./${GENERATED_MODULE}`)
+
+      // Said out loud, because the alternative is grepping a bundle. A translation module that
+      // registers nothing does not fail: every key comes back as itself, which reads like a missing
+      // entry and reaches production in the user's language. One line at build time, one at boot.
+      report(context, files)
     }
   }
+}
+
+/**
+ * Report what the scan found, or that it found nothing.
+ *
+ * @param context - The plugin context.
+ * @param files - The catalogue files the scan matched.
+ */
+function report (context: StonePluginContext, files: string[]): void {
+  const locales = [...new Set(files.map((file) => localeOf(file)).filter((locale) => locale !== undefined))]
+
+  if (files.length === 0) {
+    context.reporter.step(
+      'i18n: no catalog found. Expected `<root>/**/i18n/<locale>/<namespace>.json`; every key will be ' +
+      'returned as-is until there is one.'
+    )
+    return
+  }
+
+  context.reporter.step(`i18n: ${files.length} catalog(s), ${locales.length} locale(s) (${locales.join(', ')})`)
 }
 
 /**
