@@ -73,6 +73,24 @@ export class Questionnaire {
       { value: '@stone-js/use-react', title: 'React (SSR / SSG / SPA)' },
       { value: '@stone-js/use-view', title: 'View engine (framework-agnostic)' },
       { value: '@stone-js/browser-adapter', title: 'Browser Adapter (SPA)' },
+      // Mobile
+      { value: '@stone-js/use-react-native', title: 'React Native (mobile screens, Expo)' },
+      { value: '@stone-js/react-native-adapter', title: 'React Native Adapter (deep links, in-app navigation)' },
+      // Domain and API
+      { value: '@stone-js/validation', title: 'Validation (schemas, decorators)' },
+      { value: '@stone-js/resources', title: 'Resources (typed representations)' },
+      { value: '@stone-js/openapi', title: 'OpenAPI (derived from your routes)' },
+      { value: '@stone-js/auth', title: 'Auth (stateless JWT / OAuth)' },
+      { value: '@stone-js/authz', title: 'Authorization (abilities, per-route ACL)' },
+      { value: '@stone-js/i18n', title: 'i18n (per-request locale)' },
+      { value: '@stone-js/store', title: 'Store (state, with SSR hydration)' },
+      // Infrastructure
+      { value: '@stone-js/cache', title: 'Cache' },
+      { value: '@stone-js/queue', title: 'Queue' },
+      { value: '@stone-js/event-bus', title: 'Event bus' },
+      { value: '@stone-js/realtime', title: 'Realtime (WebSocket rooms and presence)' },
+      { value: '@stone-js/cloud-file', title: 'Cloud file storage' },
+      { value: '@stone-js/telemetry', title: 'Telemetry (traces, metrics, logs)' },
       // Node runtimes
       { value: '@stone-js/node-http-adapter', title: 'Node HTTP Adapter (server)' },
       { value: '@stone-js/node-cli-adapter', title: 'Node Console Adapter (CLI)' },

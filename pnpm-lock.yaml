@@ -2192,6 +2192,9 @@ importers:
       '@stone-js/router':
         specifier: workspace:*
         version: link:../../../stone-js-router
+      '@stone-js/telemetry':
+        specifier: workspace:*
+        version: link:../../../stone-js-telemetry
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.25.9
