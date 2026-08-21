@@ -90,3 +90,49 @@ describe('OpenApiGenerator', () => {
     expect(doc.paths['/internal']).toBeUndefined()
   })
 })
+
+describe('one schema that cannot be described', () => {
+  const unconvertible = { toJSONSchema: () => { throw new Error('Transforms cannot be represented in JSON Schema') } }
+  const fine = { toJSONSchema: () => ({ type: 'object' }) }
+
+  it('leaves the document standing, instead of taking it down', () => {
+    // What happened before: the conversion threw out of the whole generation, and the endpoint serving
+    // the contract answered 500. An API documented nothing because one of its bodies had a transform.
+    const generator = OpenApiGenerator.create({ title: 'API', version: '1' })
+      .addPath('post', '/broken', { request: { body: unconvertible as any } })
+      .addPath('get', '/fine', { responses: { 200: { description: 'ok', schema: fine as any } } })
+
+    const document: any = generator.build()
+
+    expect(Object.keys(document.paths)).toEqual(['/broken', '/fine'])
+    expect(document.paths['/fine'].get.responses[200].content).toBeDefined()
+  })
+
+  it('leaves the payload out rather than publishing an empty one', () => {
+    // A schema meaning "anything" would be a lie a caller cannot detect. A missing one is a gap.
+    const document: any = OpenApiGenerator.create({ title: 'API', version: '1' })
+      .addPath('post', '/broken', { request: { body: unconvertible as any } })
+      .build()
+
+    expect(document.paths['/broken'].post.requestBody).toBeUndefined()
+  })
+
+  it('says which one it could not describe, and why', () => {
+    const skipped: Array<{ what: string, reason: string }> = []
+
+    OpenApiGenerator.create({ title: 'API', version: '1' }, (entry) => skipped.push(entry))
+      .addPath('post', '/broken', { request: { body: unconvertible as any } })
+      .build()
+
+    expect(skipped[0].what).toBe('the request body')
+    expect(skipped[0].reason).toMatch(/Transforms/)
+  })
+
+  it('omits an operationId nobody named', () => {
+    const document: any = OpenApiGenerator.create({ title: 'API', version: '1' })
+      .addPath('get', '/anonymous', { operationId: '' })
+      .build()
+
+    expect(document.paths['/anonymous'].get).not.toHaveProperty('operationId')
+  })
+})

@@ -2,7 +2,6 @@ import { ValidationOptions } from '../declarations'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { ValidationServiceProvider } from '../ValidationServiceProvider'
 import { MetaValidateRouteMiddleware } from '../middleware/ValidateRouteMiddleware'
-import { MetaValidationSchemaMiddleware } from '../middleware/BlueprintMiddleware'
 
 /**
  * Validation configuration bucket (`stone.validation`).
@@ -36,11 +35,6 @@ export interface ValidationBlueprint extends StoneBlueprint {
 export const validationBlueprint: ValidationBlueprint = {
   stone: {
     validation: {},
-    blueprint: {
-      middleware: [
-        MetaValidationSchemaMiddleware
-      ]
-    },
     providers: [
       ValidationServiceProvider
     ],

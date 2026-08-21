@@ -257,10 +257,16 @@ function successStatus (route: RouteLike): number {
  * @returns The derived responses to keep.
  */
 function successOf (derived: OpenApiOperation, explicit: OpenApiOperation): Record<string | number, any> {
-  const declaresSuccess = Object.keys(explicit.responses ?? {}).some((code) => code.startsWith('2'))
+  const explicitCodes = Object.keys(explicit.responses ?? {})
+  const annotated = explicitCodes.some((code) => code.startsWith('2') && derived.responses?.[code] !== undefined)
+  const restated = explicitCodes.some((code) => code.startsWith('2')) && !annotated
 
-  if (!declaresSuccess) { return derived.responses ?? {} }
+  // Annotating the derived success keeps its schema: the two entries are merged in `mergeOperations`,
+  // where the author's own fields win.
+  if (!restated) { return derived.responses ?? {} }
 
+  // Restating a *different* success is a replacement: an operation answering both 200 and 204
+  // describes an endpoint that cannot exist.
   return Object.fromEntries(
     Object.entries(derived.responses ?? {}).filter(([code]) => !code.startsWith('2'))
   )
@@ -274,17 +280,28 @@ function successOf (derived: OpenApiOperation, explicit: OpenApiOperation): Reco
  * 404 means "and forget everything you knew". Statuses merge per code, parameters accumulate, and
  * anything stated at the same place still wins, because the point of writing it was to override.
  *
- * One exception, and it is the reason this is not a plain merge: an author who states a success
- * status is restating the success, not adding a second one. An operation answering both `200` and
- * `204` describes an endpoint that cannot exist, so the derived success gives way to the declared
- * one and everything else accumulates around it.
+ * One exception, and it is the reason this is not a plain merge: an author who states a success status
+ * the derivation did not produce is restating the success, not adding a second one. An operation
+ * answering both `200` and `204` describes an endpoint that cannot exist, so the derived success gives
+ * way to the declared one.
+ *
+ * Stating the *same* status is the opposite: it is a description of the response that was derived, and
+ * the schema stays. Getting that backwards emptied the payload of every endpoint whose author had
+ * written `200: { description: '…' }`, which is to say every endpoint anyone had documented carefully.
  *
  * @param derived - What the route said about itself.
  * @param explicit - What the author wrote.
  * @returns The operation.
  */
 function mergeOperations (derived: OpenApiOperation, explicit: OpenApiOperation): OpenApiOperation {
-  const responses = { ...successOf(derived, explicit), ...explicit.responses }
+  const kept = successOf(derived, explicit)
+  // Per status, and per field inside a status: writing `200: { description }` is describing the
+  // response that was derived, not replacing it. It used to replace it, which emptied the payload of
+  // every endpoint whose author had taken the trouble to describe it.
+  const responses = Object.fromEntries(
+    [...new Set([...Object.keys(kept), ...Object.keys(explicit.responses ?? {})])]
+      .map((code) => [code, { ...kept[code], ...explicit.responses?.[code] }])
+  )
   const parameters = [...(derived.parameters ?? []), ...(explicit.parameters ?? [])]
   const deduped = parameters.filter(
     (parameter, index) => parameters.findIndex((other) => sameParameter(other, parameter)) === index

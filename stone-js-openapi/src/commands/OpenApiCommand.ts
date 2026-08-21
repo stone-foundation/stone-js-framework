@@ -88,15 +88,18 @@ export class OpenApiCommand {
       )
     }
 
-    const generator = OpenApiGenerator.create(options.info ?? { title: 'API', version: '1.0.0' })
+    // Collected while deriving, reported once at the end: an endpoint whose payload could not be
+    // documented is worth a line on the console, because a contract missing it looks complete.
+    const skipped: string[] = []
+
+    const generator = OpenApiGenerator.create(
+      options.info ?? { title: 'API', version: '1.0.0' },
+      ({ what, reason }) => skipped.push(`${what} — ${reason}`)
+    )
 
     for (const server of options.servers ?? []) {
       generator.addServer(server.url, server.description)
     }
-
-    // Collected while deriving, reported once at the end: an endpoint whose payload could not be
-    // documented is worth a line on the console, because a contract missing it looks complete.
-    const skipped: string[] = []
 
     const document = generator
       .addRouter(router, {

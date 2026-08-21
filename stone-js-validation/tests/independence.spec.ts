@@ -2,9 +2,8 @@ import { Validate } from '../src/decorators/Validate'
 import { VALIDATE_KEY, VALIDATION_SCHEMA_KEY } from '../src/decorators/constants'
 import { ValidationSchema } from '../src/decorators/ValidationSchema'
 import { defineValidationSchema, isValidationSchema, isValidationSchemaClass, rulesOf } from '../src/schemaClass'
-import { ValidationSchemaMiddleware } from '../src/middleware/BlueprintMiddleware'
 import { ValidateRouteMiddleware } from '../src/middleware/ValidateRouteMiddleware'
-import { getMetadata, hasMetadata } from '@stone-js/core'
+import { getBlueprint, getMetadata, hasMetadata } from '@stone-js/core'
 
 const NameSchema = {
   validate: (data: any) => (
@@ -123,10 +122,9 @@ describe('schema classes', () => {
       blueprint: { set, get: (_k: string, f: unknown) => f }
     }
 
-    await ValidationSchemaMiddleware(context, (async (c: any) => c.blueprint) as any)
-
+    expect(context.modules.length).toBeGreaterThan(0)
     expect(hasMetadata(CreateUserSchema, VALIDATION_SCHEMA_KEY)).toBe(true)
-    expect(set).toHaveBeenCalledWith('stone.validation.schemas', { createUser: CreateUserSchema })
+    expect(getBlueprint(CreateUserSchema as any).stone.validation.schemas).toEqual({ createUser: CreateUserSchema })
   })
 
   it('falls back to the class name when no alias is given', async () => {
@@ -134,21 +132,13 @@ describe('schema classes', () => {
     @ValidationSchema()
     class AddressSchema { rules (): any { return { body: NameSchema } } }
 
-    const set = vi.fn()
-    const context: any = { modules: [AddressSchema], blueprint: { set, get: (_k: string, f: unknown) => f } }
-
-    await ValidationSchemaMiddleware(context, (async (c: any) => c.blueprint) as any)
-
-    expect(set).toHaveBeenCalledWith('stone.validation.schemas', { AddressSchema })
+    expect(getBlueprint(AddressSchema as any).stone.validation.schemas).toEqual({ AddressSchema })
   })
 
-  it('registers nothing when no module declares a schema', async () => {
-    const set = vi.fn()
-    const context: any = { modules: [class Unrelated {}], blueprint: { set, get: (_k: string, f: unknown) => f } }
+  it('leaves an undecorated class alone, carrying nothing', () => {
+    class Unrelated {}
 
-    await ValidationSchemaMiddleware(context, (async (c: any) => c.blueprint) as any)
-
-    expect(set).not.toHaveBeenCalled()
+    expect(hasMetadata(Unrelated as any, VALIDATION_SCHEMA_KEY)).toBe(false)
   })
 
   it('are resolved through the container, so rules() can use injected services', async () => {

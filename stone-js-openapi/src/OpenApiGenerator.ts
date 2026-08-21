@@ -1,4 +1,4 @@
-import { toJsonSchema } from './toJsonSchema'
+import { SchemaDirection, toJsonSchema } from './toJsonSchema'
 import { DerivationRegistries, routesFromRouter, RouterLike } from './fromRouter'
 import {
   JsonSchema,
@@ -29,14 +29,18 @@ export class OpenApiGenerator {
    * @param info - The document info.
    * @returns A new generator.
    */
-  static create (info: OpenApiInfo): OpenApiGenerator {
-    return new this(info)
+  static create (info: OpenApiInfo, onSkipped?: (skipped: { what: string, reason: string }) => void): OpenApiGenerator {
+    return new this(info, onSkipped)
   }
 
   /**
    * @param info - The document info.
+   * @param onSkipped - Told when a schema could not be described, so a gap is visible rather than silent.
    */
-  constructor (private readonly info: OpenApiInfo) {}
+  constructor (
+    private readonly info: OpenApiInfo,
+    private readonly onSkipped?: (skipped: { what: string, reason: string }) => void
+  ) {}
 
   /**
    * Add a server entry.
@@ -146,7 +150,8 @@ export class OpenApiGenerator {
     if (operation.summary !== undefined) { result.summary = operation.summary }
     if (operation.description !== undefined) { result.description = operation.description }
     if (operation.tags !== undefined) { result.tags = operation.tags }
-    if (operation.operationId !== undefined) { result.operationId = operation.operationId }
+    // An unnamed route has no operation id, and `""` is not one: readers key generated clients off it.
+    if (operation.operationId !== undefined && operation.operationId !== '') { result.operationId = operation.operationId }
     // A protected endpoint must SAY it is protected: a contract that omits it invites a caller to
     // try the endpoint unauthenticated and read the 401 as a bug.
     if (operation.security !== undefined) { result.security = operation.security }
@@ -161,23 +166,54 @@ export class OpenApiGenerator {
     if (parameters.length > 0) { result.parameters = parameters }
 
     if (operation.request?.body !== undefined) {
-      result.requestBody = {
-        required: true,
-        content: { 'application/json': { schema: toJsonSchema(operation.request.body) } }
+      const body = this.describe(operation.request.body, 'input', 'the request body')
+      if (body !== undefined) {
+        result.requestBody = { required: true, content: { 'application/json': { schema: body } } }
       }
     }
 
     const responses = operation.responses ?? { 200: { description: 'OK' } }
     result.responses = Object.fromEntries(
-      Object.entries(responses).map(([code, response]) => [
-        code,
-        response.schema === undefined
-          ? { description: response.description }
-          : { description: response.description, content: { 'application/json': { schema: toJsonSchema(response.schema) } } }
-      ])
+      Object.entries(responses).map(([code, response]) => {
+        const described = response.schema === undefined
+          ? undefined
+          : this.describe(response.schema, 'output', `the ${code} response`)
+        return [
+          code,
+          described === undefined
+            ? { description: response.description }
+            : { description: response.description, content: { 'application/json': { schema: described } } }
+        ]
+      })
     )
 
     return result
+  }
+
+  /**
+   * Describe one schema, and refuse to let it take the document with it.
+   *
+   * A conversion can fail for reasons that belong to a single schema: a transform has no output shape,
+   * an engine may not know a construct. Before this, one such schema threw out of the whole generation
+   * and the endpoint that served the contract answered 500, so an API documented nothing because one
+   * of its bodies normalised a string.
+   *
+   * What it does instead is leave that one schema out and say so. The rest of the document stands, and
+   * the gap is visible, which is the same rule the derivation already follows: a missing contract beats
+   * a wrong one.
+   *
+   * @param schema - The schema to describe.
+   * @param direction - Whether it describes what is sent or what is answered.
+   * @param what - What is being described, for the diagnostic.
+   * @returns The JSON Schema, or nothing when it could not be described.
+   */
+  private describe (schema: SchemaInput, direction: SchemaDirection, what: string): JsonSchema | undefined {
+    try {
+      return toJsonSchema(schema, direction)
+    } catch (error: any) {
+      this.onSkipped?.({ what, reason: String(error?.message ?? error) })
+      return undefined
+    }
   }
 
   /**
@@ -190,7 +226,7 @@ export class OpenApiGenerator {
   private parametersFrom (location: 'path' | 'query' | 'header', schema?: SchemaInput): Array<Record<string, unknown>> {
     if (schema === undefined) { return [] }
 
-    const json = toJsonSchema(schema)
+    const json = this.describe(schema, 'input', `the ${location} parameters`) ?? {}
     const properties = (json.properties ?? {}) as Record<string, JsonSchema>
     const required = new Set((json.required ?? []) as string[])
 

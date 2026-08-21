@@ -1,9 +1,8 @@
 import { Can } from '../../src/decorators/Can'
-import { getMetadata, hasMetadata } from '@stone-js/core'
+import { getBlueprint, getMetadata, hasMetadata, SERVICE_KEY } from '@stone-js/core'
 import { Policy } from '../../src/decorators/Policy'
 import { CAN_KEY, POLICY_KEY } from '../../src/decorators/constants'
 import { AuthorizationError } from '../../src/errors/AuthorizationError'
-import { PolicyMiddleware } from '../../src/middleware/BlueprintMiddleware'
 import { definePolicy, isPolicy, isPolicyClass } from '../../src/policy'
 import { CanRouteMiddleware, MetaCanRouteMiddleware } from '../../src/middleware/CanRouteMiddleware'
 
@@ -188,32 +187,28 @@ describe('@Can and @Policy', () => {
     await expect(middleware.handle(event, next)).resolves.toBe('response')
   })
 
-  it('discovers policy classes into the registry, with the class name as the default alias', async () => {
+  it('registers itself, with the class name as the default alias', () => {
+    // The decorator carries its own registration, the way `@KeyHandler` and `@JobHandler` do: no
+    // discovery pass reads the metadata back out, and the module is activated by the same gesture.
     @Policy()
     class ArchivePolicy { authorize (): boolean { return true } }
 
-    const set = vi.fn()
-    const context: any = {
-      modules: [UpdatePostPolicy, ArchivePolicy, class Unrelated {}],
-      blueprint: { set, get: (_k: string, f: unknown) => f }
-    }
-
-    await PolicyMiddleware(context, (async (c: any) => c.blueprint) as any)
-
     expect(hasMetadata(UpdatePostPolicy, POLICY_KEY)).toBe(true)
-    expect(set).toHaveBeenCalledWith('stone.authz.policies', {
-      'post.update': UpdatePostPolicy,
-      ArchivePolicy
-    })
+    expect(getBlueprint(UpdatePostPolicy as any).stone.authz.policies).toEqual({ 'post.update': UpdatePostPolicy })
+    expect(getBlueprint(ArchivePolicy as any).stone.authz.policies).toEqual({ ArchivePolicy })
   })
 
-  it('registers nothing when no module declares a policy', async () => {
-    const set = vi.fn()
-    const context: any = { modules: [class Unrelated {}], blueprint: { set, get: (_k: string, f: unknown) => f } }
+  it('declares itself a singleton service, so a policy can load what it protects', () => {
+    // The reason `constructor ({ posts })` above works at all.
+    const service: any = getMetadata(UpdatePostPolicy as any, SERVICE_KEY as any, {})
 
-    await PolicyMiddleware(context, (async (c: any) => c.blueprint) as any)
+    expect(service).toMatchObject({ singleton: true, isClass: true, alias: 'policy:post.update' })
+  })
 
-    expect(set).not.toHaveBeenCalled()
+  it('leaves an undecorated class alone, carrying nothing', () => {
+    class Unrelated {}
+
+    expect(hasMetadata(Unrelated as any, POLICY_KEY)).toBe(false)
   })
 
   it('recognises policies, classes and other things apart, and has an imperative counterpart', async () => {

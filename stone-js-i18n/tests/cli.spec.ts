@@ -1,5 +1,6 @@
 import defaultPlugin, {
   i18nCliPlugin,
+  localeOf,
   toImportSpecifier,
   generateI18nModule,
   scanTranslationFiles,
@@ -271,5 +272,27 @@ describe('i18nCliPlugin', () => {
   it('exposes a ready default plugin instance for package.json auto-discovery', () => {
     expect(defaultPlugin.name).toBe('@stone-js/i18n')
     expect(typeof defaultPlugin.onPrepare).toBe('function')
+  })
+})
+
+describe('the locales the scan found', () => {
+  const files = ['/app/i18n/en/common.json', '/app/i18n/en/errors.json', '/app/i18n/fr/common.json']
+
+  it('states them in the generated module, both eager and lazy', () => {
+    // Discovering them and keeping quiet was a feature that never ran: content negotiation is skipped
+    // entirely when `stone.i18n.locales` is empty, so every caller got the fallback locale whatever
+    // they asked for. Under lazy loading that is how an application answers raw keys, since only the
+    // resolved locale is fetched and the resolved locale was never the caller's.
+    expect(generateI18nModule('/build', files, true)).toContain('locales: ["en","fr"]')
+    expect(generateI18nModule('/build', files, false)).toContain('locales: ["en","fr"]')
+  })
+
+  it('reads a locale from the directory that holds the catalog', () => {
+    expect(localeOf('/app/i18n/fr/common.json')).toBe('fr')
+    expect(localeOf('C:\\app\\i18n\\pt-BR\\common.json')).toBe('pt-BR')
+  })
+
+  it('says nothing when there is nothing to say', () => {
+    expect(generateI18nModule('/build', [], true)).toContain('locales: []')
   })
 })

@@ -67,3 +67,36 @@ describe('a schema engine newer than the converter', () => {
     expect(json.properties.id.type).toBe('number')
   })
 })
+
+describe('a schema that normalises before it judges', () => {
+  it('describes a transform as what the caller sends', async () => {
+    // A request schema that trims and lowercases a handle is a transform, and a transform has no
+    // output shape to describe: asking for one throws. A request is what the caller sends, so it is
+    // described as input, which is both correct and possible.
+    const { z } = await import('zod4')
+    const schema = z.object({ handle: z.string().transform((value: string) => value.trim().toLowerCase()) })
+
+    const json: any = toJsonSchema(schema as any, 'input')
+
+    expect(json.type).toBe('object')
+    expect(json.properties.handle.type).toBe('string')
+  })
+
+  it('is what the old default could not do', async () => {
+    // The defect: the derivation asked for the output shape of request schemas, so one normalising
+    // body threw and the endpoint serving the contract answered 500 for the whole document.
+    const { z } = await import('zod4')
+    const schema = z.object({ handle: z.string().transform((value: string) => value.trim().toLowerCase()) })
+
+    // Zod says it plainly: "Transforms cannot be represented in JSON Schema".
+    expect(() => toJsonSchema(schema as any, 'output')).toThrow(/[Tt]ransform/)
+  })
+
+  it('drops a draft marker a hand-converted schema carries in', () => {
+    // An application that converts a schema itself cannot know this document is OpenAPI 3.0, where
+    // `$schema` has no place. One was found in a deployed contract.
+    const converted = { $schema: 'http://json-schema.org/draft-07/schema#', type: 'object' }
+
+    expect(toJsonSchema(converted as any)).toEqual({ type: 'object' })
+  })
+})

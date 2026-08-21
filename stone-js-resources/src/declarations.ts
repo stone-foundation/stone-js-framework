@@ -17,17 +17,28 @@ export type ResourceSchema = unknown
  * carried. The authenticated principal is part of it, because deciding what a caller may see is the
  * most common reason a projection differs between two callers.
  */
-export interface ResourceContext {
-  /** Requested sparse fieldset — narrows the output to these top-level keys. */
+export interface ResourceContext<EventType = unknown, PrincipalType = unknown> {
+  /** Requested sparse fieldset: narrows the output to these top-level keys. */
   fields?: string[]
   /** Requested relations to embed. */
   include?: string[]
   /** The requested fragment, when the caller asked for one by name. */
   fragment?: string
-  /** The authenticated principal, when the application has one. */
-  principal?: unknown
-  /** The event being answered, for a resource that needs more than the parameters above. */
-  event?: unknown
+  /**
+   * The authenticated principal, when the application has one.
+   *
+   * Typed by the resource, because deciding what a caller may see is the most common reason two
+   * callers get different shapes, and `unknown` makes every such decision a cast. The default stays
+   * `unknown`: this module never assumes an application has users, let alone what a user is.
+   */
+  principal?: PrincipalType
+  /**
+   * The event being answered, for a resource that needs more than the parameters above.
+   *
+   * Typed by the resource for the same reason, and `unknown` by default because the module is
+   * agnostic of the platform the event came from.
+   */
+  event?: EventType
   /** Anything else a resource needs. */
   [key: string]: unknown
 }

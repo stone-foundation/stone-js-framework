@@ -2,7 +2,6 @@ import { IResource } from '../declarations'
 import { ContractChecker } from '../ContractChecker'
 import { AppConfig, MetaService, StoneBlueprint } from '@stone-js/core'
 import { MetaResourceRouteMiddleware } from '../middleware/ResourceRouteMiddleware'
-import { MetaApiResourceMiddleware } from '../middleware/BlueprintMiddleware'
 
 /**
  * Resources configuration bucket (`stone.resources`).
@@ -86,11 +85,6 @@ export const resourcesBlueprint: ResourcesBlueprint = {
   stone: {
     resources: {},
     services: [MetaContractChecker],
-    blueprint: {
-      middleware: [
-        MetaApiResourceMiddleware
-      ]
-    },
     router: {
       middleware: [
         MetaResourceRouteMiddleware
