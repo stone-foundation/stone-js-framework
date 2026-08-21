@@ -1,6 +1,6 @@
 import { stoneApp } from '@stone-js/core'
 import { Application } from '../app/Application'
-import { HomeScreen } from '../app/HomeScreen'
+import { HomeScreenBlueprint } from '../app/HomeScreen'
 import { ScreenStack } from '@stone-js/use-react-native'
 import { NavigationSource } from '@stone-js/react-native-adapter'
 
@@ -26,7 +26,7 @@ describe('Screens', () => {
     await stoneApp({
       modules: [
         Application,
-        HomeScreen,
+        HomeScreenBlueprint,
         { stone: { reactNative: { navigationSource: navigation }, useReactNative: { screenStack: screens } } }
       ]
     }).run()

@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { withStone } from '../src/metro'
+import { withStone, writeManifest } from '../src/metro'
 import plugin, { NATIVE_TARGET, SetNativeBuilderMiddleware, isNativeApp, nativeBuilderDefinition, reactNativeCliPlugin } from '../src/cli'
 
 const makeProject = (files: Record<string, string>): string => {
@@ -112,6 +112,17 @@ describe('withStone', () => {
 
     expect(result).toBe(config)
     expect(readFileSync(join(root, '.stone', 'modules.ts'), 'utf-8')).toContain('export const modules')
+  })
+
+  it('re-exports the generator, so a type-check can produce the manifest without Metro', () => {
+    // `tsc --noEmit` on a fresh clone reads the entry's `./.stone/modules` import before Metro has
+    // ever run. Reaching the generator has to be possible without starting a bundler.
+    const root = project()
+
+    const result = writeManifest(root)
+
+    expect(readFileSync(join(root, '.stone', 'modules.ts'), 'utf-8')).toContain('export const modules')
+    expect(result.changed).toBe(true)
   })
 
   it('takes the project root as a shorthand, which is how metro.config.js reads best', () => {

@@ -1,6 +1,6 @@
 # Stone.js - Basic React Native starter
 
-Stone.js's basic starter to create a React Native (Expo) app using the declarative API.
+Stone.js's basic starter to create a React Native (Expo) app using the imperative API.
 
 The same welcome screen the web starters show, on a phone. Same mark, same palette, same words,
 because it is the same domain: `app/HomeScreen.tsx` is a page, with `handle`, `head` and `render`,
@@ -64,8 +64,8 @@ npm run typecheck
 
 | File | What it does |
 |---|---|
-| `app/Application.ts` | Enables the router, the adapter and the renderer. Four decorators. |
-| `app/HomeScreen.tsx` | The page answering `/`. Adding a screen is adding a file like it. |
+| `app/Application.ts` | Enables the router, the adapter and the renderer. One call, two blueprints. |
+| `app/HomeScreen.tsx` | The page factory and its `definePage` blueprint. Adding a screen is adding a file like it. |
 | `app/WelcomeView.tsx` | What the screen draws, in React Native components. |
 | `app/theme.ts` | The Stone.js palette, following the device's light or dark appearance. |
 | `index.ts` | Polyfills, boot, and `registerRootComponent`. |
@@ -137,10 +137,10 @@ export default function App () {
 
 Nothing about your pages changes.
 
-## The imperative twin
+## The declarative twin
 
-The same application, written with values instead of decorators, is
-[`basic-react-native-imperative`](../basic-react-native-imperative). Neither paradigm wraps the
+The same application, written with decorators instead of values, is
+[`basic-react-native-declarative`](../basic-react-native-declarative). Neither paradigm wraps the
 other; both write to the same manifest.
 
 ## Learn more

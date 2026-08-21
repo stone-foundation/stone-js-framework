@@ -1,8 +1,8 @@
 {
-  "name": "basic-react-native-declarative",
+  "name": "basic-react-native-imperative",
   "private": true,
   "version": "1.0.0",
-  "description": "Stone.js's basic starter to create a React Native (Expo) app using the declarative API.",
+  "description": "Stone.js's basic starter to create a React Native (Expo) app using the imperative API.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "main": "index.ts",
