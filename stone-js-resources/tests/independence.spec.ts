@@ -1,10 +1,12 @@
 import { z } from 'zod'
 import { Resource } from '../src/Resource'
-import { getMetadata, hasMetadata } from '@stone-js/core'
+import { getBlueprint, getMetadata, hasMetadata, SERVICE_KEY } from '@stone-js/core'
 import { Returns } from '../src/decorators/Returns'
 import { defineResource } from '../src/defineResource'
 import { ApiResource } from '../src/decorators/ApiResource'
 import { API_RESOURCE_KEY, RETURNS_KEY } from '../src/decorators/constants'
+import { Container } from '@stone-js/service-container'
+import { MetaContractChecker } from '../src/options/ResourcesBlueprint'
 import { ApiResourceMiddleware } from '../src/middleware/BlueprintMiddleware'
 import { ResourceRouteMiddleware } from '../src/middleware/ResourceRouteMiddleware'
 
@@ -15,6 +17,21 @@ const userResource = defineResource<User>({ schema: z.object({ id: z.number(), n
 
 /** The container the runtime hands the middleware. */
 const container = {} as any
+
+/**
+ * A container wired the way the module's blueprint wires one.
+ *
+ * The real thing, because the pattern being tested only exists there: `@ApiResource` declares the
+ * class a singleton service, the blueprint binds the checker it destructures, and the container puts
+ * the two together. A stand-in that answers whatever it is asked cannot show that working, and cannot
+ * show it failing either.
+ */
+const wiredContainer = (bindings: Record<string, unknown> = {}): any => {
+  const real = Container.create()
+  real.autoBinding(MetaContractChecker.module, MetaContractChecker.module, true, MetaContractChecker.alias)
+  Object.entries(bindings).forEach(([key, value]) => real.instance(key, value))
+  return real
+}
 
 /** A resource class whose shape depends on an injected service, which is why classes exist. */
 @ApiResource('user')
@@ -154,9 +171,7 @@ describe('resource classes', () => {
 
   it('are resolved through the container, so a projection can use injected services', async () => {
     // A resource that formats for the caller's locale needs i18n, and this is how it gets it.
-    const container: any = {
-      resolve: (Class: any) => new Class({ i18n: { getLocale: () => 'fr' } })
-    }
+    const container = wiredContainer({ i18n: { getLocale: () => 'fr' } })
     const middleware = new ResourceRouteMiddleware({ blueprint: blueprint({ user: UserResource }), container })
 
     await expect(middleware.handle(makeEvent('user'), async () => ada as any))
@@ -185,5 +200,29 @@ describe('resource classes', () => {
 
     await expect(middleware.handle(makeEvent(UserResource), async () => ada as any))
       .resolves.toEqual({ id: 1, name: 'Ada', locale: 'ht' })
+  })
+})
+
+describe('what the decorator declares on its own', () => {
+  // The pattern @KeyHandler and @JobHandler already use: the decorator says everything, and the
+  // framework does the wiring. Three facts, read straight off the class.
+  it('declares itself a singleton service, so the container wires its constructor', () => {
+    const service: any = getMetadata(UserResource as any, SERVICE_KEY as any, {})
+
+    expect(service).toMatchObject({ singleton: true, isClass: true })
+  })
+
+  it('claims a prefixed alias, so a resource named user does not fight the app for that name', () => {
+    const service: any = getMetadata(UserResource as any, SERVICE_KEY as any, {})
+
+    expect(service.alias).toBe('resource:user')
+  })
+
+  it('carries the module blueprint and its own registration, so declaring it is the whole setup', () => {
+    const blueprint: any = getBlueprint(UserResource as any)
+
+    expect(blueprint.stone.resources.registry).toEqual({ user: UserResource })
+    // The module is activated by the same gesture: its route middleware comes along.
+    expect(blueprint.stone.router.middleware).toHaveLength(1)
   })
 })

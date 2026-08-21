@@ -11,7 +11,8 @@ export const DECLARATION_KEYS = {
   validation: '@stone-js/validation/validate',
   resource: '@stone-js/resources/returns',
   auth: '@stone-js/auth/protect',
-  authz: '@stone-js/authz/can'
+  authz: '@stone-js/authz/can',
+  status: '@stone-js/http-core/response'
 } as const
 
 /** The concerns a route may declare, on itself or on its handler. */
@@ -22,7 +23,8 @@ const VALUE_PROPERTY: Record<Concern, string> = {
   validation: 'validation',
   resource: 'resource',
   auth: 'auth',
-  authz: 'authz'
+  authz: 'authz',
+  status: 'statusCode'
 }
 
 /** A route, reduced to what reading a declaration needs. */
@@ -46,7 +48,9 @@ export interface DeclaringRoute {
  * @returns What was declared, or `undefined`.
  */
 export function declaredOn (route: DeclaringRoute, concern: Concern): unknown {
-  const onRoute = route.getOption(concern)
+  // The status is the one concern a route never spells with the concern's own name: it is an HTTP
+  // detail, and `statusCode` is what a route definition already calls it.
+  const onRoute = route.getOption(concern === 'status' ? 'statusCode' : concern)
   if (onRoute !== undefined) { return onRoute }
 
   const handler = route.getOption<{ module?: any, action?: string | symbol }>('handler')

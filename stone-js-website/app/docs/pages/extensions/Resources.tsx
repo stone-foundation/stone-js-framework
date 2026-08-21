@@ -86,6 +86,14 @@ export class TaskResource extends Resource<Task> {
 async data (task: Task) {
   return { ...task, commentCount: await this.comments.countFor(task.id) }
 }`}</Code>
+        <Callout kind='note' title='A resource is a service, which is why that constructor works'>
+          <code>@ApiResource</code> declares three things at once: the class is a singleton service, so
+          the container builds it and auto-wires whatever its constructor destructures; it is bound
+          under <code>resource:task</code>, prefixed so a resource named after a domain concept never
+          competes with your own <code>task</code> binding; and it activates the module, so declaring it
+          is the whole setup. <code>@ValidationSchema</code> and <code>@Policy</code> work the same way,
+          which is how a rule set or a policy can depend on a repository.
+        </Callout>
 
         <H3>The contract is protected, not merely published</H3>
         <p>

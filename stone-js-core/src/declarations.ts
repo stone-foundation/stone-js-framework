@@ -273,6 +273,22 @@ export interface MiddlewareOptions {
    * Set as Kernel middleware
    */
   global?: boolean
+
+  /**
+   * Which pipeline the middleware belongs to.
+   *
+   * - `app` (the default): the application's own middleware, run for every event.
+   * - `kernel`: the kernel's own pipeline, the same place `global: true` puts it.
+   * - `router`: after a route has been matched, which is the only layer where a middleware can read
+   *   the route and what it declares.
+   *
+   * The last one is why this exists. A middleware that needs the matched route, to read a permission
+   * or a resource a route declared, had nowhere to be declared from: both branches of the decorator
+   * led to the kernel, where no route has been matched yet, so such a middleware could only be
+   * registered from a blueprint. A module is activated by its decorator or by its blueprint, and both
+   * must be able to say the same things.
+   */
+  layer?: 'app' | 'kernel' | 'router'
 }
 
 /**

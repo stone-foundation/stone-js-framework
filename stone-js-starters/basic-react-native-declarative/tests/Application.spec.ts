@@ -60,6 +60,6 @@ describe('Stone.js native proof of concept', () => {
     await new Promise((resolve) => setImmediate(resolve))
 
     const lastPayload = rendered.at(-1)?.content as WelcomeData | undefined
-    expect(lastPayload?.route === '/nowhere').toBe(false)
+    expect(lastPayload?.route).not.toBe('/nowhere')
   })
 })

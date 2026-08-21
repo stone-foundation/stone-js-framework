@@ -22,7 +22,7 @@ export interface TencentScfHttpOptions extends Partial<TencentScfHttpAdapterAdap
  *
  * @example
  * ```typescript
- * import { TencentScfHttp } from '@stone-js/aws-lambda-http-adapter';
+ * import { TencentScfHttp } from '@stone-js/tencent-scf-http-adapter';
  *
  * @TencentScfHttp({
  *   alias: 'MyTencentScfHttpAdapter',

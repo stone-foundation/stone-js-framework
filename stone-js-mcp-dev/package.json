@@ -59,7 +59,8 @@
     "prepare": "husky"
   },
   "peerDependencies": {
-    "@stone-js/core": "workspace:*"
+    "@stone-js/core": "workspace:*",
+    "@stone-js/cli": "workspace:*"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -98,5 +99,10 @@
   },
   "stone": {
     "cliPlugin": "./dist/cli.js"
+  },
+  "peerDependenciesMeta": {
+    "@stone-js/cli": {
+      "optional": true
+    }
   }
 }

@@ -40,7 +40,7 @@ import { TencentScfAdapterError } from './errors/TencentScfAdapterError'
  *
  * @example
  * ```typescript
- * import { TencentScfAdapter } from '@stone-js/aws-lambda-adapter';
+ * import { TencentScfAdapter } from '@stone-js/tencent-scf-adapter';
  *
  * const adapter = TencentScfAdapter.create({...});
  *

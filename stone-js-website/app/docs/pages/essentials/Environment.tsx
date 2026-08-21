@@ -28,6 +28,14 @@ export class Environment implements IPage<ReactIncomingEvent> {
           validate, turning a whole class of runtime mysteries into a loud failure at startup.
         </Lead>
 
+        <H2>Install</H2>
+        <Code file='terminal' lang='bash'>{`npm i @stone-js/env`}</Code>
+        <p>
+          A separate package, and not every starter ships it: reading the environment is a choice, not
+          a tax on an application that has nothing to read. The full starters already depend on it, so
+          check before installing twice.
+        </p>
+
         <H2>Typed getters</H2>
         <Principle
           principle={

@@ -26,7 +26,7 @@ describe('Decorators', () => {
       BinaryFileResponse.prototype.setContentDisposition = vi.fn()
       // @ts-expect-error - ignore type checking for testing purposes
       BinaryFileResponse.prototype.getValidatedFile = vi.fn((file) => file)
-      const method = FileHttpResponse()(() => 'file', { name: 'save', kind: 'method' } as any, {}) as () => Promise<BinaryFileResponse>
+      const method = FileHttpResponse()(() => 'file', { name: 'save', kind: 'method', metadata: {} } as any, {}) as () => Promise<BinaryFileResponse>
       const response = await method()
       expect(response).toBeInstanceOf(BinaryFileResponse)
       expect(response.statusCode).toBe(200)
@@ -38,7 +38,7 @@ describe('Decorators', () => {
 
   describe('NoContentHttpResponse', () => {
     it('should return an OutgoingHttpResponse with no content', async () => {
-      const method = NoContentHttpResponse()(() => ({ name: 'John Doe' }), { name: 'save', kind: 'method' } as any, {}) as () => Promise<OutgoingHttpResponse>
+      const method = NoContentHttpResponse()(() => ({ name: 'John Doe' }), { name: 'save', kind: 'method', metadata: {} } as any, {}) as () => Promise<OutgoingHttpResponse>
       const response = await method()
       expect(response).toBeInstanceOf(OutgoingHttpResponse)
       expect(response.statusCode).toBe(204)
@@ -49,7 +49,7 @@ describe('Decorators', () => {
 
   describe('HtmlHttpResponse', () => {
     it('should return an html OutgoingHttpResponse', async () => {
-      const method = HtmlHttpResponse()(() => '<h1>John Doe</h1>', { name: 'save', kind: 'method' } as any, {}) as () => Promise<OutgoingHttpResponse>
+      const method = HtmlHttpResponse()(() => '<h1>John Doe</h1>', { name: 'save', kind: 'method', metadata: {} } as any, {}) as () => Promise<OutgoingHttpResponse>
       const response = await method()
       expect(response).toBeInstanceOf(OutgoingHttpResponse)
       expect(response.statusCode).toBe(200)
@@ -60,7 +60,7 @@ describe('Decorators', () => {
 
   describe('OkHttpResponse', () => {
     it('should return a 200 OutgoingHttpResponse', async () => {
-      const method = OkHttpResponse()(() => '<h1>John Doe</h1>', { name: 'save', kind: 'method' } as any, {}) as () => Promise<OutgoingHttpResponse>
+      const method = OkHttpResponse()(() => '<h1>John Doe</h1>', { name: 'save', kind: 'method', metadata: {} } as any, {}) as () => Promise<OutgoingHttpResponse>
       const response = await method()
       expect(response).toBeInstanceOf(OutgoingHttpResponse)
       expect(response.statusCode).toBe(200)
@@ -71,7 +71,7 @@ describe('Decorators', () => {
 
   describe('HttpResponse', () => {
     it('should return a 401 OutgoingHttpResponse', async () => {
-      const method = HttpResponse(401)(() => ({ message: 'error' }), { name: 'save', kind: 'method' } as any, {}) as () => Promise<OutgoingHttpResponse>
+      const method = HttpResponse(401)(() => ({ message: 'error' }), { name: 'save', kind: 'method', metadata: {} } as any, {}) as () => Promise<OutgoingHttpResponse>
       const response = await method()
       expect(response).toBeInstanceOf(OutgoingHttpResponse)
       expect(response.is4xx()).toBe(true)
@@ -83,7 +83,7 @@ describe('Decorators', () => {
 
   describe('JsonHttpResponse', () => {
     it('should return a JsonResponse', async () => {
-      const method = JsonHttpResponse()(() => ({ name: 'John Doe' }), { name: 'save', kind: 'method' } as any, {}) as () => Promise<JsonResponse>
+      const method = JsonHttpResponse()(() => ({ name: 'John Doe' }), { name: 'save', kind: 'method', metadata: {} } as any, {}) as () => Promise<JsonResponse>
       const response = await method()
       expect(response).toBeInstanceOf(JsonResponse)
       expect(response.statusCode).toBe(200)
@@ -94,7 +94,7 @@ describe('Decorators', () => {
 
   describe('JsonpHttpResponse', () => {
     it('should return a JsonpResponse', async () => {
-      const method = JsonpHttpResponse()(() => ({ name: 'John Doe' }), { name: 'save', kind: 'method' } as any, {}) as () => Promise<JsonpResponse>
+      const method = JsonpHttpResponse()(() => ({ name: 'John Doe' }), { name: 'save', kind: 'method', metadata: {} } as any, {}) as () => Promise<JsonpResponse>
       const response = await method()
       expect(response).toBeInstanceOf(JsonpResponse)
       expect(response.statusCode).toBe(200)
@@ -105,7 +105,7 @@ describe('Decorators', () => {
 
   describe('RedirectHttpResponse', () => {
     it('should return a RedirectResponse', async () => {
-      const method = RedirectHttpResponse(301)(() => 'https://stonejs.dev', { name: 'save', kind: 'method' } as any, {}) as () => Promise<RedirectResponse>
+      const method = RedirectHttpResponse(301)(() => 'https://stonejs.dev', { name: 'save', kind: 'method', metadata: {} } as any, {}) as () => Promise<RedirectResponse>
       const response = await method()
       expect(response).toBeInstanceOf(RedirectResponse)
       expect(response.statusCode).toBe(301)

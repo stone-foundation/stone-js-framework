@@ -75,3 +75,11 @@ export const HTTP_INSUFFICIENT_STORAGE = 507 // RFC4918
 export const HTTP_LOOP_DETECTED = 508 // RFC5842
 export const HTTP_NOT_EXTENDED = 510 // RFC2774
 export const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511 // RFC6585
+
+/**
+ * Metadata key the response decorators record the status they build under.
+ *
+ * Read by anything that describes the application rather than runs it, `@stone-js/openapi` first.
+ * A string, so a reader needs no dependency on this package.
+ */
+export const RESPONSE_KEY = '@stone-js/http-core/response'

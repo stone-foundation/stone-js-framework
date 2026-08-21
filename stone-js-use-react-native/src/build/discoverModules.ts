@@ -72,7 +72,11 @@ export function discoverModules (projectRoot: string, options: DiscoverModulesOp
       return // The directory does not exist: an application with no modules is not an error.
     }
 
-    for (const entry of entries.sort((a, b) => a.localeCompare(b))) {
+    // A stable order makes a generated module list reproducible; sorted on a copy, so the read
+    // result is never mutated under the loop.
+    const ordered = [...entries].sort((a, b) => a.localeCompare(b))
+
+    for (const entry of ordered) {
       const path = join(dir, entry)
 
       if (statSync(path).isDirectory()) {

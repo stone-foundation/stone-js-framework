@@ -40,7 +40,7 @@ import { AlibabaFcAdapterError } from './errors/AlibabaFcAdapterError'
  *
  * @example
  * ```typescript
- * import { AlibabaFcAdapter } from '@stone-js/aws-lambda-adapter';
+ * import { AlibabaFcAdapter } from '@stone-js/alibaba-fc-adapter';
  *
  * const adapter = AlibabaFcAdapter.create({...});
  *

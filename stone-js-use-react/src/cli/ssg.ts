@@ -408,5 +408,9 @@ export async function runSsg (options: {
  */
 function normalizePath (path: string): string {
   const withLeading = path.startsWith('/') ? path : `/${path}`
-  return withLeading === '/' ? '/' : withLeading.replace(/\/+$/, '')
+  // Counted rather than matched: `/\/+$/` backtracks on a long run of trailing slashes, and a route
+  // list is not always written by us.
+  let end = withLeading.length
+  while (end > 1 && withLeading[end - 1] === '/') { end-- }
+  return withLeading.slice(0, end)
 }

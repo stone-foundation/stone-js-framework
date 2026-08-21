@@ -352,6 +352,34 @@ export const AdapterMiddlewareMiddleware = async (
 }
 
 /**
+ * Where a declared middleware belongs.
+ *
+ * Three layers, because there are three: the application's own middleware, the kernel's, and the
+ * router's, which is the only one that runs with a route matched and can therefore read what a route
+ * declares. `global: true` keeps meaning the kernel, and `layer` wins when both are given, since
+ * naming the layer is the more precise statement.
+ *
+ * A middleware needing the matched route previously had nowhere to be declared from: both branches
+ * led to the kernel, where nothing has been matched yet. Writing a key another module reads is how a
+ * blueprint works, and how `@AdapterMiddleware` has always reached `stone.adapter.middleware`: an
+ * unread key costs nothing when that module is absent.
+ *
+ * @param options - What the decorator declared.
+ * @returns The blueprint key to add it to.
+ */
+export function middlewareLayerOf (options: MiddlewareOptions): string {
+  const layers = {
+    app: 'stone.middleware',
+    kernel: 'stone.kernel.middleware',
+    router: 'stone.router.middleware'
+  } as const
+
+  if (options.layer !== undefined) { return layers[options.layer] }
+
+  return options.global === true ? layers.kernel : layers.app
+}
+
+/**
  * Middleware to add global and specific middleware to the kernel blueprint.
  *
  * This middleware processes modules marked as general middleware and associates them with the
@@ -375,7 +403,7 @@ export const MiddlewareMiddleware = async (
     .forEach(module => {
       const options: MiddlewareOptions = getMetadata(module, MIDDLEWARE_KEY, {})
       const middleware: MetaPipe = { ...options, module }
-      context.blueprint.add(options.global === true ? 'stone.kernel.middleware' : 'stone.middleware', [middleware])
+      context.blueprint.add(middlewareLayerOf(options), [middleware])
     })
 
   return await next(context)

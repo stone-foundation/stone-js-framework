@@ -508,6 +508,38 @@ describe('AdapterErrorHandlerMiddleware', () => {
   })
 })
 
+describe('which layer a declared middleware lands in', () => {
+  const declaring = (options: Record<string, unknown>): any => class {
+    public static [MetadataSymbol] = { [MIDDLEWARE_KEY]: options }
+  }
+
+  const landedIn = async (options: Record<string, unknown>): Promise<string> => {
+    const blueprint = createMockBlueprint()
+    await MiddlewareMiddleware({ modules: [declaring(options)], blueprint }, vi.fn().mockResolvedValue(blueprint))
+    return (blueprint.add as any).mock.calls[0][0]
+  }
+
+  it('reaches the router, so a middleware can read the matched route', async () => {
+    // The gap this closes: both branches led to the kernel, where no route has been matched yet, so a
+    // middleware that needs the route, to read a permission or a resource it declares, could only be
+    // registered from a blueprint. Both activation paths must be able to say the same things.
+    await expect(landedIn({ layer: 'router' })).resolves.toBe('stone.router.middleware')
+  })
+
+  it('reaches the kernel when asked by name', async () => {
+    await expect(landedIn({ layer: 'kernel' })).resolves.toBe('stone.kernel.middleware')
+  })
+
+  it('defaults to the application layer', async () => {
+    await expect(landedIn({ priority: 1 })).resolves.toBe('stone.middleware')
+  })
+
+  it('keeps honouring global, and lets the named layer win', async () => {
+    await expect(landedIn({ global: true })).resolves.toBe('stone.kernel.middleware')
+    await expect(landedIn({ global: true, layer: 'router' })).resolves.toBe('stone.router.middleware')
+  })
+})
+
 describe('AdapterMiddlewareMiddleware', () => {
   it('should attach adapter middleware globally if no platform/alias is set', async () => {
     const blueprint = createMockBlueprint()

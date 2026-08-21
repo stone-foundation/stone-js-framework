@@ -194,7 +194,9 @@ export class ResourceRouteMiddleware {
   private resolve (entry: any): IResource<any, any> {
     if (typeof entry !== 'function') { return entry }
     const ResourceClass = entry
-    return this.container?.resolve?.(ResourceClass, true) ?? new ResourceClass({})
+    // `resolve(Class, true)` uses the binding `@ApiResource` declared, and binds it as a singleton
+    // when there is none, so a resource is built once with its dependencies wired either way.
+    return this.container?.resolve?.(ResourceClass, true) ?? new ResourceClass()
   }
 }
 

@@ -71,7 +71,8 @@ export class TaskController {
 public () { /* no auth */ }`}</Code>
 
         <PropsTable rows={[
-          { name: 'global', type: 'boolean', default: 'false', desc: 'Register as kernel-wide middleware.' },
+          { name: 'layer', type: "'app' | 'kernel' | 'router'", default: "'app'", desc: 'Which pipeline it belongs to. Only the router layer runs with a route matched.' },
+          { name: 'global', type: 'boolean', default: 'false', desc: 'Register as kernel-wide middleware. The same thing as layer: kernel.' },
           { name: 'priority', type: 'number', desc: 'Execution order among peers (lower runs earlier).' },
           { name: 'alias', type: 'string | string[]', desc: 'Name(s) to reference the middleware by.' },
           { name: 'params', type: 'unknown[]', desc: 'Arguments passed to the middleware.' }
@@ -80,6 +81,27 @@ public () { /* no auth */ }`}</Code>
         <Callout kind='note' title='Guards before transforms'>
           Order matters: authenticate before you authorize, authorize before you validate, validate
           before the handler. Priority is the lever when the default order is not enough.
+        </Callout>
+
+        <H2>When the middleware needs the route</H2>
+        <p>
+          Kernel middleware runs before a route has been matched, so it cannot read one. A middleware
+          whose whole job is to read what a route declares, a permission, a resource, a contract, needs
+          the layer that runs after matching:
+        </p>
+        <Code file='app/middleware/readsTheRoute.ts'>{`@Middleware({ layer: 'router', priority: 5 })
+export class ReadsTheRoute {
+  handle (event: IncomingHttpEvent, next: NextMiddleware) {
+    // A route has been matched here, and only here.
+    const declared = event.getRoute()?.getOption('resource')
+    return next(event)
+  }
+}`}</Code>
+        <Callout kind='note' title='Both ways say the same things'>
+          A module is activated by its decorator or by its blueprint, and neither one can do something
+          the other cannot. <code>layer</code> is what makes that true for the router layer: it used to
+          be reachable from a blueprint only, so a route-aware middleware could not be declared where
+          it was written.
         </Callout>
 
         <H2>Two layers: kernel and adapter</H2>

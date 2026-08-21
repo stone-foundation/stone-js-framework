@@ -40,7 +40,7 @@ import { AzureFunctionsAdapterError } from './errors/AzureFunctionsAdapterError'
  *
  * @example
  * ```typescript
- * import { AzureFunctionsAdapter } from '@stone-js/aws-lambda-adapter';
+ * import { AzureFunctionsAdapter } from '@stone-js/azure-functions-adapter';
  *
  * const adapter = AzureFunctionsAdapter.create({...});
  *

@@ -28,7 +28,11 @@ export class AuthenticateMiddleware {
    * @returns The outgoing response.
    */
   async handle (event: IncomingHttpEvent, next: NextMiddleware<IncomingHttpEvent, OutgoingHttpResponse>): Promise<OutgoingHttpResponse> {
-    const token = String(event.get<string>('Authorization', '')).replace(/^Bearer\s+/i, '').trim()
+    // `getHeader`, never `get`: the event's `get()` deliberately refuses to read headers, because it
+    // also reads the query string and the body. Reading a bearer token through it did two wrong
+    // things at once, so the real `Authorization` header was ignored and every request stayed
+    // anonymous, while `?Authorization=...` would have been accepted in its place.
+    const token = String(event.getHeader<string>('Authorization', '')).replace(/^Bearer\s+/i, '').trim()
 
     if (token.length > 0) {
       const claims = await this.authenticator.verify(token)

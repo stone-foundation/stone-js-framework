@@ -1,3 +1,4 @@
+import { Promiseable } from '@stone-js/core'
 import { applyFields } from './helpers'
 import { ContractChecker, IContractChecker } from './ContractChecker'
 import { ResourceContractError } from './errors/ResourceContractError'
@@ -38,18 +39,38 @@ import {
  * }
  * ```
  */
+/**
+ * What a resource may be handed when the container builds it.
+ *
+ * Only names this module binds itself, because destructuring reads every one of them: a name nothing
+ * bound would throw before the resource ever exists. Configuration is not in here on purpose, it
+ * comes from the blueprint, which is where configuration lives.
+ */
+export interface ResourceDependencies {
+  /** The reader every projection is held against, bound as `contractChecker`. */
+  contractChecker?: IContractChecker
+}
+
 export abstract class Resource<Model = unknown, Output extends ResourceOutput = ResourceOutput> implements IResource<Model, Output> {
-  private readonly checker: IContractChecker
-  private readonly onViolation: ContractViolationPolicy
+  protected checker: IContractChecker
+  protected onViolation: ContractViolationPolicy
 
   /**
-   * @param dependencies - Auto-wired services. Nothing is required: this module reads schemas with its
-   *                       own checker, so exposing data never depends on a validation module being
-   *                       enabled. Pass `checker` to substitute a dialect of your own.
+   * @param dependencies - Auto-wired services.
+   *
+   * One name, bound by this module's own blueprint, so the container resolves it like any other service
+   * and this constructor reads it plainly. That is the whole point: a dependency read off a container
+   * that never bound it is not optional, it throws, which is what made every container-resolved
+   * resource fail. The answer was to register the checker, not to test for its presence.
+   *
+   * One name and no more, because destructuring reads each one: a resource must not have to know
+   * which services happen to be bound. The violation policy is configuration, and it travels with the
+   * request in the context, from `stone.resources.onViolation`. Substituting the dialect is a matter
+   * of binding `contractChecker` yourself.
    */
-  constructor (dependencies: { checker?: IContractChecker, onViolation?: ContractViolationPolicy } = {}) {
-    this.checker = dependencies.checker ?? ContractChecker.create()
-    this.onViolation = dependencies.onViolation ?? 'throw'
+  constructor ({ contractChecker }: ResourceDependencies = {}) {
+    this.checker = contractChecker ?? ContractChecker.create()
+    this.onViolation = 'throw'
   }
 
   /**
@@ -128,7 +149,7 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    * which would shadow the very method a subclass wrote — the override would exist on the prototype
    * and never be reached. This states the type and emits nothing.
    */
-  declare data?: (model: Model, context: ResourceContext) => unknown | Promise<unknown>
+  declare data?: (model: Model, context: ResourceContext) => Promiseable<unknown>
 
   /**
    * Named subsets a caller may ask for. Override to expose fragments.

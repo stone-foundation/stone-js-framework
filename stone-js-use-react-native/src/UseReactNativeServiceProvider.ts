@@ -39,7 +39,7 @@ export class UseReactNativeServiceProvider implements IServiceProvider {
    * Boot the provider.
    */
   boot (): Promiseable<void> {
-    NativeRuntime.instance = this.container.make<NativeRuntime>(NativeRuntime)
+    NativeRuntime.share(this.container.make<NativeRuntime>(NativeRuntime))
   }
 
   /**

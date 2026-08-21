@@ -1,31 +1,46 @@
 import { POLICY_KEY } from './constants'
-import { setClassMetadata } from '@stone-js/core'
+import { authzBlueprint } from '../options/AuthzBlueprint'
+import { addBlueprint, classDecoratorLegacyWrapper, ClassType, SERVICE_KEY, setMetadata } from '@stone-js/core'
 
 /**
- * Class decorator: register a policy class under a name.
+ * Declare a class as a policy.
  *
+ * Three statements in one, which is why nothing has to be wired by hand:
+ *
+ * 1. **It is a service.** The container builds it, as a singleton, so its constructor is auto-wired
+ *    like any other class: a repository, a client, a translator, whatever it destructures is resolved
+ *    for it. That is what lets a policy depend on the application instead of on constants.
+ * 2. **It is reachable by name.** The alias is bound as `policy:<name>`, prefixed on purpose: an
+ *    application is free to bind its own service under a plain word, and a declaration named after a
+ *    domain concept must not compete for that name.
+ * 3. **It activates the module.** The blueprint comes with the decorator, so declaring this is the
+ *    whole setup, and a route naming it resolves to this class.
+ *
+ * @param alias - The name a route refers to it by. Defaults to the class name.
+ * @returns A class decorator.
+ *
+ * @example
  * ```ts
- * @Policy('post.update')
- * export class UpdatePostPolicy implements IPolicy {
- *   private readonly posts: PostService
- *   constructor ({ posts }: { posts: PostService }) { this.posts = posts }
- *
- *   async authorize (event: IncomingEvent): Promise<boolean> {
- *     const post = await this.posts.find(event.get('id'))
- *     return post.authorId === event.getMetadataValue<JwtClaims>('auth')?.sub
- *   }
+ * @Policy('post')
+ * export class PostPolicy {
+ *   constructor (private readonly teams: TeamRepository) {}
+ *   update (user: User, post: Post): boolean { return post.authorId === user.id }
  * }
  * ```
- *
- * Routes and handlers then name it (`@Can('post.update')`, or `{ authz: 'post.update' }`), so a rule
- * that needs to load the record it protects lives in its own file and gets its services through the
- * constructor, exactly like a schema or a resource class. A rule expressed only as an ability cannot
- * do that; a policy can.
- *
- * @param alias - The name the policy is registered under. Defaults to the class name, which the
- * discovery middleware fills in, since it is the one holding the class.
- * @returns A class decorator.
  */
-export const Policy = (alias?: string): ClassDecorator => {
-  return setClassMetadata(POLICY_KEY, { alias })
+export const Policy = <T extends ClassType = ClassType>(alias?: string): ClassDecorator => {
+  return classDecoratorLegacyWrapper<T>((target: T, context: ClassDecoratorContext<T>): undefined => {
+    const name = alias ?? target.name
+
+    setMetadata(context, POLICY_KEY, { alias: name })
+    setMetadata(context, SERVICE_KEY, { singleton: true, isClass: true, alias: `policy:${name}` })
+
+    addBlueprint(target, context, authzBlueprint, {
+      stone: {
+        authz: {
+          policies: { [name]: target }
+        }
+      }
+    })
+  })
 }
