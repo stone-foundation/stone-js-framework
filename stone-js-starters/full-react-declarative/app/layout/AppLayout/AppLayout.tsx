@@ -72,7 +72,7 @@ export class AppLayout implements IPageLayout {
         <main>
           <StoneOutlet>{children}</StoneOutlet>
         </main>
-        <footer>&copy; 2025 Stone.js</footer>
+        <footer>&copy; {new Date().getFullYear()} Your Company · Built with Stone.js</footer>
       </div>
     )
   }

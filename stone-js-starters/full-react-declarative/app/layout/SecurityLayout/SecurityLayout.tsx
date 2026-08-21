@@ -30,7 +30,7 @@ export class SecurityLayout implements IPageLayout {
         </main>
         <footer className='mt-24'>
           <div className='container'>
-            <p className='px-24 text-muted'>2025 Stone.js &copy; Noowow Labs</p>
+            <p className='px-24 text-muted'>&copy; {new Date().getFullYear()} Your Company · Built with Stone.js</p>
           </div>
         </footer>
       </>
