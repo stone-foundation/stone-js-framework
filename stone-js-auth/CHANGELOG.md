@@ -1,5 +1,14 @@
 # @stone-js/auth
 
+## 0.8.13
+
+### Patch Changes
+
+- Updated dependencies [8c2b600]
+  - @stone-js/http-core@0.8.13
+  - @stone-js/core@0.8.13
+  - @stone-js/config@0.8.13
+
 ## 0.8.12
 
 ### Patch Changes
