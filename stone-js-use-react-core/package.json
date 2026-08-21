@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/use-react-core",
-  "version": "0.8.10",
+  "version": "0.8.11",
   "description": "The platform-independent half of Stone.js's React integration: page and layout contracts, decorators, hooks, context and the render orchestration shared by the web and native renderers.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
