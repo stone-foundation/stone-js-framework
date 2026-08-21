@@ -66,9 +66,6 @@ export class ResourceRouteMiddleware {
     if (resource === undefined || result === undefined || result === null) { return result }
 
     const context = contextFromEvent(event as any, this.blueprint, {
-      // The projection holds itself against its own contract, and the engine that does it is the one
-      // the application already validates input with.
-      validator: this.container?.make?.('validator'),
       onViolation: this.blueprint.get<ResourcesConfig>('stone.resources', {}).onViolation
     })
 

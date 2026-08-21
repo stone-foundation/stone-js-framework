@@ -85,7 +85,7 @@ describe('operationFromRoute', () => {
   it('lets an explicit openapi option win, because an author who wrote it meant it', () => {
     const operation = operationFromRoute(route('/users', 'POST', {
       validation: NameSchema,
-      openapi: { summary: 'Create a user', request: { body: PageSchema } }
+      contract: { summary: 'Create a user', request: { body: PageSchema } }
     }))
 
     expect(operation.summary).toBe('Create a user')
@@ -112,7 +112,7 @@ describe('routesFromRouter', () => {
 
   it('honours an opt-out, for an endpoint that must not be published', () => {
     const derived = routesFromRouter(router(
-      route('/health', 'GET', { openapi: false }),
+      route('/health', 'GET', { contract: false }),
       route('/users', 'GET', {})
     ))
 
@@ -144,10 +144,27 @@ describe('the response comes from the resource that shapes it', () => {
     expect(operation.responses?.[200]).toMatchObject({ schema: userSchema })
   })
 
-  it('names the fragments a caller may ask for', async () => {
+  it('documents the fragments as an enumerated parameter, not as prose', async () => {
+    // Named in a sentence, a fragment is invisible to everything that reads a contract rather than a
+    // page: a generated client, a form, a test.
     const operation = operationFromRoute(routeWith({ resource }))
 
-    expect(operation.responses?.[200].description).toContain('summary')
+    expect(operation.parameters).toEqual([
+      expect.objectContaining({ name: 'view', in: 'query', schema: { type: 'string', enum: ['summary'] } })
+    ])
+  })
+
+  it('advertises the parameter the application actually answers to', async () => {
+    // A contract naming `?view=` for an API that answers `?only=` is worse than saying nothing.
+    const operation = operationFromRoute(routeWith({ resource }), { fragmentParam: 'only' })
+
+    expect(operation.parameters?.[0]).toMatchObject({ name: 'only' })
+  })
+
+  it('adds no parameter when a resource exposes no fragment', async () => {
+    const plain = { schema: () => userSchema }
+
+    expect(operationFromRoute(routeWith({ resource: plain })).parameters).toBeUndefined()
   })
 
   it('reads a resource the route named, through the registry the runtime uses', async () => {
@@ -184,9 +201,60 @@ describe('the response comes from the resource that shapes it', () => {
   it('lets an explicit declaration win, because an author who wrote it meant it', async () => {
     const operation = operationFromRoute(routeWith({
       resource,
-      openapi: { responses: { 204: { description: 'No content' } } }
+      contract: { responses: { 204: { description: 'No content' } } }
     }))
 
     expect(operation.responses).toEqual({ 204: { description: 'No content' } })
+  })
+})
+
+describe('an undocumented payload is reported, not hidden', () => {
+  const routeAt = (options: Record<string, unknown>): any => ({
+    path: '/users',
+    method: 'GET',
+    getOption: <T>(key: string): T => options[key] as T
+  })
+
+  it('says which route named a resource nobody registered', () => {
+    // Omitting a contract we could not build is right; doing it silently means an endpoint ships
+    // undocumented and the document looks complete.
+    const skipped: any[] = []
+
+    operationFromRoute(routeAt({ resource: 'ghost' }), { resources: {}, onSkipped: (s) => skipped.push(s) })
+
+    expect(skipped[0]).toMatchObject({ route: 'GET /users', concern: 'resource' })
+    expect(skipped[0].reason).toContain("'ghost'")
+  })
+
+  it('says when a schema could not be read at all', () => {
+    // The common cause: a contract whose schema() needs a real context. It is read with an empty one,
+    // because a contract describes what any caller may see.
+    class NeedsContext {
+      schema (context: any): unknown { return context.principal.id }
+    }
+    const skipped: any[] = []
+
+    operationFromRoute(routeAt({ resource: NeedsContext }), {
+      resolve: (Klass: any) => new Klass(),
+      onSkipped: (s) => skipped.push(s)
+    })
+
+    expect(skipped[0].reason).toContain('could not be read')
+  })
+
+  it('says when the declared resource publishes no schema', () => {
+    const skipped: any[] = []
+
+    operationFromRoute(routeAt({ resource: { notAResource: true } }), { onSkipped: (s) => skipped.push(s) })
+
+    expect(skipped[0].reason).toContain('publishes no schema()')
+  })
+
+  it('reports nothing when a route simply declares nothing', () => {
+    const skipped: any[] = []
+
+    operationFromRoute(routeAt({}), { onSkipped: (s) => skipped.push(s) })
+
+    expect(skipped).toEqual([])
   })
 })

@@ -13,17 +13,8 @@ interface User { id: number, name: string, passwordHash: string }
 const ada: User = { id: 1, name: 'Ada', passwordHash: 'do-not-leak' }
 const userResource = defineResource<User>({ schema: z.object({ id: z.number(), name: z.string() }) })
 
-const validator = {
-  validate: <T>(schema: any, data: unknown) => {
-    const result = schema.safeParse(data)
-    return result.success
-      ? { success: true, value: result.data as T }
-      : { success: false, issues: result.error.issues.map((i: any) => ({ message: i.message, path: i.path })) }
-  }
-}
-
-/** The container the runtime hands the middleware, carrying that engine. */
-const container = { make: (key: string) => (key === 'validator' ? validator : undefined) } as any
+/** The container the runtime hands the middleware. */
+const container = {} as any
 
 /** A resource class whose shape depends on an injected service, which is why classes exist. */
 @ApiResource('user')
@@ -164,7 +155,6 @@ describe('resource classes', () => {
   it('are resolved through the container, so a projection can use injected services', async () => {
     // A resource that formats for the caller's locale needs i18n, and this is how it gets it.
     const container: any = {
-      make: (key: string) => (key === 'validator' ? validator : undefined),
       resolve: (Class: any) => new Class({ i18n: { getLocale: () => 'fr' } })
     }
     const middleware = new ResourceRouteMiddleware({ blueprint: blueprint({ user: UserResource }), container })
@@ -189,7 +179,6 @@ describe('resource classes', () => {
 
   it('accepts a class declared inline on the route, not only a registered name', async () => {
     const inline: any = {
-      make: (key: string) => (key === 'validator' ? validator : undefined),
       resolve: (Class: any) => new Class({ i18n: { getLocale: () => 'ht' } })
     }
     const middleware = new ResourceRouteMiddleware({ blueprint: blueprint(), container: inline })

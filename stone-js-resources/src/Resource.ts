@@ -1,19 +1,9 @@
 import { applyFields } from './helpers'
+import { ContractChecker, IContractChecker } from './ContractChecker'
 import { ResourceContractError } from './errors/ResourceContractError'
 import {
   ContractViolationPolicy, IResource, ResourceContext, ResourceEnvelope, ResourceOutput, ResourceSchema
 } from './declarations'
-
-/**
- * The slice of `@stone-js/validation` a resource needs, declared structurally.
- *
- * Structural on purpose: a resource validates output with the same engine the application validates
- * input with, in whatever dialect it already uses, and this package does not have to import that one
- * to say so.
- */
-export interface SchemaValidator {
-  validate: <T>(schema: any, data: unknown) => { success: boolean, value?: T, issues?: Array<{ message: string, path: Array<string | number> }> }
-}
 
 /**
  * Base API resource — the layer responsible for exposing data.
@@ -29,8 +19,8 @@ export interface SchemaValidator {
  * ```ts
  * @ApiResource('user')
  * export class UserResource extends Resource<User> {
- *   constructor ({ validator, posts }: { validator: SchemaValidator, posts: PostService }) {
- *     super({ validator })
+ *   constructor ({ posts }: { posts: PostService }) {
+ *     super()
  *     this.posts = posts
  *   }
  *
@@ -49,16 +39,16 @@ export interface SchemaValidator {
  * ```
  */
 export abstract class Resource<Model = unknown, Output extends ResourceOutput = ResourceOutput> implements IResource<Model, Output> {
-  private readonly validator?: SchemaValidator
+  private readonly checker: IContractChecker
   private readonly onViolation: ContractViolationPolicy
 
   /**
-   * @param dependencies - Auto-wired services. `validator` comes from `@stone-js/validation`; without
-   *                       it a resource still projects, but it cannot check its own promise, so it
-   *                       says so rather than pretending to have checked.
+   * @param dependencies - Auto-wired services. Nothing is required: this module reads schemas with its
+   *                       own checker, so exposing data never depends on a validation module being
+   *                       enabled. Pass `checker` to substitute a dialect of your own.
    */
-  constructor (dependencies: { validator?: SchemaValidator, onViolation?: ContractViolationPolicy } = {}) {
-    this.validator = dependencies.validator
+  constructor (dependencies: { checker?: IContractChecker, onViolation?: ContractViolationPolicy } = {}) {
+    this.checker = dependencies.checker ?? ContractChecker.create()
     this.onViolation = dependencies.onViolation ?? 'throw'
   }
 
@@ -180,21 +170,10 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    * @throws {ResourceContractError} When the data breaks the contract and the policy is `throw`.
    */
   protected async project (data: unknown, schema: ResourceSchema, context: ResourceContext): Promise<unknown> {
-    // From the context first: the middleware has the container, and an imperatively-defined resource
-    // has no constructor for one to be injected into. A resource used directly in a service is handed
-    // one the same way, or at construction.
-    const validator = (context.validator as SchemaValidator | undefined) ?? this.validator
-
-    if (validator === undefined) {
-      throw new ResourceContractError(
-        `${this.constructor.name} cannot check the contract it publishes: no validator was available. ` +
-        'Enable `@stone-js/validation` — its `validator` service is what a resource holds its output ' +
-        'against, and the route middleware passes it in — or hand one to the resource directly when ' +
-        'projecting outside a request.'
-      )
-    }
-
-    const result = validator.validate(schema, data)
+    // From the context first, so an application may hand a projection its own dialect for one call;
+    // otherwise this module's own reader, which is why exposing data needs no validation module.
+    const checker = (context.checker as IContractChecker | undefined) ?? this.checker
+    const result = checker.check(schema, data)
 
     if (result.success) { return result.value }
 

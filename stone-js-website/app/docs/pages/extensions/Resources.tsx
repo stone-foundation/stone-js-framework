@@ -78,8 +78,8 @@ export class TaskResource extends Resource<Task> {
           resolved from the container, so it may reach any service. Whatever it returns is what the
           schema then validates.
         </p>
-        <Code file='app/resources/TaskResource.ts'>{`constructor ({ validator, comments }) {
-  super({ validator })
+        <Code file='app/resources/TaskResource.ts'>{`constructor ({ comments }) {
+  super()
   this.comments = comments
 }
 
@@ -167,6 +167,14 @@ export class TaskResource { … }
           caller selected, and the authenticated <code>principal</code> — because deciding what a caller
           may see is the most common reason two callers get different shapes, and a resource that cannot
           see who is asking has to be told by the handler.
+        </Callout>
+
+        <Callout kind='note' title='It reads schemas; it does not depend on a validator'>
+          This module carries its own reader, so exposing data never requires enabling a validation
+          module. The dialects it accepts are public specifications rather than one library's API:
+          Standard Schema first — Zod, Valibot, ArkType and others — then <code>safeParse</code>,
+          {' '}<code>parse</code> or <code>validate</code>. Supply your own <code>checker</code> to
+          teach it a dialect of your own.
         </Callout>
 
         <Callout kind='future' title='One declaration, three consumers'>

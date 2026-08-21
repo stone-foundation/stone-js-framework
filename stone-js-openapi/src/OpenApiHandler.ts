@@ -83,7 +83,15 @@ export class OpenApiHandler {
     if (options.deriveFromRouter !== false) {
       generator.addRouter(this.router(), {
         schemas: this.blueprint.get<Record<string, unknown>>('stone.validation.schemas', {}),
+        // The same registry the runtime projects through, so a route naming a resource documents the
+        // response it will actually send.
+        resources: this.blueprint.get<Record<string, unknown>>('stone.resources.registry', {}),
+        fragmentParam: this.blueprint.get<string>('stone.resources.params.fragment', 'view'),
         securityScheme: options.securityScheme,
+        // Served on request, so a skipped derivation goes to the log rather than to the response.
+        onSkipped: ({ route, concern, reason }) => {
+          console.warn(`[@stone-js/openapi] ${route}: ${concern} not documented — ${reason}`)
+        },
         // The request already runs inside the container, so a schema class whose rules need i18n
         // gets i18n, and the contract is complete rather than partial. Reaching here at all means a
         // router was resolved, so a container exists.
