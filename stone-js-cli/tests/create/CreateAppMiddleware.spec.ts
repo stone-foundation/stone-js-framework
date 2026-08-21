@@ -154,16 +154,56 @@ describe('InstallDependenciesMiddleware', () => {
     await expect(InstallDependenciesMiddleware(mockContext, next)).rejects.toThrow(CliError)
   })
 
-  it('executes install command with testing dependencies using npm', async () => {
+  it('installs the chosen modules, and the test runner as a development dependency', async () => {
+    // Two calls, because a test runner is not a runtime dependency. It was installed as one: a
+    // deployed application shipped Vitest, and a starter that already declared it in
+    // `devDependencies` had it moved there.
     const result = await InstallDependenciesMiddleware(mockContext, next)
 
     expect(mockContext.commandOutput.info).toHaveBeenCalledWith('Installing packages. This might take a while...')
     expect(execFileSync).toHaveBeenCalledWith(
       'npm',
-      ['install', '@stone-js/core', 'vitest', '@vitest/coverage-v8'],
+      ['install', '@stone-js/core'],
+      { cwd: '/dest/my-app', shell: false, stdio: 'inherit' }
+    )
+    expect(execFileSync).toHaveBeenCalledWith(
+      'npm',
+      ['install', '--save-dev', 'vitest', '@vitest/coverage-v8'],
       { cwd: '/dest/my-app', shell: false, stdio: 'inherit' }
     )
     expect(result).toBe('next-called')
+  })
+
+  it('installs nothing extra when no runner was chosen', async () => {
+    mockContext.blueprint.get.mockReturnValue({
+      testing: '',
+      destDir: '/dest/my-app',
+      modules: ['@stone-js/core'],
+      packageManager: 'npm'
+    })
+
+    await InstallDependenciesMiddleware(mockContext, next)
+
+    expect(execFileSync).toHaveBeenCalledTimes(1)
+  })
+
+  it('installs any runner it was given, not only Vitest', async () => {
+    // The prompt offers Vitest, but the configuration is not the prompt: a runner named there must
+    // still be installed, and only Vitest brings a coverage provider along.
+    mockContext.blueprint.get.mockReturnValue({
+      testing: 'jest',
+      destDir: '/dest/my-app',
+      modules: [],
+      packageManager: 'npm'
+    })
+
+    await InstallDependenciesMiddleware(mockContext, next)
+
+    expect(execFileSync).toHaveBeenCalledWith(
+      'npm',
+      ['install', '--save-dev', 'jest'],
+      { cwd: '/dest/my-app', shell: false, stdio: 'inherit' }
+    )
   })
 
   it('re-reads package.json after install so the chosen modules survive finalize', async () => {
@@ -189,7 +229,13 @@ describe('InstallDependenciesMiddleware', () => {
 
     expect(execFileSync).toHaveBeenCalledWith(
       'yarn',
-      ['add', '@stone-js/core', 'jest'],
+      ['add', '@stone-js/core'],
+      { cwd: '/dest/my-app', shell: false, stdio: 'inherit' }
+    )
+    // Yarn spells the same intent differently.
+    expect(execFileSync).toHaveBeenCalledWith(
+      'yarn',
+      ['add', '--dev', 'jest'],
       { cwd: '/dest/my-app', shell: false, stdio: 'inherit' }
     )
   })
