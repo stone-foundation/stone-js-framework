@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.8.13
+
+### Patch Changes
+
+- @stone-js/cli@0.8.13
+
 ## 0.8.12
 
 ### Patch Changes

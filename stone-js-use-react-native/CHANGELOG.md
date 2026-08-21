@@ -1,5 +1,18 @@
 # @stone-js/use-react-native
 
+## 0.8.13
+
+### Patch Changes
+
+- @stone-js/use-react-core@0.8.13
+- @stone-js/core@0.8.13
+- @stone-js/config@0.8.13
+- @stone-js/router@0.8.13
+- @stone-js/browser-core@0.8.13
+- @stone-js/use-view@0.8.13
+- @stone-js/cli@0.8.13
+- @stone-js/react-native-adapter@0.8.13
+
 ## 0.8.12
 
 ### Patch Changes

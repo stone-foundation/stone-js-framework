@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.13
+
+### Patch Changes
+
+- @stone-js/core@0.8.13
+
 ## 0.8.12
 
 ### Patch Changes
