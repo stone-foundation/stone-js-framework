@@ -113,6 +113,17 @@ describe('IncomingEvent', () => {
         .not.toBe(withMetadata({ tags: ['b', 'a'] }).fingerprint())
     })
 
+    it('orders keys the same way on every machine, whatever the locale', () => {
+      // Sorted by code unit rather than by locale: a locale-aware order differs between machines,
+      // and the two halves of a hydrated render can run on two of them.
+      const one = withMetadata({ 'ä': 1, z: 2 })
+      const other = withMetadata({ z: 2, 'ä': 1 })
+
+      expect(one.fingerprint()).toBe(other.fingerprint())
+      // `z` before `ä` is code-unit order; several locales would say the opposite.
+      expect(Buffer.from(one.fingerprint(), 'base64').toString('utf-8')).toContain('{"z":2,"ä":1}')
+    })
+
     it('separates two events carrying different things', () => {
       expect(withMetadata({ id: 1 }).fingerprint()).not.toBe(withMetadata({ id: 2 }).fingerprint())
     })

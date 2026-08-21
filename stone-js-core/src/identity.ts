@@ -39,7 +39,12 @@ export const toBase64 = (value: string): string => {
 export const stableStringify = (value: unknown): string => {
   return JSON.stringify(value, (_key, item) => {
     if (isPlainObject(item)) {
-      return Object.keys(item).sort().reduce<Record<string, unknown>>((sorted, key) => {
+      // Compared by code unit, deliberately, and not through `localeCompare`: a locale-aware order
+      // is not the same order on two machines, and the two halves of a hydrated render can run on
+      // two machines. A key has to be stable before it is pretty.
+      const byCodeUnit = (a: string, b: string): number => a < b ? -1 : (a > b ? 1 : 0)
+
+      return Object.keys(item).sort(byCodeUnit).reduce<Record<string, unknown>>((sorted, key) => {
         sorted[key] = (item as Record<string, unknown>)[key]
         return sorted
       }, {})
