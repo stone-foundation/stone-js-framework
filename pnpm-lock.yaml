@@ -4188,6 +4188,9 @@ importers:
       '@stone-js/use-view':
         specifier: workspace:*
         version: link:../stone-js-use-view
+      cross-spawn:
+        specifier: ^7.0.6
+        version: 7.0.6
       react:
         specifier: ^19.0.0
         version: 19.2.8
@@ -4210,9 +4213,15 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^12.1.4
         version: 12.3.0(rollup@4.62.2)(tslib@2.8.1)(typescript@5.9.3)
+      '@stone-js/cli':
+        specifier: workspace:*
+        version: link:../stone-js-cli
       '@testing-library/react':
         specifier: ^16.3.0
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@types/cross-spawn':
+        specifier: ^6.0.6
+        version: 6.0.6
       '@types/node':
         specifier: ^24.0.7
         version: 24.13.3
