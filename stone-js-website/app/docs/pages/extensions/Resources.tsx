@@ -110,6 +110,28 @@ async data (task: Task) {
           check refuses the answer, which is the loud failure this module exists to produce.
         </Callout>
 
+        <H3>Typing who is asking</H3>
+        <p>
+          Deciding what a caller may see is the most common reason two callers get different shapes, so a
+          resource can say what its event and its principal are. The type parameters travel down into
+          every signature you write, and nothing needs a cast:
+        </p>
+        <Code file='app/resources/MyAccountResource.ts'>{`class MyAccountResource extends Resource<Account, ResourceOutput, IncomingHttpEvent, Actor> {
+  schema (context: ResourceContext<IncomingHttpEvent, Actor>) {
+    return context.principal?.isSelf === true ? fullSchema : publicSchema   // typed, not unknown
+  }
+
+  async data (account: Account, context: ResourceContext<IncomingHttpEvent, Actor>) {
+    return { ...account, email: context.principal?.actorId === account.id ? account.email : undefined }
+  }
+}`}</Code>
+        <p>
+          Both are <code>unknown</code> by default, so a resource that does not care writes nothing.
+          <code> data()</code> and <code>fragments()</code> can be written as methods or as arrow
+          properties; both forms are accepted deliberately, because the natural way to write an override
+          in a class is a method, and a strict application must still be able to narrow the context.
+        </p>
+
         <H3>The contract is protected, not merely published</H3>
         <p>
           Data that breaks the schema does not go out. A caller cannot detect a broken contract, and a
