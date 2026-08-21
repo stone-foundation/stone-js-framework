@@ -63,9 +63,15 @@ export interface ResourceEnvelope<T> {
  * and to the resource itself, which validates against it before anything leaves. One declaration, three
  * consumers, and no way for the documentation to drift from the response.
  */
-export interface IResource<Model = unknown, Output = ResourceOutput> {
+export interface IResource<
+  Model = unknown,
+  Output = ResourceOutput,
+  EventType = unknown,
+  PrincipalType = unknown
+> {
   /** The contract: the schema every projection is validated against and documented from. */
-  schema: (context: ResourceContext) => ResourceSchema | Promise<ResourceSchema>
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  schema(context: ResourceContext<EventType, PrincipalType>): ResourceSchema | Promise<ResourceSchema>
 
   /**
    * Named subsets a caller may ask for, each with its own schema.
@@ -73,7 +79,8 @@ export interface IResource<Model = unknown, Output = ResourceOutput> {
    * A fragment is not a filter: it is a contract of its own, documented and validated like the full
    * one. That is what makes `?view=summary` safe to expose.
    */
-  fragments?: (context: ResourceContext) => Record<string, ResourceSchema> | Promise<Record<string, ResourceSchema>>
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  fragments?(context: ResourceContext<EventType, PrincipalType>): Record<string, ResourceSchema> | Promise<Record<string, ResourceSchema>>
 
   /**
    * Optional hook to shape or complete the model before it meets the schema.
@@ -81,14 +88,18 @@ export interface IResource<Model = unknown, Output = ResourceOutput> {
    * Asynchronous, and resolved from the container, so it may reach any service: fetch a relation,
    * translate a label, compute a total. Whatever it returns is what the schema then validates.
    */
-  data?: (model: Model, context: ResourceContext) => Promiseable<unknown>
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  data?(model: Model, context: ResourceContext<EventType, PrincipalType>): Promiseable<unknown>
 
   /** Project one model. */
-  item: (model: Model, context?: ResourceContext) => Promise<Output>
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  item(model: Model, context?: ResourceContext<EventType, PrincipalType>): Promise<Output>
   /** Project a collection. */
-  collection: (models: Model[], context?: ResourceContext) => Promise<Output[]>
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  collection(models: Model[], context?: ResourceContext<EventType, PrincipalType>): Promise<Output[]>
   /** Project into a `{ data, meta }` envelope. */
-  response: (models: Model | Model[], context?: ResourceContext, meta?: Record<string, unknown>) => Promise<ResourceEnvelope<Output | Output[]>>
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  response(models: Model | Model[], context?: ResourceContext<EventType, PrincipalType>, meta?: Record<string, unknown>): Promise<ResourceEnvelope<Output | Output[]>>
 }
 
 /** What to do when the data does not match the contract the resource published. */

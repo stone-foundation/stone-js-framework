@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/testing",
-  "version": "0.8.12",
+  "version": "0.8.13",
   "description": "Testing utilities for Stone.js. Boot a real app in-memory and dispatch synthetic events through the full kernel — no server, no adapter — plus event/response factories. Works with any test runner.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
@@ -32,6 +32,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "default": "./dist/http.js"
     }
   },
   "engines": {
@@ -53,7 +61,8 @@
   },
   "peerDependencies": {
     "@stone-js/core": "workspace:*",
-    "@stone-js/http-core": "workspace:*"
+    "@stone-js/http-core": "workspace:*",
+    "@stone-js/browser-core": "workspace:*"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -62,6 +71,7 @@
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
+    "@stone-js/browser-core": "workspace:*",
     "@stone-js/core": "workspace:*",
     "@stone-js/http-core": "workspace:*",
     "@stone-js/router": "workspace:*",
@@ -91,5 +101,13 @@
   "dependencies": {
     "@stone-js/filesystem": "workspace:*",
     "dotenv": "^16.4.7"
+  },
+  "peerDependenciesMeta": {
+    "@stone-js/browser-core": {
+      "optional": true
+    },
+    "@stone-js/http-core": {
+      "optional": true
+    }
   }
 }

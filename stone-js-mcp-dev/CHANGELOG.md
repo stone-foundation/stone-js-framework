@@ -1,5 +1,12 @@
 # @stone-js/mcp-dev
 
+## 0.8.13
+
+### Patch Changes
+
+- @stone-js/core@0.8.13
+- @stone-js/cli@0.8.13
+
 ## 0.8.12
 
 ### Patch Changes

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": true,
+    /* What a strict application turns on, and what a narrowed parameter used to fail under: a
+       function-typed property is contravariant on its parameters, so an implementation could not say
+       which event it reads. Checked against the published types, the way a consumer sees them. */
+    "strict": true,
+    "strictFunctionTypes": true,
+    "exactOptionalPropertyTypes": true,
+    "paths": { "@stone-js/authz": ["./dist/index.d.ts"] }
+  },
+  "include": ["types-tests/**/*.ts"]
+}

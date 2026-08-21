@@ -222,9 +222,11 @@ describe('resolveTranslationFiles', () => {
 describe('i18nCliPlugin', () => {
   const cwd = vi.spyOn(process, 'cwd').mockReturnValue('/proj')
 
-  const makeContext = (): { writeFile: any, addModule: any, buildPath: any } => ({
+  const makeContext = (): { writeFile: any, addModule: any, buildPath: any, reporter: any } => ({
     writeFile: vi.fn(),
     addModule: vi.fn(),
+    // The real context always carries one, and the plugin now says what it found through it.
+    reporter: { step: vi.fn() },
     buildPath: (rel: string) => `/proj/.stone/tmp/${rel}`
   })
 
@@ -294,5 +296,36 @@ describe('the locales the scan found', () => {
 
   it('says nothing when there is nothing to say', () => {
     expect(generateI18nModule('/build', [], true)).toContain('locales: []')
+  })
+})
+
+describe('saying what the scan found', () => {
+  const contextWith = (): any => ({
+    buildPath: (file: string) => `/build/${file}`,
+    writeFile: vi.fn(),
+    addModule: vi.fn(),
+    reporter: { step: vi.fn() }
+  })
+
+  it('reports the catalogs and locales it registered', () => {
+    // The alternative is grepping a bundle, which is what an application had to do to find out
+    // whether translations had been registered at all.
+    vi.mocked(globSync).mockReturnValue(['/app/i18n/fr/errors.json', '/app/i18n/en/errors.json'] as any)
+    const context = contextWith()
+
+    i18nCliPlugin({ pattern: 'app/**/i18n' }).onPrepare?.(context)
+
+    expect(context.reporter.step).toHaveBeenCalledWith('i18n: 2 catalog(s), 2 locale(s) (en, fr)')
+  })
+
+  it('says so when it found none, instead of registering nothing quietly', () => {
+    // A module with no catalogs answers every key with itself, which reads like a missing entry and
+    // ships to production in the user's language.
+    vi.mocked(globSync).mockReturnValue([] as any)
+    const context = contextWith()
+
+    i18nCliPlugin({ pattern: 'app/**/i18n' }).onPrepare?.(context)
+
+    expect(context.reporter.step).toHaveBeenCalledWith(expect.stringContaining('no catalog found'))
   })
 })

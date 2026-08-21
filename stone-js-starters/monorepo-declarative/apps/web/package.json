@@ -1,0 +1,40 @@
+{
+  "name": "@acme/web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "The web application: the shared domain, served in a browser.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "stone dev",
+    "build": "stone build",
+    "preview": "stone preview",
+    "build:ssr": "stone build --ssr",
+    "test": "stone test",
+    "test:cvg": "stone test --coverage"
+  },
+  "dependencies": {
+    "@acme/domain": "workspace:*",
+    "@stone-js/browser-adapter": "^0.8.13",
+    "@stone-js/core": "^0.8.13",
+    "@stone-js/router": "^0.8.13",
+    "@stone-js/use-react": "^0.8.13",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.25.9",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-typescript": "^7.27.0",
+    "@stone-js/cli": "^0.8.13",
+    "@stone-js/testing": "^0.8.13",
+    "@types/node": "^24.0.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "@vitest/coverage-v8": "^3.0.9",
+    "vitest": "^3.0.9"
+  }
+}

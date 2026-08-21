@@ -18,7 +18,8 @@
     "@stone-js/node-cli-adapter": "workspace:*",
     "@stone-js/node-http-adapter": "workspace:*",
     "@stone-js/router": "workspace:*",
-    "@stone-js/i18n": "workspace:*"
+    "@stone-js/i18n": "workspace:*",
+    "@stone-js/telemetry": "workspace:*"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.25.9",

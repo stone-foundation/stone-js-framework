@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/authz",
-  "version": "0.8.12",
+  "version": "0.8.13",
   "description": "Framework-agnostic, isomorphic authorization for Stone.js built on CASL. RBAC + ABAC with the same rules on the backend and the frontend — define abilities once, guard routes and shape the UI.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
@@ -46,12 +46,13 @@
     "doc": "typedoc",
     "clean": "rimraf dist",
     "build": "rollup -c",
-    "test": "vitest run",
+    "test": "vitest run && npm run test:types",
     "test:cvg": "npm run test -- --coverage",
     "test:text": "npm run test:cvg -- --coverage.reporter=text",
     "test:html": "npm run test:cvg -- --coverage.reporter=html",
     "test:clover": "npm run test:cvg -- --coverage.reporter=clover",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:types": "tsc -p tsconfig.types.json"
   },
   "peerDependencies": {
     "@stone-js/core": "workspace:*",

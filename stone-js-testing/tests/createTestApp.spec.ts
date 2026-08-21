@@ -1,6 +1,6 @@
 import { htmlHttpResponse, httpCoreBlueprint, jsonHttpResponse } from '@stone-js/http-core'
 import { createTestApp } from '../src/createTestApp'
-import { makeIncomingHttpEvent } from '../src/factories'
+import { makeIncomingHttpEvent } from '../src/http'
 
 /** The shape real code has: a class whose dependencies are auto-wired from the container. */
 class ClockHandler {
@@ -28,6 +28,25 @@ describe('createTestApp', () => {
 
     expect(response.statusCode).toBe(201)
     expect(JSON.parse(response.content)).toEqual({ hello: 'World' })
+  })
+
+  it('lets a test force a value over what the application declares', async () => {
+    // The one ordering a test can use. `@StoneApp` carries the default blueprint, which sets nearly
+    // every key, so an option merged before the application's modules would do nothing at all.
+    class NameHandler {
+      private readonly blueprint: any
+      constructor ({ blueprint }: any) { this.blueprint = blueprint }
+      handle (): any { return jsonHttpResponse({ name: this.blueprint.get('stone.name') }, 200) }
+    }
+
+    const app = await createTestApp({
+      modules: [{ stone: { name: 'FromTheApp', kernel: { eventHandler: { module: NameHandler, isClass: true } } } }] as any,
+      blueprint: { stone: { name: 'ForcedByTheTest' } } as any
+    })
+
+    const response: any = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/' }))
+
+    expect(JSON.parse(response.content).name).toBe('ForcedByTheTest')
   })
 
   it('accepts modules (not just a blueprint) and reuses the app across sends', async () => {

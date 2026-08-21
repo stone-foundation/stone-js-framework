@@ -1,221 +1,121 @@
-import { Mock } from 'vitest'
-import { gzip, brotliCompress, deflate } from 'node:zlib'
+import * as zlib from 'node:zlib'
+import { OutgoingResponse } from '@stone-js/core'
+import { OutgoingHttpResponse } from '../../src/OutgoingHttpResponse'
 import { CompressionMiddleware } from '../../src/middleware/CompressionMiddleware'
 
-vi.mock('node:zlib') // Mock zlib compression methods
+// Real zlib, with one seam: a flag that makes gzip fail, so the fallback path can be exercised
+// without pretending the whole module away.
+let gzipFails = false
 
+vi.mock('node:zlib', async (mod) => {
+  const actual = await mod<typeof import('node:zlib')>()
+  return {
+    ...actual,
+    gzip: (buffer: any, callback: any) => gzipFails
+      ? callback(new Error('boom'))
+      : actual.gzip(buffer, callback)
+  }
+})
+
+/**
+ * Real responses and real zlib, on purpose.
+ *
+ * These assertions used to be about whether `setHeader` had been called on an object literal, which
+ * can pass while nothing is compressed and while the response type is wrong. What matters is that
+ * the bytes coming out decompress back to the bytes going in, and that the headers a cache reads say
+ * so. Only the event is a stand-in: the middleware reads one header from it, and the response is the
+ * subject.
+ */
 describe('CompressionMiddleware', () => {
-  let middleware: any
+  let middleware: CompressionMiddleware
+
+  /** The middleware reads exactly one thing from the event. */
+  const eventAccepting = (encodings: string): any => ({ getHeader: vi.fn().mockReturnValue(encodings) })
+
+  const httpResponse = (content: unknown): OutgoingHttpResponse =>
+    OutgoingHttpResponse.create({ content, statusCode: 200 })
+
+  const nextReturning = (response: unknown): any => vi.fn().mockResolvedValue(response)
+
+  // Above the middleware's 1 kB threshold, which is the case that was broken.
+  const LARGE = 'Write the domain once, run it anywhere. '.repeat(40)
 
   beforeEach(() => {
-    (gzip as unknown as Mock).mockClear()
+    gzipFails = false
     middleware = new CompressionMiddleware()
   })
 
-  it('should compress content using gzip if the client supports it', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('gzip') }
-    const nextMock = vi.fn().mockResolvedValue({
-      content: 'This is a test content that is larger than 1KB.'.repeat(50), // >1KB
-      setHeader: vi.fn(),
-      setContent: vi.fn(),
-      addVary: vi.fn(),
-      removeHeader: vi.fn()
-    })
+  it.each([
+    ['gzip', (buffer: Buffer) => zlib.gunzipSync(buffer)],
+    ['deflate', (buffer: Buffer) => zlib.inflateSync(buffer)],
+    ['br', (buffer: Buffer) => zlib.brotliDecompressSync(buffer)]
+  ])('compresses with %s, and the bytes decompress back', async (encoding, decompress) => {
+    const response = await middleware.handle(eventAccepting(encoding), nextReturning(httpResponse(LARGE)))
 
-    const compressedBuffer = Buffer.from('compressed content');
-    (gzip as unknown as Mock).mockImplementation((_buffer, cb) => cb(null, compressedBuffer))
-
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(eventMock.getHeader).toHaveBeenCalledWith('accept-encoding', '')
-    expect(nextMock).toHaveBeenCalled()
-    expect(gzip).toHaveBeenCalled()
-    expect(response.addVary).toHaveBeenCalledWith('Accept-Encoding')
-    expect(response.setHeader).toHaveBeenCalledWith('Content-Encoding', 'gzip')
-    expect(response.removeHeader).toHaveBeenCalledWith('Content-Length')
-    expect(response.setContent).toHaveBeenCalledWith(compressedBuffer)
+    expect(response.getHeader('Content-Encoding')).toBe(encoding)
+    expect(decompress(response.content as Buffer).toString('utf-8')).toBe(LARGE)
+    // A cache must not reuse an encoded body for a client that asked for another encoding, and the
+    // length it was told no longer matches what it holds.
+    expect(response.vary).toContain('Accept-Encoding')
+    expect(response.hasHeader('Content-Length')).toBe(false)
   })
 
-  it('should compress content using Brotli if the client supports it', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('br') }
-    const nextMock = vi.fn().mockResolvedValue({
-      content: Buffer.from('This is compressible content.'),
-      setHeader: vi.fn(),
-      setContent: vi.fn(),
-      addVary: vi.fn(),
-      removeHeader: vi.fn()
-    })
+  it('picks brotli first when the client accepts several', async () => {
+    const response = await middleware.handle(eventAccepting('deflate, gzip, br'), nextReturning(httpResponse(LARGE)))
 
-    const compressedBuffer = Buffer.from('compressed content');
-    (brotliCompress as unknown as Mock).mockImplementation((buffer, cb) => cb(null, compressedBuffer))
-
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(eventMock.getHeader).toHaveBeenCalledWith('accept-encoding', '')
-    expect(nextMock).toHaveBeenCalled()
-    expect(brotliCompress).toHaveBeenCalled()
-    expect(response.addVary).toHaveBeenCalledWith('Accept-Encoding')
-    expect(response.setHeader).toHaveBeenCalledWith('Content-Encoding', 'br')
-    expect(response.removeHeader).toHaveBeenCalledWith('Content-Length')
-    expect(response.setContent).toHaveBeenCalledWith(compressedBuffer)
+    expect(response.getHeader('Content-Encoding')).toBe('br')
   })
 
-  it('should skip compression if no encoding is supported', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('') }
-    const nextMock = vi.fn().mockResolvedValue({
-      content: Buffer.from('This is compressible content.'),
-      setHeader: vi.fn(),
-      setContent: vi.fn(),
-      addVary: vi.fn(),
-      removeHeader: vi.fn()
-    })
+  it('leaves the body alone when the client accepts nothing it can produce', async () => {
+    const response = await middleware.handle(eventAccepting('identity'), nextReturning(httpResponse(LARGE)))
 
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(eventMock.getHeader).toHaveBeenCalledWith('accept-encoding', '')
-    expect(nextMock).toHaveBeenCalled()
-    expect(response.setContent).not.toHaveBeenCalled()
-    expect(response.removeHeader).toHaveBeenCalledWith('Content-Length')
-    expect(response.addVary).toHaveBeenCalledWith('Accept-Encoding')
+    expect(response.getHeader('Content-Encoding')).toBeUndefined()
+    expect(response.content).toBe(LARGE)
+    // Still declared: the response was negotiable even though this client got the plain form.
+    expect(response.vary).toContain('Accept-Encoding')
   })
 
-  it('should skip compression for content smaller than 1KB', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('gzip') }
-    const nextMock = vi.fn().mockResolvedValue({
-      content: 'Short content',
-      setContent: vi.fn()
-    })
+  it('leaves a body under 1 kB alone, headers included', async () => {
+    const response = await middleware.handle(eventAccepting('gzip'), nextReturning(httpResponse('Short content')))
 
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(nextMock).toHaveBeenCalled()
-    expect(response.setContent).not.toHaveBeenCalled()
-    expect(gzip).not.toHaveBeenCalled()
+    expect(response.content).toBe('Short content')
+    expect(response.getHeader('Content-Encoding')).toBeUndefined()
+    expect(response.vary).not.toContain('Accept-Encoding')
   })
 
-  it('should handle errors during compression gracefully for gzip', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('gzip') }
-    const compressedBuffer = Buffer.from('This is compressible content.')
-    const nextMock = vi.fn().mockResolvedValue({
-      content: compressedBuffer,
-      setHeader: vi.fn(),
-      setContent: vi.fn(),
-      addVary: vi.fn(),
-      removeHeader: vi.fn()
-    });
+  it('compresses a Buffer whatever its size, since a Buffer is already bytes', async () => {
+    const response = await middleware.handle(eventAccepting('gzip'), nextReturning(httpResponse(Buffer.from('small'))))
 
-    (gzip as unknown as Mock).mockImplementation((buffer, cb) => cb(new Error('Compression error')))
-
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(nextMock).toHaveBeenCalled()
-    expect(gzip).toHaveBeenCalled()
-    expect(response.removeHeader).toHaveBeenCalledWith('Content-Length')
-    expect(response.addVary).toHaveBeenCalledWith('Accept-Encoding')
+    expect(response.getHeader('Content-Encoding')).toBe('gzip')
+    expect(zlib.gunzipSync(response.content as Buffer).toString('utf-8')).toBe('small')
   })
 
-  it('should handle errors during compression gracefully for deflate', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('deflate') }
-    const compressedBuffer = Buffer.from('This is compressible content.')
-    const nextMock = vi.fn().mockResolvedValue({
-      content: compressedBuffer,
-      setHeader: vi.fn(),
-      setContent: vi.fn(),
-      addVary: vi.fn(),
-      removeHeader: vi.fn()
-    });
+  it('has nothing to compress when there is no body', async () => {
+    const response = await middleware.handle(eventAccepting('gzip'), nextReturning(httpResponse(null)))
 
-    (deflate as unknown as Mock).mockImplementation((buffer, cb) => cb(new Error('Compression error')))
-
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(nextMock).toHaveBeenCalled()
-    expect(deflate).toHaveBeenCalled()
-    expect(response.removeHeader).toHaveBeenCalledWith('Content-Length')
-    expect(response.addVary).toHaveBeenCalledWith('Accept-Encoding')
+    expect(response.getHeader('Content-Encoding')).toBeUndefined()
   })
 
-  it('should handle errors during compression gracefully for br', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('br') }
-    const compressedBuffer = Buffer.from('This is compressible content.')
-    const nextMock = vi.fn().mockResolvedValue({
-      content: compressedBuffer,
-      setHeader: vi.fn(),
-      setContent: vi.fn(),
-      addVary: vi.fn(),
-      removeHeader: vi.fn()
-    });
+  it('serves the body uncompressed when zlib fails, rather than failing the response', async () => {
+    gzipFails = true
 
-    (brotliCompress as unknown as Mock).mockImplementation((buffer, cb) => cb(new Error('Compression error')))
+    const response = await middleware.handle(eventAccepting('gzip'), nextReturning(httpResponse(LARGE)))
 
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(nextMock).toHaveBeenCalled()
-    expect(brotliCompress).toHaveBeenCalled()
-    expect(response.removeHeader).toHaveBeenCalledWith('Content-Length')
-    expect(response.addVary).toHaveBeenCalledWith('Accept-Encoding')
+    expect(response.getHeader('Content-Encoding')).toBeUndefined()
+    expect(response.content).toBe(LARGE)
   })
 
-  it('should compress content using deflate if the client supports it', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('deflate') }
-    const nextMock = vi.fn().mockResolvedValue({
-      content: Buffer.from('This is compressible content.'),
-      setHeader: vi.fn(),
-      setContent: vi.fn(),
-      addVary: vi.fn(),
-      removeHeader: vi.fn()
-    })
+  it('leaves a response that is not going over HTTP untouched', async () => {
+    // The regression this guard exists for. The middleware is global, so in an application that
+    // renders rather than serves, what comes back is a browser or native response: it has no headers
+    // to set, because nothing is going over a wire. Reaching for `setHeader` there threw
+    // `response.removeHeader is not a function`, and only above 1 kB, so a small page worked and a
+    // real one did not.
+    const rendered = OutgoingResponse.create({ content: LARGE, statusCode: 200 })
 
-    const compressedBuffer = Buffer.from('compressed content');
-    (deflate as unknown as Mock).mockImplementation((buffer, cb) => cb(null, compressedBuffer))
+    const response = await middleware.handle(eventAccepting('gzip'), nextReturning(rendered))
 
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(eventMock.getHeader).toHaveBeenCalledWith('accept-encoding', '')
-    expect(nextMock).toHaveBeenCalled()
-    expect(deflate).toHaveBeenCalled()
-    expect(response.addVary).toHaveBeenCalledWith('Accept-Encoding')
-    expect(response.setHeader).toHaveBeenCalledWith('Content-Encoding', 'deflate')
-    expect(response.removeHeader).toHaveBeenCalledWith('Content-Length')
-    expect(response.setContent).toHaveBeenCalledWith(compressedBuffer)
-  })
-
-  it('should skip compression if no valid encoding is provided', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('invalid-encoding') }
-    const nextMock = vi.fn().mockResolvedValue({
-      content: Buffer.from('This is compressible content.'),
-      setHeader: vi.fn(),
-      setContent: vi.fn(),
-      addVary: vi.fn(),
-      removeHeader: vi.fn()
-    })
-
-    const compressedBuffer = Buffer.from('compressed content');
-    (gzip as unknown as Mock).mockImplementation((buffer, cb) => cb(null, compressedBuffer))
-
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(eventMock.getHeader).toHaveBeenCalledWith('accept-encoding', '')
-    expect(nextMock).toHaveBeenCalled()
-    expect(gzip).not.toHaveBeenCalled()
-    // No encoding negotiated → no Content-Encoding, but Vary is still merged and Content-Length dropped.
-    expect(response.setHeader).not.toHaveBeenCalledWith('Content-Encoding', expect.anything())
-    expect(response.addVary).toHaveBeenCalledWith('Accept-Encoding')
-    expect(response.removeHeader).toHaveBeenCalled()
-    expect(response.setContent).not.toHaveBeenCalled()
-  })
-
-  it('should not compress if the content is not compressible', async () => {
-    const eventMock = { getHeader: vi.fn().mockReturnValue('gzip') }
-    const nextMock = vi.fn().mockResolvedValue({
-      content: null,
-      setContent: vi.fn()
-    })
-
-    const response = await middleware.handle(eventMock, nextMock)
-
-    expect(nextMock).toHaveBeenCalled()
-    expect(response.setContent).not.toHaveBeenCalled()
-    expect(gzip).not.toHaveBeenCalled()
+    expect(response).toBe(rendered as any)
+    expect(response.content).toBe(LARGE)
   })
 })

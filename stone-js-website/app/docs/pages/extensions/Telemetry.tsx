@@ -67,6 +67,41 @@ create (event: IncomingHttpEvent) {
   })
 }`}</Code>
 
+        <H2>The health probe</H2>
+        <p>
+          Telemetry is what you read after the fact; a health probe is the question asked in the moment,
+          by something that cannot read: a load balancer deciding whether to route traffic, a platform
+          deciding whether to replace an instance. Enabling telemetry publishes it at{' '}
+          <code>/health</code>, and the answer is a status code first: <code>200</code> to route here,
+          {' '}<code>503</code> to stop. The body is for the person who follows up.
+        </p>
+        <p>
+          With nothing registered it answers <code>200</code>, which is the truthful answer to "is this
+          process up and routing". Register a check and the answer starts meaning more:
+        </p>
+        <Code file='app/health/DatabaseCheck.ts'>{`import { HealthCheck } from '@stone-js/telemetry'
+
+@HealthCheck('database')
+export class DatabaseCheck {
+  constructor ({ db }) { this.db = db }          // resolved, like any service
+
+  async check () {
+    return await this.db.ping()                   // true, or { healthy: false, detail: '…' }
+  }
+}`}</Code>
+        <PropsTable nameHeader='key' rows={[
+          { name: 'stone.telemetry.health.path', type: 'string | false', default: "'/health'", desc: 'Where the probe answers. false serves nothing, for a deployment that answers it elsewhere.' },
+          { name: 'stone.telemetry.health.checks', type: 'MetaHealthCheck[]', desc: 'The registered checks. A module or an application adds to this list; the decorator does it for you.' },
+          { name: 'stone.telemetry.health.timeout', type: 'number', default: '2000', desc: 'How long a single check may take before it counts as failed.' }
+        ]} />
+        <Callout kind='note' title='It never hangs, and never stops at the first failure'>
+          A check that does not answer within its timeout is a failed check, because a probe that waits
+          is worse than one that fails: the platform waits with it. And a check that throws reports its
+          own failure while the others report theirs, since the point of a report is to name every
+          dependency that is down. The probe stays out of the published API contract: a contract
+          describing <code>/health</code> tells a consumer nothing they can use.
+        </Callout>
+
         <H3>Exporters</H3>
         <p>
           Where telemetry goes is an exporter, swapped without touching your instrumentation. The
