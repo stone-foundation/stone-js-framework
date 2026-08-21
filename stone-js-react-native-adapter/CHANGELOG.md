@@ -1,5 +1,15 @@
 # @stone-js/react-native-adapter
 
+## 0.8.11
+
+### Patch Changes
+
+- Updated dependencies [13cebd1]
+  - @stone-js/core@0.8.11
+  - @stone-js/browser-core@0.8.11
+  - @stone-js/router@0.8.11
+  - @stone-js/config@0.8.11
+
 ## 0.8.10
 
 ### Patch Changes

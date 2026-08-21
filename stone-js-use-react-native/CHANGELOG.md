@@ -1,5 +1,98 @@
 # @stone-js/use-react-native
 
+## 0.8.11
+
+### Patch Changes
+
+- 4f99eaa: docs(use-react-native): the fastest loop on a native application is a browser tab
+
+  Expo serves a React Native application to a browser through `react-native-web`, with Fast Refresh,
+  and the same code then runs on a device untouched. That is the loop most of a mobile application
+  should be built in, and nothing said so.
+
+  Verified rather than assumed: the official starter was bundled for the web target, and the whole
+  chain goes through, adapter and renderer included. It is documented as opt-in, because the web
+  target needs `react-dom` and `react-native-web`, which a native-only application has no reason to
+  carry.
+
+  Documented with its limits, which is the part that makes the loop trustworthy: `react-native-web`
+  covers the core primitives, not every native module, so a screen built on the camera, on secure
+  storage or on a native gesture handler still has to be tried on a device. Use the browser for the
+  domain, the navigation and most of the interface; use a device before believing anything about the
+  parts that are actually native.
+
+- b2ff332: feat(use-react-native): a native application stops listing its modules
+
+  A web application never lists its pages: the build collects them. A native one had to, and that
+  was the last place the mobile story asked for something the other platforms do not. The reason was
+  never conceptual, it was the bundler: collection is a bundler question, the web build asks Vite for
+  `import.meta.glob`, and Metro has no such thing and would not understand one.
+
+  So the question is answered before any bundler runs. `withStone` wraps a Metro configuration,
+  collects everything under `app/` and writes `.stone/modules.ts`: real static imports, which is what
+  Metro needs to see, extensionless so per-platform files (`HomePage.ios.tsx`) still win as they
+  would for hand-written code, and sorted so the file is byte-identical between two runs on the same
+  tree. Only rewritten when it changed, because Metro watches what it bundles and an identical
+  rewrite would ask it to reload for nothing.
+
+  ```js
+  // metro.config.js
+  const { getDefaultConfig } = require("expo/metro-config");
+  const { withStone } = require("@stone-js/use-react-native/metro");
+
+  module.exports = withStone(getDefaultConfig(__dirname), __dirname);
+  ```
+
+  ```ts
+  import { modules } from "./.stone/modules";
+
+  stoneApp({ modules }).run();
+  ```
+
+  **It hooks into `metro.config.js` on purpose.** Metro loads that file whatever brought it up, so
+  `expo start`, `expo run:ios` and an EAS build all get the generation without anyone remembering to
+  ask. A command could not make that claim. It runs at Metro start rather than continuously, so
+  adding a page to a running dev server means restarting it; editing one needs nothing.
+
+  **And the CLI gains a `native` target**, auto-discovered from this package, so there is one
+  vocabulary across platforms: `stone dev native` and `stone build native` collect the modules and
+  hand the rest to `expo start` and `expo export`. Deliberately thin: Expo and Metro own native
+  bundling, and producing an installable application stays `expo run:ios` or an EAS build, which need
+  a native toolchain and are better commands than a wrapper would be. It is also the first target
+  registered by a module rather than by the CLI, which is what the registered-targets work was for.
+
+  **One CLI change, and it removes the last hardcoded path from a command.** A `self-hosted` target
+  now declares what `stone serve` should launch, through `devEntry`, exactly as it already declared
+  where `stone preview` starts from. The React target names its generated Vite server; the native
+  one names nothing, because Expo's own process is the dev server and there is nothing left to
+  supervise. `stone serve` no longer knows any target's file layout.
+
+- 13cebd1: fix: authentication reads the header, and a contract describes the API
+
+  Six defects reported from a pilot application, each reproduced before it was touched.
+
+  - `@stone-js/auth` read the bearer token with `event.get('Authorization')`, and that accessor deliberately refuses to read headers, because it also reads the query string and the body. So the real header was ignored, every request stayed anonymous, and `?Authorization=` would have been read in its place. It reads `getHeader` now.
+  - `@stone-js/openapi` documented every endpoint under `/`: a route's `path` is the pathname of the event it is answering, and no event is bound while generating a document. It reads the declared template, translates `:id` into `{id}`, declares the parameters the template requires, and publishes both paths for an optional segment.
+  - A Zod 4 schema converted to `{}`, an empty JSON Schema meaning "anything", so every documented body and response was silently unconstrained. A schema that can describe itself is now asked to.
+  - An explicit `contract:` block replaced everything derived, so documenting one `404` deleted the derived success response. It merges instead, per status, and a declared success status replaces the derived one rather than joining it.
+  - The derived success status was always `200`, even for a handler answering `201`. The response decorators now record the status they build, so the document cannot contradict the code it came from.
+  - `@stone-js/resources`: every `@ApiResource` the container resolved crashed on `checker`, an optional dependency read straight off the container, which resolves any name it is asked for and throws when nothing is bound.
+  - `@stone-js/core`: `@Middleware` could only ever declare kernel middleware, so a middleware that reads the matched route could be registered from a blueprint but not from the decorator. `layer: 'app' | 'kernel' | 'router'` closes that, `global` keeps working.
+
+  Packaging: `@stone-js/i18n`, `@stone-js/mcp-dev`, `@stone-js/openapi` and `@stone-js/use-react-native` published types referencing `@stone-js/cli` while declaring it as a dev dependency only. It is an optional peer now, so an application is never asked to resolve a package nobody told it about.
+
+- Updated dependencies [b2ff332]
+- Updated dependencies [13cebd1]
+- Updated dependencies [b568e53]
+  - @stone-js/cli@0.8.11
+  - @stone-js/core@0.8.11
+  - @stone-js/use-react-core@0.8.11
+  - @stone-js/browser-core@0.8.11
+  - @stone-js/react-native-adapter@0.8.11
+  - @stone-js/router@0.8.11
+  - @stone-js/use-view@0.8.11
+  - @stone-js/config@0.8.11
+
 ## 0.8.10
 
 ### Patch Changes
