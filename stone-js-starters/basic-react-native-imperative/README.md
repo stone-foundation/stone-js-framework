@@ -106,36 +106,29 @@ the page that owns `/`, with `name` readable through `event.get('name')`. Change
 
 `App.tsx` renders `StoneNativeApp`, which shows the screen on top of the stack. That is the floor,
 not the ceiling: it is what makes the first run work with nothing installed. The platform's
-transitions, the swipe-back gesture, and a screen keeping its own state while another covers it are
-things only a native navigator gives you.
+transitions, the swipe-back gesture, the hardware back button, and a screen keeping its own state
+while another covers it are things only a native navigator gives you.
 
-The stack is public state, so a navigator drives itself from it:
+Two commands and one import away:
+
+```sh
+npx expo install @react-navigation/native @react-navigation/native-stack \
+  react-native-screens react-native-safe-area-context
+```
 
 ```tsx
-import { useScreens } from '@stone-js/use-react-native'
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-
-const Stack = createNativeStackNavigator()
+// App.tsx
+import { StoneNativeStack } from '@stone-js/use-react-native/navigation'
 
 export default function App () {
-  const screens = useScreens()
-
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {screens.map((screen) => (
-          <Stack.Screen key={screen.key} name={screen.key} options={{ title: screen.title }}>
-            {() => screen.element}
-          </Stack.Screen>
-        ))}
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
+  return <StoneNativeStack screenOptions={{ headerShown: true }} />
 }
 ```
 
-Nothing about your pages changes.
+Nothing about your screens changes. Each becomes a native one, keyed so the navigator keeps its
+state, and titled from the page's `head`. See the
+[renderer's README](https://www.npmjs.com/package/@stone-js/use-react-native) for how the two stacks
+stay in agreement, and for writing your own navigator instead.
 
 ## The declarative twin
 

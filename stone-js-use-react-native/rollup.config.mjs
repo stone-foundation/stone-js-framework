@@ -16,10 +16,20 @@ export default createRollupConfig({
     // The renderer (`.`). It never includes the build-time code, which reads the filesystem: a
     // single `node:fs` import here and a native bundler could not load this package at all.
     {
-      input: ['src/**/*.{ts,tsx}', '!src/cli/**/*', '!src/metro/**/*', '!src/build/**/*'],
+      input: [
+        'src/**/*.{ts,tsx}',
+        '!src/cli/**/*',
+        '!src/metro/**/*',
+        '!src/build/**/*',
+        '!src/navigation/**/*'
+      ],
       file: 'dist/index.js',
-      barrel: { exclude: ['cli/', 'metro/', 'build/'] }
+      barrel: { exclude: ['cli/', 'metro/', 'build/', 'navigation/'] }
     },
+    // The native navigator (`./navigation`). Kept out of the main bundle so that
+    // `@react-navigation/native` and its native dependencies stay optional: an application happy
+    // with `StoneNativeApp` installs none of them, and a bundler never looks for them.
+    { input: ['src/navigation/index.ts'], file: 'dist/navigation.js', multiEntry: false },
     // The CLI plugin (`./cli`). `multiEntry: false` because auto-discovery reads this bundle's
     // default export, and multi-entry re-exports named exports only.
     { input: ['src/cli/index.ts'], file: 'dist/cli.js', multiEntry: false },

@@ -41,6 +41,10 @@
     "./metro": {
       "types": "./dist/metro.d.ts",
       "default": "./dist/metro.js"
+    },
+    "./navigation": {
+      "types": "./dist/navigation.d.ts",
+      "default": "./dist/navigation.js"
     }
   },
   "engines": {
@@ -67,12 +71,12 @@
   },
   "peerDependencies": {
     "@stone-js/browser-core": "workspace:*",
+    "@stone-js/cli": "workspace:*",
     "@stone-js/config": "workspace:*",
     "@stone-js/core": "workspace:*",
     "@stone-js/react-native-adapter": "workspace:*",
     "@stone-js/router": "workspace:*",
-    "react": "^19.0.0",
-    "@stone-js/cli": "workspace:*"
+    "react": "^19.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
