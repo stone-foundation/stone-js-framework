@@ -19,6 +19,7 @@
     "lint": "pnpm -r run lint",
     "build:ci": "pnpm -r --filter='!@stone-js/website' --filter='!@stone-js/lab-*' --filter='!@stone-js/starters' --filter='!@stone-js/blog-starters' run build",
     "test:ci": "pnpm -r --filter='!@stone-js/website' --filter='!@stone-js/lab-*' --filter='!@stone-js/starters' --filter='!@stone-js/blog-starters' run test:cvg",
+    "test:lab": "pnpm -r --filter='@stone-js/lab-*' run test",
     "lint:ci": "pnpm -r --filter='!@stone-js/website' --filter='!@stone-js/lab-*' --filter='!@stone-js/starters' --filter='!@stone-js/blog-starters' run lint",
     "audit:ci": "pnpm audit --audit-level=high",
     "changeset": "changeset",
