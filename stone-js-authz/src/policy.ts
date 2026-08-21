@@ -20,14 +20,19 @@ import { IncomingEvent } from '@stone-js/core'
  *
  * That is the case an ability alone cannot express: "may update **this** post" needs the post. An
  * ability answers what a role may do; a policy answers what this caller may do to this record.
+ *
+ * The event type is a parameter because a policy reads its event: `implements IPolicy<IncomingHttpEvent>`
+ * types `authorize (event)` as that event, headers and cookies included. Without it, narrowing the
+ * parameter in an implementation is rejected outright, since a function-typed property is contravariant
+ * on its parameters, and an application had to drop the `implements` clause to write what it meant.
  */
-export interface IPolicy {
+export interface IPolicy<EventType extends IncomingEvent = IncomingEvent> {
   /** Whether the caller may proceed. */
-  authorize: (event: IncomingEvent) => boolean | Promise<boolean>
+  authorize: (event: EventType) => boolean | Promise<boolean>
 }
 
 /** A class that can be resolved into an {@link IPolicy}. */
-export type PolicyClass = new (...args: any[]) => IPolicy
+export type PolicyClass = new (...args: any[]) => IPolicy<any>
 
 /**
  * Whether a value is a policy class rather than a policy.

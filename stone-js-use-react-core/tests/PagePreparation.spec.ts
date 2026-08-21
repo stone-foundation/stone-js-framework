@@ -12,13 +12,17 @@ const makeContext = (blueprintValues: Record<string, any> = {}): {
   container: IContainer
   response: any
   event: any
+  logger: { error: ReturnType<typeof vi.fn> }
 } => {
   const blueprint = {
     get: vi.fn((key: string, fallback?: any) => blueprintValues[key] ?? fallback)
   } as unknown as IBlueprint
   const event: any = { pathname: '/tasks', fingerprint: () => 'fp', get: vi.fn() }
+  const logger = { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() }
   const container = {
-    make: vi.fn((key: string) => (key === 'blueprint' ? blueprint : key === 'event' ? event : undefined)),
+    make: vi.fn((key: string) => (
+      key === 'blueprint' ? blueprint : key === 'event' ? event : key === 'logger' ? logger : undefined
+    )),
     resolve: vi.fn((module: any) => new module())
   } as unknown as IContainer
   const response: any = {
@@ -29,7 +33,7 @@ const makeContext = (blueprintValues: Record<string, any> = {}): {
     isError: () => false
   }
 
-  return { container, response, event }
+  return { container, response, event, logger }
 }
 
 describe('preparePageParts', () => {
@@ -94,6 +98,60 @@ describe('preparePageParts', () => {
 })
 
 describe('prepareErrorPageParts', () => {
+  it('says out loud that the route failed, with the message and the path', async () => {
+    // An error page is a successful-looking response, so nothing else announces the failure. Without
+    // this the only trace was `{"name":"TypeError"}` in the snapshot, and a message-less TypeError on
+    // a path that never mentions compression cost hours to track down.
+    const { container, response, event, logger } = makeContext()
+    response.content = { error: new TypeError('response.removeHeader is not a function') }
+
+    await prepareErrorPageParts(event, response, container, {} as any)
+
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.stringContaining('response.removeHeader is not a function'),
+      expect.anything()
+    )
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('/tasks'), expect.anything())
+  })
+
+  it('keeps the message out of the snapshot, which is sent to the browser', async () => {
+    const { container, response, event } = makeContext()
+    response.content = { error: new Error('SELECT * FROM users failed at /srv/app/db.ts:42') }
+
+    const parts = await prepareErrorPageParts(event, response, container, {} as any)
+
+    expect(parts.snapshotData.error).toEqual({ name: 'Error' })
+  })
+
+  it('puts the message in the snapshot when the application asked to be debugged', async () => {
+    const { container, response, event } = makeContext({ 'stone.debug': true })
+    response.content = { error: new Error('boom') }
+
+    const parts = await prepareErrorPageParts(event, response, container, {} as any)
+
+    expect(parts.snapshotData.error).toEqual({ name: 'Error', message: 'boom' })
+  })
+
+  it('reports something readable even when what threw was not an Error', async () => {
+    const { container, response, event, logger } = makeContext()
+    response.content = { error: 'a string was thrown' }
+
+    await prepareErrorPageParts(event, response, container, {} as any)
+
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('a string was thrown'), expect.anything())
+  })
+
+  it('still serves the page when there is no logger to tell', async () => {
+    // A container that cannot resolve a logger is not a reason to fail a response that was going to
+    // be served.
+    const { container, response, event } = makeContext()
+    const original = container.make as any
+    ;(container as any).make = vi.fn((key: string) => (key === 'logger' ? undefined : original(key)))
+    response.content = { error: new Error('boom') }
+
+    await expect(prepareErrorPageParts(event, response, container, {} as any)).resolves.toBeDefined()
+  })
+
   it('gives the error to the page, first argument', async () => {
     let seen: any
     class ErrorScreen {

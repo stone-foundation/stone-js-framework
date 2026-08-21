@@ -99,7 +99,7 @@ export class CanRouteMiddleware {
    * @returns The policy.
    * @throws {AuthorizationError} When no policy is registered under that name.
    */
-  private policy (name: string): IPolicy {
+  private policy (name: string): IPolicy<any> {
     const registry = this.blueprint.get<AuthzOptions>('stone.authz', {}).policies ?? {}
     const entry = registry[name]
 
