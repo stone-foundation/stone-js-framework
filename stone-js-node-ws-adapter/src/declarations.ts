@@ -21,6 +21,8 @@ export interface WsSocket {
   close: (code?: number, reason?: string) => void
   /** Subscribe to a socket event (`message`, `close`, `error`). */
   on: (event: string, listener: (...args: any[]) => void) => void
+  /** Drop the connection without waiting for a close handshake. */
+  terminate?: () => void
 }
 
 /**

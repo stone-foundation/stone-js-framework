@@ -84,7 +84,9 @@ describe('NodeHttpAdapter', () => {
     mockServer = {
       close: vi.fn((cb) => cb()),
       once: vi.fn().mockReturnThis(),
-      listen: vi.fn((port, host, cb) => cb())
+      listen: vi.fn((port, host, cb) => cb()),
+      closeIdleConnections: vi.fn(),
+      closeAllConnections: vi.fn()
     }
 
     vi.mocked(createServer).mockReturnValue(mockServer)
@@ -93,6 +95,10 @@ describe('NodeHttpAdapter', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    // A shutdown test schedules a timer that exits the process; a leaked one would kill the runner.
+    vi.useRealTimers()
+    process.removeAllListeners('SIGINT')
+    process.removeAllListeners('SIGTERM')
   })
 
   it('should create instance and default to HTTP server', () => {
@@ -242,6 +248,49 @@ describe('NodeHttpAdapter', () => {
 
     // @ts-expect-error - private access
     expect(adapter.executeHooks).toHaveBeenCalledWith('onStop')
+  })
+
+  /** Signal the adapter without letting a real `process.exit` take the test runner with it. */
+  const shutdownWith = async (close: any, gracePeriod?: number): Promise<any> => {
+    vi.useFakeTimers()
+    const exit = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never)
+    mockServer.close = close
+    if (gracePeriod !== undefined) { blueprint.set('stone.adapter.shutdownGracePeriod', gracePeriod) }
+
+    const adapter: any = NodeHttpAdapter.create(blueprint)
+    adapter.executeHooks = vi.fn()
+    adapter.setupShutdownHook()
+    process.emit('SIGTERM')
+
+    return exit
+  }
+
+  it('closes idle connections at once, so a graceful shutdown can finish', async () => {
+    // `close()` waits for every socket, and a keep-alive connection sitting idle has no request to
+    // wait for: it held the exit callback forever, so a SIGTERM'd process never died and whatever
+    // signalled it waited out its own timeout and hard-killed it instead.
+    await shutdownWith(vi.fn((cb: any) => cb()))
+
+    await vi.waitFor(() => expect(mockServer.closeIdleConnections).toHaveBeenCalled())
+  })
+
+  it('exits anyway once the grace period is over', async () => {
+    // A request in flight gets its chance. A request that never ends does not get to keep the process,
+    // or an orchestrator's rolling restart hangs on it.
+    const exit = await shutdownWith(vi.fn(() => mockServer)) // never calls back: still in flight
+
+    await vi.advanceTimersByTimeAsync(10000)
+
+    expect(mockServer.closeAllConnections).toHaveBeenCalled()
+    expect(exit).toHaveBeenCalledWith(0)
+  })
+
+  it('lets the application choose how long that is', async () => {
+    const exit = await shutdownWith(vi.fn(() => mockServer), 500)
+
+    await vi.advanceTimersByTimeAsync(500)
+
+    expect(exit).toHaveBeenCalledWith(0)
   })
 
   it('should log unhandled promise rejections', () => {

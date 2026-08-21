@@ -241,3 +241,63 @@ describe('writePrerendered / runSsg', () => {
     expect(existsSync(join(defaultOutDir, 'index.html'))).toBe(true)
   })
 })
+
+describe('a page the application could not render', () => {
+  let outDir: string
+
+  beforeEach(() => { outDir = mkdtempSync(join(tmpdir(), 'stone-ssg-')) })
+  afterEach(() => { rmSync(outDir, { recursive: true, force: true }) })
+
+  const failing = async (target: any): Promise<any> => target.path === '/broken'
+    ? { path: target.path, html: '<title>Server Error</title>', statusCode: 500 }
+    : { path: target.path, html: `<title>${String(target.path)}</title>`, statusCode: 200 }
+
+  it('fails the build instead of shipping the error body as that page', async () => {
+    // The defect this replaces: a pre-render is an HTTP request, so a page that throws answers with an
+    // error body. That body was written as the page and the build exited 0, which means a site could
+    // ship an error page that looked like content until a visitor found it.
+    await expect(runSsg({ definitions: [{ path: '/' }, { path: '/broken' }], outDir, render: failing }))
+      .rejects.toThrow(/could not render/)
+  })
+
+  it('names the page and what it answered', async () => {
+    // "Build failed" sends someone hunting; the path and the status point straight at it.
+    await expect(runSsg({ definitions: [{ path: '/broken' }], outDir, render: failing }))
+      .rejects.toThrow(/\/broken answered 500/)
+  })
+
+  it('writes nothing at all, not even the pages that worked', async () => {
+    // A partial output that looks complete is the same failure wearing a different hat: the next deploy
+    // would publish a directory missing pages nobody was told about.
+    await runSsg({ definitions: [{ path: '/' }, { path: '/broken' }], outDir, render: failing }).catch(() => {})
+
+    expect(existsSync(join(outDir, 'index.html'))).toBe(false)
+  })
+
+  it('fails on a page the app does not serve, rather than saving its 404', async () => {
+    // A configured route the application has no page for is a mistake in the configuration, and its 404
+    // body is not the page that was asked for.
+    await expect(runSsg({
+      definitions: [{ path: '/' }],
+      extraTargets: [{ path: '/typo' }],
+      outDir,
+      render: async (target: any) => ({
+        path: target.path,
+        html: '<title>Not Found</title>',
+        statusCode: target.path === '/typo' ? 404 : 200
+      })
+    })).rejects.toThrow(/\/typo answered 404/)
+  })
+
+  it('still writes when a render reports no status at all', async () => {
+    // `statusCode` is optional in the contract, and a renderer that does not report one has not
+    // reported a failure either.
+    const written = await runSsg({
+      definitions: [{ path: '/' }],
+      outDir,
+      render: async (target: any) => ({ path: target.path, html: '<title>home</title>' })
+    })
+
+    expect(written).toHaveLength(1)
+  })
+})
