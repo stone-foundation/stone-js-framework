@@ -103,8 +103,16 @@ export class Chat {
         <H2>Configuration</H2>
         <PropsTable nameHeader='key' rows={[
           { name: 'stone.adapter.url', type: 'ws://localhost:8080', desc: 'The bind URL (host + port).' },
-          { name: 'stone.adapter.server', type: '{}', desc: 'Options forwarded to the ws WebSocketServer (e.g. attach to an http server).' }
+          { name: 'stone.adapter.server', type: '{}', desc: 'Options forwarded to the ws WebSocketServer (e.g. attach to an http server).' },
+          { name: 'stone.adapter.shutdownGracePeriod', type: '10000', desc: 'How long connected clients have to leave on stop before they are dropped.' }
         ]} />
+        <Callout kind='note' title='Stopping a server everyone is still connected to'>
+          A WebSocket client stays connected by definition, and a connected client holds the server
+          open: closing the server alone would never finish. Stopping asks every client to leave with
+          <code> 1001 Going away</code>, the code a browser reads as "reconnect later" rather than an
+          error, and drops whoever has not gone by the end of the grace period. A stop that cannot
+          finish is not a stop.
+        </Callout>
 
         <Callout kind='future' title='Scale out with Redis, and edge with API Gateway'>
           Switch realtime to <code>{"{ driver: 'redis' }"}</code> and a broadcast fans out across every

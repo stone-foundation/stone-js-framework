@@ -46,6 +46,13 @@ OutgoingHttpResponse
   printUrls?: boolean
 
   /**
+   * How long, in milliseconds, requests in flight are given to finish after SIGINT/SIGTERM before the
+   * process exits anyway. Zero-config: it defaults to 10 seconds, which is under the grace period
+   * every common orchestrator gives a container.
+   */
+  shutdownGracePeriod?: number
+
+  /**
    * The platform middleware used for processing platform node HTTP requests and responses.
    * This middleware is executed before the adapter middleware.
    * This middleware is lower-level and should be used for platform-specific processing.
@@ -96,6 +103,7 @@ export const nodeHttpAdapterBlueprint: NodeHttpAdapterBlueprint = {
         serverMiddleware: [],
         url: 'http://localhost:8080',
         platform: NODE_HTTP_PLATFORM,
+        shutdownGracePeriod: 10000,
         middleware: [
           MetaIncomingEventMiddleware,
           // Parsing the body of a POST is the default expectation, not an option. Leaving it opt-in

@@ -101,6 +101,13 @@ export class Rendering implements IPage<ReactIncomingEvent> {
           discovery yields nothing; with it, one line pre-renders the whole grid. Routes that still
           cannot be expanded are reported at build time, with the segments they would need.
         </Callout>
+        <Callout kind='note' title='A page that cannot render fails the build'>
+          Pre-rendering is your own render, executed at build time over HTTP, so a page that throws
+          answers with an error body. That body is never written: the build stops, names each page it
+          could not render and what it answered, and writes nothing at all. A partial output that looks
+          complete is the same failure in a quieter form, and an error page shipped as content is one
+          nobody finds until a visitor does.
+        </Callout>
 
         <H2>SOR: server-only, zero client JS</H2>
         <p>

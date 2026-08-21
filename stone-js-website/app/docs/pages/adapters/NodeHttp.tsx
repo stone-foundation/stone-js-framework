@@ -66,8 +66,17 @@ curl localhost:8080/tasks   # your routes, served`}</Code>
         <PropsTable rows={[
           { name: 'default', type: 'boolean', default: 'false', desc: 'Run this adapter by default when several are stacked.' },
           { name: 'url / host / port', type: 'string / number', desc: 'Where the server listens (also settable via the environment).' },
-          { name: 'server', type: 'object', desc: 'Underlying server options (timeouts, body limits).' }
+          { name: 'server', type: 'object', desc: 'Underlying server options (timeouts, body limits).' },
+          { name: 'shutdownGracePeriod', type: 'number', default: '10000', desc: 'How long requests in flight have to finish on SIGINT/SIGTERM before the process exits anyway.' }
         ]} />
+        <Callout kind='note' title='A graceful shutdown that actually ends'>
+          On <code>SIGINT</code> or <code>SIGTERM</code> the server stops accepting, runs your
+          <code> onStop</code> hooks, and closes idle keep-alive connections at once, because a socket
+          sitting idle has no request to wait for and would otherwise hold the process open forever.
+          Requests in flight get the grace period, then the process exits regardless. That upper bound
+          is what makes a rolling restart predictable: your orchestrator never has to hard-kill a
+          container that promised to leave.
+        </Callout>
         <p>
           It builds on <code>@stone-js/http-core</code>, so the request and response model, cookies,
           headers and file uploads are the runtime-agnostic ones documented in Essentials.

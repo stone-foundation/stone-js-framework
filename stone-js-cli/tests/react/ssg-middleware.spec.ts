@@ -24,7 +24,14 @@ const makeChild = (behavior: 'url' | 'exit' | 'stderr-url' | 'exit-stderr'): any
   const child: any = new EventEmitter()
   child.stdout = new EventEmitter()
   child.stderr = new EventEmitter()
-  child.kill = vi.fn()
+  // Stand-ins for real pipes, which are closable and are what keep a parent process alive.
+  child.stdout.destroy = vi.fn()
+  child.stderr.destroy = vi.fn()
+  child.exitCode = null
+  child.signalCode = null
+  child.on('exit', (code: number | null) => { child.exitCode = code })
+  // A well-behaved child exits when signalled; the stubborn one is exercised on its own below.
+  child.kill = vi.fn(() => { queueMicrotask(() => child.emit('exit', 0)) })
   queueMicrotask(() => {
     if (behavior === 'url') { child.stdout.emit('data', Buffer.from('Server listening on http://localhost:3000')) }
     if (behavior === 'stderr-url') { child.stderr.emit('data', Buffer.from('ready http://localhost:4000')) }
@@ -169,5 +176,73 @@ describe('GenerateStaticSiteMiddleware (SSG)', () => {
     const context = makeContext()
     await expect(GenerateStaticSiteMiddleware(context, vi.fn()))
       .rejects.toThrow(CliError)
+  })
+})
+
+describe('stopping the pre-render server', () => {
+  let GenerateStaticSiteMiddleware: any
+
+  beforeEach(async () => {
+    vi.clearAllMocks()
+    GenerateStaticSiteMiddleware = (await import('../../src/react/ReactBuildMiddleware')).GenerateStaticSiteMiddleware
+  })
+
+  /** A server that answers SIGTERM by shutting down gracefully, and never finishing. */
+  const stubbornChild = (): any => {
+    const child: any = new EventEmitter()
+    child.stdout = new EventEmitter()
+    child.stderr = new EventEmitter()
+    child.stdout.destroy = vi.fn()
+    child.stderr.destroy = vi.fn()
+    child.exitCode = null
+    child.signalCode = null
+    child.kill = vi.fn()
+    queueMicrotask(() => child.stdout.emit('data', Buffer.from('http://localhost:3000')))
+    return child
+  }
+
+  it('forces the child down when it does not answer SIGTERM', async () => {
+    // The defect this replaces: SIGTERM is a request. A graceful shutdown waiting on a socket the
+    // crawler left open never finishes, the child outlives the build, and its open pipes keep the CLI
+    // alive: a build that had already printed its result hung instead of exiting.
+    vi.useFakeTimers()
+    const child = stubbornChild()
+    spawnMock.mockReturnValue(child)
+    runSsgMock.mockResolvedValue(['/'])
+
+    const done = GenerateStaticSiteMiddleware(makeContext(), async (c: any) => c)
+    await vi.advanceTimersByTimeAsync(5000)
+    await done
+
+    expect(child.kill).toHaveBeenCalledWith('SIGTERM')
+    expect(child.kill).toHaveBeenCalledWith('SIGKILL')
+    vi.useRealTimers()
+  })
+
+  it('releases the pipes it was reading, which are a reason of their own not to exit', async () => {
+    vi.useFakeTimers()
+    const child = stubbornChild()
+    spawnMock.mockReturnValue(child)
+    runSsgMock.mockResolvedValue(['/'])
+
+    const done = GenerateStaticSiteMiddleware(makeContext(), async (c: any) => c)
+    await vi.advanceTimersByTimeAsync(5000)
+    await done
+
+    expect(child.stdout.destroy).toHaveBeenCalled()
+    vi.useRealTimers()
+  })
+
+  it('stops the server even when the pre-render failed', async () => {
+    // The failure path is exactly where a leaked server hurts: the build has an error to report and
+    // must still be able to exit to report it.
+    const child = stubbornChild()
+    child.kill = vi.fn(() => { queueMicrotask(() => child.emit('exit', 0)) })
+    spawnMock.mockReturnValue(child)
+    runSsgMock.mockRejectedValue(new CliError('SSG could not render 1 page(s)'))
+
+    await expect(GenerateStaticSiteMiddleware(makeContext(), async (c: any) => c))
+      .rejects.toThrow(/could not render/)
+    expect(child.kill).toHaveBeenCalledWith('SIGTERM')
   })
 })

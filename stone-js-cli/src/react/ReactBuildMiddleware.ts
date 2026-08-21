@@ -599,10 +599,35 @@ export const GenerateStaticSiteMiddleware = async (
 
     context.commandOutput.info(`Pre-rendered ${written.length} route(s) to static HTML.`)
   } finally {
-    child.kill('SIGTERM')
+    await stopServer(child)
   }
 
   return await next(context)
+}
+
+/**
+ * Stop the pre-render server, and be certain it stopped.
+ *
+ * `SIGTERM` is a request, not a guarantee: an application is free to shut down gracefully, and a
+ * graceful shutdown that waits on a socket the crawler left open never finishes. The child then
+ * outlives the build and its open pipes keep the CLI alive, so a build that has already printed its
+ * result hangs instead of exiting. Waiting for the exit, and forcing it when it does not come, is what
+ * makes `stone build --ssg` always return.
+ *
+ * @param child - The server started to render against.
+ */
+async function stopServer (child: ChildProcess, killTimeout = 3000): Promise<void> {
+  if (child.exitCode !== null || child.signalCode !== null) { return }
+
+  await new Promise<void>((resolve) => {
+    const timer = setTimeout(() => { child.kill('SIGKILL'); resolve() }, killTimeout)
+    child.once('exit', () => { clearTimeout(timer); resolve() })
+    child.kill('SIGTERM')
+  })
+
+  // The build is done reading them, and a live pipe is itself a reason the process would not exit.
+  child.stdout?.destroy()
+  child.stderr?.destroy()
 }
 
 /**

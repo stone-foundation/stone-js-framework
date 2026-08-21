@@ -323,6 +323,33 @@ export function targetToFilePath (routePath: string, outDir: string = distPath()
 }
 
 /**
+ * Refuse to ship a page the application could not render.
+ *
+ * A pre-render is an HTTP request, so a page that throws answers with an error body, and writing that
+ * body as the page means the site ships an error page that looks like content, from a build that
+ * reported success. Nobody finds that until a visitor does.
+ *
+ * So the build fails instead, naming every page and what it answered. Nothing is written: a partial
+ * output that looks complete is the same failure in a different shape.
+ *
+ * @param results - What the pre-render produced.
+ * @throws {CliError} When any page answered 400 or above.
+ */
+function assertEveryPageRendered (results: PrerenderResult[]): void {
+  const failed = results.filter((result) => (result.statusCode ?? 200) >= 400)
+
+  if (failed.length === 0) { return }
+
+  const detail = failed.map((result) => `  ${result.path} answered ${String(result.statusCode)}`).join('\n')
+
+  throw new CliError(
+    `SSG could not render ${failed.length} page(s), so nothing was written:\n${detail}\n\n` +
+    'The page threw while rendering on the server. Run `stone dev` and open it to see the error: a ' +
+    'pre-render is the same render, so whatever fails here fails there.'
+  )
+}
+
+/**
  * Write pre-rendered results to disk as `<out>/<route>/index.html`.
  *
  * @param results - The pre-render results.
@@ -369,6 +396,9 @@ export async function runSsg (options: {
     const batch = targets.slice(i, i + limit)
     results.push(...await Promise.all(batch.map(async (t) => await options.render(t))))
   }
+
+  // Checked before a single file is written, so a broken page cannot reach `dist/`.
+  assertEveryPageRendered(results)
 
   return writePrerendered(results, outDir)
 }

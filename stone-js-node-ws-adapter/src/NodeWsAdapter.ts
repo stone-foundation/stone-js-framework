@@ -102,12 +102,26 @@ NodeWsAdapterContext
 
   /**
    * Stop the server and run the stop hooks.
+   *
+   * A connected client keeps the underlying server open, and a WebSocket client stays connected by
+   * definition: `close()` alone therefore never calls back for as long as anyone is listening, which
+   * is a realtime server's normal state. Every client is asked to leave with `1001 Going away`, the
+   * code a browser reads as "reconnect later", and whoever has not gone by the end of the grace
+   * period is dropped. A stop that cannot finish is not a stop.
    */
   public async stop (): Promise<void> {
     await this.executeHooks('onStop')
     await new Promise<void>((resolve) => {
-      if (this.server === undefined) { resolve(); return }
-      this.server.close(() => resolve())
+      const server = this.server
+      if (server === undefined) { resolve(); return }
+
+      const timer = setTimeout(() => {
+        server.clients?.forEach((client: WsSocket) => client.terminate?.())
+        resolve()
+      }, this.blueprint.get('stone.adapter.shutdownGracePeriod', 10000))
+
+      server.close(() => { clearTimeout(timer); resolve() })
+      server.clients?.forEach((client: WsSocket) => client.close?.(1001, 'Server shutting down'))
     })
   }
 

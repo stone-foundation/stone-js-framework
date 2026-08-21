@@ -61,6 +61,41 @@ describe('NodeWsAdapter (lifecycle & server)', () => {
     expect(server.close).toHaveBeenCalled()
   })
 
+  it('stop() asks every client to leave, because a connected one holds the server open', async () => {
+    // Verified against the real `ws`: with a single client connected, `close(cb)` never calls back.
+    // A realtime server is connected by definition, so `stop()` could not finish, which means a
+    // deploy or a restart waited on it until something hard-killed the process.
+    const client = { close: vi.fn(), terminate: vi.fn(), send: vi.fn(), on: vi.fn() }
+    const server = { on: vi.fn(), close: vi.fn(), clients: new Set([client]) }
+    const adapter = NodeWsAdapter.create(makeBlueprint({ 'stone.adapter.serverFactory': vi.fn(() => server) }))
+    vi.spyOn(adapter as any, 'executeHooks').mockResolvedValue(undefined)
+    await adapter.run()
+
+    void adapter.stop()
+
+    // 1001 is "going away", which a browser client reads as "reconnect later" rather than an error.
+    await vi.waitFor(() => expect(client.close).toHaveBeenCalledWith(1001, 'Server shutting down'))
+  })
+
+  it('stop() finishes even when a client refuses to leave', async () => {
+    vi.useFakeTimers()
+    const client = { close: vi.fn(), terminate: vi.fn(), send: vi.fn(), on: vi.fn() }
+    const server = { on: vi.fn(), close: vi.fn(), clients: new Set([client]) } // close never calls back
+    const adapter = NodeWsAdapter.create(makeBlueprint({
+      'stone.adapter.serverFactory': vi.fn(() => server),
+      'stone.adapter.shutdownGracePeriod': 500
+    }))
+    vi.spyOn(adapter as any, 'executeHooks').mockResolvedValue(undefined)
+    await adapter.run()
+
+    const stopped = adapter.stop()
+    await vi.advanceTimersByTimeAsync(500)
+    await expect(stopped).resolves.toBeUndefined()
+
+    expect(client.terminate).toHaveBeenCalled()
+    vi.useRealTimers()
+  })
+
   it('stop() resolves even when no server was started', async () => {
     const adapter = NodeWsAdapter.create(makeBlueprint())
     vi.spyOn(adapter as any, 'executeHooks').mockResolvedValue(undefined)

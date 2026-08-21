@@ -34,6 +34,14 @@ export class ConsoleErrorHandler implements IErrorHandler<IncomingEvent> {
     }
 
     this.context.commandOutput.error(error.message)
+
+    // Then leave, deliberately. Setting an exit code assumes the loop will drain, and a build tool's
+    // loop does not: vite, esbuild and rollup leave handles behind, which is why a successful build
+    // already exits on purpose. Without the same gesture here a failed command printed the right
+    // message, resolved the right code, and then hung forever, which in CI is worse than the failure
+    // it was reporting. Unref'd, so a command that can end on its own still does.
+    setImmediate(() => process.exit(1)).unref()
+
     return OutgoingResponse.create({ statusCode: 1 })
   }
 }

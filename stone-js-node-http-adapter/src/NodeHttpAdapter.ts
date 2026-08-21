@@ -270,7 +270,16 @@ NodeHttpAdapterContext
   }
 
   /**
-   * Sets up a shutdown listener to gracefully stop the server on SIGINT.
+   * Sets up a shutdown listener to gracefully stop the server on SIGINT/SIGTERM.
+   *
+   * Graceful means "let the requests in flight finish", not "wait for every socket ever opened".
+   * `close()` alone means the latter: a keep-alive connection sitting idle has no request to finish,
+   * yet it holds the callback, so `process.exit(0)` never runs. A signalled process then never dies.
+   * Whatever sent the signal waits for its own timeout and hard-kills, which is how a rolling deploy
+   * turns a graceful shutdown into a killed one and an `onStop` hook becomes a lie.
+   *
+   * So idle connections are closed immediately, requests in flight get the grace period, and the
+   * process exits either way.
    */
   protected setupShutdownHook (): void {
     // Idempotent alongside setupGlobalErrorHandlers (both bind once; see the shared guard flag).
@@ -278,7 +287,14 @@ NodeHttpAdapterContext
 
     const shutdown = async (): Promise<void> => {
       await this.executeHooks('onStop')
+
       this.server.close(() => process.exit(0))
+      this.server.closeIdleConnections?.()
+
+      setTimeout(() => {
+        this.server.closeAllConnections?.()
+        process.exit(0)
+      }, this.blueprint.get('stone.adapter.shutdownGracePeriod', 10000)).unref()
     }
 
     process
