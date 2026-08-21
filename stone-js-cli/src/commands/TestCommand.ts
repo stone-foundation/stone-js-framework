@@ -137,6 +137,16 @@ export class TestCommand {
     const defaults = {
       globals: true,
       environment: 'node',
+      // `createTestApp()` discovers the application's modules by importing them at run time. Vitest
+      // externalises dependencies that come from `node_modules`, and an externalised module's
+      // `import()` is Node's own, which cannot load a `.ts` or `.tsx` file: discovery fails with
+      // "Unknown file extension". Inlining the package puts those imports back through Vite's
+      // transform, which is what makes them loadable.
+      //
+      // Invisible inside this repository, and that is exactly why it shipped: a workspace link is
+      // inlined by default, so the lab apps and the framework's own suites never saw it. A project
+      // installing from the registry saw nothing else.
+      server: { deps: { inline: ['@stone-js/testing'] } },
       include: config.include ?? ['./tests/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
       coverage: {
         provider: 'v8',

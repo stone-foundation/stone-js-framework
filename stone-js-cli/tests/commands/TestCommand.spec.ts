@@ -113,6 +113,16 @@ describe('TestCommand', () => {
     expect(generatedConfig().coverage).toEqual(expect.objectContaining({ include: ['app/**/*.ts'] }))
   })
 
+  it('inlines @stone-js/testing, so module discovery can import TypeScript', async () => {
+    // Discovery imports the app's files at run time. Vitest externalises anything from
+    // node_modules, and an externalised module's `import()` is Node's, which cannot load a `.ts`
+    // file. Inside this repository the package is a workspace link, which is inlined by default,
+    // so nothing here ever failed while every installed project's first `npm test` did.
+    await new TestCommand(makeContext()).handle(makeEvent())
+
+    expect(generatedConfig().server).toEqual({ deps: { inline: ['@stone-js/testing'] } })
+  })
+
   it('lets stone.config.mjs override any of it, exactly as vite and rollup are overridden', async () => {
     // How a frontend project switches to a DOM environment for component tests.
     await new TestCommand(makeContext({ vitest: { environment: 'happy-dom' } })).handle(makeEvent())
