@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Stone.js",
-    "slug": "basic-react-native-declarative",
+    "slug": "basic-react-native-imperative",
     "scheme": "stone",
     "version": "1.0.0",
     "orientation": "portrait",

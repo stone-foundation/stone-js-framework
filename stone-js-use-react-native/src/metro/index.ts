@@ -1,6 +1,19 @@
 import { WriteManifestOptions, writeManifest } from '../build/writeManifest'
 
 /**
+ * The manifest generator, on its own.
+ *
+ * `withStone` is how an application gets it for free, and covers every way Metro can start. But
+ * Metro is not the only thing that needs the file to exist: `tsc --noEmit` on a fresh clone reads
+ * the entry's `import { modules } from './.stone/modules'` before Metro has ever run, and so does a
+ * CI step that type-checks without bundling, and so does an editor opening the project.
+ *
+ * Exposing it here rather than from the package root keeps the split honest: this entry is the
+ * build-time one, it reads the filesystem, and a phone never loads it.
+ */
+export { writeManifest, type WriteManifestOptions, type ManifestResult } from '../build/writeManifest'
+
+/**
  * The shape of a Metro configuration. Declared structurally so this module needs neither Metro
  * nor Expo installed to be built or type-checked.
  */

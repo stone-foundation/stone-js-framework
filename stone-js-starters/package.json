@@ -26,7 +26,7 @@
     "starters": [
       {
         "value": "basic-service-declarative",
-        "title": "Basic · service · declarative",
+        "title": "Basic \u00b7 service \u00b7 declarative",
         "description": "Minimal HTTP/service API, decorator API.",
         "tags": [
           "api",
@@ -38,7 +38,7 @@
       },
       {
         "value": "basic-service-imperative",
-        "title": "Basic · service · imperative",
+        "title": "Basic \u00b7 service \u00b7 imperative",
         "description": "Minimal HTTP/service API, imperative API.",
         "tags": [
           "api",
@@ -50,7 +50,7 @@
       },
       {
         "value": "basic-react-declarative",
-        "title": "Basic · React · declarative",
+        "title": "Basic \u00b7 React \u00b7 declarative",
         "description": "Minimal React SPA, decorator API.",
         "tags": [
           "react",
@@ -62,7 +62,7 @@
       },
       {
         "value": "basic-react-imperative",
-        "title": "Basic · React · imperative",
+        "title": "Basic \u00b7 React \u00b7 imperative",
         "description": "Minimal React SPA, imperative API.",
         "tags": [
           "react",
@@ -73,8 +73,34 @@
         "path": "basic-react-imperative"
       },
       {
+        "value": "basic-react-native-declarative",
+        "title": "Basic \u00b7 React Native \u00b7 declarative (Expo)",
+        "description": "Minimal native mobile app with React Native and Expo, decorator API.",
+        "tags": [
+          "react-native",
+          "expo",
+          "mobile",
+          "basic",
+          "declarative"
+        ],
+        "path": "basic-react-native-declarative"
+      },
+      {
+        "value": "basic-react-native-imperative",
+        "title": "Basic \u00b7 React Native \u00b7 imperative (Expo)",
+        "description": "Minimal native mobile app with React Native and Expo, imperative API.",
+        "tags": [
+          "react-native",
+          "expo",
+          "mobile",
+          "basic",
+          "imperative"
+        ],
+        "path": "basic-react-native-imperative"
+      },
+      {
         "value": "standard-service-declarative",
-        "title": "Standard · service · declarative",
+        "title": "Standard \u00b7 service \u00b7 declarative",
         "description": "Common service setup, decorator API.",
         "tags": [
           "api",
@@ -86,7 +112,7 @@
       },
       {
         "value": "standard-service-imperative",
-        "title": "Standard · service · imperative",
+        "title": "Standard \u00b7 service \u00b7 imperative",
         "description": "Common service setup, imperative API.",
         "tags": [
           "api",
@@ -98,7 +124,7 @@
       },
       {
         "value": "standard-react-declarative",
-        "title": "Standard · React · declarative (SSR)",
+        "title": "Standard \u00b7 React \u00b7 declarative (SSR)",
         "description": "React with SSR, decorator API.",
         "tags": [
           "react",
@@ -110,7 +136,7 @@
       },
       {
         "value": "standard-react-imperative",
-        "title": "Standard · React · imperative (SSR)",
+        "title": "Standard \u00b7 React \u00b7 imperative (SSR)",
         "description": "React with SSR, imperative API.",
         "tags": [
           "react",
@@ -122,7 +148,7 @@
       },
       {
         "value": "full-service-declarative",
-        "title": "Full · service · declarative",
+        "title": "Full \u00b7 service \u00b7 declarative",
         "description": "Full-featured service, decorator API.",
         "tags": [
           "api",
@@ -134,7 +160,7 @@
       },
       {
         "value": "full-service-imperative",
-        "title": "Full · service · imperative",
+        "title": "Full \u00b7 service \u00b7 imperative",
         "description": "Full-featured service, imperative API.",
         "tags": [
           "api",
@@ -146,7 +172,7 @@
       },
       {
         "value": "full-react-declarative",
-        "title": "Full · React · declarative (SSR/SSG)",
+        "title": "Full \u00b7 React \u00b7 declarative (SSR/SSG)",
         "description": "Full React with SSR & SSG, decorator API.",
         "tags": [
           "react",
@@ -159,7 +185,7 @@
       },
       {
         "value": "full-react-imperative",
-        "title": "Full · React · imperative (SSR/SSG)",
+        "title": "Full \u00b7 React \u00b7 imperative (SSR/SSG)",
         "description": "Full React with SSR & SSG, imperative API.",
         "tags": [
           "react",
@@ -169,19 +195,6 @@
           "imperative"
         ],
         "path": "full-react-imperative"
-      },
-      {
-        "value": "basic-react-native-declarative",
-        "title": "Basic · React Native · declarative (Expo)",
-        "description": "Native mobile app with React Native and Expo, decorator API.",
-        "tags": [
-          "react-native",
-          "expo",
-          "mobile",
-          "basic",
-          "declarative"
-        ],
-        "path": "basic-react-native-declarative"
       },
       {
         "value": "continuum-showcase",
@@ -222,6 +235,8 @@
     "basic-service-imperative",
     "basic-react-declarative",
     "basic-react-imperative",
+    "basic-react-native-declarative",
+    "basic-react-native-imperative",
     "standard-service-declarative",
     "standard-service-imperative",
     "standard-react-declarative",
@@ -230,7 +245,6 @@
     "full-service-imperative",
     "full-react-declarative",
     "full-react-imperative",
-    "basic-react-native-declarative",
     "continuum-showcase"
   ],
   "publishConfig": {
