@@ -1,5 +1,76 @@
 # Changelog
 
+## 0.8.10
+
+### Patch Changes
+
+- f493bc1: refactor(cli)!: build targets are registered, not hard-coded
+
+  The CLI knew its two targets by name. Six commands asked `isReactApp()` and then instantiated
+  `ReactBuilder` or `ServerBuilder` themselves, which meant a module could not own its own build:
+  adding a target required changing the CLI.
+
+  A target is now a declaration under `stone.builder.builders.<name>`:
+
+  ```ts
+  {
+    target: 'acme',
+    priority: 20,
+    match: (blueprint, event) => true,     // detection only
+    resolver: (context) => new AcmeBuilder(context),
+    devMode: 'self-hosted',
+    previewEntry: (blueprint) => 'dist/acme.mjs'
+  }
+  ```
+
+  The commands resolve whichever target answers and drive it. Every step (`build`, `dev`,
+  `preview`, `console`, `export`, `watchFiles`) is optional, and a command says which step a
+  target does not support instead of failing on an undefined call.
+
+  **`react` and `server` are registered through that same key.** If the first-party targets kept a
+  private path, the public one would not be worth much, and both are destined to move out: React
+  into `@stone-js/use-react`, the backend build into whichever package owns service builds. When
+  they do, nothing here is replaced, only removed.
+
+  Two things the commands used to know about targets became things a target declares, so
+  `stone serve` and `stone preview` no longer branch on a name:
+
+  - `devMode`: `supervised` (the CLI watches, rebuilds and restarts) or `self-hosted` (the
+    builder's own dev server reloads itself, and the CLI follows its exit code). Vite and Expo are
+    self-hosted; a backend build is not.
+  - `previewEntry`: where `stone preview` starts the built application from.
+
+  **Behaviour is unchanged for existing projects.** Precedence is the one the CLI already used:
+  `--target` wins, then `stone.builder.target`, then detection, with the backend target answering
+  last. Two things are more forgiving than before: an empty target (an empty positional from
+  yargs, an empty string in a config) now means "nothing was named" instead of naming a target
+  that cannot exist, and `--target` accepts any registered name rather than a closed list of two,
+  with an unknown one rejected by an error that lists the real ones.
+
+  `BuilderConfig.target` widens from `'react' | 'service'` to `string` for the same reason: a
+  closed union could not name a target the CLI does not ship.
+
+- 8760d1c: fix: a build that fails says so, and a shutdown that starts finishes
+
+  Four silent failures, all of the same shape: something reported success, or reported nothing, while the process was in a state nobody asked for.
+
+  - `stone build --ssg` wrote whatever a page answered, including an error body, and exited `0`. A pre-render is an HTTP request, so a page that throws answers 500, and that HTML was published as the page. The build now stops, names every page it could not render and what it answered, and writes nothing at all.
+  - A failed CLI command resolved exit `1` and then hung forever: build tooling leaves handles behind, which is why a successful build already exits deliberately. The failing path now does the same, so CI sees the failure instead of a timeout.
+  - SSG left its pre-render server behind when the app shut down gracefully, and the open pipes kept the CLI alive. It now waits for the child to go, and forces it when it does not.
+  - `@stone-js/node-http-adapter` closed the server on `SIGINT`/`SIGTERM` and waited for every socket, so an idle keep-alive connection held the process open forever and an orchestrator had to hard-kill a container that promised to leave. Idle connections are closed at once, requests in flight get `shutdownGracePeriod` (10s by default), and the process exits either way.
+  - `@stone-js/node-ws-adapter` could not stop while anyone was connected, which is a realtime server's normal state. Clients are now asked to leave with `1001 Going away` and dropped after the grace period.
+
+- Updated dependencies [18644c8]
+- Updated dependencies [9f074f8]
+- Updated dependencies [318cbf5]
+  - @stone-js/router@0.8.10
+  - @stone-js/use-react@0.8.10
+  - @stone-js/core@0.8.10
+  - @stone-js/filesystem@0.8.10
+  - @stone-js/node-cli-adapter@0.8.10
+  - @stone-js/pipeline@0.8.10
+  - @stone-js/config@0.8.10
+
 ## 0.8.9
 
 ### Patch Changes
