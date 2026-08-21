@@ -115,10 +115,41 @@ export class OpenApiHandler {
    */
   docs (event: IncomingEvent): string {
     const options = this.options()
-    return swaggerUiHtml(options.specPath ?? DEFAULT_SPEC_PATH, {
+    return swaggerUiHtml(this.specUrl(options), {
       title: options.info?.title,
       ...options.swaggerUi
     })
+  }
+
+  /**
+   * Where the document is actually served.
+   *
+   * Not the same thing as where it was declared. A router carrying a prefix serves `/openapi.json` at
+   * `/v1/openapi.json`, and the explorer printed the declared path, so the page asked for a URL that
+   * answered 404. Writing the prefix into `specPath` did not help either: the router applied its own
+   * on top, and the document moved to `/v1/v1/openapi.json`.
+   *
+   * So the router is asked, by the name the route was registered under. A declared `swaggerUi.specUrl`
+   * still wins, for a document hosted somewhere else entirely, and the declared path remains the
+   * fallback when no router can answer.
+   *
+   * @param options - The `stone.openapi` bucket.
+   * @returns The URL the explorer should load.
+   */
+  private specUrl (options: OpenApiServeOptions): string {
+    const explicit = options.swaggerUi?.specUrl
+
+    if (typeof explicit === 'string') { return explicit }
+
+    try {
+      const generated = this.router().generate?.({ name: 'openapi.spec' })
+      if (typeof generated === 'string' && generated.length > 0) { return generated }
+    } catch {
+      // No router, or no such route: the declared path is the honest answer, and `spec` would have
+      // failed long before the explorer did.
+    }
+
+    return options.specPath ?? DEFAULT_SPEC_PATH
   }
 
   /**
