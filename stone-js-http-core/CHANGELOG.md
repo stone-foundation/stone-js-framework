@@ -1,5 +1,52 @@
 # Changelog
 
+## 0.8.12
+
+### Patch Changes
+
+- 047d9b0: feat: a route declares what it answers with, and an application names its own envelope
+
+  Two declarations that remove two kinds of boilerplate.
+
+  **`response` on a route.** A route already says what it is: its path, its verb, what it accepts, whether it is protected. Now it can say what it answers with, so the handler stays about the domain:
+
+  ```ts
+  @Post('/tasks', { response: { type: 'json', status: 201 } })
+  create (event: IncomingHttpEvent): Task { return this.tasks.add(event.get('body')) }
+
+  @Delete('/tasks/:id', { response: { type: 'no-content' } })
+  remove (event: IncomingHttpEvent): void { this.tasks.remove(event.get('id')) }
+  ```
+
+  `json`, `jsonp`, `html`, `text`, `file`, `redirect` and `no-content`, with a status and headers, all optional and defaulting to JSON with `200`. A method decorator still wins: `@JsonHttpResponse(201)` produces the response itself, and when a handler has already answered, the route option steps aside. The published contract reads the same declaration, so a route answering `201` is documented as answering `201` without saying it twice.
+
+  **`stone.resources.envelope`.** An endpoint answering a page returns something like `{ items, meta }`, and `items` and `meta` are not fields of a model: shaping that object published the wrapper as if it were the thing, which applications worked around with a middleware of their own. Naming the word once is enough, and everything around the payload is left as it was:
+
+  ```ts
+  blueprint.set("stone.resources.envelope", { payload: "items" });
+  ```
+
+  Undeclared by default, deliberately: guessing which key holds the payload would quietly mangle a model that happens to have a field by that name.
+
+- c971168: fix: authentication reads the header, and a contract describes the API
+
+  Six defects reported from a pilot application, each reproduced before it was touched.
+
+  - `@stone-js/auth` read the bearer token with `event.get('Authorization')`, and that accessor deliberately refuses to read headers, because it also reads the query string and the body. So the real header was ignored, every request stayed anonymous, and `?Authorization=` would have been read in its place. It reads `getHeader` now.
+  - `@stone-js/openapi` documented every endpoint under `/`: a route's `path` is the pathname of the event it is answering, and no event is bound while generating a document. It reads the declared template, translates `:id` into `{id}`, declares the parameters the template requires, and publishes both paths for an optional segment.
+  - A Zod 4 schema converted to `{}`, an empty JSON Schema meaning "anything", so every documented body and response was silently unconstrained. A schema that can describe itself is now asked to.
+  - An explicit `contract:` block replaced everything derived, so documenting one `404` deleted the derived success response. It merges instead, per status, and a declared success status replaces the derived one rather than joining it.
+  - The derived success status was always `200`, even for a handler answering `201`. The response decorators now record the status they build, so the document cannot contradict the code it came from.
+  - `@stone-js/resources`: every `@ApiResource` the container resolved crashed on `checker`, an optional dependency read straight off the container, which resolves any name it is asked for and throws when nothing is bound.
+  - `@stone-js/core`: `@Middleware` could only ever declare kernel middleware, so a middleware that reads the matched route could be registered from a blueprint but not from the decorator. `layer: 'app' | 'kernel' | 'router'` closes that, `global` keeps working.
+
+  Packaging: `@stone-js/i18n`, `@stone-js/mcp-dev`, `@stone-js/openapi` and `@stone-js/use-react-native` published types referencing `@stone-js/cli` while declaring it as a dev dependency only. It is an optional peer now, so an application is never asked to resolve a package nobody told it about.
+
+- Updated dependencies [c971168]
+  - @stone-js/core@0.8.12
+  - @stone-js/filesystem@0.8.12
+  - @stone-js/config@0.8.12
+
 ## 0.8.11
 
 ### Patch Changes

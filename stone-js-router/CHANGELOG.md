@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.12
+
+### Patch Changes
+
+- Updated dependencies [c971168]
+  - @stone-js/core@0.8.12
+  - @stone-js/pipeline@0.8.12
+
 ## 0.8.11
 
 ### Patch Changes
