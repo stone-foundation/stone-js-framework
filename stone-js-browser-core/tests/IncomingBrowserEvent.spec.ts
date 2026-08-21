@@ -1,5 +1,6 @@
 import { BrowserError } from '../src/errors/BrowserError'
 import { CookieCollection } from '../src/cookies/CookieCollection'
+import { urlFingerprint } from '@stone-js/core'
 import { IncomingBrowserEvent, IncomingBrowserEventOptions } from '../src/IncomingBrowserEvent'
 
 // Mock Symbol.metadata for testing purposes
@@ -72,10 +73,31 @@ describe('IncomingBrowserEvent', () => {
     expect(event.getUri(true)).toBe('http://localhost/')
   })
 
-  it('should generate a valid browser fingerprint', () => {
-    const fingerprint = btoa([event.method, event.pathname].join('|'))
-    expect(event.fingerprint()).toBe(fingerprint)
-    expect(event.getRouteResolver()).toBeInstanceOf(Function)
+  describe('fingerprint', () => {
+    const at = (url: string): IncomingBrowserEvent => IncomingBrowserEvent.create({
+      url: new URL(url, 'http://localhost'),
+      source: { rawEvent: {}, platform: 'test', rawContext: {} }
+    })
+
+    it('is the core\'s url fingerprint, so an HTTP event cannot disagree with it', () => {
+      // Pinned to the shared formula: a server render produces an HTTP event and its hydration
+      // produces this one, and they have to key on the same string.
+      const subject = at('/tasks?page=2')
+
+      expect(subject.fingerprint()).toBe(urlFingerprint(subject.method, subject.url))
+    })
+
+    it('separates two pages that differ only by their query', () => {
+      expect(at('/tasks?page=2').fingerprint()).not.toBe(at('/tasks?page=3').fingerprint())
+    })
+
+    it('handles a path no bare btoa could encode', () => {
+      expect(() => at('/東京').fingerprint()).not.toThrow()
+    })
+
+    it('still resolves its route', () => {
+      expect(event.getRouteResolver()).toBeInstanceOf(Function)
+    })
   })
 
   describe('get', () => {

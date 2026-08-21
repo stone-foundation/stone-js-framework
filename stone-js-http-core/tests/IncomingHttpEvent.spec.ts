@@ -4,6 +4,7 @@ import { HttpMethods } from '../src/declarations'
 import { HttpError } from '../src/errors/HttpError'
 import { UploadedFile } from '@stone-js/filesystem'
 import { CookieCollection } from '../src/cookies/CookieCollection'
+import { urlFingerprint } from '@stone-js/core'
 import { IncomingHttpEvent, IncomingHttpEventOptions } from '../src/IncomingHttpEvent'
 
 // Mock options for IncomingHttpEvent
@@ -229,16 +230,46 @@ describe('IncomingHttpEvent', () => {
     expect(event.params).toEqual(route.params)
   })
 
-  it('should generate a valid backend fingerprint', () => {
-    const fingerprint = btoa([event.method, event.uri, event.userAgent, event.ip].join('|'))
-    expect(event.fingerprint(true)).toBe(fingerprint)
-    expect(event.getRouteResolver()).toBeInstanceOf(Function)
-  })
+  describe('fingerprint', () => {
+    const at = (url: string): IncomingHttpEvent => IncomingHttpEvent.create({
+      url: new URL(url, 'http://localhost'),
+      method: 'GET',
+      source: { rawEvent: {}, platform: 'test', rawContext: {} }
+    })
 
-  it('should generate a valid browser fingerprint', () => {
-    const fingerprint = btoa([event.method, event.pathname].join('|'))
-    expect(event.fingerprint()).toBe(fingerprint)
-    expect(event.getRouteResolver()).toBeInstanceOf(Function)
+    it('is the core\'s url fingerprint, so a browser event cannot disagree with it', () => {
+      // Pinned to the shared formula rather than restated here. The two used to be written twice and
+      // drifted: this one dropped the query string, the browser kept it, and a server render and its
+      // own hydration keyed on different strings.
+      const subject = at('/tasks?page=2')
+
+      expect(subject.fingerprint()).toBe(urlFingerprint('GET', subject.url))
+    })
+
+    it('separates two pages that differ only by their query', () => {
+      expect(at('/tasks?page=2').fingerprint()).not.toBe(at('/tasks?page=3').fingerprint())
+    })
+
+    it('handles a path no bare btoa could encode', () => {
+      // `btoa` throws outside latin1, so this used to fail on any non-latin URL.
+      expect(() => at('/東京').fingerprint()).not.toThrow()
+    })
+
+    it('narrows further when asked for the full form', () => {
+      const subject = IncomingHttpEvent.create({
+        url: new URL('http://localhost/x'),
+        method: 'GET',
+        ip: '1.2.3.4',
+        headers: { 'user-agent': 'ua' },
+        source: { rawEvent: {}, platform: 'test', rawContext: {} }
+      })
+
+      expect(subject.fingerprint(true)).not.toBe(subject.fingerprint())
+    })
+
+    it('still resolves its route', () => {
+      expect(event.getRouteResolver()).toBeInstanceOf(Function)
+    })
   })
 
   it('should throw an error on invalid header name', () => {

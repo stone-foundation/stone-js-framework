@@ -2,7 +2,7 @@ import { Cookie } from './cookies/Cookie'
 import { HttpMethod, IRoute } from './declarations'
 import { BrowserError } from './errors/BrowserError'
 import { CookieCollection } from './cookies/CookieCollection'
-import { IncomingEvent, IncomingEventOptions } from '@stone-js/core'
+import { IncomingEvent, IncomingEventOptions, urlFingerprint } from '@stone-js/core'
 
 /**
  * IncomingBrowserEventOptions interface.
@@ -362,13 +362,9 @@ export class IncomingBrowserEvent extends IncomingEvent {
    * @returns The generated fingerprint as a base64 string.
    */
   fingerprint (): string {
-    // Include the full path (pathname + search) so distinct navigations don't collide, and
-    // base64-encode UTF-8 bytes so non-latin1 paths don't throw (bare `btoa` only accepts latin1).
-    const raw = [this.method, this.path].join('|')
-    /* v8 ignore next 3 */ // The browser btoa branch can't run under the Node test runtime (Buffer always defined).
-    return typeof Buffer !== 'undefined'
-      ? Buffer.from(raw, 'utf-8').toString('base64')
-      : btoa(String.fromCodePoint(...new TextEncoder().encode(raw)))
+    // Computed by the core, so an HTTP event and this one cannot disagree about what identifies the
+    // same page. They used to: the two halves of a hydrated render then keyed on different strings.
+    return urlFingerprint(this.method, this.url)
   }
 
   /**
