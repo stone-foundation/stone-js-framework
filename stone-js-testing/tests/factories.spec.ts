@@ -1,4 +1,5 @@
-import { makeIncomingHttpEvent, makeIncomingEvent } from '../src/factories'
+import { makeIncomingEvent } from '../src/factories'
+import { makeIncomingHttpEvent } from '../src/http'
 
 describe('makeIncomingHttpEvent', () => {
   it('applies sensible defaults', () => {

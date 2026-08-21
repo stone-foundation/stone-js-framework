@@ -48,10 +48,13 @@ export class I18nServiceProvider implements IServiceProvider {
     if (hasResources || hasLoaders) { return }
 
     this.container.make<ILogger>('logger')?.warn(
-      '[@stone-js/i18n] No catalogs registered: every key will be returned as-is. Either the scan found ' +
-      'nothing under `app/**/i18n/<locale>/<namespace>.*`, or the build plugin did not run (check that ' +
-      '`@stone-js/i18n` is a direct dependency and that `stone.builder.autoDiscover` is not `false`), ' +
-      'or `stone.i18n.resources` was set to an empty map.'
+      '[@stone-js/i18n] No catalogs registered: every key will be returned as-is. Four things cause it, ' +
+      'in the order worth checking: a configuration replaced the whole `stone.i18n` bucket with ' +
+      '`blueprint.set(\'stone.i18n\', { … })`, dropping what the build injected into it (set the keys ' +
+      'one at a time instead: `stone.i18n.locale`); the scan found nothing under ' +
+      '`app/**/i18n/<locale>/<namespace>.*`; the build plugin did not run (`@stone-js/i18n` must be a ' +
+      'direct dependency, and `stone.builder.autoDiscover` must not be `false`); or ' +
+      '`stone.i18n.resources` was set to an empty map.'
     )
   }
 }

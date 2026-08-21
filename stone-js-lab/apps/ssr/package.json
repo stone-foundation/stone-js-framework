@@ -29,6 +29,7 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.27.0",
     "@stone-js/cli": "workspace:*",
+    "@stone-js/http-core": "workspace:*",
     "@stone-js/testing": "workspace:*",
     "@types/node": "^24.0.7",
     "@types/react": "^19.0.7",

@@ -99,17 +99,28 @@ export const InstallDependenciesMiddleware = async (
   }
 
   const installCmd = packageManager === 'yarn' ? 'add' : 'install'
-  const testingDeps = testing === 'vitest' ? ['@vitest/coverage-v8'] : []
+  const devFlag = packageManager === 'yarn' ? '--dev' : '--save-dev'
+  // Whatever runner was named, plus the coverage provider Vitest needs. `''` means none.
+  const testingDeps = isNotEmpty<string>(testing)
+    ? [testing, ...(testing === 'vitest' ? ['@vitest/coverage-v8'] : [])]
+    : []
 
   context.commandOutput.info('Installing packages. This might take a while...')
 
-  const packages = [modules, testing, testingDeps].flat()
+  const run = (args: string[]): void => {
+    execFileSync(packageManager, args, { cwd: destDir, shell: false, stdio: 'inherit' })
+  }
 
-  execFileSync(packageManager, [installCmd, ...packages], {
-    cwd: destDir,
-    shell: false,
-    stdio: 'inherit'
-  })
+  if (modules.length > 0) {
+    run([installCmd, ...modules])
+  }
+
+  // A test runner is a development dependency, and it was being installed as a runtime one: a
+  // deployed application shipped Vitest, and the starter that already declared it in
+  // `devDependencies` had it moved. Installed separately so the flag applies only to these.
+  if (testingDeps.length > 0) {
+    run([installCmd, devFlag, ...testingDeps])
+  }
 
   // The package manager just rewrote package.json on disk with the chosen modules in
   // `dependencies`. Re-read it so the finalize step writes THAT manifest, not the stale copy

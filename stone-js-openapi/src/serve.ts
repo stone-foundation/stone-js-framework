@@ -6,6 +6,13 @@ export interface SwaggerUiOptions {
   title?: string
   /** `swagger-ui-dist` major version served from the CDN (default `'5'`). */
   version?: string
+  /**
+   * Where the explorer loads the document from, when it is not the route this module serves.
+   *
+   * Normally unnecessary: the URL is asked of the router, so a prefix is accounted for. State it for a
+   * document published elsewhere, behind a CDN path or on another host.
+   */
+  specUrl?: string
 }
 
 /**

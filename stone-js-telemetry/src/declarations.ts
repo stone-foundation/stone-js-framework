@@ -85,4 +85,65 @@ export interface TelemetryOptions {
   exporter?: TelemetryExporter
   /** Injectable monotonic-ish clock (ms). Defaults to `Date.now`. Mainly for testing. */
   now?: () => number
+  /** The health probe: where it answers, what it checks, how long a check may take. */
+  health?: HealthOptions
+}
+
+/**
+ * What one check answered.
+ *
+ * A boolean is enough to route traffic; a detail is what the person paged at 3am reads.
+ */
+export interface HealthCheckResult {
+  healthy: boolean
+  detail?: string
+}
+
+/**
+ * A class-shaped check.
+ *
+ * Resolved through the container, so a check can hold the very client it is checking: the database
+ * pool, the cache, the queue.
+ */
+export interface IHealthCheck {
+  check: () => HealthCheckResult | boolean | Promise<HealthCheckResult | boolean>
+}
+
+/** A check written as a plain function. */
+export type FunctionalHealthCheck = () => HealthCheckResult | boolean | Promise<HealthCheckResult | boolean>
+
+/**
+ * A declared check, in any of the three forms the framework accepts.
+ *
+ * `name` is what the report calls it, and what a dashboard groups by; without one, the module's own
+ * name is used.
+ */
+export interface MetaHealthCheck {
+  module: unknown
+  name?: string
+  isClass?: boolean
+  isFactory?: boolean
+}
+
+/** What the endpoint answers: one status, and a line per check. */
+export interface HealthReport {
+  status: 'healthy' | 'unhealthy'
+  checks: Record<string, HealthCheckResult>
+}
+
+/**
+ * How the health probe is configured (`stone.telemetry.health.*`).
+ */
+export interface HealthOptions {
+  /**
+   * Where the probe answers. Default `/health`, `false` to serve nothing.
+   *
+   * A probe is an inbound question from something that cannot read a log: a load balancer deciding
+   * whether to route traffic, a platform deciding whether to replace an instance.
+   */
+  path?: string | false
+  /** The registered checks. Modules and applications add to this list. */
+  checks?: MetaHealthCheck[]
+  /** How long a single check may take before it counts as failed. Default 2000ms. */
+  timeout?: number
 }
