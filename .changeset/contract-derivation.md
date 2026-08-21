@@ -1,6 +1,6 @@
 ---
-'@stone-js/resources': minor
-'@stone-js/openapi': minor
+'@stone-js/resources': patch
+'@stone-js/openapi': patch
 ---
 
 Resources stand alone, and a contract is derived from everything a route declares.

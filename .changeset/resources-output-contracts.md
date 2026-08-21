@@ -1,5 +1,5 @@
 ---
-'@stone-js/resources': minor
+'@stone-js/resources': patch
 '@stone-js/openapi': patch
 '@stone-js/validation': patch
 '@stone-js/auth': patch
