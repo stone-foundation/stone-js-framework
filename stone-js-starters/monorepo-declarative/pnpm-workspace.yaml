@@ -1,0 +1,4 @@
+# The two applications and the domain they share.
+packages:
+  - 'apps/*'
+  - 'packages/*'
