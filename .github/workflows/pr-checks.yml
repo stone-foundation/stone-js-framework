@@ -49,6 +49,32 @@ jobs:
       # The PR title becomes the squash-merge commit on main, so it must pass the same commitlint
       # rules as any commit. Reuse the repo's commitlint config for a single source of truth.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      # A `fixed` group means every package lands on the same version, so the group's bump is the
+      # highest one declared anywhere in it. On a 0.x line the minor slot is the breaking slot, which
+      # is why a single `minor` promoted the whole group to a major and took 0.8.9 to 1.0.0, silently,
+      # in a release nobody had asked to be the first stable one. Until the API freeze every bump
+      # stays a patch, and the one deliberate jump is made by hand with the label below.
+      - name: Pre-1.0 changesets declare patch only
+        run: |
+          version=$(jq -r .version stone-js-core/package.json)
+          echo "Current line: $version"
+          case "$version" in
+            0.*) ;;
+            *) echo "Past 1.0, nothing to enforce."; exit 0 ;;
+          esac
+
+          if jq -e '[.pull_request.labels[].name] | index("release: intentional bump")' "$GITHUB_EVENT_PATH" > /dev/null; then
+            echo "Labelled as a deliberate bump, so the rule is waived for this PR."
+            exit 0
+          fi
+
+          offenders=$(grep -rlE '^ *.@stone-js/[^"'\'']+.: *(minor|major) *$' .changeset/*.md 2>/dev/null || true)
+          if [ -n "$offenders" ]; then
+            echo "::error::On a $version line every changeset must declare 'patch'. A minor or major anywhere in the fixed group bumps every package to the next major (1.0.0). Offending files:%0A$offenders%0AUse patch, or add the label 'release: intentional bump' if the jump is deliberate."
+            exit 1
+          fi
+          echo "Every changeset declares patch."
+
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
