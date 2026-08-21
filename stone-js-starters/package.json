@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/starters",
-  "version": "0.8.13",
+  "version": "0.8.14",
   "description": "This repository contains official **starter templates** for Stone.js applications.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "starters": [
       {
         "value": "basic-service-declarative",
-        "title": "Basic \u00b7 service \u00b7 declarative",
+        "title": "Basic · service · declarative",
         "description": "Minimal HTTP/service API, decorator API.",
         "tags": [
           "api",
@@ -38,7 +38,7 @@
       },
       {
         "value": "basic-service-imperative",
-        "title": "Basic \u00b7 service \u00b7 imperative",
+        "title": "Basic · service · imperative",
         "description": "Minimal HTTP/service API, imperative API.",
         "tags": [
           "api",
@@ -50,7 +50,7 @@
       },
       {
         "value": "basic-react-declarative",
-        "title": "Basic \u00b7 React \u00b7 declarative",
+        "title": "Basic · React · declarative",
         "description": "Minimal React SPA, decorator API.",
         "tags": [
           "react",
@@ -62,7 +62,7 @@
       },
       {
         "value": "basic-react-imperative",
-        "title": "Basic \u00b7 React \u00b7 imperative",
+        "title": "Basic · React · imperative",
         "description": "Minimal React SPA, imperative API.",
         "tags": [
           "react",
@@ -74,7 +74,7 @@
       },
       {
         "value": "basic-react-native-declarative",
-        "title": "Basic \u00b7 React Native \u00b7 declarative (Expo)",
+        "title": "Basic · React Native · declarative (Expo)",
         "description": "Minimal native mobile app with React Native and Expo, decorator API.",
         "tags": [
           "react-native",
@@ -87,7 +87,7 @@
       },
       {
         "value": "basic-react-native-imperative",
-        "title": "Basic \u00b7 React Native \u00b7 imperative (Expo)",
+        "title": "Basic · React Native · imperative (Expo)",
         "description": "Minimal native mobile app with React Native and Expo, imperative API.",
         "tags": [
           "react-native",
@@ -100,7 +100,7 @@
       },
       {
         "value": "standard-service-declarative",
-        "title": "Standard \u00b7 service \u00b7 declarative",
+        "title": "Standard · service · declarative",
         "description": "Common service setup, decorator API.",
         "tags": [
           "api",
@@ -112,7 +112,7 @@
       },
       {
         "value": "standard-service-imperative",
-        "title": "Standard \u00b7 service \u00b7 imperative",
+        "title": "Standard · service · imperative",
         "description": "Common service setup, imperative API.",
         "tags": [
           "api",
@@ -124,7 +124,7 @@
       },
       {
         "value": "standard-react-declarative",
-        "title": "Standard \u00b7 React \u00b7 declarative (SSR)",
+        "title": "Standard · React · declarative (SSR)",
         "description": "React with SSR, decorator API.",
         "tags": [
           "react",
@@ -136,7 +136,7 @@
       },
       {
         "value": "standard-react-imperative",
-        "title": "Standard \u00b7 React \u00b7 imperative (SSR)",
+        "title": "Standard · React · imperative (SSR)",
         "description": "React with SSR, imperative API.",
         "tags": [
           "react",
@@ -148,7 +148,7 @@
       },
       {
         "value": "full-service-declarative",
-        "title": "Full \u00b7 service \u00b7 declarative",
+        "title": "Full · service · declarative",
         "description": "Full-featured service, decorator API.",
         "tags": [
           "api",
@@ -160,7 +160,7 @@
       },
       {
         "value": "full-service-imperative",
-        "title": "Full \u00b7 service \u00b7 imperative",
+        "title": "Full · service · imperative",
         "description": "Full-featured service, imperative API.",
         "tags": [
           "api",
@@ -172,7 +172,7 @@
       },
       {
         "value": "full-react-declarative",
-        "title": "Full \u00b7 React \u00b7 declarative (SSR/SSG)",
+        "title": "Full · React · declarative (SSR/SSG)",
         "description": "Full React with SSR & SSG, decorator API.",
         "tags": [
           "react",
@@ -185,7 +185,7 @@
       },
       {
         "value": "full-react-imperative",
-        "title": "Full \u00b7 React \u00b7 imperative (SSR/SSG)",
+        "title": "Full · React · imperative (SSR/SSG)",
         "description": "Full React with SSR & SSG, imperative API.",
         "tags": [
           "react",
@@ -198,7 +198,7 @@
       },
       {
         "value": "monorepo-declarative",
-        "title": "Monorepo \u00b7 one domain, two applications \u00b7 declarative",
+        "title": "Monorepo · one domain, two applications · declarative",
         "description": "A shared domain package consumed by a web application and a React Native one.",
         "tags": [
           "monorepo",

@@ -1,5 +1,141 @@
 # Changelog
 
+## 0.8.14
+
+### Patch Changes
+
+- d47ddd7: feat(starters): one domain, two applications
+
+  A monorepo where the interesting file is the one that runs everywhere. `@acme/domain` holds the
+  entities and the behaviour and imports `@stone-js/core` and nothing else about a platform: no
+  `Request`, no `Response`, no `window`, no `View`. `@acme/web` and `@acme/mobile` both depend on it,
+  and neither has a copy of it.
+
+  Their `Application.ts` files differ by two decorators, `@Browser()`/`@ReactNative()` and
+  `@UseReact()`/`@UseReactNative()`, and by nothing else. Their pages' `handle` and `head` are
+  identical line for line, because answering a route is not a platform question; only `render` differs,
+  and only in what it draws with.
+
+  The three suites sit at three levels, and the cheapest one carries the most: the domain boots nothing
+  and tests plain objects in milliseconds, the web application boots the real kernel and reads the HTML
+  that came back, and the mobile one boots the kernel, adapter and renderer under Node, sends a deep
+  link and asserts the navigation stack. The web and mobile suites make the same assertions about the
+  same domain through two different contexts, which is the claim the starter exists to demonstrate.
+
+  **Two things a web-and-mobile workspace genuinely needs, both documented in its README.** React is
+  pinned at the root, because Expo pins it exactly and a workspace holding one React with a different
+  React DOM fails at run time with "Incompatible React versions". And the domain's relative imports
+  carry their `.js`, because it is published as ESM under `moduleResolution: NodeNext`.
+
+  Verified: the domain builds and passes 8 tests, the web application builds (CSR) and passes 2, the
+  mobile one passes 3 with a clean `tsc --noEmit` and an `expo export` producing Hermes bytecode, with
+  Metro resolving the shared package across the workspace.
+
+- 627de9f: feat(use-react-native): the native navigator, wired
+
+  `StoneNativeApp` shows the screen on top of the stack, which is what makes a first run work with
+  nothing installed. It is the floor. The platform's own transitions, the swipe-back gesture, the
+  hardware back button, and a screen keeping its own state while another covers it are things only a
+  native navigator gives you, and none of them can be imitated in JavaScript. Until now the README
+  explained how to wire one yourself; `StoneNativeStack` is that wiring, shipped.
+
+  ```tsx
+  import { registerRootComponent } from "expo";
+  import { StoneNativeStack } from "@stone-js/use-react-native/navigation";
+
+  registerRootComponent(() => (
+    <StoneNativeStack screenOptions={{ headerShown: true }} />
+  ));
+  ```
+
+  Nothing about a page changes. Each Stone screen becomes a native one, keyed by its own identity so
+  the navigator keeps its state as the stack grows, and titled from the page's `head`.
+
+  **The one thing worth understanding is a single comparison.** There are two stacks and one truth: the
+  router owns navigation, so Stone's stack is the truth and the navigator displays it. A screen can then
+  leave the navigator for two reasons, and only one needs answering. A swipe back removed it without
+  telling Stone, so Stone still has it on top and it gets popped. A `useGoBack` or a `reset` popped it
+  already, and the navigator is only catching up with a render it was given: popping again would eat the
+  screen underneath. Comparing the departing screen's key with what Stone now has on top separates the
+  two exactly, with no flag to keep and no window in which a fast double-back does the wrong thing. It
+  is `shouldPopStone`, exported, and it is the part to read before writing your own navigator.
+
+  **Behind `/navigation`, and depending on nothing.** React Navigation declares `react-native` as a
+  peer, package managers install peers, `react-native` brings Metro, and Metro brings a version of
+  `image-size` with two unpatched advisories: declaring these packages, even as optional peers, failed
+  `pnpm audit --audit-level=high` for the whole workspace. So they are described by ambient
+  declarations instead, the same conclusion the adapter reached about `react-native` itself, and the
+  package's main entry imports nothing from them. An application that is happy with the floor installs
+  nothing; one that wants the navigator runs `npx expo install`.
+
+  **What is verified, and what is not.** The rule has nine cases against a real screen stack, and the
+  component's wiring has seven with React Navigation stood in for: what a navigator _does_ with a screen
+  is its business, and reproducing it under a test runner would test their library with ours. Resolution
+  and bundling are verified for real: the starter bundles to Hermes bytecode for iOS and Android with
+  the navigator in place, and to the web target too, so the whole chain can be seen in a browser tab
+  before a device is involved. The transitions and the gesture themselves need a device, and nothing
+  here pretends otherwise.
+
+- 2f7d043: test(starters): a native screen is tested the way a web page is
+
+  The React Native starters tested their domain through the real adapter, supplying a navigation source
+  and a screen stack, because nothing else could reach a native application. That was fifty lines to
+  answer a question every platform answers the same way: what does this route resolve to.
+
+  Each starter now has two suites, and the split says which question is which.
+
+  `tests/HomeScreen.spec.ts` is the web starters' test, unchanged in shape: `createTestApp()` discovers
+  `app/**`, one event goes through the kernel, and the head proves the loader read the deep link's
+  parameter. Six lines of setup became one.
+
+  ```ts
+  const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM });
+  const response = await app.send(
+    makeIncomingBrowserEvent({ url: "stone://app/?name=Ada" })
+  );
+  ```
+
+  `tests/navigation.spec.ts` keeps what only a device does: the real React Native adapter, the real
+  screen stack, a deep link pushing a screen, and the stack replacing rather than duplicating a route
+  already on top. Nothing is substituted there, on purpose.
+
+  **Their Vitest configuration now inlines `@stone-js/testing`**, which is what lets `createTestApp()`
+  import an application's TypeScript at run time. `stone test` does this for a project it drives; an
+  Expo project runs Vitest directly, so it states it itself. Without it, discovery fails with
+  `Unknown file extension ".ts"`, naming the application's own entry file.
+
+- 6df78d4: feat(testing): platform-agnostic, and able to test what an application actually receives
+
+  Three things, one theme: a test should reach for the platform it is testing, and nothing else.
+
+  **`@stone-js/http-core` is no longer a dependency.** It was a required peer, so every project
+  installed an HTTP package to run its tests: a React Native application did, a CLI one did, a worker
+  did. `makeIncomingHttpEvent` now lives behind `@stone-js/testing/http` and the peer is optional. The
+  main entry imports no platform package at all, verified in the emitted bundle. Measured the other way
+  too: a React Native project with no HTTP package installed anywhere boots through `createTestApp` and
+  resolves its route.
+
+  **A browser or native application can be tested at all.** Dispatching `makeIncomingEvent()` into one
+  failed with `event.fingerprint is not a function`, thrown from the kernel's error handler.
+  `makeIncomingBrowserEvent`, behind `@stone-js/testing/browser`, builds the event those applications
+  receive, and keeps schemes rather than resolving them away, so a deep link like `myapp://tasks/42`
+  reaches in a test the route it reaches on a phone.
+
+  **`blueprint` is now an override.** It was merged before the application's own modules, and
+  `@StoneApp` carries the default blueprint, which sets nearly every key: anything passed through the
+  option was overwritten, so it could only ever affect keys no application touched. It is merged after
+  them now, which is the only ordering a test can use. This is the configuration counterpart of
+  `bindings`: one replaces a service, the other replaces a value.
+
+  ```ts
+  const app = await createTestApp({ blueprint: { stone: { debug: true } } });
+  ```
+
+  **Migration is one import line**, and every starter and lab application in the repository has been
+  moved: `makeIncomingHttpEvent` comes from `@stone-js/testing/http`. The two SPA starters moved further
+  and now use `makeIncomingBrowserEvent`, because a browser application receives a browser event; the
+  SSR and SSG ones keep the HTTP event, because they are genuinely served over HTTP.
+
 ## 0.8.13
 
 ## 0.8.12
