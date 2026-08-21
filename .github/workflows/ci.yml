@@ -81,6 +81,14 @@ jobs:
           name: dist
       - name: Test (with coverage)
         run: pnpm run test:ci
+      # The lab applications are what the packages look like once assembled: a real SPA, a real SSR
+      # app, a real API, each booted through the kernel. They were outside the gate, so a test file
+      # that stopped compiling lived there unnoticed until someone ran it by hand. Four seconds, for
+      # the only place in this repository where the packages are used the way an application uses
+      # them. The starters stay out: they install from the registry, so a CI run cannot point them at
+      # the build under test.
+      - name: Test the lab applications
+        run: pnpm run test:lab
       - name: Upload coverage
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
