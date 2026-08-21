@@ -1,54 +1,36 @@
-import { stoneApp } from '@stone-js/core'
-import { Application } from '../app/Application'
-import { ScreenStack } from '@stone-js/use-react-native'
-import { TaskListScreen } from '../app/TaskListScreen'
-import { NavigationSource } from '@stone-js/react-native-adapter'
+import { createTestApp } from '@stone-js/testing'
+import { makeIncomingBrowserEvent } from '@stone-js/testing/browser'
+import { REACT_NATIVE_PLATFORM } from '@stone-js/react-native-adapter'
 
 /**
- * The mobile application, booted under Node and asked real questions.
+ * The mobile application, booted in memory and asked the same questions the web one is asked.
  *
- * Nothing is mocked. The kernel, the router, the adapter and the renderer are the ones a phone runs,
- * and the domain is the very same `@acme/domain` the web application uses. What a device adds is a
- * screen to draw on, and this asserts what the framework resolved before drawing.
+ * Read it next to `apps/web/tests/TaskListPage.spec.ts`. Same domain, same assertions, same counts,
+ * through two different contexts. That is the claim this repository exists to demonstrate, and it is
+ * visible in the tests rather than only in the source.
  *
- * Read it next to `apps/web/tests/TaskListPage.spec.ts`: same domain, same questions, same answers.
+ * `createTestApp()` discovers `app/**` and substitutes the adapter, which is the architecture rather
+ * than a concession to testing: the domain is written once and the context is chosen at run time, so
+ * under Node the context is a test adapter instead of React Native. What a native application does
+ * differently, its navigation stack, is `tests/navigation.spec.ts`.
  */
 describe('TaskListScreen', () => {
-  const screens = ScreenStack.create()
-  const navigation = NavigationSource.create({ baseUrl: 'acme://app' })
+  it('resolves the task list from the shared domain', async () => {
+    const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM })
 
-  // Booted once for the whole suite, as on a device: the default blueprints are shared module
-  // objects, so booting the same modules twice in one process would accumulate route definitions.
-  beforeAll(async () => {
-    await stoneApp({
-      modules: [
-        Application,
-        TaskListScreen,
-        { stone: { reactNative: { navigationSource: navigation }, useReactNative: { screenStack: screens } } }
-      ]
-    }).run()
-  })
+    const response = await app.send(makeIncomingBrowserEvent({ url: 'acme://app/' }))
 
-  const settle = async (): Promise<void> => { await new Promise((resolve) => setImmediate(resolve)) }
-
-  it('puts the task list on the stack at launch, counted by the shared domain', () => {
-    expect(screens.size()).toBe(1)
-    expect(screens.top()?.path).toBe('/')
-    expect(screens.top()?.title).toBe('1 left · Acme tasks')
+    expect(response.statusCode).toBe(200)
+    // The head is what a navigator shows in its header, and it carries the count the domain computed.
+    expect((response.content as any).head.title).toBe('1 left · Acme tasks')
   })
 
   it('toggles a task through the same domain the web app uses', async () => {
-    navigation.navigate('acme://app/?toggle=3')
-    await settle()
+    const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM })
 
-    expect(screens.top()?.title).toBe('0 left · Acme tasks')
-  })
+    const response = await app.send(makeIncomingBrowserEvent({ url: 'acme://app/?toggle=3' }))
 
-  it('surfaces an unknown route instead of crashing', async () => {
-    navigation.navigate('acme://app/nowhere')
-    await settle()
-
-    // An error page is still a screen: the application stays up and shows something.
-    expect(screens.top()?.path).not.toBe('/')
+    expect(response.statusCode).toBe(200)
+    expect((response.content as any).head.title).toBe('0 left · Acme tasks')
   })
 })

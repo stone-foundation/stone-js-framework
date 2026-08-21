@@ -30,6 +30,7 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.27.0",
     "@stone-js/cli": "^0.8.13",
+    "@stone-js/http-core": "^0.8.13",
     "@stone-js/testing": "^0.8.13",
     "@types/node": "^24.0.7",
     "@types/react": "^19.0.7",
