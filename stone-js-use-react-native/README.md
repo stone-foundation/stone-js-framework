@@ -156,39 +156,60 @@ navigate({ name: 'tasks.show', params: { id: 42 } })  // by route name
 
 ## Using a native navigator
 
-`StoneNativeApp` is the floor, not the ceiling: it shows the top screen and no more. The platform's transitions, the swipe-back gesture, and a screen keeping its own state while another covers it are things only a native navigator gives you.
+`StoneNativeApp` is the floor, not the ceiling: it shows the top screen and no more. The platform's
+transitions, the swipe-back gesture, the hardware back button, and a screen keeping its own state
+while another covers it are things only a native navigator gives you, and none of them can be
+imitated in JavaScript.
 
-So the stack is public state rather than a private detail. Drive `@react-navigation/native-stack` from it, and this package still depends on nothing:
+`StoneNativeStack` is that navigator, wired:
 
-```tsx
-import { useScreens } from '@stone-js/use-react-native'
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-
-const Stack = createNativeStackNavigator()
-
-export function App () {
-  const screens = useScreens()
-
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {screens.map((screen) => (
-          <Stack.Screen
-            key={screen.key}
-            name={screen.key}
-            options={{ title: screen.title }}
-          >
-            {() => screen.element}
-          </Stack.Screen>
-        ))}
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
-}
+```sh
+npx expo install @react-navigation/native @react-navigation/native-stack \
+  react-native-screens react-native-safe-area-context
 ```
 
-Each Stone screen becomes a native one, keyed by its own identity, so the navigator keeps its state as the stack grows. Nothing about your pages changes.
+```tsx
+import { registerRootComponent } from 'expo'
+import { StoneNativeStack } from '@stone-js/use-react-native/navigation'
+
+registerRootComponent(() => <StoneNativeStack screenOptions={{ headerShown: true }} />)
+```
+
+Nothing about your pages changes. Each Stone screen becomes a native one, keyed by its own identity
+so the navigator keeps its state as the stack grows, and titled from the page's `head`.
+
+**It is behind `/navigation` so the dependencies stay optional.** An application happy with the floor
+installs none of them, and a bundler never looks for them: the package's main entry imports nothing
+from `@react-navigation`.
+
+### The one thing worth understanding
+
+There are two stacks and one truth. The router owns navigation, so Stone's stack is the truth and the
+navigator displays it. A screen can then leave the navigator for two different reasons, and only one
+of them needs answering:
+
+- **The user swiped back.** The navigator removed the screen and Stone knows nothing about it, so
+  Stone's stack still has it on top. It gets popped, and the two agree again.
+- **Stone popped it already**, through `useGoBack` or a `reset`. The navigator is only catching up
+  with a render it was given, and popping again would eat the screen underneath.
+
+Comparing the departing screen's key with what Stone now has on top separates the two exactly, with
+no flag to keep and no window in which a fast double-back does the wrong thing. That comparison is
+`shouldPopStone`, exported alongside the component, and it is the part worth reading if you write
+your own navigator instead.
+
+### Writing your own
+
+The stack is public state, so nothing stops you. `useScreens()` gives the screens, oldest first, and
+`useScreenStack()` gives the stack itself:
+
+```tsx
+import { useScreens, useScreenStack } from '@stone-js/use-react-native'
+import { shouldPopStone } from '@stone-js/use-react-native/navigation'
+```
+
+The hooks live at the root, because reading the stack needs nothing installed. Only the rule and the
+component sit behind `/navigation`, with the dependencies they need.
 
 ## Developing in a browser
 
