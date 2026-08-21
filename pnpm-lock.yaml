@@ -4000,6 +4000,9 @@ importers:
       '@stone-js/http-core':
         specifier: workspace:*
         version: link:../stone-js-http-core
+      '@stone-js/pipeline':
+        specifier: workspace:*
+        version: link:../stone-js-pipeline
       '@stone-js/router':
         specifier: workspace:*
         version: link:../stone-js-router

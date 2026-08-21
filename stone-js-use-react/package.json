@@ -70,6 +70,7 @@
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
     "@stone-js/filesystem": "workspace:*",
+    "@stone-js/pipeline": "workspace:*",
     "@stone-js/use-react-core": "workspace:*",
     "@stone-js/use-view": "workspace:*",
     "@vitejs/plugin-react": "^4.3.4",
