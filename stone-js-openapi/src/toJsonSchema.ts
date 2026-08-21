@@ -13,6 +13,16 @@ export function isZodSchema (value: unknown): value is ZodLike {
 }
 
 /**
+ * Which side of the exchange a schema is being described for.
+ *
+ * It is not cosmetic. A request schema that normalises before it judges (a trimmed handle, an
+ * upper-cased country) is a transform, and a transform has no output shape to describe: asking for one
+ * throws. `input` is also the honest direction for a request, which is what the caller sends, before
+ * coercion and defaults, and `output` is the honest one for a response.
+ */
+export type SchemaDirection = 'input' | 'output'
+
+/**
  * Whether a schema knows how to describe itself.
  *
  * Zod 4 answers yes, and so does anything else that grew the same method. Asking the schema is
@@ -43,14 +53,30 @@ export function isSelfDescribing (value: unknown): value is { toJSONSchema: (opt
  * @param schema - The schema input.
  * @returns The JSON Schema.
  */
-export function toJsonSchema (schema: SchemaInput): JsonSchema {
+export function toJsonSchema (schema: SchemaInput, direction: SchemaDirection = 'output'): JsonSchema {
   if (isSelfDescribing(schema)) {
-    return openApiDialect(schema)
+    return openApiDialect(schema, direction)
   }
   if (isZodSchema(schema)) {
-    return zodToJsonSchema(schema as never, { target: 'openApi3', $refStrategy: 'none' }) as JsonSchema
+    return withoutDialect(zodToJsonSchema(schema as never, { target: 'openApi3', $refStrategy: 'none' }) as JsonSchema)
   }
-  return schema
+  // A plain JSON Schema passes through, minus its draft marker: an application that converted a schema
+  // itself has no way to know this document is OpenAPI 3.0, where `$schema` has no place.
+  return withoutDialect(schema)
+}
+
+/**
+ * Strip the draft marker an OpenAPI 3.0 document has nowhere to put.
+ *
+ * @param schema - A JSON Schema.
+ * @returns The same schema, without `$schema`.
+ */
+function withoutDialect (schema: JsonSchema): JsonSchema {
+  if (typeof schema !== 'object' || schema === null || !('$schema' in schema)) { return schema }
+  // Copied only when there is something to remove, so a schema handed in untouched comes back
+  // untouched, the same object it went in as.
+  const { $schema: _dropped, ...rest } = schema as JsonSchema & { $schema?: string }
+  return rest
 }
 
 /**
@@ -59,14 +85,17 @@ export function toJsonSchema (schema: SchemaInput): JsonSchema {
  * @param schema - The schema.
  * @returns The JSON Schema.
  */
-function openApiDialect (schema: { toJSONSchema: (options?: unknown) => JsonSchema }): JsonSchema {
+function openApiDialect (
+  schema: { toJSONSchema: (options?: unknown) => JsonSchema },
+  direction: SchemaDirection
+): JsonSchema {
   const converted = ((): JsonSchema => {
     try {
-      return schema.toJSONSchema({ target: 'openapi-3.0' })
+      return schema.toJSONSchema({ target: 'openapi-3.0', io: direction })
     } catch {
       // A converter too old to know the dialect still describes the schema, which is worth far more
       // than nothing at all.
-      return schema.toJSONSchema()
+      return schema.toJSONSchema({ io: direction })
     }
   })()
 

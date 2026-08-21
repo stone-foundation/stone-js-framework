@@ -1,0 +1,17 @@
+{
+  "include": ["app", ".stone"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": false,
+    "target": "esnext",
+    "module": "ESNext",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "types": ["node", "vitest/globals"]
+  }
+}

@@ -234,6 +234,21 @@ export function toSafeJsStringLiteral (value: string): string {
 }
 
 /**
+ * The locale a catalog file belongs to: the directory that holds it.
+ *
+ * `app/i18n/fr/common.json` is the `fr` catalog, which is the layout the scan already assumes when it
+ * reads `<locale>/<namespace>`.
+ *
+ * @param file - An absolute catalog path.
+ * @returns The locale, or nothing when the path has no locale directory.
+ */
+export function localeOf (file: string): string | undefined {
+  const segments = file.split(/[\\/]/).filter((segment) => segment.length > 0)
+  segments.pop()
+  return segments.pop()
+}
+
+/**
  * Generate the source of the module the plugin injects into the build.
  *
  * The generated module contributes the resources through real imports, so it builds on every target
@@ -251,6 +266,14 @@ export function toSafeJsStringLiteral (value: string): string {
  */
 export function generateI18nModule (moduleDir: string, files: string[], lazy: boolean): string {
   const specifiers = files.map((file) => toSafeJsStringLiteral(toImportSpecifier(moduleDir, file)))
+  // The locales the scan found, declared for the runtime.
+  //
+  // Discovering them at build time and keeping quiet about them was a whole feature that never ran:
+  // content negotiation is skipped entirely when `stone.i18n.locales` is empty, so every request got
+  // the fallback locale however the caller asked. Under lazy loading that is how an application answers
+  // raw keys: only the resolved locale's catalog is fetched, and the resolved locale was never the
+  // caller's. Stating them here is the same discovery, said out loud.
+  const locales = JSON.stringify([...new Set(files.map((file) => localeOf(file)).filter((locale) => locale !== undefined))])
   // A plain `stone`-wrapped blueprint, which the module scan applies directly (`isStoneBlueprint`).
   // It used to emit `defineConfig(defineI18n({...}))`, which silently did NOTHING: that helper
   // returned an unwrapped `{ i18n }` fragment while `defineConfig` expects a function or an object
@@ -266,6 +289,7 @@ export function generateI18nModule (moduleDir: string, files: string[], lazy: bo
 export const stoneI18nResources = {
   stone: {
     i18n: {
+      locales: ${locales},
       loaders: {
 ${entries.join(',\n')}
       }
@@ -284,6 +308,7 @@ ${imports.join('\n')}
 export const stoneI18nResources = {
   stone: {
     i18n: {
+      locales: ${locales},
       resources: loadTranslations({
 ${entries.join(',\n')}
       })

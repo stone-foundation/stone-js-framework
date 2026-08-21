@@ -7,7 +7,6 @@ import { ApiResource } from '../src/decorators/ApiResource'
 import { API_RESOURCE_KEY, RETURNS_KEY } from '../src/decorators/constants'
 import { Container } from '@stone-js/service-container'
 import { MetaContractChecker } from '../src/options/ResourcesBlueprint'
-import { ApiResourceMiddleware } from '../src/middleware/BlueprintMiddleware'
 import { ResourceRouteMiddleware } from '../src/middleware/ResourceRouteMiddleware'
 
 interface User { id: number, name: string, passwordHash: string }
@@ -142,31 +141,22 @@ describe('resource classes', () => {
       blueprint: { set, get: (_k: string, f: unknown) => f }
     }
 
-    await ApiResourceMiddleware(context, (async (c: any) => c.blueprint) as any)
-
+    expect(context.modules).toHaveLength(2)
     expect(hasMetadata(UserResource, API_RESOURCE_KEY)).toBe(true)
-    expect(set).toHaveBeenCalledWith('stone.resources.registry', { user: UserResource })
+    expect(getBlueprint(UserResource as any).stone.resources.registry).toEqual({ user: UserResource })
   })
 
   it('falls back to the class name when no alias is given', async () => {
     @ApiResource()
     class AddressResource extends Resource<any> { schema (): unknown { return z.any() } }
 
-    const set = vi.fn()
-    const context: any = { modules: [AddressResource], blueprint: { set, get: (_k: string, f: unknown) => f } }
-
-    await ApiResourceMiddleware(context, (async (c: any) => c.blueprint) as any)
-
-    expect(set).toHaveBeenCalledWith('stone.resources.registry', { AddressResource })
+    expect(getBlueprint(AddressResource as any).stone.resources.registry).toEqual({ AddressResource })
   })
 
-  it('registers nothing when no module declares a resource', async () => {
-    const set = vi.fn()
-    const context: any = { modules: [class Unrelated {}], blueprint: { set, get: (_k: string, f: unknown) => f } }
+  it('leaves an undecorated class alone, carrying nothing', () => {
+    class Unrelated {}
 
-    await ApiResourceMiddleware(context, (async (c: any) => c.blueprint) as any)
-
-    expect(set).not.toHaveBeenCalled()
+    expect(hasMetadata(Unrelated as any, API_RESOURCE_KEY)).toBe(false)
   })
 
   it('are resolved through the container, so a projection can use injected services', async () => {

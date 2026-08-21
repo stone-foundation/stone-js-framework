@@ -146,7 +146,12 @@ export class TestCommand {
       // Invisible inside this repository, and that is exactly why it shipped: a workspace link is
       // inlined by default, so the lab apps and the framework's own suites never saw it. A project
       // installing from the registry saw nothing else.
-      server: { deps: { inline: ['@stone-js/testing'] } },
+      //
+      // Matched as a substring, and never as a regular expression: this object is written out as JSON,
+      // where a `RegExp` becomes `{}` and the runner then finds no tests at all. Every framework
+      // package is covered rather than just this one, because any of them importing your source at
+      // run time meets the same wall.
+      server: { deps: { inline: ['@stone-js/'] } },
       include: config.include ?? ['./tests/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
       coverage: {
         provider: 'v8',

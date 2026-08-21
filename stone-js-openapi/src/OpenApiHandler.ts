@@ -73,7 +73,12 @@ export class OpenApiHandler {
     if (options.document !== undefined) { return options.document }
 
     const generator = OpenApiGenerator.create(
-      options.info ?? { title: 'API', version: '1.0.0' }
+      options.info ?? { title: 'API', version: '1.0.0' },
+      // A schema that could not be described leaves a gap in the document; the gap is logged rather
+      // than served, for the same reason as the derivation above.
+      ({ what, reason }) => {
+        console.warn(`[@stone-js/openapi] ${what} could not be described — ${reason}`)
+      }
     )
 
     for (const server of options.servers ?? [{ url: this.originOf(event) }]) {

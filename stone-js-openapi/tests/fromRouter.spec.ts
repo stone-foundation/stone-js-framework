@@ -353,3 +353,39 @@ describe('what an author writes over what was derived', () => {
     expect(Object.keys(operation.responses ?? {})).toEqual(['201'])
   })
 })
+
+describe('describing a response the derivation already found', () => {
+  const resource = { schema: () => ({ toJSONSchema: () => ({ type: 'object' }) }) }
+
+  it('keeps the schema when the author describes that same status', async () => {
+    // Found in a deployed contract: 27 of 29 responses had no payload at all, and the two that did
+    // were the only ones nobody had documented. Writing `200: { description }` was being read as
+    // "replace the success", so describing an endpoint carefully was what emptied it.
+    const operation = operationFromRoute(route('/me', 'GET', {
+      resource,
+      contract: { responses: { 200: { description: 'The account' } } }
+    }))
+
+    expect(operation.responses?.[200].description).toBe('The account')
+    expect(operation.responses?.[200].schema).toBeDefined()
+  })
+
+  it('still replaces the derived success when the author names a different one', async () => {
+    const operation = operationFromRoute(route('/me', 'DELETE', {
+      resource,
+      contract: { responses: { 204: { description: 'No content' } } }
+    }))
+
+    expect(Object.keys(operation.responses ?? {})).toEqual(['204'])
+  })
+
+  it('adds an error status without touching the derived success', async () => {
+    const operation = operationFromRoute(route('/me', 'GET', {
+      resource,
+      contract: { responses: { 401: { description: 'No token' } } }
+    }))
+
+    expect(Object.keys(operation.responses ?? {}).sort()).toEqual(['200', '401'])
+    expect(operation.responses?.[200].schema).toBeDefined()
+  })
+})
