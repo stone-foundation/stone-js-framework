@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.14
+
+### Patch Changes
+
+- Updated dependencies [ed1bdb8]
+- Updated dependencies [a67a77b]
+  - @stone-js/core@0.8.14
+  - @stone-js/http-core@0.8.14
+  - @stone-js/filesystem@0.8.14
+  - @stone-js/config@0.8.14
+  - @stone-js/env@0.8.14
+
 ## 0.8.13
 
 ### Patch Changes
