@@ -2,7 +2,7 @@
  * Design-system & provider integration for React apps.
  *
  * A **view provider** is any component that must wrap the whole application tree (SSR and CSR):
- * a design-system theme provider (MUI, Chakra, NoowowDesign System…), an i18n provider, a
+ * a design-system theme provider (MUI, Chakra, Mantine…), an i18n provider, a
  * store provider, etc. Tailwind / plain-CSS design systems need none of this — they are just a
  * stylesheet import handled by the CLI's Vite pipeline.
  *
@@ -19,7 +19,9 @@
  * ```ts
  * import { defineBlueprintConfig } from '@stone-js/core'
  * import { defineViewProvider } from '@stone-js/use-react'
- * import { ThemeProvider, theme } from '@noowow/design-system'
+ * import { createTheme, ThemeProvider } from '@mui/material/styles'
+ *
+ * const theme = createTheme()
  *
  * export const AppConfig = defineBlueprintConfig((blueprint) => {
  *   blueprint.add('stone.useReact.providers', [
@@ -42,7 +44,9 @@
  * ```tsx
  * import { Component, ReactNode } from 'react'
  * import { ViewProvider } from '@stone-js/use-react'
- * import { ThemeProvider, theme } from '@noowow/design-system'
+ * import { createTheme, ThemeProvider } from '@mui/material/styles'
+ *
+ * const theme = createTheme()
  *
  * @ViewProvider({ priority: 10 })
  * export class AppThemeProvider extends Component<{ children: ReactNode }> {
