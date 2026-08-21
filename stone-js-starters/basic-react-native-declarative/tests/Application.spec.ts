@@ -1,65 +1,63 @@
 import { stoneApp } from '@stone-js/core'
-import { describe, it, expect, beforeAll } from 'vitest'
 import { Application } from '../app/Application'
-import { OutgoingBrowserResponse } from '@stone-js/browser-core'
-import { nativeEventSource } from '../adapter/NativeEventSource'
-import { WelcomeData, WelcomeController } from '../app/WelcomeController'
-import { onNativeError, onNativeRender } from '../adapter/renderSink'
+import { HomeScreen } from '../app/HomeScreen'
+import { ScreenStack } from '@stone-js/use-react-native'
+import { NavigationSource } from '@stone-js/react-native-adapter'
 
 /**
- * Behavioral test of the full continuum chain: the exact modules the native
- * application boots (domain + router + native adapter) are booted here under
- * Node, navigation intents are emitted, and the rendered payloads asserted.
+ * The whole application, booted under Node and asked real questions.
  *
- * The adapter is pure JavaScript, so what passes here is what runs on device;
- * only the platform checks (URL polyfill, Hermes) need the real application.
+ * Nothing is mocked. The kernel, the router, the adapter and the renderer are the ones a phone
+ * runs; what a device adds is a screen to draw on, and this asserts what the framework resolved
+ * before drawing. Two things are supplied rather than discovered, both through documented
+ * configuration: the navigation source, so the test can send a deep link, and the screen stack, so
+ * it can read what landed on it.
  *
- * The application boots ONCE for the whole suite, like on a device: default
- * blueprints are shared module-level objects, so booting the same modules
- * twice in one process would accumulate route definitions.
+ * Screens are listed here because the generated manifest (`.stone/modules.ts`) is Metro's, written
+ * when Metro starts. Under a test runner the modules are imported directly, which is the same set.
  */
-describe('Stone.js native proof of concept', () => {
-  const rendered: OutgoingBrowserResponse[] = []
-  const errors: Error[] = []
+describe('Screens', () => {
+  const screens = ScreenStack.create()
+  const navigation = NavigationSource.create({ baseUrl: 'stone://app' })
 
+  // Booted once for the whole suite, as on a device: the default blueprints are shared module
+  // objects, so booting the same modules twice in one process would accumulate route definitions.
   beforeAll(async () => {
-    onNativeRender((response) => rendered.push(response))
-    onNativeError((error) => errors.push(error))
-    await stoneApp({ modules: [Application, WelcomeController] }).run()
+    await stoneApp({
+      modules: [
+        Application,
+        HomeScreen,
+        { stone: { reactNative: { navigationSource: navigation }, useReactNative: { screenStack: screens } } }
+      ]
+    }).run()
   })
 
-  it('boots and renders the landing route on startup', () => {
-    expect(errors).toHaveLength(0)
-    expect(rendered).toHaveLength(1)
+  const settle = async (): Promise<void> => { await new Promise((resolve) => setImmediate(resolve)) }
 
-    const payload = rendered[0].content as WelcomeData
-    expect(payload.route).toBe('/')
-    expect(payload.message).toContain('Welcome to Stone.js on React Native!')
-    expect(payload.framework.name).toBe('Stone.js')
+  it('puts the home screen on the stack at launch', () => {
+    expect(screens.size()).toBe(1)
+    expect(screens.top()?.path).toBe('/')
+    expect(screens.top()?.title).toBe('World · Welcome to Stone.js')
   })
 
-  it('routes a navigation intent with a parameter to the same domain', async () => {
-    nativeEventSource.navigate('stone://app/hello/Noowow')
-    await new Promise((resolve) => setImmediate(resolve))
+  it('routes a deep link to the screen that owns it, parameters included', async () => {
+    navigation.navigate('stone://app/?name=Ada')
+    await settle()
 
-    const payload = rendered.at(-1)?.content as WelcomeData
-    expect(payload.route).toBe('/hello/Noowow')
-    expect(payload.message).toContain('Hello Noowow!')
+    expect(screens.top()?.title).toBe('Ada · Welcome to Stone.js')
   })
 
-  it('decodes encoded route parameters', async () => {
-    nativeEventSource.navigate('stone://app/hello/Mr.%20Stone')
-    await new Promise((resolve) => setImmediate(resolve))
-
-    const payload = rendered.at(-1)?.content as WelcomeData
-    expect(payload.message).toContain('Hello Mr. Stone!')
+  it('re-resolving the current route replaces it instead of stacking a duplicate', () => {
+    // The deep link above resolved `/` again with fresh data. A user walking back must not find
+    // two identical screens, so the stack swaps the top rather than growing.
+    expect(screens.size()).toBe(1)
   })
 
-  it('surfaces unknown routes through the error chain instead of crashing', async () => {
-    nativeEventSource.navigate('stone://app/nowhere')
-    await new Promise((resolve) => setImmediate(resolve))
+  it('surfaces an unknown route instead of crashing', async () => {
+    navigation.navigate('stone://app/nowhere')
+    await settle()
 
-    const lastPayload = rendered.at(-1)?.content as WelcomeData | undefined
-    expect(lastPayload?.route).not.toBe('/nowhere')
+    // An error page is still a screen: the application stays up and shows something.
+    expect(screens.top()?.path).not.toBe('/')
   })
 })

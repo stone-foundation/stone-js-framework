@@ -37,9 +37,9 @@ describe('NavigationSource', () => {
   })
 
   it('should resolve against a configured base URL', () => {
-    const source = NavigationSource.create({ baseUrl: 'noowow://app' })
+    const source = NavigationSource.create({ baseUrl: 'myapp://app' })
 
-    expect(source.resolveUrl('/profile').href).toBe('noowow://app/profile')
+    expect(source.resolveUrl('/profile').href).toBe('myapp://app/profile')
   })
 
   it('should notify listeners of an in-app navigation', () => {

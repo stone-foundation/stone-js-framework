@@ -51,7 +51,7 @@ describe('preparePageParts', () => {
 
   it('merges the layout head under the page head', async () => {
     class LayoutWithHead {
-      head (): unknown { return { title: 'Noowow', description: 'from the layout' } }
+      head (): unknown { return { title: 'From the layout', description: 'from the layout' } }
       render (): string { return 'layout' }
     }
     class TasksPage {

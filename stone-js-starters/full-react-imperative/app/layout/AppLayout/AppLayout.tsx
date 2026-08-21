@@ -35,7 +35,7 @@ export const AppLayout = (): IPageLayout => ({
         </div>
 
         <footer className='app-footer'>
-          Stone.js &copy; 2025 Stone Foundation
+          &copy; {new Date().getFullYear()} Your Company · Built with Stone.js
         </footer>
       </div>
     )

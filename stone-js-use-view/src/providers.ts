@@ -3,7 +3,7 @@
  * wrap the application root without touching framework internals.
  *
  * A "view provider" is any component that should wrap the whole app tree: a design-system
- * theme provider (MUI, Chakra, NoowowDesign…), an i18n provider, a store provider, etc.
+ * theme provider (MUI, Chakra, Mantine…), an i18n provider, a store provider, etc.
  * Tailwind and plain-CSS design systems need no provider at all — they are just a stylesheet
  * import — so this registry is only for providers that must be present in the React/Vue tree.
  *

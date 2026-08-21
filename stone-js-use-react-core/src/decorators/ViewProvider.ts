@@ -26,8 +26,10 @@ import { setMetadata, classDecoratorLegacyWrapper, ClassType } from '@stone-js/c
  * @example
  * ```tsx
  * import { Component, ReactNode } from 'react'
- * import { ThemeProvider } from '@noowow/design-system'
  * import { ViewProvider } from '@stone-js/use-react'
+ * import { createTheme, ThemeProvider } from '@mui/material/styles'
+ *
+ * const theme = createTheme({ palette: { mode: 'dark' } })
  *
  * @ViewProvider({ priority: 10 })
  * export class AppThemeProvider extends Component<{ children: ReactNode }> {

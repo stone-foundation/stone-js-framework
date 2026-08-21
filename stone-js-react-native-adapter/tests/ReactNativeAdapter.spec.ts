@@ -128,13 +128,13 @@ describe('ReactNativeAdapter', () => {
   it('should resolve an in-app path against a configured base URL', async () => {
     const seen: IncomingBrowserEvent[] = []
     const { adapter } = await bootAdapter({
-      baseUrl: 'noowow://app',
+      baseUrl: 'myapp://app',
       handler: (event) => { seen.push(event); return { content: 'ok' } }
     })
 
     await adapter.run()
 
-    expect(seen[0].url.protocol).toBe('noowow:')
+    expect(seen[0].url.protocol).toBe('myapp:')
 
     await adapter.stop()
   })
