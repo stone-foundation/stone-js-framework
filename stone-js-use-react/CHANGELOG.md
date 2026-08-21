@@ -1,5 +1,100 @@
 # Changelog
 
+## 0.8.10
+
+### Patch Changes
+
+- 18644c8: feat(router): navigation becomes an effect the platform provides, not an assumption
+
+  `Router.navigate()` was the one place the universal router stopped being universal: it reached
+  straight for `window.history` and `window.dispatchEvent`, and threw outside a browser. Everything
+  around it, matching and generating a path from a route name, is platform-independent already.
+
+  Only that last step is now delegated, to a `RouterNavigator` under `stone.router.navigator`:
+
+  ```ts
+  export type RouterNavigator = (context: NavigationContext) => void;
+  // NavigationContext: { path, replace, options }
+  ```
+
+  The router still does the platform-independent work before calling it, so a navigator receives a
+  resolved path and performs one effect. `browserNavigator` is the fallback when none is configured,
+  and it is the exact behaviour that was inlined before (push or replace a History entry, then
+  announce it so the adapter re-enters the kernel), which means **nothing changes for a web
+  application**: a `navigate()` outside a browser still throws the same `RouterError`.
+
+  The fallback lives in `Router.navigate()` and deliberately **not** in the router's blueprint. Pinning
+  it there would make "not configured" indistinguishable from "configured to be the browser", and an
+  adapter for another platform could never tell whether it was free to install its own: it could not,
+  and `navigate()` on a phone threw "browser environment" instead of navigating.
+
+  One ordering nuance for the curious: with a route name and no browser, the missing-route error now
+  surfaces before the missing-browser one, because resolving the path no longer waits behind a
+  platform check.
+
+  **`ViewEngine` no longer requires a DOM element to mount into.** `mount` and `hydrate` were typed
+  `(node, container: Element)`, a DOM type in the middle of the engine-agnostic contract. The host is
+  now a third type parameter defaulting to `Element`, so every existing engine and call site is
+  unchanged, and an engine on a platform with no element tree (React Native registers a root
+  component) can name its own host.
+
+  **`ReactViewEngine` no longer instantiates a `TextEncoder` at import time.** It moved inside the
+  streaming helper that uses it. Importing a module should not require a global that only server
+  streaming needs, and some client engines do not have it.
+
+  Together these are what a platform outside the browser needs from the shared layers, and they are
+  the reason the React Native work needs no fork of the router or of the view contract.
+
+- 318cbf5: refactor(use-react): the platform-independent half becomes `@stone-js/use-react-core`
+
+  Both React renderers, the web one and the native one, do the same work before they differ.
+  Resolving which component answers a route, loading a lazy page, running its loader, wrapping
+  it in its layout, merging the head, running the view hooks: none of that is web or native.
+  It now lives in `@stone-js/use-react-core`, and `@stone-js/use-react` depends on it and
+  re-exports it.
+
+  **Nothing changes for you.** Every symbol you imported from `@stone-js/use-react` still
+  comes from `@stone-js/use-react`: its public surface was measured before and after the split
+  and is identical, 176 exports either way. No import in an application, a starter or the CLI
+  moves.
+
+  **Why a package and not a folder.** A React Native bundler resolves every import it sees,
+  including dynamic ones, so a module that reaches for `react-dom` cannot be loaded on a phone
+  at all, whatever its code paths do at runtime. `@stone-js/use-react`'s published entry also
+  pulls the SSR bundle, and with it `node:http`. The split is what makes one domain reachable
+  from both platforms; the emitted `dist/index.js` of the new package is checked to import
+  nothing but `@stone-js/core`, `@stone-js/router`, `@stone-js/use-view` and `react`.
+
+  What stayed in `@stone-js/use-react`: mounting a root and hydrating server markup, the HTML
+  shell, the snapshot script tag, the `ReactViewEngine`, `StoneLink`, `StoneOutlet`,
+  `StoneError`, the DOM helpers, the server and browser sub-trees, and the two hooks that need
+  the web runtime (`useRuntime`, `useHead`). What moved: the page, layout and error-page
+  contracts and their decorators, the React context, the eleven platform-independent hooks,
+  view providers, the blueprint middleware that reads decorator metadata, and the render
+  orchestration.
+
+  One behaviour change, and it is the seam that made the split possible:
+  `buildAdapterErrorComponent` no longer imports the `StoneError` component. It takes an
+  optional `fallback` component instead, and `@stone-js/use-react` passes `StoneError` as it
+  always did. Called without a fallback it now returns `undefined` rather than rendering an
+  `<h1>`, because a package that may be rendering native views cannot reach for HTML.
+
+  `ReactViewEngine` gained the tests it was missing (mount update, hydration, stream
+  cancellation, a failing shell), which took `@stone-js/use-react` from 96.55% to 100% function
+  coverage on the way through.
+
+- Updated dependencies [18644c8]
+- Updated dependencies [9f074f8]
+- Updated dependencies [318cbf5]
+  - @stone-js/router@0.8.10
+  - @stone-js/use-view@0.8.10
+  - @stone-js/core@0.8.10
+  - @stone-js/use-react-core@0.8.10
+  - @stone-js/browser-adapter@0.8.10
+  - @stone-js/browser-core@0.8.10
+  - @stone-js/http-core@0.8.10
+  - @stone-js/config@0.8.10
+
 ## 0.8.9
 
 ### Patch Changes
