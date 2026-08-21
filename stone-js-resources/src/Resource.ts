@@ -51,7 +51,12 @@ export interface ResourceDependencies {
   contractChecker?: IContractChecker
 }
 
-export abstract class Resource<Model = unknown, Output extends ResourceOutput = ResourceOutput> implements IResource<Model, Output> {
+export abstract class Resource<
+  Model = unknown,
+  Output extends ResourceOutput = ResourceOutput,
+  EventType = unknown,
+  PrincipalType = unknown
+> implements IResource<Model, Output, EventType, PrincipalType> {
   protected checker: IContractChecker
   protected onViolation: ContractViolationPolicy
 
@@ -79,7 +84,7 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    * @param context - The resource context.
    * @returns The schema.
    */
-  abstract schema (context: ResourceContext): ResourceSchema | Promise<ResourceSchema>
+  abstract schema (context: ResourceContext<EventType, PrincipalType>): ResourceSchema | Promise<ResourceSchema>
 
   /**
    * Project one model.
@@ -93,7 +98,7 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    * @returns The projected output.
    * @throws {ResourceContractError} When the data breaks the contract and the policy is `throw`.
    */
-  async item (model: Model, context: ResourceContext = {}): Promise<Output> {
+  async item (model: Model, context: ResourceContext<EventType, PrincipalType> = {}): Promise<Output> {
     const data = this.data !== undefined ? await this.data(model, context) : model
     const schema = await this.schemaFor(context)
     const projected = await this.project(data, schema, context)
@@ -112,7 +117,7 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    * @param context - The resource context.
    * @returns The projected collection.
    */
-  async collection (models: Model[], context: ResourceContext = {}): Promise<Output[]> {
+  async collection (models: Model[], context: ResourceContext<EventType, PrincipalType> = {}): Promise<Output[]> {
     const out: Output[] = []
 
     for (const model of models) {
@@ -132,7 +137,7 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    */
   async response (
     models: Model | Model[],
-    context: ResourceContext = {},
+    context: ResourceContext<EventType, PrincipalType> = {},
     meta?: Record<string, unknown>
   ): Promise<ResourceEnvelope<Output | Output[]>> {
     const data = Array.isArray(models)
@@ -141,20 +146,6 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
 
     return meta === undefined ? { data } : { data, meta }
   }
-
-  /**
-   * Optional: shape or complete the model before it meets the schema.
-   *
-   * `declare`, not a field: an uninitialised class field is *defined* as `undefined` on the instance,
-   * which would shadow the very method a subclass wrote — the override would exist on the prototype
-   * and never be reached. This states the type and emits nothing.
-   */
-  declare data?: (model: Model, context: ResourceContext) => Promiseable<unknown>
-
-  /**
-   * Named subsets a caller may ask for. Override to expose fragments.
-   */
-  declare fragments?: (context: ResourceContext) => Record<string, ResourceSchema> | Promise<Record<string, ResourceSchema>>
 
   /**
    * The schema to hold this projection against: the requested fragment when the resource exposes one,
@@ -167,7 +158,7 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    * @param context - The resource context.
    * @returns The schema.
    */
-  protected async schemaFor (context: ResourceContext): Promise<ResourceSchema> {
+  protected async schemaFor (context: ResourceContext<EventType, PrincipalType>): Promise<ResourceSchema> {
     const name = context.fragment
 
     if (name !== undefined && this.fragments !== undefined) {
@@ -243,4 +234,36 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
   protected whenIncluded<T> (context: ResourceContext, name: string, value: T | (() => T)): T | undefined {
     return this.when(context.include?.includes(name) === true, value)
   }
+}
+
+/**
+ * The two optional hooks, declared as methods rather than as properties.
+ *
+ * A property-typed function is contravariant on its parameters, and TypeScript refuses a method where
+ * the base declared a property. Between them, those two rules meant a subclass could neither narrow the
+ * context nor write `async data (model, context) {}`, which is the form every example uses. Declared
+ * here, on an interface merged with the class, both forms are accepted and the type parameters actually
+ * reach the signature a subclass writes.
+ */
+// A merged interface must repeat the class's type parameter list exactly, so `Output` is named here
+// without being used in a signature.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface Resource<Model, Output extends ResourceOutput, EventType, PrincipalType> {
+  /**
+   * Optional: shape or complete the model before it meets the schema.
+   *
+   * A method signature, deliberately, against the repository's own lint rule: a property-typed
+   * function is contravariant on its parameters, so a subclass narrowing the context was rejected, and
+   * TypeScript separately refuses a method where the base declared a property, so
+   * `async data (model, context) {}` was rejected too. The rule's soundness argument is theoretical for
+   * an extension point; the cost was measured, in an application that could not type its resources.
+   */
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  data?(model: Model, context: ResourceContext<EventType, PrincipalType>): Promiseable<unknown>
+
+  /**
+   * Named subsets a caller may ask for. Override to expose fragments.
+   */
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
+  fragments?(context: ResourceContext<EventType, PrincipalType>): Record<string, ResourceSchema> | Promise<Record<string, ResourceSchema>>
 }
