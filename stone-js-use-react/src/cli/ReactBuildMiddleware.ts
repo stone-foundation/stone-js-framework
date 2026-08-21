@@ -568,7 +568,9 @@ export const GenerateStaticSiteMiddleware = async (
   const extraTargets = configured.map((path) => ({ path }))
   if (derived.length === 0 && extraTargets.length === 0) extraTargets.push({ path: '/' })
 
-  const child = spawn('node', [distPath(output)], { stdio: ['ignore', 'pipe', 'pipe'] })
+  // `process.execPath`, not `'node'`: the SSR server has to run on the same Node that is building,
+  // and a bare command name is resolved through `PATH`, which decides neither of those things.
+  const child = spawn(process.execPath, [distPath(output)], { stdio: ['ignore', 'pipe', 'pipe'] })
 
   try {
     const baseUrl = await waitForServer(child, adapterUrl)

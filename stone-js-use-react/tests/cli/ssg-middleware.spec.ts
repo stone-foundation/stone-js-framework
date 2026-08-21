@@ -79,6 +79,17 @@ describe('GenerateStaticSiteMiddleware (SSG)', () => {
     expect(next).toHaveBeenCalled()
   })
 
+  it('runs the SSR server on the same Node that is building, not on whatever PATH resolves', async () => {
+    spawnMock.mockReturnValue(makeChild('url'))
+    runSsgMock.mockResolvedValue(['/dist/index.html'])
+    vi.stubGlobal('fetch', vi.fn(async () => ({ text: async () => '<html>ok</html>', status: 200 })))
+
+    const context = makeContext()
+    await GenerateStaticSiteMiddleware(context, vi.fn().mockResolvedValue(context.blueprint))
+
+    expect(spawnMock).toHaveBeenCalledWith(process.execPath, ['/dist/server.mjs'], expect.anything())
+  })
+
   it('derives the pre-render set from the scanned page routes (zero-config)', async () => {
     spawnMock.mockReturnValue(makeChild('url'))
     let received: any
