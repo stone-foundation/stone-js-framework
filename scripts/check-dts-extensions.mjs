@@ -16,6 +16,11 @@ import { join } from 'node:path'
 
 const SPECIFIER = /(?:from|import|export)\s*\(?\s*'(\.[^']*)'/g
 const ALLOWED_EXTENSIONS = /\.(js|mjs|cjs|jsx|json|css)$/
+// Doc comments survive into the emitted declarations, and prose legitimately quotes import
+// statements (`import { modules } from './.stone/modules'`). Those are not specifiers a consumer
+// resolves, so they are removed before matching: only block comments, which is the form JSDoc takes
+// and the only one `tsc` keeps, so nothing that is code can be swallowed here.
+const BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g
 
 const walk = (dir) => readdirSync(dir).flatMap((name) => {
   const path = join(dir, name)
@@ -31,7 +36,7 @@ for (const pkg of readdirSync('.').filter((n) => n.startsWith('stone-js-'))) {
 
   for (const file of walk(dist).filter((p) => p.endsWith('.d.ts'))) {
     scanned++
-    const source = readFileSync(file, 'utf-8')
+    const source = readFileSync(file, 'utf-8').replace(BLOCK_COMMENT, '')
     const bad = [...source.matchAll(SPECIFIER)]
       .map((m) => m[1])
       .filter((specifier) => !ALLOWED_EXTENSIONS.test(specifier))
