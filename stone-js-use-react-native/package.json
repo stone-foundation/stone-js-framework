@@ -71,7 +71,8 @@
     "@stone-js/core": "workspace:*",
     "@stone-js/react-native-adapter": "workspace:*",
     "@stone-js/router": "workspace:*",
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "@stone-js/cli": "workspace:*"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -109,5 +110,10 @@
   },
   "stone": {
     "cliPlugin": "./dist/cli.js"
+  },
+  "peerDependenciesMeta": {
+    "@stone-js/cli": {
+      "optional": true
+    }
   }
 }

@@ -258,3 +258,98 @@ describe('an undocumented payload is reported, not hidden', () => {
     expect(skipped).toEqual([])
   })
 })
+
+describe('the path a route is documented under', () => {
+  // A real `Route`, because that is where the defect lived: its `path` is the pathname of the event
+  // it is answering, so with nothing bound it is `/`. The stubs above pass a path in, which is why a
+  // suite could stay green while every documented endpoint collapsed onto the root.
+  const realRoute = async (options: Record<string, unknown>): Promise<any> => {
+    const { Route } = await import('@stone-js/router')
+    return Route.create({ method: 'GET', handler: () => 'ok', ...options } as any)
+  }
+
+  it('documents the template a route declares, not the URL it happens to be answering', async () => {
+    const route = await realRoute({ path: '/tasks/:id', contract: { summary: 'One task' } })
+    expect(route.path).toBe('/') // what the old derivation read
+
+    const [documented] = routesFromRouter(router(route))
+
+    expect(documented.path).toBe('/tasks/{id}')
+  })
+
+  it('translates the router syntax into the one a contract speaks', async () => {
+    const route = await realRoute({ path: '/users/:userId/posts/:postId', contract: {} })
+
+    expect(routesFromRouter(router(route))[0].path).toBe('/users/{userId}/posts/{postId}')
+  })
+
+  it('declares every parameter the template requires, or the document is invalid', async () => {
+    // A template naming `{id}` with no parameter object is rejected by every reader of the spec.
+    const route = await realRoute({ path: '/tasks/:id', contract: {} })
+
+    const [documented] = routesFromRouter(router(route))
+
+    expect(documented.openapi?.parameters).toEqual([
+      { name: 'id', in: 'path', required: true, schema: { type: 'string' } }
+    ])
+  })
+
+  it('keeps the parameter name when a rule constrains it', async () => {
+    const route = await realRoute({ path: '/tasks/:id(\\d+)', contract: {} })
+
+    expect(routesFromRouter(router(route))[0].path).toBe('/tasks/{id}')
+  })
+
+  it('publishes both paths for an optional segment, since neither one alone is true', async () => {
+    // OpenAPI has no optional path parameter. Two honest paths beat one that claims to require a
+    // segment a caller may leave out, which is the localized-prefix case exactly.
+    const route = await realRoute({ path: '/:lang?/about', contract: {} })
+
+    const paths = routesFromRouter(router(route)).map((documented) => documented.path)
+
+    expect(paths).toEqual(['/{lang}/about', '/about'])
+  })
+})
+
+describe('what an author writes over what was derived', () => {
+  const resource = { schema: () => ({ toJSONSchema: () => ({ type: 'object' }) }) }
+
+  it('adds a status without deleting the one that was derived', async () => {
+    // The defect this replaces: the explicit block was spread over the whole operation, so
+    // documenting a 404 deleted the derived success response. Nobody writing a 404 means "and forget
+    // what you knew".
+    const operation = operationFromRoute(route('/tasks', 'GET', {
+      resource,
+      contract: { responses: { 404: { description: 'No such task' } } }
+    }))
+
+    expect(Object.keys(operation.responses ?? {})).toEqual(['200', '404'])
+  })
+
+  it('lets an author override the derived status itself', async () => {
+    const operation = operationFromRoute(route('/tasks', 'GET', {
+      resource,
+      contract: { responses: { 200: { description: 'Mine' } } }
+    }))
+
+    expect(operation.responses?.[200].description).toBe('Mine')
+  })
+
+  it('keeps the derived parameters when an author adds one', async () => {
+    const operation = operationFromRoute(
+      route('/tasks', 'GET', { resource, contract: { parameters: [{ name: 'page', in: 'query' }] } }),
+      {},
+      [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }]
+    )
+
+    expect(operation.parameters?.map((parameter: any) => parameter.name)).toEqual(['id', 'page'])
+  })
+
+  it('publishes the status the handler actually answers with', async () => {
+    // A handler carrying `@JsonHttpResponse(201)` said so once. A contract publishing 200 for it
+    // contradicts the code it was derived from, so a generated client waits for the wrong status.
+    const operation = operationFromRoute(route('/tasks', 'POST', { resource, statusCode: 201 }))
+
+    expect(Object.keys(operation.responses ?? {})).toEqual(['201'])
+  })
+})

@@ -1,5 +1,6 @@
+import { HTTP_NO_CONTENT } from '../constants'
 import { HeadersType } from '../declarations'
-import { decoratorResponseCallback } from '../utils'
+import { decoratorResponseCallback, declareResponseStatus } from '../utils'
 import { noContentHttpResponse } from '../HttpResponse'
 import { methodDecoratorLegacyWrapper } from '@stone-js/core'
 
@@ -22,7 +23,8 @@ import { methodDecoratorLegacyWrapper } from '@stone-js/core'
  * ```
  */
 export const NoContentHttpResponse = <T extends Function = Function>(headers: HeadersType = {}): MethodDecorator => {
-  return methodDecoratorLegacyWrapper<T>(<TFunction>(target: T, _context: ClassMethodDecoratorContext<T>): TFunction => {
+  return methodDecoratorLegacyWrapper<T>(<TFunction>(target: T, context: ClassMethodDecoratorContext<T>): TFunction => {
+    declareResponseStatus(context as ClassMethodDecoratorContext, HTTP_NO_CONTENT)
     return decoratorResponseCallback(target, async () => noContentHttpResponse(headers))
   })
 }

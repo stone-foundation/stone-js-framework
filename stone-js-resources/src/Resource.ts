@@ -38,6 +38,31 @@ import {
  * }
  * ```
  */
+/**
+ * Read an optional dependency without insisting that it exist.
+ *
+ * A container-resolved class is handed the container itself, which answers any property by resolving
+ * a service of that name and throws when nothing is bound. Reading an optional dependency straight
+ * off it therefore crashed the resource rather than falling back, so every `@ApiResource` the
+ * container built failed on a service nobody was ever asked to register. Asking whether it is bound
+ * first is the whole difference between an optional dependency and a required one.
+ *
+ * A plain object, as the imperative form passes, is read as a plain object.
+ *
+ * @param dependencies - The container, or an explicit object.
+ * @param key - The service to read.
+ * @returns The dependency, when there is one.
+ */
+function optional<T> (dependencies: object, key: string): T | undefined {
+  const container = dependencies as { has?: (key: string) => boolean, make?: <V>(key: string) => V }
+
+  if (typeof container.has === 'function' && typeof container.make === 'function') {
+    return container.has(key) ? container.make<T>(key) : undefined
+  }
+
+  return (dependencies as Record<string, unknown>)[key] as T | undefined
+}
+
 export abstract class Resource<Model = unknown, Output extends ResourceOutput = ResourceOutput> implements IResource<Model, Output> {
   private readonly checker: IContractChecker
   private readonly onViolation: ContractViolationPolicy
@@ -48,8 +73,8 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    *                       enabled. Pass `checker` to substitute a dialect of your own.
    */
   constructor (dependencies: { checker?: IContractChecker, onViolation?: ContractViolationPolicy } = {}) {
-    this.checker = dependencies.checker ?? ContractChecker.create()
-    this.onViolation = dependencies.onViolation ?? 'throw'
+    this.checker = optional<IContractChecker>(dependencies, 'checker') ?? ContractChecker.create()
+    this.onViolation = optional<ContractViolationPolicy>(dependencies, 'onViolation') ?? 'throw'
   }
 
   /**

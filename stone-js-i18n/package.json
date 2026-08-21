@@ -60,7 +60,8 @@
   },
   "peerDependencies": {
     "@stone-js/config": "workspace:*",
-    "@stone-js/core": "workspace:*"
+    "@stone-js/core": "workspace:*",
+    "@stone-js/cli": "workspace:*"
   },
   "dependencies": {
     "glob": "^11.0.0",
@@ -102,5 +103,10 @@
   },
   "stone": {
     "cliPlugin": "./dist/cli.js"
+  },
+  "peerDependenciesMeta": {
+    "@stone-js/cli": {
+      "optional": true
+    }
   }
 }

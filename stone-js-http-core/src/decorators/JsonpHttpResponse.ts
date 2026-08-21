@@ -1,7 +1,7 @@
 import { HTTP_OK } from '../constants'
 import { HeadersType } from '../declarations'
 import { jsonpHttpResponse } from '../HttpResponse'
-import { decoratorResponseCallback } from '../utils'
+import { decoratorResponseCallback, declareResponseStatus } from '../utils'
 import { methodDecoratorLegacyWrapper } from '@stone-js/core'
 
 /**
@@ -24,7 +24,8 @@ import { methodDecoratorLegacyWrapper } from '@stone-js/core'
  * ```
  */
 export const JsonpHttpResponse = <T extends Function = Function>(statusCode: number = HTTP_OK, headers: HeadersType = {}): MethodDecorator => {
-  return methodDecoratorLegacyWrapper<T>(<TFunction>(target: T, _context: ClassMethodDecoratorContext<T>): TFunction => {
+  return methodDecoratorLegacyWrapper<T>(<TFunction>(target: T, context: ClassMethodDecoratorContext<T>): TFunction => {
+    declareResponseStatus(context as ClassMethodDecoratorContext, statusCode)
     return decoratorResponseCallback(target, async (content: any) => jsonpHttpResponse(content, statusCode, headers))
   })
 }

@@ -1,3 +1,5 @@
+import { RESPONSE_KEY } from './constants'
+import { addMetadata } from '@stone-js/core'
 import send from 'send'
 import bytes from 'bytes'
 import Busboy from 'busboy'
@@ -25,6 +27,26 @@ import { File, UploadedFile, FilesystemError } from '@stone-js/filesystem'
  * @param responseCallback - The response callback.
  * @returns The function with the response callback.
  */
+/**
+ * Record, on the class, the status the decorated method answers with.
+ *
+ * The decorator already knows it: the author wrote `@JsonHttpResponse(201)` once. Without this the
+ * knowledge lived only inside the wrapped function, so anything reading the class, a generated
+ * contract above all, had to assume `200` and contradicted the code it was derived from.
+ *
+ * Declaring it changes nothing at run time. It is what makes "the code is the single description"
+ * true for the status as well as for the payload.
+ *
+ * @param context - The method decorator context.
+ * @param statusCode - The status the method answers with.
+ */
+export function declareResponseStatus (
+  context: ClassMethodDecoratorContext,
+  statusCode: number
+): void {
+  addMetadata(context, RESPONSE_KEY, { action: context.name, statusCode })
+}
+
 export function decoratorResponseCallback<TTarget, TFunction, UReturn extends OutgoingHttpResponse> (
   target: TTarget,
   responseCallback: (content: any) => Promise<UReturn>

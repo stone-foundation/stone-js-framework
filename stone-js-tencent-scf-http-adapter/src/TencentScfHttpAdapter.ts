@@ -34,7 +34,7 @@ import { IncomingHttpEvent, IncomingHttpEventOptions, OutgoingHttpResponse } fro
  *
  * @example
  * ```typescript
- * import { TencentScfHttpAdapter } from '@stone-js/aws-lambda-http-adapter';
+ * import { TencentScfHttpAdapter } from '@stone-js/tencent-scf-http-adapter';
  *
  * const adapter = TencentScfHttpAdapter.create({...});
  *

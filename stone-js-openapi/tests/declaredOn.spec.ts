@@ -76,7 +76,10 @@ describe('a declaration is read wherever it was written', () => {
       validation: '@stone-js/validation/validate',
       resource: '@stone-js/resources/returns',
       auth: '@stone-js/auth/protect',
-      authz: '@stone-js/authz/can'
+      authz: '@stone-js/authz/can',
+      // The status a handler answers with is a declaration too: written once in the response
+      // decorator, read here so the document cannot contradict it.
+      status: '@stone-js/http-core/response'
     })
   })
 })

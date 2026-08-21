@@ -1,17 +1,26 @@
+import { URL } from 'node:url'
+import { HttpMethods, IncomingHttpEvent } from '@stone-js/http-core'
 import { AuthenticateMiddleware } from '../src/middleware/AuthenticateMiddleware'
 import { requireAuth, requireScopes, normalizeScopes } from '../src/middleware/guards'
 import { AuthenticationError, InsufficientScopeError } from '../src/errors/AuthErrors'
 
+/**
+ * A real event, not a stand-in.
+ *
+ * The stub this replaces answered `get('Authorization')` from a plain map, so it agreed with the
+ * middleware about where a token lives and the suite stayed green while authentication never worked
+ * against an actual request. A real event knows the difference between a header and a query
+ * parameter, which is the whole point.
+ */
 const eventStub = (over: any = {}): any => {
-  const meta: Record<string, unknown> = { ...over.meta }
-  let user: unknown
-  return {
-    get: (key: string, fallback?: unknown) => over[key] ?? fallback,
-    setMetadataValue: (k: string, v: unknown) => { meta[k] = v },
-    getMetadataValue: <T>(k: string, fb?: T) => (k in meta ? meta[k] : fb) as T,
-    setUserResolver: (fn: () => unknown) => { user = fn() },
-    getUser: () => user
-  }
+  const { meta, ...headers } = over
+  const event: any = IncomingHttpEvent.create({
+    url: new URL('http://localhost/tasks'),
+    method: HttpMethods.GET,
+    headers,
+    metadata: { ...meta }
+  } as any)
+  return event
 }
 
 const blueprintStub = (auth: Record<string, unknown> = {}): any => ({
@@ -99,5 +108,45 @@ describe('guards', () => {
 
   it('requireScopes throws when anonymous', async () => {
     await expect(requireScopes('read')(eventStub(), (async () => 'ok') as any)).rejects.toThrow(AuthenticationError)
+  })
+})
+
+describe('where a bearer token is read from', () => {
+  const authenticator: any = { verify: vi.fn(async () => ({ sub: 'u1' })) }
+  const middleware = (): AuthenticateMiddleware => new AuthenticateMiddleware({ authenticator, blueprint: blueprintStub() })
+
+  beforeEach(() => { authenticator.verify.mockClear() })
+
+  it('reads the Authorization header, whatever case the client sent', async () => {
+    // HTTP header names are case-insensitive and Node lowercases them, so a middleware that looks
+    // for exactly `Authorization` in a map finds nothing on a real request.
+    for (const name of ['Authorization', 'authorization', 'AUTHORIZATION']) {
+      authenticator.verify.mockClear()
+      await middleware().handle(eventStub({ [name]: 'Bearer real.token' }), (async () => 'ok') as any)
+      expect(authenticator.verify).toHaveBeenCalledWith('real.token')
+    }
+  })
+
+  it('refuses a token smuggled through the query string', async () => {
+    // The event's own `get()` reads the query string and the body, which is why it must never be the
+    // way a credential is read: `?Authorization=` would have been accepted as a header.
+    const event = IncomingHttpEvent.create({
+      url: new URL('http://localhost/tasks?Authorization=Bearer%20smuggled'),
+      method: HttpMethods.GET,
+      headers: {},
+      queryString: 'Authorization=Bearer%20smuggled'
+    } as any)
+
+    await middleware().handle(event as any, (async () => 'ok') as any)
+
+    expect(authenticator.verify).not.toHaveBeenCalled()
+    expect(event.getUser()).toBeUndefined()
+  })
+
+  it('continues anonymously when no header is present', async () => {
+    const event = eventStub()
+
+    await expect(middleware().handle(event, (async () => 'ok') as any)).resolves.toBe('ok')
+    expect(event.getUser()).toBeUndefined()
   })
 })

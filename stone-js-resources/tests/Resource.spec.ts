@@ -232,3 +232,42 @@ describe('conditional fields inside a projection', () => {
       .resolves.toEqual({ id: 1 })
   })
 })
+
+describe('a resource the container builds', () => {
+  // The real container, because the defect only exists there: it hands a class itself, answers any
+  // property by resolving a service of that name, and throws when nothing is bound. An optional
+  // dependency read straight off it crashed every `@ApiResource` the container resolved, on a
+  // service nobody was ever told to register.
+  const containerOf = async (bindings: Record<string, unknown> = {}): Promise<any> => {
+    const { Container } = await import('@stone-js/service-container')
+    const container = Container.create()
+    Object.entries(bindings).forEach(([key, value]) => container.instance(key, value))
+    return container
+  }
+
+  it('resolves, instead of failing on a service nobody registered', async () => {
+    const container = await containerOf()
+
+    const resource = container.resolve(UserResource, true)
+
+    await expect(resource.item(ada, { checker: undefined })).resolves.toEqual({ id: 1, name: 'Ada' })
+  })
+
+  it('still takes a checker from the container when one is bound', async () => {
+    // Substituting the dialect stays possible: the point was never to stop reading the container.
+    const calls: unknown[] = []
+    const checker = { check: (schema: any, data: unknown) => { calls.push(data); return { success: true, value: { id: 1 } } } }
+    const container = await containerOf({ checker })
+
+    const resource = container.resolve(UserResource, true)
+    await expect(resource.item(ada)).resolves.toEqual({ id: 1 })
+
+    expect(calls).toHaveLength(1)
+  })
+
+  it('reads an explicit object as an object, for the imperative form', async () => {
+    const resource = defineResource<User>({ schema: z.object({ id: z.number() }) }, { onViolation: 'warn' })
+
+    await expect(resource.item(ada)).resolves.toEqual({ id: 1 })
+  })
+})

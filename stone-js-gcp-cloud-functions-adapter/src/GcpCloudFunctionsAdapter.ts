@@ -40,7 +40,7 @@ import { GcpCloudFunctionsAdapterError } from './errors/GcpCloudFunctionsAdapter
  *
  * @example
  * ```typescript
- * import { GcpCloudFunctionsAdapter } from '@stone-js/aws-lambda-adapter';
+ * import { GcpCloudFunctionsAdapter } from '@stone-js/gcp-cloud-functions-adapter';
  *
  * const adapter = GcpCloudFunctionsAdapter.create({...});
  *
