@@ -589,3 +589,36 @@ describe('Kernel', () => {
     expect(hook).toHaveBeenCalled()
   })
 })
+
+describe('answering with the agnostic response', () => {
+  it('translates it through the platform resolver instead of handing it to the adapter raw', async () => {
+    // A module that stays platform-neutral builds `OutgoingResponse`, and every platform answers with
+    // its own subclass. Passing the base class straight through failed where the adapter writes, with
+    // an error about a chunk that named nothing. Its options take the same road a bare value takes.
+    const resolved: unknown[] = []
+    const kernel: any = Object.create(Kernel.prototype)
+    kernel.blueprint = {
+      get: (key: string) => (key === 'stone.kernel.responseResolver'
+        ? (options: unknown) => { resolved.push(options); return { platform: true, ...(options as object) } }
+        : undefined)
+    }
+
+    const answer = await kernel.validateAndResolveResponse(
+      OutgoingResponse.create({ content: { status: 'unhealthy' }, statusCode: 503 })
+    )
+
+    expect(resolved[0]).toMatchObject({ content: { status: 'unhealthy' }, statusCode: 503 })
+    expect(answer).toMatchObject({ platform: true, statusCode: 503 })
+  })
+
+  it('leaves a platform response exactly as it is', async () => {
+    // A subclass is already what the adapter wants; translating it again would undo what it built.
+    class PlatformResponse extends OutgoingResponse {}
+    const kernel: any = Object.create(Kernel.prototype)
+    kernel.blueprint = { get: () => (() => ({ translated: true })) }
+
+    const platform = PlatformResponse.create({ statusCode: 204 })
+
+    await expect(kernel.validateAndResolveResponse(platform)).resolves.toBe(platform)
+  })
+})

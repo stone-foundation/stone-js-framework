@@ -170,3 +170,42 @@ describe('OpenApiHandler: schema classes at request time', () => {
   })
 })
 
+
+describe('where the explorer looks for the document', () => {
+  const handlerWith = (config: Record<string, unknown>, router?: unknown): any => {
+    const blueprint: any = { get: (key: string, fallback?: unknown) => (key === 'stone.openapi' ? config : fallback) }
+    const container: any = {
+      has: () => router !== undefined,
+      make: () => router,
+      resolve: (target: any) => target
+    }
+    return new OpenApiHandler({ blueprint, container })
+  }
+
+  const routerAt = (url: string): any => ({
+    getRoutes: () => ({ getRoutes: () => [] }),
+    generate: ({ name }: { name: string }) => (name === 'openapi.spec' ? url : '')
+  })
+
+  it('asks the router, because a prefix moves the document', () => {
+    // The defect: the page printed the declared path, so behind `/v1` it asked for `/openapi.json`
+    // and got a 404. Writing the prefix into `specPath` made the router apply its own on top and the
+    // document moved to `/v1/v1/openapi.json`.
+    const html = handlerWith({}, routerAt('/v1/openapi.json')).docs({} as any)
+
+    expect(html).toContain('/v1/openapi.json')
+    expect(html).not.toContain('"/openapi.json"')
+  })
+
+  it('lets a document hosted elsewhere be stated outright', () => {
+    const html = handlerWith({ swaggerUi: { specUrl: 'https://cdn.example.test/api.json' } }, routerAt('/v1/openapi.json')).docs({} as any)
+
+    expect(html).toContain('https://cdn.example.test/api.json')
+  })
+
+  it('falls back to the declared path when no router can answer', () => {
+    const html = handlerWith({ specPath: '/contract.json' }).docs({} as any)
+
+    expect(html).toContain('/contract.json')
+  })
+})

@@ -109,6 +109,28 @@ export class Configuration implements IPage<ReactIncomingEvent> {
         </p>
         <CodeTabs file='app/Application.ts' decl={DECL} imp={IMP} />
 
+        <Callout kind='important' title='Set keys, not buckets'>
+          <p>
+            A bucket a module fills is not yours to replace. <code>blueprint.set('stone.i18n', {'{'} … {'}'})</code>
+            {' '}overwrites the whole thing, including the catalogs the build discovered and injected into
+            it, and the application then behaves as if the module were absent: translations answer their
+            own keys, a named schema is suddenly unknown, a named resource cannot be found. Set the keys
+            one at a time and nothing is lost.
+          </p>
+          <Code file='app/configurations/AppConfiguration.ts'>{`// Replaces the bucket, and everything the build put in it
+blueprint.set('stone.i18n', { locale: 'fr', fallbackLocale: 'fr' })
+
+// Sets what you meant, and leaves the rest alone
+blueprint.set('stone.i18n.locale', 'fr')
+blueprint.set('stone.i18n.fallbackLocale', 'fr')`}</Code>
+          <p>
+            It applies to every bucket a plugin or a decorator feeds: <code>stone.i18n</code>,
+            {' '}<code>stone.validation</code>, <code>stone.resources</code>, <code>stone.openapi</code>.
+            The decorators themselves are safe, because a decorator's blueprint is merged rather than
+            assigned. Dotted keys are the same mechanism, one level down.
+          </p>
+        </Callout>
+
         <H2>Configuration classes</H2>
         <p>
           Options on <code>@StoneApp</code> are literals: they say what a value is, not how to work it

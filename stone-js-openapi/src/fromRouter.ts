@@ -15,6 +15,14 @@ export interface RouteLike {
 /** The shape this module needs from a router. */
 export interface RouterLike {
   getRoutes: () => { getRoutes: () => RouteLike[] }
+  /**
+   * The URL of a named route, prefix included.
+   *
+   * Optional, because this package duck-types a router rather than depending on it. It is how the
+   * explorer finds the document: a route's declared path is not where it is served once the router
+   * carries a prefix.
+   */
+  generate?: (options: { name: string, [key: string]: unknown }) => string
 }
 
 /**
