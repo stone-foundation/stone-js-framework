@@ -87,6 +87,8 @@ export interface TelemetryOptions {
   now?: () => number
   /** The health probe: where it answers, what it checks, how long a check may take. */
   health?: HealthOptions
+  /** The build identity: which release is answering, and on which adapter. */
+  version?: VersionOptions
 }
 
 /**
@@ -146,4 +148,33 @@ export interface HealthOptions {
   checks?: MetaHealthCheck[]
   /** How long a single check may take before it counts as failed. Default 2000ms. */
   timeout?: number
+}
+
+/**
+ * How the build identity is configured (`stone.telemetry.version.*`).
+ */
+export interface VersionOptions {
+  /**
+   * Where it answers. Default `/version`, `false` to serve nothing.
+   *
+   * Public on purpose in most deployments: knowing which build answers is what shortens an
+   * investigation. Serve nothing when even that is more than you want to say.
+   */
+  path?: string | false
+  /**
+   * What this build is called: a tag, a commit, a release number.
+   *
+   * Declared, never guessed from the environment: an application already knows this and already has a
+   * place to put what it knows. `blueprint.set('stone.telemetry.version.release', …)` from a
+   * configuration class is the whole setup.
+   */
+  release?: string
+}
+
+/** What the build identity answers: facts, not a verdict. */
+export interface VersionReport {
+  name: string
+  env: string
+  platform: string
+  release: string
 }

@@ -20,11 +20,25 @@ interface RouteLike {
  * frontend — then the event sources (custom headers → query → cookie → `Accept-Language` → the
  * event's locale → fallback). The result is stored on the event: `locale` (the string) and `i18n` (a
  * request-bound, concurrency-safe translator). Read them via `translatorFor`/`localeFromEvent`.
+ *
+ * The request's own i18n instance is moved to that locale too, so code that never sees the event still
+ * translates in the caller's language: an injected `{ i18n }`, the `i18next` binding, the helpers. That
+ * is sound here and would not be in a framework with a long-lived container, because Stone.js builds
+ * the kernel and its container per event: the instance being moved belongs to this request only.
  */
 export class SetLocaleMiddleware {
   private readonly i18n: I18nManager
   private readonly container: IContainer
   private readonly options: LocaleResolutionOptions
+  /**
+   * The locale the application was configured with, read once.
+   *
+   * The last resort of the resolution chain, and read here rather than from the instance on purpose:
+   * the instance is moved to each request's locale, so asking it would make one caller's language the
+   * next caller's default. That cannot happen on a per-request kernel, and it is exactly what would
+   * happen wherever an instance outlives one event, a browser application above all.
+   */
+  private readonly configuredLocale: Locale
 
   /**
    * @param dependencies - Auto-wired container services.
@@ -32,6 +46,7 @@ export class SetLocaleMiddleware {
   constructor ({ i18n, blueprint, container }: { i18n: I18nManager, blueprint: IBlueprint, container: IContainer }) {
     this.i18n = i18n
     this.container = container
+    this.configuredLocale = i18n.configuredLocale
     const config = blueprint.get<I18nOptions>('stone.i18n', {})
     const fallback = Array.isArray(config.fallbackLocale) ? config.fallbackLocale[0] : config.fallbackLocale
     this.options = {
@@ -55,13 +70,22 @@ export class SetLocaleMiddleware {
   async handle (event: IncomingEvent, next: NextMiddleware<IncomingEvent, OutgoingResponse>): Promise<OutgoingResponse> {
     const locale = await this.localeFromRoute(event) ??
       resolveLocale(event as LocaleAwareEvent, this.options) ??
-      this.i18n.getLocale()
+      this.configuredLocale
 
     // Lazy catalogs: import the active locale before the handler renders, so there is no flash of
     // untranslated keys. A no-op unless `stone.i18n.loaders` were configured.
     await this.i18n.loadLocale(locale)
 
+    // The request's own instance is moved to that locale, so everything that reads i18n without being
+    // handed the event reads the right one: a service with `constructor ({ i18n })`, the `i18next`
+    // binding, the `t()` helpers. It is the request's instance and nobody else's, because the kernel
+    // and its container are built per event, which is what makes this safe rather than a leak between
+    // concurrent requests.
+    await this.i18n.setLocale(locale)
+
     event.setMetadataValue('locale', locale)
+    // Still a bound clone on the event: it needs no ambient state at all, which is what keeps a page
+    // rendered off the event correct even if something later moves the instance.
     event.setMetadataValue('i18n', this.i18n.forLocale(locale))
     return await next(event)
   }

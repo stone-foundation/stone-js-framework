@@ -23,6 +23,7 @@ export class I18nManager implements II18n {
   private readonly loaders?: LocaleLoaders
   private readonly loaded: Set<Locale>
   private readonly fallbackLocale?: Locale
+  private readonly declaredLocale: Locale
 
   /**
    * @param i18next - The underlying i18next instance.
@@ -38,7 +39,8 @@ export class I18nManager implements II18n {
     timeZone?: string,
     loaders?: LocaleLoaders,
     loaded?: Set<Locale>,
-    fallbackLocale?: Locale
+    fallbackLocale?: Locale,
+    configuredLocale?: Locale
   ) {
     this.i18next = i18next
     this.boundLocale = boundLocale
@@ -46,6 +48,20 @@ export class I18nManager implements II18n {
     this.loaders = loaders
     this.loaded = loaded ?? new Set<Locale>()
     this.fallbackLocale = fallbackLocale
+    this.declaredLocale = configuredLocale ?? i18next.language
+  }
+
+  /**
+   * The locale the application was configured with, which never moves.
+   *
+   * Distinct from {@link getLocale}, which answers what is active now: moving the instance to a
+   * caller's language must not turn that caller's language into the next one's default. Anything
+   * choosing a last resort reads this, not the live value.
+   *
+   * @returns The configured locale.
+   */
+  get configuredLocale (): Locale {
+    return this.declaredLocale
   }
 
   /**
@@ -92,7 +108,7 @@ export class I18nManager implements II18n {
         : undefined
     })
 
-    return new I18nManager(instance, undefined, options.timeZone, options.loaders, undefined, fallback)
+    return new I18nManager(instance, undefined, options.timeZone, options.loaders, undefined, fallback, instance.language)
   }
 
   /**
@@ -177,7 +193,7 @@ export class I18nManager implements II18n {
    * @returns A locale-bound translator.
    */
   forLocale (locale: Locale): I18nManager {
-    return new I18nManager(this.i18next, locale, this.timeZone, this.loaders, this.loaded, this.fallbackLocale)
+    return new I18nManager(this.i18next, locale, this.timeZone, this.loaders, this.loaded, this.fallbackLocale, this.declaredLocale)
   }
 
   /**

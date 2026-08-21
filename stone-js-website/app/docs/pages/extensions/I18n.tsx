@@ -129,6 +129,16 @@ import { i18nBlueprint } from '@stone-js/i18n'
 
 export const Application = defineStoneApp(handler, { name: 'my-app' }, [i18nBlueprint])`}</Code>
 
+        <Callout kind='note' title='An injected i18n speaks the caller language'>
+          The middleware moves the request's own i18n instance to the resolved locale, so code that
+          never sees the event still translates correctly: a service written{' '}
+          <code>constructor ({'{'} i18n {'}'})</code>, the <code>i18next</code> binding, the helpers. That
+          is sound because Stone.js builds the kernel and its container per event, so the instance being
+          moved belongs to this request and no other. The event still carries a bound translator
+          (<code>event.getMetadataValue('i18n')</code>) for code that prefers to depend on nothing
+          ambient at all.
+        </Callout>
+
         <H2>Zero-config layout</H2>
         <p>
           A catalog is any directory named <code>i18n</code>, holding{' '}

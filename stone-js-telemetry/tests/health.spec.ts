@@ -1,7 +1,7 @@
 import { runHealthChecks } from '../src/health'
 import { HealthCheck } from '../src/decorators/HealthCheck'
 import { HealthHandler, DEFAULT_HEALTH_PATH } from '../src/HealthHandler'
-import { HealthRouteMiddleware } from '../src/middleware/HealthRouteMiddleware'
+import { TelemetryRoutesMiddleware } from '../src/middleware/TelemetryRoutesMiddleware'
 
 const blueprintWith = (health: unknown): any => ({
   get: (key: string, fallback?: unknown) => (key === 'stone.telemetry' ? { health } : fallback)
@@ -80,32 +80,31 @@ describe('publishing the probe', () => {
       get: (key: string, fallback?: unknown) => (key === 'stone.telemetry' ? { health } : fallback),
       add: (key: string, value: unknown[]) => added.push([key, value])
     }
-    await HealthRouteMiddleware({ blueprint } as any, (async () => blueprint) as any)
+    await TelemetryRoutesMiddleware({ blueprint } as any, (async () => blueprint) as any)
     return added
   }
 
-  it('publishes /health by default', async () => {
-    const [[key, [definition]]] = await runMiddleware({})
+  const healthOf = (added: any[]): any =>
+    added.flatMap(([, definitions]) => definitions).find((definition: any) => definition.name === 'telemetry.health')
 
-    expect(key).toBe('stone.router.definitions')
-    expect(definition).toMatchObject({ path: DEFAULT_HEALTH_PATH, method: 'GET', name: 'telemetry.health' })
+  it('publishes /health by default', async () => {
+    const added = await runMiddleware({})
+
+    expect(added[0][0]).toBe('stone.router.definitions')
+    expect(healthOf(added)).toMatchObject({ path: DEFAULT_HEALTH_PATH, method: 'GET', name: 'telemetry.health' })
   })
 
   it('answers wherever the application says', async () => {
-    const [[, [definition]]] = await runMiddleware({ path: '/_status' })
-
-    expect(definition.path).toBe('/_status')
+    expect(healthOf(await runMiddleware({ path: '/_status' })).path).toBe('/_status')
   })
 
-  it('publishes nothing when the probe is answered elsewhere', async () => {
-    await expect(runMiddleware({ path: false })).resolves.toEqual([])
+  it('publishes no probe when it is answered elsewhere', async () => {
+    await expect(healthOf(await runMiddleware({ path: false }))).toBeUndefined()
   })
 
   it('keeps itself out of the published contract', async () => {
     // A contract describing `/health` tells a consumer nothing they can use.
-    const [[, [definition]]] = await runMiddleware({})
-
-    expect(definition.contract).toBe(false)
+    expect(healthOf(await runMiddleware({})).contract).toBe(false)
   })
 })
 
