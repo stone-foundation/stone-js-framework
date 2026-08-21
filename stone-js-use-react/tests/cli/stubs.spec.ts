@@ -1,10 +1,11 @@
+// @vitest-environment node
 import {
   reactClientEntryPointTemplate,
   reactServerEntryPointTemplate,
   reactConsoleEntryPointTemplate,
   reactHtmlEntryPointTemplate,
   viteDevServerTemplate
-} from '../../src/react/stubs'
+} from '../../src/cli/stubs'
 
 import { NODE_CONSOLE_PLATFORM } from '@stone-js/node-cli-adapter'
 

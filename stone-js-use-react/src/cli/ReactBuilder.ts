@@ -4,15 +4,11 @@ import {
   reactClientEntryPointTemplate,
   reactConsoleEntryPointTemplate
 } from './stubs'
-import { CliError } from '../errors/CliError'
+import { CliError, StoneReporter, RunStonePluginsPrepareMiddleware, ConsoleContext, dirPath, isCSR, isSSR, isSSG, isTypescriptApp } from '@stone-js/cli'
 import { basePath } from '@stone-js/filesystem'
-import { StoneReporter } from '../StoneReporter'
-import { RunStonePluginsPrepareMiddleware } from '../plugins/RunStonePluginsMiddleware'
-import { ConsoleContext } from '../declarations'
 import { MetaPipe, Pipeline } from '@stone-js/pipeline'
 import { IBlueprint, IncomingEvent } from '@stone-js/core'
 import { ReactPreviewMiddleware } from './ReactPreviewMiddleware'
-import { dirPath, isCSR, isSSR, isSSG, isTypescriptApp } from '../utils'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { ReactConsoleMiddleware, ReactDevMiddleware } from './ReactDevMiddleware'
 import { ReactCSRBuildMiddleware, ReactSSRBuildMiddleware, ReactSSGBuildMiddleware } from './ReactBuildMiddleware'

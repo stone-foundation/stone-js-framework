@@ -1,9 +1,9 @@
 import builtins from 'node:module'
-import { defineConfig } from 'vite'
+import { defineConfig, type UserConfigFnObject } from 'vite'
 import babel from 'vite-plugin-babel'
 import browserslist from 'browserslist'
 import react from '@vitejs/plugin-react'
-import { onwarnSkipVendorCycles } from '../server/rollup-config'
+import { onwarnSkipVendorCycles } from '@stone-js/cli'
 
 /**
  * The default browser targets.
@@ -39,7 +39,7 @@ export const resolveBrowserTargets = (): string | string[] => {
 /**
  * The Vite configuration.
  */
-export const viteConfig = defineConfig(() => {
+export const viteConfig: UserConfigFnObject = defineConfig(() => {
   const targets = resolveBrowserTargets()
 
   return {

@@ -1,12 +1,13 @@
+// @vitest-environment node
 import { EventEmitter } from 'node:events'
-import { CliError } from '../../src/errors/CliError'
+import { CliError } from '@stone-js/cli'
 
 const spawnMock = vi.fn()
 const runSsgMock = vi.fn()
 
 vi.mock('node:child_process', () => ({ spawn: (...a: any[]) => spawnMock(...a), ChildProcess: class {} }))
 // Keep the real collectStaticTargets (the derivation under test); mock only the writer.
-vi.mock('../../src/react/ssg', async (mod) => ({
+vi.mock('../../src/cli/ssg', async (mod) => ({
   ...(await mod<any>()),
   runSsg: (...a: any[]) => runSsgMock(...a)
 }))
@@ -58,7 +59,7 @@ describe('GenerateStaticSiteMiddleware (SSG)', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    GenerateStaticSiteMiddleware = (await import('../../src/react/ReactBuildMiddleware')).GenerateStaticSiteMiddleware
+    GenerateStaticSiteMiddleware = (await import('../../src/cli/ReactBuildMiddleware')).GenerateStaticSiteMiddleware
   })
 
   it('pre-renders each route against the spawned SSR server and stops it', async () => {
@@ -184,7 +185,7 @@ describe('stopping the pre-render server', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    GenerateStaticSiteMiddleware = (await import('../../src/react/ReactBuildMiddleware')).GenerateStaticSiteMiddleware
+    GenerateStaticSiteMiddleware = (await import('../../src/cli/ReactBuildMiddleware')).GenerateStaticSiteMiddleware
   })
 
   /** A server that answers SIGTERM by shutting down gracefully, and never finishing. */

@@ -13,7 +13,15 @@ export default createRollupConfig({
   nodeExternals,
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
   builds: [
-    { input: ['src/**/*.{ts,tsx}', '!src/server/**/*'], file: 'dist/browser.js' },
-    { input: ['src/**/*.{ts,tsx}', '!src/browser/**/*'], file: 'dist/index.js', barrel: { exclude: ['server/'] } }
+    { input: ['src/**/*.{ts,tsx}', '!src/server/**/*', '!src/cli/**/*'], file: 'dist/browser.js' },
+    {
+      input: ['src/**/*.{ts,tsx}', '!src/browser/**/*', '!src/cli/**/*'],
+      file: 'dist/index.js',
+      barrel: { exclude: ['server/', 'cli/'] }
+    },
+    // The build-time plugin (`./cli`). Never part of the runtime bundles: it reads the filesystem
+    // and drives Vite, and a browser has no business seeing either. `multiEntry: false` because
+    // auto-discovery reads this bundle's default export.
+    { input: ['src/cli/index.ts'], file: 'dist/cli.js', multiEntry: false }
   ]
 })

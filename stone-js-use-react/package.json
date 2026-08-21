@@ -39,6 +39,10 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "default": "./dist/cli.js"
     }
   },
   "engines": {
@@ -59,15 +63,30 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@babel/plugin-proposal-decorators": "^7.29.7",
+    "@babel/plugin-transform-class-properties": "^7.29.7",
+    "@babel/plugin-transform-class-static-block": "^7.29.7",
+    "@babel/plugin-transform-private-methods": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@stone-js/filesystem": "workspace:*",
     "@stone-js/use-react-core": "workspace:*",
-    "@stone-js/use-view": "workspace:*"
+    "@stone-js/use-view": "workspace:*",
+    "@vitejs/plugin-react": "^4.3.4",
+    "browserslist": "^4.28.2",
+    "fs-extra": "^11.2.0",
+    "glob": "^13.0.0",
+    "vite": "^6.0.5",
+    "vite-plugin-babel": "^1.3.0"
   },
   "peerDependencies": {
     "@stone-js/browser-adapter": "workspace:*",
     "@stone-js/browser-core": "workspace:*",
+    "@stone-js/cli": "workspace:*",
     "@stone-js/config": "workspace:*",
     "@stone-js/core": "workspace:*",
     "@stone-js/http-core": "workspace:*",
+    "@stone-js/node-cli-adapter": "workspace:*",
     "@stone-js/router": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -79,7 +98,10 @@
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
+    "@stone-js/cli": "workspace:*",
+    "@stone-js/node-cli-adapter": "workspace:*",
     "@testing-library/react": "^16.3.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.0.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
@@ -104,5 +126,16 @@
       "describe",
       "beforeEach"
     ]
+  },
+  "stone": {
+    "cliPlugin": "./dist/cli.js"
+  },
+  "peerDependenciesMeta": {
+    "@stone-js/cli": {
+      "optional": true
+    },
+    "@stone-js/node-cli-adapter": {
+      "optional": true
+    }
   }
 }

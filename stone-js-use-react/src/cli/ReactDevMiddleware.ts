@@ -4,16 +4,14 @@ import {
   reactConsoleEntryPointTemplate,
   reactClientEntryPointTemplate
 } from './stubs'
-import { applyPluginInjections } from '../plugins/applyPluginInjections'
+import { applyPluginInjections, ConsoleContext, generatePublicEnvironmentsFile, isTypescriptApp, setCache } from '@stone-js/cli'
 import fsExtra from 'fs-extra'
 import { relative } from 'node:path'
 import { build, mergeConfig } from 'vite'
 import { IBlueprint } from '@stone-js/core'
 import { getViteConfig } from './react-utils'
-import { ConsoleContext } from '../declarations'
 import { MetaPipe, NextPipe } from '@stone-js/pipeline'
 import { basePath, buildPath } from '@stone-js/filesystem'
-import { generatePublicEnvironmentsFile, isTypescriptApp, setCache } from '../utils'
 
 const { outputFileSync, existsSync, readFileSync } = fsExtra
 

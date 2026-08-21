@@ -1,5 +1,5 @@
 import { join, dirname } from 'node:path'
-import { CliError } from '../errors/CliError'
+import { CliError } from '@stone-js/cli'
 import { distPath } from '@stone-js/filesystem'
 import { mkdirSync, writeFileSync } from 'node:fs'
 

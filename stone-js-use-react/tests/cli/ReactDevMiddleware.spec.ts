@@ -1,8 +1,9 @@
+// @vitest-environment node
 import fsExtra from 'fs-extra'
 import { build as viteBuild } from 'vite'
-import { generatePublicEnvironmentsFile, isTypescriptApp, setCache } from '../../src/utils'
-import { reactClientEntryPointTemplate, reactConsoleEntryPointTemplate } from '../../src/react/stubs'
-import { GenerateEntryPointFileMiddleware, BuildConsoleAppMiddleware, GenerateDevHtmlTemplateFileMiddleware, GenerateDevServerMiddleware, GeneratePublicEnvFileDevMiddleware, GenerateReactConsoleFileMiddleware } from '../../src/react/ReactDevMiddleware'
+import { generatePublicEnvironmentsFile, isTypescriptApp, setCache } from '@stone-js/cli'
+import { reactClientEntryPointTemplate, reactConsoleEntryPointTemplate } from '../../src/cli/stubs'
+import { GenerateEntryPointFileMiddleware, BuildConsoleAppMiddleware, GenerateDevHtmlTemplateFileMiddleware, GenerateDevServerMiddleware, GeneratePublicEnvFileDevMiddleware, GenerateReactConsoleFileMiddleware } from '../../src/cli/ReactDevMiddleware'
 
 const { outputFileSync, existsSync, readFileSync } = fsExtra
 
@@ -21,20 +22,23 @@ vi.mock('@stone-js/filesystem', async () => ({
   buildPath: vi.fn((p?: string) => `/build/${p ?? ''}`)
 }))
 
-vi.mock('../../src/react/stubs', async () => ({
+vi.mock('../../src/cli/stubs', async () => ({
   reactClientEntryPointTemplate: vi.fn().mockReturnValue('// client'),
   reactHtmlEntryPointTemplate: vi.fn().mockReturnValue('<html><!--main-js--><!--main-css--></html>'),
   reactConsoleEntryPointTemplate: vi.fn().mockReturnValue('// console'),
   viteDevServerTemplate: vi.fn().mockReturnValue('// server')
 }))
 
-vi.mock('../../src/utils', async () => ({
+// A partial mock: only the helpers this middleware reads are stubbed. The rest of the CLI's
+// surface stays real, because the module under test also imports `ConsoleContext` from it.
+vi.mock('@stone-js/cli', async (mod) => ({
+  ...(await mod<Record<string, unknown>>()),
   isTypescriptApp: vi.fn().mockReturnValue(true),
   generatePublicEnvironmentsFile: vi.fn().mockReturnValue(true),
   setCache: vi.fn()
 }))
 
-vi.mock('../../src/react/react-utils', async () => ({
+vi.mock('../../src/cli/react-utils', async () => ({
   getViteConfig: vi.fn().mockResolvedValue({ test: true })
 }))
 
