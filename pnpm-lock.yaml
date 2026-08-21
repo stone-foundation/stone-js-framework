@@ -2528,6 +2528,9 @@ importers:
       '@stone-js/cli':
         specifier: workspace:*
         version: link:../../../stone-js-cli
+      '@stone-js/http-core':
+        specifier: workspace:*
+        version: link:../../../stone-js-http-core
       '@stone-js/testing':
         specifier: workspace:*
         version: link:../../../stone-js-testing
@@ -2632,6 +2635,9 @@ importers:
       '@stone-js/cli':
         specifier: workspace:*
         version: link:../../../stone-js-cli
+      '@stone-js/http-core':
+        specifier: workspace:*
+        version: link:../../../stone-js-http-core
       '@stone-js/testing':
         specifier: workspace:*
         version: link:../../../stone-js-testing
@@ -3965,6 +3971,9 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^12.1.4
         version: 12.3.0(rollup@4.62.2)(tslib@2.8.1)(typescript@5.9.3)
+      '@stone-js/browser-core':
+        specifier: workspace:*
+        version: link:../stone-js-browser-core
       '@stone-js/core':
         specifier: workspace:*
         version: link:../stone-js-core

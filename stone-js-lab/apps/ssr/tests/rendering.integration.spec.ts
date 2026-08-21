@@ -1,4 +1,5 @@
-import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
+import { createTestApp } from '@stone-js/testing'
+import { makeIncomingHttpEvent } from '@stone-js/testing/http'
 
 
 /**

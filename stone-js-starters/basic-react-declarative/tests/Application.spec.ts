@@ -1,4 +1,5 @@
-import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
+import { createTestApp } from '@stone-js/testing'
+import { makeIncomingBrowserEvent } from '@stone-js/testing/browser'
 
 /**
  * The whole application, booted in memory and asked a real question.
@@ -12,7 +13,7 @@ describe('Pages', () => {
   it('renders the home page, data included', async () => {
     const app = await createTestApp()
 
-    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/?name=Ada' }))
+    const response = await app.send(makeIncomingBrowserEvent({ url: '/?name=Ada' }))
 
     expect(response.statusCode).toBe(200)
     // A page is a handler, so a rendered page is a response whose body is HTML. Query that HTML with
@@ -23,7 +24,7 @@ describe('Pages', () => {
   it('renders without a name', async () => {
     const app = await createTestApp()
 
-    const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/' }))
+    const response = await app.send(makeIncomingBrowserEvent({ url: '/' }))
 
     expect(response.statusCode).toBe(200)
   })

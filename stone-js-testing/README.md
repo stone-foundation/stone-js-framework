@@ -30,7 +30,8 @@ npm i @stone-js/testing
 Nothing to list: your application is discovered from `app/**`, the same files the CLI builds.
 
 ```ts
-import { createTestApp, makeIncomingHttpEvent } from '@stone-js/testing'
+import { createTestApp } from '@stone-js/testing'
+import { makeIncomingHttpEvent } from '@stone-js/testing/http'
 
 const app = await createTestApp()                 // boots the REAL app in-memory, no port
 const response = await app.send(makeIncomingHttpEvent({ method: 'GET', url: '/tasks' }))
@@ -47,6 +48,32 @@ expect(response.html()).toContain('<h1>Tasks</h1>')
 
 There is no assertion library here on purpose: query that HTML with whatever you already use
 (`happy-dom`, `jsdom`, Testing Library).
+
+### Testing a browser or a native application
+
+An application that renders receives a browser event, not an HTTP one, and the React renderer keys
+its hydration snapshot on that event's `fingerprint()`. The platform-agnostic `makeIncomingEvent`
+does not carry one, so dispatching it into a rendering application fails with
+`event.fingerprint is not a function`, from inside the kernel's error handler.
+
+`makeIncomingBrowserEvent` builds the event those applications actually receive:
+
+```ts
+import { createTestApp } from '@stone-js/testing'
+import { makeIncomingBrowserEvent } from '@stone-js/testing/browser'
+import { REACT_NATIVE_PLATFORM } from '@stone-js/react-native-adapter'
+
+const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM })
+
+const response = await app.send(makeIncomingBrowserEvent({ url: 'myapp://tasks/42' }))
+```
+
+A deep link is just a URL with your own scheme, and the factory keeps it, so the route a phone
+reaches is the route the test reaches. `platform` names the context the application runs in, which is
+what lets its renderer register itself.
+
+It lives behind `@stone-js/testing/browser` so `@stone-js/browser-core` stays optional: a service has
+no reason to install a browser package to run its tests.
 
 ### Substituting a dependency
 
