@@ -1,5 +1,6 @@
 import { IResource } from '../declarations'
-import { AppConfig, StoneBlueprint } from '@stone-js/core'
+import { ContractChecker } from '../ContractChecker'
+import { AppConfig, MetaService, StoneBlueprint } from '@stone-js/core'
 import { MetaResourceRouteMiddleware } from '../middleware/ResourceRouteMiddleware'
 import { MetaApiResourceMiddleware } from '../middleware/BlueprintMiddleware'
 
@@ -66,9 +67,25 @@ export interface ResourcesBlueprint extends StoneBlueprint {
  * export const Application = defineStoneApp({ name: 'my-app' }, [resourcesBlueprint])
  * ```
  */
+/**
+ * The reader every resource holds its contract against, as a service.
+ *
+ * Bound so a resource's constructor can simply ask for it. A dependency read off the container that
+ * nothing ever bound is not optional, it is a crash, which is what made every container-resolved
+ * resource fail on a service nobody was told to register. The fix is the registration, not a
+ * conditional read.
+ */
+export const MetaContractChecker: MetaService = {
+  module: ContractChecker,
+  isClass: true,
+  singleton: true,
+  alias: 'contractChecker'
+}
+
 export const resourcesBlueprint: ResourcesBlueprint = {
   stone: {
     resources: {},
+    services: [MetaContractChecker],
     blueprint: {
       middleware: [
         MetaApiResourceMiddleware

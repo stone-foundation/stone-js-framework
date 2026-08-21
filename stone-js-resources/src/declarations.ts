@@ -1,3 +1,5 @@
+import { Promiseable } from '@stone-js/core'
+
 /**
  * A schema, in whatever shape the application already writes them.
  *
@@ -68,7 +70,7 @@ export interface IResource<Model = unknown, Output = ResourceOutput> {
    * Asynchronous, and resolved from the container, so it may reach any service: fetch a relation,
    * translate a label, compute a total. Whatever it returns is what the schema then validates.
    */
-  data?: (model: Model, context: ResourceContext) => unknown
+  data?: (model: Model, context: ResourceContext) => Promiseable<unknown>
 
   /** Project one model. */
   item: (model: Model, context?: ResourceContext) => Promise<Output>

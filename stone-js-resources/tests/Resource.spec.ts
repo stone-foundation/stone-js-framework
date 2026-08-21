@@ -240,28 +240,48 @@ describe('a resource the container builds', () => {
   // service nobody was ever told to register.
   const containerOf = async (bindings: Record<string, unknown> = {}): Promise<any> => {
     const { Container } = await import('@stone-js/service-container')
+    const { MetaContractChecker } = await import('../src/options/ResourcesBlueprint')
     const container = Container.create()
+    // Exactly what the module's blueprint contributes, and the reason a resource's constructor can
+    // simply ask for its checker.
+    container.autoBinding(MetaContractChecker.module, MetaContractChecker.module, true, MetaContractChecker.alias)
     Object.entries(bindings).forEach(([key, value]) => container.instance(key, value))
     return container
   }
 
-  it('resolves, instead of failing on a service nobody registered', async () => {
+  it('resolves, because the module binds what its resources ask for', async () => {
+    // The defect this replaces: the base read an optional `checker` off the container, which resolves
+    // any name it is asked for and throws when nothing is bound, so an optional dependency behaved as
+    // a required one and every container-resolved resource failed. The fix is the registration.
     const container = await containerOf()
 
     const resource = container.resolve(UserResource, true)
 
-    await expect(resource.item(ada, { checker: undefined })).resolves.toEqual({ id: 1, name: 'Ada' })
+    await expect(resource.item(ada)).resolves.toEqual({ id: 1, name: 'Ada' })
   })
 
-  it('still takes a checker from the container when one is bound', async () => {
-    // Substituting the dialect stays possible: the point was never to stop reading the container.
+  it('hands the same instance out twice, because a resource is a singleton service', async () => {
+    const container = await containerOf()
+
+    expect(container.resolve(UserResource, true)).toBe(container.resolve(UserResource, true))
+  })
+
+  it('lets an application substitute the dialect by binding its own first', async () => {
+    // How substitution actually works: `autoBinding` leaves an existing binding alone, so an
+    // application that binds the checker key before the module's blueprint does keeps its own. The
+    // point was never to stop reading the container, it was to stop reading names nobody bound.
     const calls: unknown[] = []
-    const checker = { check: (schema: any, data: unknown) => { calls.push(data); return { success: true, value: { id: 1 } } } }
-    const container = await containerOf({ checker })
+    const { Container } = await import('@stone-js/service-container')
+    const { ContractChecker } = await import('../src/ContractChecker')
+    const { MetaContractChecker } = await import('../src/options/ResourcesBlueprint')
 
-    const resource = container.resolve(UserResource, true)
-    await expect(resource.item(ada)).resolves.toEqual({ id: 1 })
+    const container = Container.create()
+    container.instance(ContractChecker, {
+      check: (_schema: any, data: unknown) => { calls.push(data); return { success: true, value: { id: 1 } } }
+    })
+    container.autoBinding(MetaContractChecker.module, MetaContractChecker.module, true, MetaContractChecker.alias)
 
+    await expect((container.resolve(UserResource, true) as any).item(ada)).resolves.toEqual({ id: 1 })
     expect(calls).toHaveLength(1)
   })
 

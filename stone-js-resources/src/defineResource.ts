@@ -1,3 +1,4 @@
+import { Promiseable } from '@stone-js/core'
 import { Resource } from './Resource'
 import { IContractChecker } from './ContractChecker'
 import { ContractViolationPolicy, ResourceContext, ResourceOutput, ResourceSchema } from './declarations'
@@ -13,7 +14,7 @@ export interface ResourceDefinition<Model = unknown> {
   /** Named subsets a caller may ask for, each with its own schema. */
   fragments?: Record<string, ResourceSchema> | ((context: ResourceContext) => Record<string, ResourceSchema> | Promise<Record<string, ResourceSchema>>)
   /** Optional hook to shape or complete the model before it meets the schema. */
-  data?: (model: Model, context: ResourceContext) => unknown
+  data?: (model: Model, context: ResourceContext) => Promiseable<unknown>
 }
 
 /**
@@ -39,13 +40,21 @@ export function defineResource<Model = unknown, Output extends ResourceOutput = 
   definition: ResourceDefinition<Model>,
   dependencies: { checker?: IContractChecker, onViolation?: ContractViolationPolicy } = {}
 ): Resource<Model, Output> {
+  // Assigned after construction, not through it: the class constructor is the container's, and it
+  // only reads names this module binds. An explicit object is the imperative form's business.
   const resource = new class extends Resource<Model, Output> {
+    constructor () {
+      super()
+      if (dependencies.checker !== undefined) { this.checker = dependencies.checker }
+      if (dependencies.onViolation !== undefined) { this.onViolation = dependencies.onViolation }
+    }
+
     async schema (context: ResourceContext): Promise<ResourceSchema> {
       if (typeof definition.schema !== 'function') { return definition.schema }
       const build = definition.schema as (c: ResourceContext) => Promise<ResourceSchema>
       return await build(context)
     }
-  }(dependencies)
+  }()
 
   if (definition.fragments !== undefined) {
     const declared = definition.fragments
