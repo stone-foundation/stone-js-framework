@@ -10,7 +10,7 @@ import { getPath, hasPath } from '@stone-js/config'
 import { HttpError } from './errors/HttpError'
 import { UploadedFile } from '@stone-js/filesystem'
 import { CookieCollection } from './cookies/CookieCollection'
-import { IncomingEvent, IncomingEventOptions } from '@stone-js/core'
+import { IncomingEvent, IncomingEventOptions, urlFingerprint } from '@stone-js/core'
 import { HttpMethods, IOutgoingHttpResponse, IRoute } from './declarations'
 
 /**
@@ -717,9 +717,11 @@ export class IncomingHttpEvent extends IncomingEvent {
    * @returns The generated fingerprint as a base64 string.
    */
   fingerprint (full?: boolean): string {
-    return full === true
-      ? btoa([this.method, this.uri, this.userAgent, this.ip].join('|'))
-      : btoa([this.method, this.pathname].join('|'))
+    // Computed by the core, so a browser event and this one cannot disagree about what identifies
+    // the same page. They used to: this one dropped the query string while the browser kept it, so
+    // a server render of `/tasks?page=2` and its own hydration keyed on different strings. Bare
+    // `btoa` was also the wrong encoder: it throws outside latin1, so a path like `/東京` failed.
+    return urlFingerprint(this.method, this.url, full === true ? [this.userAgent ?? '', String(this.ip)] : [])
   }
 
   /**

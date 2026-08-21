@@ -80,4 +80,55 @@ describe('IncomingEvent', () => {
     expect(cloned.metadata).toEqual(event.metadata)
     expect(cloned.source).toBe(event.source)
   })
+
+  describe('fingerprint', () => {
+    const withMetadata = (metadata: Record<string, unknown>): IncomingEvent =>
+      IncomingEvent.create({ source: baseSource, type: 'custom_event', metadata })
+
+    it('is stable for the same event', () => {
+      expect(withMetadata({ id: 1 }).fingerprint()).toBe(withMetadata({ id: 1 }).fingerprint())
+    })
+
+    it('ignores the moment the event was created', () => {
+      // A server render and a browser render of the same event happen at different moments and have
+      // to agree, which is the whole point of the key.
+      const first = IncomingEvent.create({ source: baseSource, type: 't', metadata: { id: 1 }, timeStamp: 1 })
+      const second = IncomingEvent.create({ source: baseSource, type: 't', metadata: { id: 1 }, timeStamp: 2 })
+
+      expect(first.fingerprint()).toBe(second.fingerprint())
+    })
+
+    it('ignores the order metadata was written in', () => {
+      // Two objects holding the same entries are the same event.
+      expect(withMetadata({ a: 1, b: 2 }).fingerprint()).toBe(withMetadata({ b: 2, a: 1 }).fingerprint())
+    })
+
+    it('sorts nested keys too', () => {
+      expect(withMetadata({ user: { id: 1, name: 'Ada' } }).fingerprint())
+        .toBe(withMetadata({ user: { name: 'Ada', id: 1 } }).fingerprint())
+    })
+
+    it('keeps array order, because in an array order is meaning', () => {
+      expect(withMetadata({ tags: ['a', 'b'] }).fingerprint())
+        .not.toBe(withMetadata({ tags: ['b', 'a'] }).fingerprint())
+    })
+
+    it('separates two events carrying different things', () => {
+      expect(withMetadata({ id: 1 }).fingerprint()).not.toBe(withMetadata({ id: 2 }).fingerprint())
+    })
+
+    it('separates two events of different types carrying the same thing', () => {
+      const queued = IncomingEvent.create({ source: baseSource, type: 'queue', metadata: { id: 1 } })
+      const timed = IncomingEvent.create({ source: baseSource, type: 'timer', metadata: { id: 1 } })
+
+      expect(queued.fingerprint()).not.toBe(timed.fingerprint())
+    })
+
+    it('survives a payload no browser could base64 on its own', () => {
+      // `btoa` only accepts latin1, so an accent or a non-latin script would throw without the
+      // UTF-8 step. A key that throws is worse than a key that collides.
+      expect(() => withMetadata({ name: 'Évens', city: '東京' }).fingerprint()).not.toThrow()
+      expect(withMetadata({ name: 'Évens' }).fingerprint()).not.toBe(withMetadata({ name: 'Evens' }).fingerprint())
+    })
+  })
 })
