@@ -1,4 +1,5 @@
-import { Resource, SchemaValidator } from './Resource'
+import { Resource } from './Resource'
+import { IContractChecker } from './ContractChecker'
 import { ContractViolationPolicy, ResourceContext, ResourceOutput, ResourceSchema } from './declarations'
 
 /**
@@ -19,9 +20,7 @@ export interface ResourceDefinition<Model = unknown> {
  * The imperative way to define a resource: an object instead of a class.
  *
  * Parity is the rule, so this declares exactly what a class declares and gets exactly what a class
- * gets. What it cannot have is a constructor the container fills, which is why a projection takes its
- * validator from the context: the middleware puts it there, and a resource used directly in a service
- * is handed one the same way.
+ * gets. It needs nothing injected: this module reads schemas with its own checker.
  *
  * @param definition - The schema, and optionally fragments and a `data()` hook.
  * @param dependencies - Optional explicit services, for a resource used outside a request.
@@ -38,7 +37,7 @@ export interface ResourceDefinition<Model = unknown> {
  */
 export function defineResource<Model = unknown, Output extends ResourceOutput = ResourceOutput> (
   definition: ResourceDefinition<Model>,
-  dependencies: { validator?: SchemaValidator, onViolation?: ContractViolationPolicy } = {}
+  dependencies: { checker?: IContractChecker, onViolation?: ContractViolationPolicy } = {}
 ): Resource<Model, Output> {
   const resource = new class extends Resource<Model, Output> {
     async schema (context: ResourceContext): Promise<ResourceSchema> {

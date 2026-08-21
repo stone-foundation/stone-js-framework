@@ -94,14 +94,32 @@ export class OpenApiCommand {
       generator.addServer(server.url, server.description)
     }
 
-    return generator
+    // Collected while deriving, reported once at the end: an endpoint whose payload could not be
+    // documented is worth a line on the console, because a contract missing it looks complete.
+    const skipped: string[] = []
+
+    const document = generator
       .addRouter(router, {
         schemas: blueprint.get<Record<string, unknown>>('stone.validation.schemas', {}),
+        // The same registry the runtime projects through, so a route naming a resource documents the
+        // response it will actually send.
+        resources: blueprint.get<Record<string, unknown>>('stone.resources.registry', {}),
+        fragmentParam: blueprint.get<string>('stone.resources.params.fragment', 'view'),
         securityScheme: options.securityScheme,
+        onSkipped: ({ route, concern, reason }) => skipped.push(`${route}: ${concern} — ${reason}`),
         // The application is fully booted here, so every schema class gets its services.
         resolve: (target: any) => this.container.resolve(target, true)
       })
       .addRoutes(options.routes ?? [])
       .build()
+
+    if (skipped.length > 0) {
+      process.stderr.write(
+        `[@stone-js/openapi] ${skipped.length} declaration(s) could not be documented:\n  ` +
+        `${skipped.join('\n  ')}\n`
+      )
+    }
+
+    return document
   }
 }

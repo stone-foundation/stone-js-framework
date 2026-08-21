@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/extensions/openapi'
 
@@ -54,6 +54,42 @@ export const spec = OpenApiGenerator
   .create({ title: 'Tasks API', version: '1.0.0' })
   .addServer('https://api.example.com')
   .build()   // a valid OpenAPI document`}</Code>
+
+        <H3>What is derived, and from where</H3>
+        <p>
+          Everything a route already says about itself, read from the route <em>and</em> from the
+          handler's own decorators — because both validation and resources work without a router, and a
+          contract that only read route options documented half of such an application.
+        </p>
+        <PropsTable nameHeader='Derived' rows={[
+          { name: 'Request', type: 'validation', desc: 'From `validation:` on the route or `@Validate()` on the handler.' },
+          { name: 'Response', type: 'resources', desc: 'From `resource:` on the route or `@Returns()` on the handler: the schema the resource publishes is the documented payload.' },
+          { name: 'Fragments', type: 'resources', desc: 'A query parameter with an enum of the names a caller may select — the parameter your app actually answers to.' },
+          { name: 'Security', type: 'auth / authz', desc: 'From `auth:` / `authz:` on the route, or `@Protect()` / `@Can()` on the handler.' }
+        ]} />
+        <p>
+          A declaration it could not read is <strong>reported</strong> rather than dropped: a resource
+          named but never registered, or a schema that needs a real context, prints one line naming the
+          route. A missing payload in a document that looks complete is worse than a loud gap.
+        </p>
+
+        <H3>Saying more, on the route</H3>
+        <p>
+          A route can add anything the derivation cannot know — a summary, tags, extra responses — under
+          {' '}<code>contract</code>. What you write there wins, because an author who wrote it meant it,
+          and <code>contract: false</code> keeps an endpoint out of the document entirely.
+        </p>
+        <Code file='app/TasksController.ts'>{`@Get('/tasks', { contract: { summary: 'List tasks', tags: ['tasks'] } })
+list () { … }
+
+@Get('/internal/metrics', { contract: false })   // documented nowhere
+metrics () { … }`}</Code>
+        <Callout kind='note' title='Why the key is not called openapi'>
+          A route describes itself; OpenAPI is one way of <em>rendering</em> that description. Naming the
+          option after a specification would put that specification's name in the router's vocabulary,
+          and every application would have to rename its routes the day the same contract is rendered as
+          something else.
+        </Callout>
 
         <H2>Serving it</H2>
         <p>

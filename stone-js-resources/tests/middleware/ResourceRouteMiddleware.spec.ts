@@ -8,15 +8,6 @@ interface User { id: number, name: string, passwordHash: string }
 const ada: User = { id: 1, name: 'Ada', passwordHash: 'do-not-leak' }
 const grace: User = { id: 2, name: 'Grace', passwordHash: 'do-not-leak' }
 
-const validator = {
-  validate: <T>(schema: any, data: unknown) => {
-    const result = schema.safeParse(data)
-    return result.success
-      ? { success: true, value: result.data as T }
-      : { success: false, issues: result.error.issues.map((i: any) => ({ message: i.message, path: i.path })) }
-  }
-}
-
 const userResource = defineResource<User>({
   schema: z.object({ id: z.number(), name: z.string() }),
   fragments: { summary: z.object({ id: z.number() }) }
@@ -38,7 +29,7 @@ const context = (config: Record<string, any> = {}): any => ({
       return fallback
     }
   },
-  container: { make: (key: string) => (key === 'validator' ? validator : undefined) }
+  container: {}
 })
 
 /** A response, as a handler carrying `@JsonHttpResponse(201)` has already produced one. */
@@ -160,7 +151,7 @@ describe('ResourceRouteMiddleware', () => {
     class Registered { item = async (): Promise<unknown> => ({ resolved: true }) }
     const middleware = new ResourceRouteMiddleware({
       blueprint: { get: (_k: string, fallback: unknown) => fallback },
-      container: { make: () => validator, resolve: (Klass: any) => new Klass() }
+      container: { resolve: (Klass: any) => new Klass() }
     } as any)
 
     const output: any = await middleware.handle(makeEvent(Registered), async () => ada as any)

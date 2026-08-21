@@ -47,6 +47,14 @@ export interface OpenApiOperation {
   responses?: Record<string | number, OpenApiResponse>
 
   /**
+   * Parameters stated outright, merged with those derived from the request schemas.
+   *
+   * For anything a schema cannot express: the fragment a resource lets a caller select, for instance,
+   * which is a closed set of names rather than a shape.
+   */
+  parameters?: Array<Record<string, unknown>>
+
+  /**
    * Security requirements for this operation, as OpenAPI expects them.
    *
    * Derived from a route's `auth` and `authz` when the document is built from the router, so a
