@@ -32,6 +32,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
     }
   },
   "engines": {
@@ -53,7 +57,8 @@
   },
   "peerDependencies": {
     "@stone-js/core": "workspace:*",
-    "@stone-js/http-core": "workspace:*"
+    "@stone-js/http-core": "workspace:*",
+    "@stone-js/browser-core": "workspace:*"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -62,6 +67,7 @@
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
+    "@stone-js/browser-core": "workspace:*",
     "@stone-js/core": "workspace:*",
     "@stone-js/http-core": "workspace:*",
     "@stone-js/router": "workspace:*",
@@ -91,5 +97,10 @@
   "dependencies": {
     "@stone-js/filesystem": "workspace:*",
     "dotenv": "^16.4.7"
+  },
+  "peerDependenciesMeta": {
+    "@stone-js/browser-core": {
+      "optional": true
+    }
   }
 }
