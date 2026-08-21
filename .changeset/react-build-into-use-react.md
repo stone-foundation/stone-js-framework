@@ -36,6 +36,13 @@ templates and the SSG helpers are now imported from `@stone-js/use-react/cli` in
 `@stone-js/cli`. The CLI's own helpers they build on (`isCSR`, `isSSR`, `isSSG`, `isTypescriptApp`,
 `generatePublicEnvironmentsFile`, `getStoneBuilderConfig` and the rest) stay where they are.
 
+**One behaviour did change, and for the better: the SSG prerender now runs its SSR server on the
+Node that is building.** It spawned `node`, a bare command name resolved through `PATH`, which
+decides neither that the interpreter is the one that just produced the bundle nor that the directory
+it came from is trustworthy. `process.execPath` answers both. The two SSG lab applications still
+pre-render their routes with their markup intact, which is how a wrong interpreter would have shown
+itself.
+
 This is the same move the native target already made, applied to the platform that came first. A
 module owns its build, the CLI owns none of them, and adding a renderer to the ecosystem no longer
 means editing the CLI.
