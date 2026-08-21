@@ -166,3 +166,59 @@ describe('ResourceRouteMiddleware', () => {
     expect(resourcesBlueprint.stone.router?.middleware).toEqual([MetaResourceRouteMiddleware])
   })
 })
+
+describe('an application that wraps its payloads', () => {
+  it('shapes what is inside the envelope, and leaves the envelope alone', async () => {
+    // A page is `{ items, meta }`, and `items` and `meta` are not fields of a model: shaping that
+    // object would publish the wrapper as if it were the thing. Applications wrote a middleware of
+    // their own to avoid it, which is a lot of machinery to say one word.
+    const middleware = new ResourceRouteMiddleware(context({ envelope: { payload: 'items' } }))
+
+    const output: any = await middleware.handle(
+      makeEvent(userResource),
+      async () => ({ items: [ada, grace], meta: { total: 2, cursor: 'abc' } }) as any
+    )
+
+    expect(output.items).toEqual([{ id: 1, name: 'Ada' }, { id: 2, name: 'Grace' }])
+    expect(output.meta).toEqual({ total: 2, cursor: 'abc' })
+  })
+
+  it('accepts more than one word, since an application may have two', async () => {
+    const middleware = new ResourceRouteMiddleware(context({ envelope: { payload: ['items', 'data'] } }))
+
+    const output: any = await middleware.handle(makeEvent(userResource), async () => ({ data: ada }) as any)
+
+    expect(output.data).toEqual({ id: 1, name: 'Ada' })
+  })
+
+  it('shapes inside an envelope carried by a response, keeping its status', async () => {
+    const middleware = new ResourceRouteMiddleware(context({ envelope: { payload: 'items' } }))
+
+    const output: any = await middleware.handle(
+      makeEvent(userResource),
+      async () => responseWith({ items: [ada], meta: { total: 1 } }, 200)
+    )
+
+    expect(output.content.items).toEqual([{ id: 1, name: 'Ada' }])
+    expect(output.content.meta).toEqual({ total: 1 })
+    expect(output.statusCode).toBe(200)
+  })
+
+  it('assumes nothing when nothing is declared, and says so loudly', async () => {
+    // Guessing the key would quietly mangle a model that happens to have a field by that name, so a
+    // declared envelope is the only envelope. Undeclared, the wrapper is treated as a model and the
+    // contract catches it, which is the loud failure this module exists to produce.
+    const middleware = new ResourceRouteMiddleware(context())
+
+    await expect(middleware.handle(makeEvent(userResource), async () => ({ items: [ada] }) as any))
+      .rejects.toThrow(/does not match the contract/)
+  })
+
+  it('shapes the model itself when it carries no declared key', async () => {
+    const middleware = new ResourceRouteMiddleware(context({ envelope: { payload: 'items' } }))
+
+    const output: any = await middleware.handle(makeEvent(userResource), async () => ada as any)
+
+    expect(output).toEqual({ id: 1, name: 'Ada' })
+  })
+})

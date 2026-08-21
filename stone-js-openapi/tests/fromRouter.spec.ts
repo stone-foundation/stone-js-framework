@@ -389,3 +389,21 @@ describe('describing a response the derivation already found', () => {
     expect(operation.responses?.[200].schema).toBeDefined()
   })
 })
+
+describe('a route that declares what it answers with', () => {
+  const resource = { schema: () => ({ toJSONSchema: () => ({ type: 'object' }) }) }
+
+  it('documents the status the route declared, since that is what builds the answer', () => {
+    // `@Post('/tasks', { response: { type: 'json', status: 201 } })` says it once. The document and
+    // the response are then the same statement rather than two.
+    const operation = operationFromRoute(route('/tasks', 'POST', { resource, response: { type: 'json', status: 201 } }))
+
+    expect(Object.keys(operation.responses ?? {})).toEqual(['201'])
+  })
+
+  it('prefers it over a bare statusCode, being the more complete declaration', () => {
+    const operation = operationFromRoute(route('/tasks', 'POST', { resource, statusCode: 200, response: { status: 202 } }))
+
+    expect(Object.keys(operation.responses ?? {})).toEqual(['202'])
+  })
+})

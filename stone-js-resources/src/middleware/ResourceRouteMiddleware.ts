@@ -70,12 +70,54 @@ export class ResourceRouteMiddleware {
     })
 
     if (this.isContentBearing(result)) {
-      const shaped = await this.shape(resource, result.content, context)
+      const shaped = await this.shapePayload(resource, result.content, context)
       result.setContent(shaped)
       return result
     }
 
-    return await this.shape(resource, result, context) as OutgoingResponse
+    return await this.shapePayload(resource, result, context) as OutgoingResponse
+  }
+
+  /**
+   * Shape a value, or shape what is inside the envelope the application declared.
+   *
+   * A page is `{ items: [...], meta: { total } }`, and `items` and `meta` are not fields of a model:
+   * projecting that object would publish the envelope as if it were the thing. An application names its
+   * own wrapper once, in `stone.resources.envelope`, and everything around the payload is left as it
+   * was, counts and cursors included.
+   *
+   * Nothing is assumed when nothing is declared, because guessing which key holds the payload would
+   * quietly mangle a model that happens to have one by that name.
+   *
+   * @param resource - The resource to apply.
+   * @param value - The value the handler produced.
+   * @param context - The resource context.
+   * @returns The projected value, wrapper intact.
+   */
+  private async shapePayload (resource: IResource<any, any>, value: unknown, context: any): Promise<unknown> {
+    const key = this.envelopeKeyOf(value)
+
+    if (key === undefined) { return await this.shape(resource, value, context) }
+
+    const envelope = value as Record<string, unknown>
+
+    return { ...envelope, [key]: await this.shape(resource, envelope[key], context) }
+  }
+
+  /**
+   * Which declared envelope key this value carries, if any.
+   *
+   * @param value - The value the handler produced.
+   * @returns The key holding the payload, or nothing when this is not an envelope.
+   */
+  private envelopeKeyOf (value: unknown): string | undefined {
+    const declared = this.blueprint.get<ResourcesConfig>('stone.resources', {}).envelope
+
+    if (declared === undefined || typeof value !== 'object' || value === null || Array.isArray(value)) {
+      return undefined
+    }
+
+    return [declared.payload].flat().find((candidate) => candidate in (value as Record<string, unknown>))
   }
 
   /**

@@ -1,10 +1,10 @@
 import { I18nManager } from '@stone-js/i18n'
-import { EventHandler, Get } from '@stone-js/router'
+import { EventHandler, Get, Post, Delete } from '@stone-js/router'
 import { IncomingHttpEvent } from '@stone-js/http-core'
 
 /**
- * One route, one translated string: everything this lab app needs to say whether the catalogs
- * travelled with the artefact or stayed behind in the source tree.
+ * One translated route, plus the two shapes of a declared response: the lab is where these are
+ * exercised against a real server rather than a stub.
  */
 @EventHandler('/')
 export class GreetingController {
@@ -13,4 +13,12 @@ export class GreetingController {
     const i18n = event.getMetadataValue<I18nManager>('i18n')
     return { text: i18n.t('common:greeting') }
   }
+
+  @Post('/tasks', { response: { type: 'json', status: 201, headers: { 'X-Lab': 'declared' } } })
+  create (): { id: number } {
+    return { id: 7 }
+  }
+
+  @Delete('/tasks/7', { response: { type: 'no-content' } })
+  remove (): void {}
 }

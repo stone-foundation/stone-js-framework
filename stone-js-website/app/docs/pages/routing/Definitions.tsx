@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { CodeTabs } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, H3, Callout, PropsTable, SeeAlso, Pager } from '../../components/content'
@@ -93,8 +93,35 @@ export class Definitions implements IPage<ReactIncomingEvent> {
           { name: 'rules', type: 'Record<string, RegExp | string>', desc: 'Constraints on path parameters.' },
           { name: 'bindings', type: 'Record<string, Resolver>', desc: 'Resolve a parameter into a model.' },
           { name: 'defaults', type: 'Record<string, unknown>', desc: 'Default values for optional parameters.' },
-          { name: 'redirect', type: 'string | object', desc: 'Redirect instead of handling.' }
+          { name: 'redirect', type: 'string | object', desc: 'Redirect instead of handling.' },
+          { name: 'response', type: '{ type?, status?, headers? }', desc: 'What the route answers with. The handler returns the payload; the framework builds the response.' }
         ]} />
+
+        <H2>Declaring what a route answers with</H2>
+        <p>
+          A route already says what it is: its path, its verb, what it accepts, whether it is protected.
+          <code> response</code> is the other half of that sentence, so the handler can stay about the
+          domain and there is one place to read when you want to know what an endpoint returns.
+        </p>
+        <Code file='app/TasksController.ts'>{`@Post('/tasks', { response: { type: 'json', status: 201 } })
+create (event: IncomingHttpEvent): Task {
+  return this.tasks.add(event.get('body'))   // the payload, nothing else
+}
+
+@Delete('/tasks/:id', { response: { type: 'no-content' } })
+remove (event: IncomingHttpEvent): void { this.tasks.remove(event.get('id')) }`}</Code>
+        <PropsTable nameHeader='key' rows={[
+          { name: 'type', type: "'json' | 'jsonp' | 'html' | 'text' | 'file' | 'redirect' | 'no-content'", default: "'json'", desc: 'What kind of answer it is.' },
+          { name: 'status', type: 'number', default: '200', desc: 'The status a successful answer carries. 302 for a redirect, 204 for no content.' },
+          { name: 'headers', type: 'Record<string, string>', desc: 'Headers to send with it.' }
+        ]} />
+        <Callout kind='note' title='A method decorator still wins'>
+          <code>@JsonHttpResponse(201)</code> produces the response itself, so when a handler has
+          already answered, the route option steps aside: the more specific statement is the one that
+          holds. The two forms are a choice, not a conflict. The published contract reads the same
+          declaration, so a route answering <code>201</code> is documented as answering{' '}
+          <code>201</code> without saying it twice.
+        </Callout>
 
         <Callout kind='note' title='The three forms apply here too'>
           A handler can be a class method (shown here), a factory, or a plain function. The imperative

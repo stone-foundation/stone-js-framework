@@ -95,6 +95,21 @@ async data (task: Task) {
           which is how a rule set or a policy can depend on a repository.
         </Callout>
 
+        <H3>When your payloads travel in an envelope</H3>
+        <p>
+          An endpoint answering a page returns something like <code>{'{ items, meta }'}</code>, and
+          <code> items</code> and <code>meta</code> are not fields of a model: shaping that object would
+          publish the wrapper as if it were the thing. Name your envelope once and the payload inside it
+          is what gets shaped, with counts and cursors left exactly as they were.
+        </p>
+        <Code file='stone.config.mjs'>{`blueprint.set('stone.resources.envelope', { payload: 'items' })
+// or several words, if your API has more than one: { payload: ['items', 'data'] }`}</Code>
+        <Callout kind='note' title='Undeclared by default, and deliberately'>
+          Guessing which key holds the payload would quietly mangle a model that happens to have a
+          field by that name. Without a declaration an envelope is treated as a model, and the contract
+          check refuses the answer, which is the loud failure this module exists to produce.
+        </Callout>
+
         <H3>The contract is protected, not merely published</H3>
         <p>
           Data that breaks the schema does not go out. A caller cannot detect a broken contract, and a
