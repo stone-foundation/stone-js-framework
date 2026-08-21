@@ -21,6 +21,20 @@ npm run ios      # opens the iOS simulator directly
 npm start        # or the interactive way: then press i (iOS) or a (Android)
 ```
 
+## Develop it in a browser
+
+Faster than a simulator, with Fast Refresh, and the same code runs on a device afterwards. Two
+dependencies the web target needs, and one command:
+
+```bash
+npx expo install react-dom react-native-web
+npx expo start --web
+```
+
+Your routes resolve, your loaders run, your screens render. What a browser cannot do it still
+cannot do: `react-native-web` covers the core primitives, not every native module, so a screen
+built on the camera or on secure storage has to be tried on a device.
+
 ## Test it
 
 The whole chain (domain, router, adapter) is pure JavaScript, so the exact modules the application boots are also tested under Node:
