@@ -33,6 +33,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "default": "./dist/cli.js"
+    },
+    "./metro": {
+      "types": "./dist/metro.d.ts",
+      "default": "./dist/metro.js"
     }
   },
   "engines": {
@@ -54,7 +62,8 @@
   },
   "dependencies": {
     "@stone-js/use-react-core": "workspace:*",
-    "@stone-js/use-view": "workspace:*"
+    "@stone-js/use-view": "workspace:*",
+    "cross-spawn": "^7.0.6"
   },
   "peerDependencies": {
     "@stone-js/browser-core": "workspace:*",
@@ -71,7 +80,9 @@
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
+    "@stone-js/cli": "workspace:*",
     "@testing-library/react": "^16.3.0",
+    "@types/cross-spawn": "^6.0.6",
     "@types/node": "^24.0.7",
     "@types/react": "^19.0.7",
     "@vitest/coverage-v8": "^3.2.4",
@@ -95,5 +106,8 @@
       "describe",
       "beforeEach"
     ]
+  },
+  "stone": {
+    "cliPlugin": "./dist/cli.js"
   }
 }

@@ -21,6 +21,7 @@ const builderRegistry = (devMode: 'self-hosted' | 'supervised'): any => ({
     target: devMode === 'self-hosted' ? 'react' : 'server',
     devMode,
     match: () => true,
+    devEntry: () => '/dist/server.mjs',
     resolver: () => devMode === 'self-hosted'
       ? { dev: selfHostedDev }
       : { dev: supervisedDev, watchFiles: supervisedWatchFiles }
@@ -199,5 +200,26 @@ describe('ServeCommand', () => {
       desc: 'imperative api'
     })
     expect(result).toBe(yargs)
+  })
+
+  it('launches nothing for a target that delegates its dev server elsewhere', async () => {
+    // What a native target does: Expo's own process is the dev server, so there is nothing for
+    // the CLI to launch or supervise, and the dev step owns the terminal.
+    context.blueprint.get = vi.fn((key: string) => key === 'stone.builder.builders'
+      ? {
+          only: {
+            target: 'native',
+            devMode: 'self-hosted',
+            match: () => true,
+            resolver: () => ({ dev: selfHostedDev })
+          }
+        }
+      : '')
+
+    const cmd = new ServeCommand(context)
+    await cmd.handle(event)
+
+    expect(selfHostedDev).toHaveBeenCalledWith(event)
+    expect(pmCreate).not.toHaveBeenCalled()
   })
 })

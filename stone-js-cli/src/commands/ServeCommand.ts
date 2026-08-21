@@ -5,6 +5,7 @@ import { ConsoleContext } from '../declarations'
 import { StoneReporter } from '../StoneReporter'
 import { ProcessManager } from '../server/ProcessManager'
 import { CommandOptions } from '@stone-js/node-cli-adapter'
+import { StoneBuilderDefinition } from '../builders/declarations'
 import { resolveBuilder, resolveBuilderDefinition, runBuilderStep } from '../builders/resolveBuilder'
 
 /**
@@ -76,9 +77,9 @@ export class ServeCommand {
     const definition = resolveBuilderDefinition(this.context, event)
 
     if (definition.devMode === 'self-hosted') {
-      await this.startSelfHostedServer(event)
+      await this.startSelfHostedServer(event, definition)
     } else {
-      await this.startServerAndWatchFiles(event)
+      await this.startServerAndWatchFiles(event, definition)
     }
   }
 
@@ -88,14 +89,22 @@ export class ServeCommand {
    *
    * @param event - The incoming event.
    */
-  private async startSelfHostedServer (event: IncomingEvent): Promise<void> {
+  private async startSelfHostedServer (event: IncomingEvent, definition: StoneBuilderDefinition): Promise<void> {
     this.reporter.step('Starting dev server…')
 
     await runBuilderStep(this.context, event, 'dev')
 
-    // Vite owns HMR; if its dev server exits on its own there is nothing left to do, so mirror
-    // its exit code.
-    this.launch(buildPath('server.mjs'), process.argv.slice(2), (code) => process.exit(code ?? 0))
+    const entry = definition.devEntry?.(this.context.blueprint)
+
+    if (entry === undefined) {
+      // The target delegates to another tool, whose own process is the dev server. There is
+      // nothing to launch and nothing to supervise, so the step above owns the terminal.
+      return
+    }
+
+    // The dev server owns reloading; if it exits on its own there is nothing left to do, so
+    // mirror its exit code.
+    this.launch(entry, process.argv.slice(2), (code) => process.exit(code ?? 0))
     this.reporter.hint('HMR enabled — press Ctrl+C to stop')
   }
 
@@ -105,8 +114,9 @@ export class ServeCommand {
    *
    * @param event - The incoming event.
    */
-  private async startServerAndWatchFiles (event: IncomingEvent): Promise<void> {
+  private async startServerAndWatchFiles (event: IncomingEvent, definition: StoneBuilderDefinition): Promise<void> {
     const builder = resolveBuilder(this.context, event)
+    const entry = definition.devEntry?.(this.context.blueprint) ?? buildPath('server.mjs')
 
     this.reporter.step('Starting dev server…')
     const spinner = this.reporter.spin('Building application…')
@@ -126,7 +136,7 @@ export class ServeCommand {
 
     // First launch prints the URLs (server.dev set printUrls=true); then we watch for changes.
     // If the server crashes on its own, keep the watcher alive so the next edit restarts it.
-    this.launch(buildPath('server.mjs'), process.argv.slice(2), (code) => {
+    this.launch(entry, process.argv.slice(2), (code) => {
       if (code !== null && code !== 0) {
         this.reporter.warn(`Server exited (code ${code}). Waiting for changes to restart…`)
       }

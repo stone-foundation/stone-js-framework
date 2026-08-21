@@ -76,6 +76,15 @@ export interface StoneBuilderDefinition {
   devMode?: 'supervised' | 'self-hosted'
 
   /**
+   * What `stone serve` should launch for a `self-hosted` target, if anything.
+   *
+   * The React target generates a Vite dev server and needs it launched and followed. A target
+   * that delegates to another tool returns nothing: that tool's own process is the dev server,
+   * and there is nothing left for the CLI to supervise.
+   */
+  devEntry?: (blueprint: IBlueprint) => string | undefined
+
+  /**
    * Where `stone preview` should start the built application from.
    *
    * A React build is served by a generated preview server, a backend build by its own bundle,

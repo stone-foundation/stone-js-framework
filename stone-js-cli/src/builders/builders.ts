@@ -25,6 +25,7 @@ export const reactBuilderDefinition: StoneBuilderDefinition = {
   target: 'react',
   priority: 10,
   devMode: 'self-hosted', // Vite owns HMR.
+  devEntry: () => buildPath('server.mjs'),
   previewEntry: () => buildPath('preview.mjs'),
   match: (blueprint: IBlueprint, _event: IncomingEvent) => hasReactViews(blueprint),
   resolver: (context) => new ReactBuilder(context)

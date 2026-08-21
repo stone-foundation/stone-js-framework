@@ -11,5 +11,19 @@ export default createRollupConfig({
   typescript,
   nodeResolve,
   nodeExternals,
-  extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs']
+  extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
+  builds: [
+    // The renderer (`.`). It never includes the build-time code, which reads the filesystem: a
+    // single `node:fs` import here and a native bundler could not load this package at all.
+    {
+      input: ['src/**/*.{ts,tsx}', '!src/cli/**/*', '!src/metro/**/*', '!src/build/**/*'],
+      file: 'dist/index.js',
+      barrel: { exclude: ['cli/', 'metro/', 'build/'] }
+    },
+    // The CLI plugin (`./cli`). `multiEntry: false` because auto-discovery reads this bundle's
+    // default export, and multi-entry re-exports named exports only.
+    { input: ['src/cli/index.ts'], file: 'dist/cli.js', multiEntry: false },
+    // The Metro integration (`./metro`), loaded from a project's `metro.config.js`.
+    { input: ['src/metro/index.ts'], file: 'dist/metro.js', multiEntry: false }
+  ]
 })

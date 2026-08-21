@@ -14,7 +14,9 @@ Everything before that last step is shared with the web renderer, from [`@stone-
 - **A real stack**: screens stack as the user goes deeper, each keeping its own state, so a back gesture has somewhere to go.
 - **Deep links for free**: with [`@stone-js/react-native-adapter`](https://www.npmjs.com/package/@stone-js/react-native-adapter), `myapp://tasks/42` reaches the page that owns `/tasks/:id`.
 - **Navigation through the router**: `useNavigate()` goes through the router, so a screen never renders another screen itself.
-- **No native module of its own**: this package imports nothing but React and Stone.js, so it adds no build step and no linking.
+- **Nothing to list**: your modules are collected from `app/` at build time, so adding a page is adding a file.
+- **One vocabulary**: `stone dev native` and `stone build native` alongside `stone dev` and `stone build`, with Expo still doing the bundling.
+- **No native module of its own**: the renderer imports nothing but React and Stone.js, so it adds no build step and no linking.
 
 ## Installation
 
@@ -24,6 +26,59 @@ npm i @stone-js/core @stone-js/router @stone-js/browser-core \
 ```
 
 React Native's `URL` is a stub without a usable `pathname`, which the router needs on every event, so a polyfill loads first. The adapter's README covers this and the Babel decorators option, both of which are required.
+
+## Zero configuration
+
+A web application never lists its pages: the build collects them. A native one should not have to
+either, and the only reason it did is that the collection is a bundler question, and no two
+bundlers answer it the same way. The web build asks Vite for `import.meta.glob`; Metro has no such
+thing and would not understand one.
+
+So the question is answered before any bundler runs. Two lines in `metro.config.js`:
+
+```js
+const { getDefaultConfig } = require('expo/metro-config')
+const { withStone } = require('@stone-js/use-react-native/metro')
+
+module.exports = withStone(getDefaultConfig(__dirname), __dirname)
+```
+
+and one import in your entry:
+
+```ts
+import { stoneApp } from '@stone-js/core'
+import { modules } from './.stone/modules'
+
+stoneApp({ modules }).run()
+```
+
+`.stone/modules.ts` is generated: real static imports of everything under `app/`, which is what
+Metro needs to see. Add `.stone/` to your `.gitignore` and never open it again.
+
+Why `metro.config.js` rather than a command: Metro loads that file whatever brought it up, so
+`expo start`, `expo run:ios` and an EAS build all get the generation without anyone remembering to
+ask for it. One thing to know is that it runs when Metro starts, not while it runs: adding a page
+to a running dev server means restarting it. Editing a page that already exists needs nothing,
+Fast Refresh was never involved.
+
+## The `native` build target
+
+Installing this package also gives the CLI a native target, auto-discovered, so there is one
+vocabulary across platforms:
+
+```bash
+stone dev native        # collects your modules, then `expo start`
+stone build native      # collects your modules, then `expo export`
+stone build native --platform ios
+```
+
+It is deliberately thin. Expo and Metro own native bundling, and they know about Hermes, the
+per-platform resolution, the native projects and the dev client; there is nothing to gain from a
+second opinion on any of it. Producing an installable application stays `expo run:ios` or an EAS
+build, which need a native toolchain and are better commands than any wrapper would be.
+
+Running `expo start` directly keeps working, and keeps collecting your modules, because that part
+lives in the Metro configuration rather than in the command.
 
 ## Usage
 
