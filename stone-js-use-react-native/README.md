@@ -135,6 +135,31 @@ export function App () {
 
 Each Stone screen becomes a native one, keyed by its own identity, so the navigator keeps its state as the stack grows. Nothing about your pages changes.
 
+## Developing in a browser
+
+The fastest loop on a native application is not a simulator, it is a browser tab. Expo serves a
+React Native application to one through `react-native-web`, with Fast Refresh, and the same code
+then runs on a device untouched. Everything in this package works there, verified by bundling the
+official starter for the web target.
+
+It is opt-in, because the web target needs two dependencies a native-only application has no
+reason to carry:
+
+```bash
+npx expo install react-dom react-native-web
+npx expo start --web
+```
+
+What you get is the real thing: your routes resolve, your loaders run, your screens render, deep
+links arrive as URLs. What you do not get is anything a browser cannot do, which is worth knowing
+before you trust the loop for a given screen. `react-native-web` covers the core primitives, not
+every native module, so a screen built on the camera, on secure storage or on a native gesture
+handler has to be tried on a device. Layout is close but not identical, and performance says
+nothing about the phone.
+
+Use it for the domain, the navigation and most of the interface. Use a device before believing
+anything about the parts that are actually native.
+
 ## Testing under Node
 
 Your domain, your routes and your loaders test without a device or a simulator, which is where
