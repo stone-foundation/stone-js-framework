@@ -128,6 +128,21 @@ function hasSchema (value: any): boolean {
 }
 
 /**
+ * Name a declaration in a way a person can act on.
+ *
+ * A route names a resource with a string, and a diagnostic that prints `[object Object]` for anything
+ * else tells the reader nothing about which endpoint to go and look at.
+ *
+ * @param declared - What the route declared.
+ * @returns Something readable.
+ */
+function nameOf (declared: unknown): string {
+  if (typeof declared === 'string') { return declared }
+  if (typeof declared === 'function') { return declared.name }
+  return typeof declared
+}
+
+/**
  * Read what a route promises to return, from the resource that will shape it.
  *
  * This is the half of a contract that usually has to be written twice: once as the projection the
@@ -157,7 +172,7 @@ export function readResource (
     registries.onSkipped?.({
       route,
       concern: 'resource',
-      reason: `no resource is registered as '${String(declared)}', so its response is undocumented`
+      reason: `no resource is registered as '${nameOf(declared)}', so its response is undocumented`
     })
     return undefined
   }

@@ -50,7 +50,7 @@ export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [] } = 
         .filter((p) => p.endsWith('.d.ts'))
         .map((p) => relative(dir, p).replaceAll('\\', '/'))
         .filter((r) => r !== out && !exclude.some((e) => r.startsWith(e)))
-        .sort()
+        .sort((left, right) => left.localeCompare(right))
       // `.js`, not extensionless: this package is ESM with an `exports` map, and a consumer on
       // `moduleResolution: nodenext` cannot resolve a relative import without its extension. It
       // silently sees no exports at all, and TypeScript reports the misleading "has no exported

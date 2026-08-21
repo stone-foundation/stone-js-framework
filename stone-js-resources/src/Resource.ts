@@ -153,7 +153,7 @@ export abstract class Resource<Model = unknown, Output extends ResourceOutput = 
    * which would shadow the very method a subclass wrote — the override would exist on the prototype
    * and never be reached. This states the type and emits nothing.
    */
-  declare data?: (model: Model, context: ResourceContext) => unknown | Promise<unknown>
+  declare data?: (model: Model, context: ResourceContext) => unknown
 
   /**
    * Named subsets a caller may ask for. Override to expose fragments.

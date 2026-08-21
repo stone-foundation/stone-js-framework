@@ -68,7 +68,7 @@ export interface IResource<Model = unknown, Output = ResourceOutput> {
    * Asynchronous, and resolved from the container, so it may reach any service: fetch a relation,
    * translate a label, compute a total. Whatever it returns is what the schema then validates.
    */
-  data?: (model: Model, context: ResourceContext) => unknown | Promise<unknown>
+  data?: (model: Model, context: ResourceContext) => unknown
 
   /** Project one model. */
   item: (model: Model, context?: ResourceContext) => Promise<Output>

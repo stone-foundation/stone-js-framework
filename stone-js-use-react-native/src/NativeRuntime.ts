@@ -28,9 +28,30 @@ export class NativeRuntime {
   private readonly screenStack: ScreenStack
 
   /**
-   * The NativeRuntime instance.
+   * The runtime the application booted.
+   *
+   * Held privately with one named writer, because a public mutable field means any code at all can
+   * rebind the runtime the whole application is talking to.
    */
-  public static instance?: NativeRuntime
+  private static currentRuntime?: NativeRuntime
+
+  /**
+   * The booted runtime, for code that runs outside the container: a screen, the native entry.
+   *
+   * @returns The runtime, once the application has booted.
+   */
+  static current (): NativeRuntime | undefined {
+    return NativeRuntime.currentRuntime
+  }
+
+  /**
+   * Share the booted runtime. Called by the provider that booted it, and by nothing else.
+   *
+   * @param runtime - The runtime.
+   */
+  static share (runtime: NativeRuntime): void {
+    NativeRuntime.currentRuntime = runtime
+  }
 
   /**
    * Create a NativeRuntime.

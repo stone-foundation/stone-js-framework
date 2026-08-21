@@ -13,7 +13,7 @@ export interface ResourceDefinition<Model = unknown> {
   /** Named subsets a caller may ask for, each with its own schema. */
   fragments?: Record<string, ResourceSchema> | ((context: ResourceContext) => Record<string, ResourceSchema> | Promise<Record<string, ResourceSchema>>)
   /** Optional hook to shape or complete the model before it meets the schema. */
-  data?: (model: Model, context: ResourceContext) => unknown | Promise<unknown>
+  data?: (model: Model, context: ResourceContext) => unknown
 }
 
 /**
