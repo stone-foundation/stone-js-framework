@@ -20,9 +20,9 @@
     "test:cvg": "npm run test -- --coverage"
   },
   "dependencies": {
-    "@stone-js/browser-core": "^0.8.10",
-    "@stone-js/core": "^0.8.10",
-    "@stone-js/router": "^0.8.10",
+    "@stone-js/browser-core": "^0.8.11",
+    "@stone-js/core": "^0.8.11",
+    "@stone-js/router": "^0.8.11",
     "expo": "~57.0.14",
     "expo-status-bar": "~57.0.1",
     "fast-text-encoding": "^1.0.6",
