@@ -139,32 +139,17 @@ describe('SetLocaleMiddleware', () => {
     expect(b.meta.locale).toBe('fr')
   })
 
-  it('resolves a path-based locale via the router when a param is configured', async () => {
-    const route = { bind: vi.fn().mockResolvedValue(undefined), getParam: () => 'fr' }
-    const router = { findRoute: vi.fn().mockResolvedValue(route) }
+  it('resolves a path-based locale by asking the router its one question', async () => {
+    // The router owns the find-bind-read dance behind findParam, memoized per event: doing it here
+    // would be doing the router's job a second time, without the memo.
+    const router = { findParam: vi.fn().mockResolvedValue('fr') }
     const container = { bound: (k: string) => k === 'router', make: () => router }
     const event: any = { getHeader: () => 'en' } // header says en, but the path wins
-    const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang' }, event, container)
-    await result
-    expect(meta.locale).toBe('fr')
-    expect(route.bind).toHaveBeenCalledWith(event)
-  })
-
-  it('asks the router its one-call peek when it has one, instead of the find-bind-read dance', async () => {
-    // The router matches once per event however many middleware ask, so the peek is preferred the
-    // moment it exists; the dance stays for an older router that lacks it.
-    const router = {
-      findParam: vi.fn().mockResolvedValue('fr'),
-      findRoute: vi.fn() // must not be consulted when the peek exists
-    }
-    const container = { bound: (k: string) => k === 'router', make: () => router }
-    const event: any = { getHeader: () => 'en' }
     const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang' }, event, container)
     await result
 
     expect(meta.locale).toBe('fr')
     expect(router.findParam).toHaveBeenCalledWith(expect.anything(), 'lang')
-    expect(router.findRoute).not.toHaveBeenCalled()
   })
 
   it('falls back to event sources when the router is not available', async () => {
@@ -175,7 +160,7 @@ describe('SetLocaleMiddleware', () => {
   })
 
   it('is best-effort: a router error falls back to event sources', async () => {
-    const container = { bound: () => true, make: () => ({ findRoute: vi.fn().mockRejectedValue(new Error('boom')) }) }
+    const container = { bound: () => true, make: () => ({ findParam: vi.fn().mockRejectedValue(new Error('boom')) }) }
     const event: any = { getHeader: (n: string) => (n.toLowerCase() === 'x-locale' ? 'fr' : undefined) }
     const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang' }, event, container)
     await result
@@ -183,7 +168,7 @@ describe('SetLocaleMiddleware', () => {
   })
 
   it('falls back when the router finds no route', async () => {
-    const container = { bound: () => true, make: () => ({ findRoute: vi.fn().mockResolvedValue(undefined) }) }
+    const container = { bound: () => true, make: () => ({ findParam: vi.fn().mockResolvedValue(undefined) }) }
     const event: any = { getHeader: () => undefined, locale: 'en' }
     const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang', fallbackLocale: 'en' }, event, container)
     await result
