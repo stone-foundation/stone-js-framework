@@ -120,3 +120,43 @@ describe('HttpErrorHandler', () => {
     expect(response).toEqual({ status: 500, body: 'Internal Server Error' })
   })
 })
+
+describe('an error that declares its own status', () => {
+  const handle = (error: Error): any => {
+    const handler: any = new HttpErrorHandler({ logger: { error: vi.fn() } } as any)
+    return handler.handle(error, { preferredType: () => 'json' } as any)
+  }
+
+  class AgnosticRefusal extends Error {
+    readonly statusCode = 429
+    readonly headers = { 'Retry-After': '30' }
+    constructor () { super('Too many requests'); this.name = 'AgnosticRefusal' }
+  }
+
+  it('answers that status, instead of turning a refusal into a bug report', () => {
+    // A platform-agnostic module cannot import this package, so it says what it means on the error.
+    // Keyed only by name, every one of those answered 500: a deliberate refusal read as a crash, and
+    // a caller told to retry something that was never going to succeed.
+    const response: any = handle(new AgnosticRefusal())
+
+    expect(response.status).toBe(429)
+    expect(response.headers).toEqual({ 'Retry-After': '30' })
+  })
+
+  it('keeps 500 for an error that declares nothing usable', () => {
+    class Plain extends Error {}
+    class Nonsense extends Error { readonly statusCode = 42 }
+
+    expect(handle(new Plain('boom')).status).toBe(500)
+    expect(handle(new Nonsense('boom')).status).toBe(500)
+  })
+
+  it('still matches a known name first', () => {
+    class KnownName extends Error {
+      readonly statusCode = 418
+      constructor () { super('nope'); this.name = 'NotFoundError' }
+    }
+
+    expect(handle(new KnownName()).status).toBe(404)
+  })
+})

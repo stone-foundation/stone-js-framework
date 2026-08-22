@@ -61,8 +61,41 @@ export class HttpErrorHandler implements IErrorHandler<IncomingHttpEvent, Outgoi
       UnauthorizedError: () => unauthorizedHttpResponse(message('Unauthorized')),
       MethodNotAllowedError: () => methodNotAllowedHttpResponse(message('Method Not Allowed')),
       HttpError: () => createHttpResponse(message(httpError.statusMessage), httpError.statusCode, httpError.headers)
-    }[error.name] ?? (() => serverErrorHttpResponse(message('Internal Server Error')))
+    }[error.name] ?? this.fromDeclaredStatus(httpError, message)
 
     return response()
+  }
+
+  /**
+   * The status an error declared, when this handler does not know its name.
+   *
+   * A platform-agnostic module cannot import this package, so it says what it means on the error
+   * itself: `AuthorizationError` carries `403`, a limiter's error carries `429`. Keyed only by name,
+   * every one of those answered `500`, which turns a deliberate refusal into a bug report and tells
+   * the caller to retry an operation that was never going to succeed. Honouring the declaration is
+   * what lets a module choose its status without knowing which platform is answering.
+   *
+   * Nothing else changes: an error that declares no usable status is still an internal error, and a
+   * name this handler knows is still matched first.
+   *
+   * @param error - The error, read for a declared status and headers.
+   * @param message - How to render the body for the negotiated type.
+   * @returns The response builder.
+   */
+  private fromDeclaredStatus (
+    error: HttpError,
+    message: (error: string) => string | { error: string }
+  ): () => OutgoingHttpResponse {
+    const statusCode = error.statusCode
+
+    if (typeof statusCode !== 'number' || statusCode < 400 || statusCode > 599) {
+      return () => serverErrorHttpResponse(message('Internal Server Error'))
+    }
+
+    return () => createHttpResponse(
+      message(error.statusMessage ?? error.message),
+      statusCode,
+      error.headers ?? {}
+    )
   }
 }
