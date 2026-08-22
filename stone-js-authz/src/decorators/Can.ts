@@ -13,7 +13,7 @@ export interface CanRule {
 }
 
 /** What a route's `authz` option, or `@Can`, may hold. */
-export type CanInput = CanRule | string
+export type CanInput = CanRule | string | Array<CanRule | string>
 
 /**
  * What `@Can` records for one handler method.

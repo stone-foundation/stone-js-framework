@@ -24,6 +24,17 @@ export interface RouteMapperOptions<
 > {
   prefix?: string
   strict?: boolean
+  /**
+   * Module props that compose down a group instead of being replaced by the child's value.
+   *
+   * The router carries module props without knowing them, and the default merge is child-wins, which
+   * is right for most: a child's `contract` is its contract. Some props are gates, and a gate
+   * declared on a group must hold for every child on top of the child's own: `authz` above all. A
+   * module declares its own key composable through its blueprint (`stone.router.composableProps`),
+   * so the router still names no module. Parent first, for the same reason group middleware runs
+   * first: a group encloses its routes.
+   */
+  composableProps?: string[]
   maxDepth: number
   protocolPolicy?: ProtocolPolicy
   rules?: Record<string, RegExp>
@@ -158,6 +169,16 @@ export class RouteMapper<
     // of a protected surface to them.
     child.middleware = [parent.middleware, child.middleware].flat().filter((v) => v !== undefined)
     child.excludeMiddleware = [child.excludeMiddleware, parent.excludeMiddleware].flat().filter((v) => v !== undefined)
+
+    // Declared-composable module props: both sides flattened parent-first, so a gate on the group
+    // holds for every child on top of the child's own. One side alone flows through the spread below.
+    for (const prop of this.options.composableProps ?? []) {
+      const fromParent = (parent as Record<string, unknown>)[prop]
+      const fromChild = (child as Record<string, unknown>)[prop]
+      if (fromParent !== undefined && fromChild !== undefined) {
+        (child as Record<string, unknown>)[prop] = [fromParent, fromChild].flat()
+      }
+    }
 
     if (
       child.handler !== undefined &&
