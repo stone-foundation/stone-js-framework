@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/use-react-native",
-  "version": "0.8.15",
+  "version": "0.8.16",
   "description": "React Native renderer for Stone.js. Your pages become native screens: the same domain, the same routes, the same loaders, displayed by a native navigation stack.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

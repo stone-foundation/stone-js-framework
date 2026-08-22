@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.16
+
+### Patch Changes
+
+- Updated dependencies [2c11b54]
+  - @stone-js/http-core@0.8.16
+  - @stone-js/core@0.8.16
+  - @stone-js/config@0.8.16
+  - @stone-js/filesystem@0.8.16
+
 ## 0.8.15
 
 ### Patch Changes
