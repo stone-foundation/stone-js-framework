@@ -102,6 +102,32 @@ export class DatabaseCheck {
           describing <code>/health</code> tells a consumer nothing they can use.
         </Callout>
 
+        <H2>Which build is answering</H2>
+        <p>
+          A different question from the probe, and worth keeping separate. A probe is asked by a platform
+          that cannot read and only needs a verdict; this one is asked by a person mid-investigation, and
+          the answer is a fact. Is the deploy live yet. Is that canary the new build. Why does production
+          behave differently. Enabling telemetry publishes it at <code>/version</code>:
+        </p>
+        <Code file='terminal' lang='bash'>{`curl https://api.example/version
+{"name":"my-api","env":"production","platform":"aws_lambda_http","release":"2026.08.21-3"}`}</Code>
+        <p>
+          <code>platform</code> earns its place: one artefact can carry several adapters, each claiming
+          the runtime it detects, so which one won is not knowable from the outside. The release is
+          declared, never guessed from the environment, because an application already knows it and
+          already has a place to put what it knows:
+        </p>
+        <Code file='app/configurations/BuildConfiguration.ts'>{`@Configuration()
+export class BuildConfiguration implements IConfiguration {
+  configure (blueprint: IBlueprint): void {
+    blueprint.set('stone.telemetry.version.release', myReleaseTag)
+  }
+}`}</Code>
+        <PropsTable nameHeader='key' rows={[
+          { name: 'stone.telemetry.version.path', type: 'string | false', default: "'/version'", desc: 'Where it answers. false serves nothing, when even that is more than you want to say.' },
+          { name: 'stone.telemetry.version.release', type: 'string', default: "'unknown'", desc: 'What this build is called: a tag, a commit, a release number.' }
+        ]} />
+
         <H3>Exporters</H3>
         <p>
           Where telemetry goes is an exporter, swapped without touching your instrumentation. The

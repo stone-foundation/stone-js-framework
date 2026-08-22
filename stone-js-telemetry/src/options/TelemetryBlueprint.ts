@@ -2,7 +2,7 @@ import { TelemetryOptions } from '../declarations'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { TelemetryServiceProvider } from '../TelemetryServiceProvider'
 import { TelemetryMiddleware } from '../middleware/TelemetryMiddleware'
-import { MetaHealthRouteMiddleware } from '../middleware/HealthRouteMiddleware'
+import { MetaTelemetryRoutesMiddleware } from '../middleware/TelemetryRoutesMiddleware'
 
 /**
  * Telemetry configuration bucket (`stone.telemetry`).
@@ -44,11 +44,11 @@ export const telemetryBlueprint: TelemetryBlueprint = {
         { module: TelemetryMiddleware, isClass: true }
       ]
     },
-    // The probe is published when a router is in play, and answers `200` even with no checks
-    // registered: that is the truthful answer to "is this process up and routing".
+    // The two operational endpoints, published when a router is in play: `/health` answers a verdict
+    // to a platform, `/version` answers a fact to a person. Both opt out with `path: false`.
     blueprint: {
       middleware: [
-        MetaHealthRouteMiddleware
+        MetaTelemetryRoutesMiddleware
       ]
     }
   }

@@ -196,3 +196,87 @@ describe('I18nError', () => {
     expect(error.message).toBe('boom')
   })
 })
+
+describe('the request instance carries the request locale', () => {
+  const noRouter = { bound: () => false, make: () => undefined }
+
+  const handle = async (headerLocale: string): Promise<I18nManager> => {
+    // A fresh instance per call, the way the provider builds one per event: the kernel and its
+    // container are per-request, which is what makes moving the instance safe rather than a leak.
+    const i18n = I18nManager.create({ locale: 'en', locales: ['en', 'fr'], resources })
+    const event: any = {
+      getHeader: (name: string) => (name.toLowerCase() === 'x-locale' ? headerLocale : undefined),
+      locale: 'en',
+      setMetadataValue: () => {}
+    }
+    const middleware = new SetLocaleMiddleware({
+      i18n, blueprint: { get: () => ({ locales: ['en', 'fr'], fallbackLocale: 'en' }) }, container: noRouter
+    } as any)
+
+    await middleware.handle(event, (async () => 'RESPONSE') as any)
+
+    return i18n
+  }
+
+  it('moves the instance, so an injected i18n translates in the caller language', async () => {
+    // The reason it matters: a service written `constructor ({ i18n })` never sees the event, and used
+    // to translate in the configured locale whatever the caller asked for.
+    const i18n = await handle('fr')
+
+    expect(i18n.getLocale()).toBe('fr')
+    expect(i18n.t('hello', { name: 'X' })).toBe('Bonjour X !')
+  })
+
+  it('leaves the bound clone on the event correct either way', async () => {
+    // Belt and braces: a page rendered off the event needs no ambient state at all.
+    const i18n = I18nManager.create({ locale: 'en', locales: ['en', 'fr'], resources })
+    const meta: Record<string, any> = {}
+    const event: any = {
+      getHeader: (name: string) => (name.toLowerCase() === 'x-locale' ? 'fr' : undefined),
+      locale: 'en',
+      setMetadataValue: (key: string, value: unknown) => { meta[key] = value }
+    }
+
+    await new SetLocaleMiddleware({
+      i18n, blueprint: { get: () => ({ locales: ['en', 'fr'] }) }, container: noRouter
+    } as any).handle(event, (async () => 'RESPONSE') as any)
+
+    expect(meta.i18n.getLocale()).toBe('fr')
+    expect(meta.i18n.t('hello', { name: 'X' })).toBe('Bonjour X !')
+  })
+
+  it('answers each caller in their own language, request after request', async () => {
+    // One instance per request means no crosstalk: the second caller does not inherit the first's
+    // locale, and the first does not lose it.
+    const french = await handle('fr')
+    const english = await handle('en')
+
+    expect(french.getLocale()).toBe('fr')
+    expect(english.getLocale()).toBe('en')
+  })
+})
+
+describe('one caller never becomes the next one default', () => {
+  const noRouter = { bound: () => false, make: () => undefined }
+
+  it('keeps the configured locale as the last resort, whatever was served before', async () => {
+    // The coupling this avoids: the chain used to end on the instance's current locale, and the
+    // instance is now moved per request. On a per-request kernel that cannot bite; in a browser
+    // application, where one instance serves every navigation, it would.
+    const i18n = I18nManager.create({ locale: 'en', locales: ['en', 'fr'], resources })
+    const middleware = new SetLocaleMiddleware({
+      i18n, blueprint: { get: () => ({ locales: ['en', 'fr'] }) }, container: noRouter
+    } as any)
+
+    const asking = { getHeader: (n: string) => (n.toLowerCase() === 'x-locale' ? 'fr' : undefined), locale: 'en', setMetadataValue: () => {} }
+    const silent = { getHeader: () => undefined, locale: undefined, setMetadataValue: () => {} }
+
+    await middleware.handle(asking as any, (async () => 'ok') as any)
+    expect(i18n.getLocale()).toBe('fr')
+
+    const meta: Record<string, any> = {}
+    await middleware.handle({ ...silent, setMetadataValue: (k: string, v: unknown) => { meta[k] = v } } as any, (async () => 'ok') as any)
+
+    expect(meta.locale).toBe('en')
+  })
+})
