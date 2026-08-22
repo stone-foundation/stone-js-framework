@@ -1,4 +1,4 @@
-import { StoreDefinition } from '../defineStore'
+import { StoreRegistration } from '../defineStore'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { StoreServiceProvider } from '../StoreServiceProvider'
 
@@ -11,7 +11,7 @@ export interface StoreConfig {
    *
    * Filled by `@Store()` and by handing `defineStore(...)` definitions here.
    */
-  stores?: StoreDefinition[]
+  stores?: StoreRegistration[]
 
   /**
    * The snapshot key the hydrated states live under. Default `'stores'`.

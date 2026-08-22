@@ -75,6 +75,63 @@ export class Store implements IPage<ReactIncomingEvent> {
         </p>
         <CodeTabs file='app/stores/TasksStore.ts' decl={DECL} imp={IMP} />
 
+        <H2>A feature's store, as a class</H2>
+        <p>
+          A data declaration is state with no behaviour. A feature usually wants more: the
+          {' '}<code>competition</code> module has its client, its service and its store, and the
+          store's actions call the client. Write it as a class extending <code>StateStore</code> and
+          the container builds it, so its constructor is auto-wired like any other class:
+        </p>
+        <CodeTabs
+          file='app/competition/CompetitionStore.ts'
+          decl={`import { FeatureStore, StateStore } from '@stone-js/store'
+
+interface CompetitionState {
+  list: Competition[]
+  selected?: Competition
+}
+
+@FeatureStore('competition')
+export class CompetitionStore extends StateStore<CompetitionState> {
+  private readonly client: CompetitionClient
+
+  constructor ({ competitionClient }: { competitionClient: CompetitionClient }) {
+    super({ list: [] })
+    this.client = competitionClient
+  }
+
+  async load (): Promise<void> {
+    this.setState({ list: await this.client.list() })
+  }
+
+  select (id: string): void {
+    this.setState((state) => ({ selected: state.list.find((c) => c.id === id) }))
+  }
+}`}
+          imp={`import { defineStore, StateStore } from '@stone-js/store'
+
+// The same class, registered imperatively: neither paradigm can do what the other cannot.
+export const competitionStore = defineStore(CompetitionStore, { name: 'competition' })
+
+// Or a factory, for full control with the container in hand.
+export const liveStore = defineStore(
+  (container) => StateStore.create({ scores: container.make('feed').initial() }),
+  { name: 'live', isFactory: true }
+)`}
+        />
+        <p>
+          Everything a data store gets, a class store gets too: resolved under{' '}
+          <code>store.competition</code>, hydrated from the snapshot before the first render, and
+          per-request on the server by default. Declaring it is the whole setup, because the decorator
+          carries the module's blueprint with it.
+        </p>
+        <Callout kind='note' title='Actions live with the state they move'>
+          The alternative is a service that reaches into a bag of state it does not own. A class store
+          keeps the transition next to the data and gives it the dependencies it needs, which is what
+          makes <code>store.load()</code> from a page both testable and honest: the store is the only
+          writer of its own state.
+        </Callout>
+
         <H2>Reading and writing</H2>
         <p>
           The store is a container binding like any other, so a page reaches it through

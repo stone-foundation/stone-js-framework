@@ -47,7 +47,9 @@ export class StoreServiceProvider implements IServiceProvider {
 
     for (const definition of options.stores ?? []) {
       const build = (): IStore<any> => {
-        const store = makeStore(definition)
+        // The container is what auto-wires a class store's constructor and what a factory receives;
+        // a plain data definition ignores it.
+        const store = makeStore(definition, this.container)
         const state = hydrated[definition.name]
         // Adopted before anything can read the store, so the first render already has real state.
         if (state !== undefined) { store.hydrate(state) }
