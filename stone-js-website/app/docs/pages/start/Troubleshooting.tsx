@@ -99,7 +99,7 @@ export default defineConfig({
           everything is correct. Use <code>Reflect.ownKeys()</code> instead.
         </p>
         <Code file='node' lang='js'>{`Reflect.ownKeys(MyClass[Symbol.metadata] ?? {})   // the real keys
-JSON.stringify(MyClass[Symbol.metadata])          // always "{}" — do not trust it`}</Code>
+JSON.stringify(MyClass[Symbol.metadata])          // always "{}", so do not trust it`}</Code>
         <Callout kind='important' title='Node version'>
           Stone.js targets <code>Node &gt;= 20.11</code> and is <strong>ESM-only</strong>. On an older
           Node, or with <code>"type": "commonjs"</code>, decorators and <code>Symbol.metadata</code>

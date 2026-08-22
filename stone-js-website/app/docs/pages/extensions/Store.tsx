@@ -97,7 +97,7 @@ export class Store implements IPage<ReactIncomingEvent> {
             <p>
               Server rendering already serialises a page's data into the HTML: keyed per request,
               escaped against injection, read before anything renders. A solved channel. This store
-              does not invent one, it <em>uses</em> that one — which is exactly what a store outside
+              does not invent one, it <em>uses</em> that one, which is exactly what a store outside
               the framework cannot do, because it cannot write into a snapshot it does not know exists.
             </p>
           }
@@ -133,7 +133,7 @@ export class TasksStore {}`}</Code>
         <H3>Serialisation is stated, not guessed</H3>
         <p>
           A snapshot carries JSON. A store holding a <code>Map</code>, a <code>Date</code> or a class
-          instance therefore either says how it serialises, or is told that it cannot — because the
+          instance therefore either says how it serialises, or is told that it cannot, because the
           alternative is <code>[object Object]</code> appearing after hydration, in a place far from
           the declaration that caused it. <code>dehydrate</code> and <code>hydrate</code> are where
           that conversion lives when the state is not plain data.
@@ -143,7 +143,7 @@ export class TasksStore {}`}</Code>
         <p>
           A selector that builds a fresh object on every call compares unequal to itself, and a
           component subscribed to it re-renders forever. <code>watch</code> compares before it
-          notifies, so the core does not amplify the mistake — and the rule stays written down here
+          notifies, so the core does not amplify the mistake, and the rule stays written down here
           rather than passed around: select values, or memoise what you build.
         </p>
         <Aphorism>State crosses the boundary once, and arrives before the first paint.</Aphorism>

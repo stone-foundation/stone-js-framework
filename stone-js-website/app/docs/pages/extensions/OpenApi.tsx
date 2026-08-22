@@ -58,13 +58,13 @@ export const spec = OpenApiGenerator
         <H3>What is derived, and from where</H3>
         <p>
           Everything a route already says about itself, read from the route <em>and</em> from the
-          handler's own decorators — because both validation and resources work without a router, and a
+          handler's own decorators, because both validation and resources work without a router, and a
           contract that only read route options documented half of such an application.
         </p>
         <PropsTable nameHeader='Derived' rows={[
           { name: 'Request', type: 'validation', desc: 'From `validation:` on the route or `@Validate()` on the handler.' },
           { name: 'Response', type: 'resources', desc: 'From `resource:` on the route or `@Returns()` on the handler: the schema the resource publishes is the documented payload.' },
-          { name: 'Fragments', type: 'resources', desc: 'A query parameter with an enum of the names a caller may select — the parameter your app actually answers to.' },
+          { name: 'Fragments', type: 'resources', desc: 'A query parameter with an enum of the names a caller may select, the parameter your app actually answers to.' },
           { name: 'Security', type: 'auth / authz', desc: 'From `auth:` / `authz:` on the route, or `@Protect()` / `@Can()` on the handler.' }
         ]} />
         <p>
@@ -75,7 +75,7 @@ export const spec = OpenApiGenerator
 
         <H3>Saying more, on the route</H3>
         <p>
-          A route can add anything the derivation cannot know — a summary, tags, extra responses — under
+          A route can add anything the derivation cannot know (a summary, tags, extra responses) under
           {' '}<code>contract</code>. What you write there wins, because an author who wrote it meant it,
           and <code>contract: false</code> keeps an endpoint out of the document entirely.
         </p>

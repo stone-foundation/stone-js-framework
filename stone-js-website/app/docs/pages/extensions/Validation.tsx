@@ -129,7 +129,7 @@ create (event: IncomingHttpEvent): Task {
         <H3>Without a router, and without the route</H3>
         <p>
           The same thing said on the handler, for a single-handler service, a CLI command or a browser
-          event — anything with no route to hang it on. <code>@Validate</code> owns its own key, so the
+          event, anything with no route to hang it on. <code>@Validate</code> owns its own key, so the
           module works with a router and without one.
         </p>
         <Code file='app/CreateTask.ts'>{`@Validate({ body: CreateTaskSchema, query: ListQuerySchema })
@@ -137,8 +137,8 @@ handle (event: IncomingEvent): Task { … }`}</Code>
 
         <H3>Schemas as classes, registered by name</H3>
         <p>
-          A schema that needs services — translated messages, a repository to check uniqueness against
-          — is a class the container resolves, so its <code>rules()</code> can use what it was given.
+          A schema that needs services (translated messages, a repository to check uniqueness against)
+          is a class the container resolves, so its <code>rules()</code> can use what it was given.
           Register it once and refer to it by name from anywhere: the route stops importing schemas,
           and a shared query filter is declared in exactly one place.
         </p>

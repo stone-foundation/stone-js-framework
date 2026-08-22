@@ -46,7 +46,7 @@ export class GcpCloudFunctions implements IPage<ReactIncomingEvent> {
         <ArticleTop eyebrow='Adapters' title='GCP Cloud Functions' />
         <Lead>
           Google Cloud Functions invokes an HTTP function with the Functions Framework's
-          Express-flavoured <code>(req, res)</code> signature. <code>@stone-js/gcp-cloud-functions-http-adapter</code>
+          plain <code>(req, res)</code> signature. <code>@stone-js/gcp-cloud-functions-http-adapter</code>
           maps that call to an intention, runs your kernel, and writes the response back, so your
           routes run on Cloud Functions unchanged.
         </Lead>

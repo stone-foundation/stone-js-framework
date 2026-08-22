@@ -24,7 +24,7 @@ export class Resources implements IPage<ReactIncomingEvent> {
         <ArticleTop eyebrow='Extensions' title='Resources' />
         <Lead>
           Your internal model and your public representation are not the same thing. A resource is the
-          deliberate projection between them — declared as a <strong>schema</strong>, which is what lets
+          deliberate projection between them, declared as a <strong>schema</strong>, which is what lets
           one declaration project the response, hold it against its own promise before sending, and
           document it in the published contract.
         </Lead>
@@ -43,8 +43,8 @@ export class Resources implements IPage<ReactIncomingEvent> {
           }
           incarnation={
             <p>
-              A resource declares a schema instead. The schema <em>is</em> the projection — what it does
-              not describe is not exposed — and the same declaration validates the response before it is
+              A resource declares a schema instead. The schema <em>is</em> the projection: what it does
+              not describe is not exposed, and the same declaration validates the response before it is
               sent and gives <code>@stone-js/openapi</code> the exact output contract.
             </p>
           }
@@ -141,7 +141,7 @@ async data (task: Task) {
         <p>
           It fires on a genuine breach, not on a difference: a schema strips what it does not describe,
           so extra fields are simply not exposed. An application that would rather answer than be
-          correct can say so, explicitly, with{' '}<code>onViolation: 'warn'</code> — the breach then
+          correct can say so, explicitly, with{' '}<code>onViolation: 'warn'</code>. The breach then
           reaches the log instead of the caller.
         </p>
 
@@ -157,7 +157,7 @@ async data (task: Task) {
 
 // GET /tasks?view=summary`}</Code>
         <p>
-          The parameter names are configuration, not convention — an API that already answers
+          The parameter names are configuration, not convention: an API that already answers
           {' '}<code>?only=</code> keeps its vocabulary:
         </p>
         <Code file='app/Application.ts'>{`@Resources({ params: { fragment: 'only' }, onViolation: 'throw' })
@@ -209,7 +209,7 @@ export class TaskResource { … }
         ]} />
         <Callout kind='note' title='What the context carries'>
           <code>fields</code> and <code>include</code> from the request, the <code>fragment</code> the
-          caller selected, and the authenticated <code>principal</code> — because deciding what a caller
+          caller selected, and the authenticated <code>principal</code>, because deciding what a caller
           may see is the most common reason two callers get different shapes, and a resource that cannot
           see who is asking has to be told by the handler.
         </Callout>
@@ -217,7 +217,7 @@ export class TaskResource { … }
         <Callout kind='note' title='It reads schemas; it does not depend on a validator'>
           This module carries its own reader, so exposing data never requires enabling a validation
           module. The dialects it accepts are public specifications rather than one library's API:
-          Standard Schema first — Zod, Valibot, ArkType and others — then <code>safeParse</code>,
+          Standard Schema first (Zod, Valibot, ArkType and others), then <code>safeParse</code>,
           {' '}<code>parse</code> or <code>validate</code>. Supply your own <code>checker</code> to
           teach it a dialect of your own.
         </Callout>
@@ -225,7 +225,7 @@ export class TaskResource { … }
         <Callout kind='future' title='One declaration, three consumers'>
           The schema serves the response that leaves your API, the OpenAPI contract derived from it, and
           the resource itself, which holds the response against it before sending. Written once, it
-          cannot drift from itself — which is the failure mode of every hand-written contract.
+          cannot drift from itself, which is the failure mode of every hand-written contract.
         </Callout>
 
         <SeeAlso links={[

@@ -158,6 +158,8 @@ export const Application = defineStoneApp(handler, { name: 'my-app' }, [i18nBlue
             whole <code>stone.i18n</code> bucket with <code>blueprint.set('stone.i18n', {'{'} … {'}'})</code>,
             which drops what the build injected into it. Set the keys one at a time.
           </p>
+        </Callout>
+
         <Callout kind='note' title='An injected i18n speaks the caller language'>
           The middleware moves the request's own i18n instance to the resolved locale, so code that
           never sees the event still translates correctly: a service written{' '}
