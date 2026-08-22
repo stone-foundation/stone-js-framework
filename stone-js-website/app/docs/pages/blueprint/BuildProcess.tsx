@@ -1,8 +1,9 @@
 import { JSX } from 'react'
 import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
+import { StoneLink } from '@stone-js/use-react'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, H3, Callout, Principle, PropsTable, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, Aphorism, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/blueprint/build'
 
@@ -41,6 +42,29 @@ stone build --ssg    # same, pre-rendered to static HTML
 stone preview        # serve the production build
 stone export         # emit static output (SSG)`}</Code>
 
+        <H2>A target is registered, not hardcoded</H2>
+        <p>
+          The CLI knows how to run commands. It does not know what a React application is, nor a
+          native one. Each is a <em>target</em>, declared on the Blueprint under{' '}
+          <code>stone.builder.builders.&lt;name&gt;</code> by the package that is qualified to answer:
+          how views become an application is the renderer's business, and it carries its own build to
+          prove it.
+        </p>
+        <PropsTable nameHeader='Target' rows={[
+          { name: 'server', type: '@stone-js/cli', desc: 'A backend service, bundled with Rollup. The CLI\'s own, declared through the same public key as every other, so a first-party target has no back door.' },
+          { name: 'react', type: '@stone-js/use-react', desc: 'CSR, SSR and SSG, bundled with Vite. Auto-discovered from the renderer, so installing it is all a React project does.' },
+          { name: 'native', type: '@stone-js/use-react-native', desc: 'Collects your modules, then hands the bundling to Expo and Metro.' }
+        ]} />
+        <p>
+          The consequence is worth stating plainly: <strong>a project that renders nothing installs no
+          bundler.</strong> A backend service does not carry Vite, and a native application does not
+          carry either. And adding a renderer to the ecosystem does not mean editing the CLI, which is
+          what <StoneLink to='/docs/extending/cli-plugins'>a build plugin</StoneLink> is for.
+        </p>
+        <Aphorism>
+          The tool that runs commands does not get to know what a view is.
+        </Aphorism>
+
         <H2>Zero-config by default</H2>
         <p>
           There is nothing you must configure. The rendering strategy is deduced from the adapters you
@@ -77,7 +101,7 @@ export default defineConfig({})`}</Code>
         </p>
         <Code file='stone.config.mjs' lang='js'>{`export default defineBuilderConfig({
   builder: {
-    target: 'react',                 // 'react' | 'service' (usually deduced)
+    target: 'react',                 // 'server' | 'react' | 'native' | yours (usually deduced)
     rendering: 'ssg',                // pin instead of using the --ssg flag
     ssg: { routes: ['/sitemap'] }    // ADDED to the auto-derived routes
   }
@@ -85,7 +109,7 @@ export default defineConfig({})`}</Code>
 
         <H3>Config reference</H3>
         <PropsTable nameHeader='Setting' rows={[
-          { name: "builder.target", type: "'react' | 'service'", desc: 'A frontend (React) app, or a backend service. Usually deduced.' },
+          { name: 'builder.target', type: 'string', desc: 'Which registered target builds this application: `server`, `react`, `native`, or one a package of yours registered. Usually deduced from what the app enabled.' },
           { name: 'builder.rendering', type: "'csr' | 'ssr' | 'ssg'", desc: 'Pin the rendering mode. Deduced from adapters when omitted.' },
           { name: 'builder.ssg.routes', type: 'string[]', desc: 'Extra static paths, ADDED to the routes auto-derived from your pages.' },
           { name: 'builder.lazy', type: 'boolean', default: 'true', desc: 'Per-route code splitting (and the scanned routes that feed SSG).' },

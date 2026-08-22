@@ -7,8 +7,8 @@ import { ArticleTop, Lead, H2, Callout, Pager } from '../../components/content'
 const PATH = '/docs/reference/cli'
 
 const COMMANDS = [
-  { cmd: 'stone serve', alias: 'dev', desc: 'Start the development server with hot reload.' },
-  { cmd: 'stone build', alias: 'prod', desc: 'Produce the production build for your configured target.' },
+  { cmd: 'stone serve [target]', alias: 'dev', desc: 'Start the development server with hot reload. Name a target when the project stacks several, e.g. `stone dev native`.' },
+  { cmd: 'stone build [target]', alias: 'prod', desc: 'Produce the production build. The target is deduced from what the app enabled, or named as a positional argument.' },
   { cmd: 'stone preview', alias: 'p', desc: 'Serve the production build locally.' },
   { cmd: 'stone export', alias: 'e', desc: 'Emit the static output (SSG) to disk.' },
   { cmd: 'stone test', alias: 't', desc: 'Run the test suite (Vitest), configured from stone.config.mjs.' },
@@ -26,6 +26,7 @@ const FLAGS = [
   { flag: '--imperative, -i', on: 'serve', desc: 'Run against the imperative entry instead of the decorated one.' },
   { flag: '--language, -lang', on: 'serve, build', desc: 'Target language for the build (ts or js).' },
   { flag: '--target, -t', on: 'preview', desc: 'Which built target to preview.' },
+  { flag: '--platform', on: 'build (native)', desc: 'Which platform to bundle for: ios or android. Omit it and Expo decides.' },
   { flag: '--watch, -w', on: 'test', desc: 'Re-run tests when files change.' },
   { flag: '--coverage, -c', on: 'test', desc: 'Collect coverage for the run.' },
   { flag: '--starter', on: 'init', desc: 'Scaffold this starter id, e.g. basic-react-declarative. Skips the starter question.' },
