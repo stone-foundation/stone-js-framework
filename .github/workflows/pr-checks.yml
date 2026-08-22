@@ -75,6 +75,25 @@ jobs:
           fi
           echo "Every changeset declares patch."
 
+      # The `fixed` group is listed package by package, so a new module is in it only if someone
+      # remembered to add it. One that was forgotten versions on its own: it drifts off the shared
+      # line, and an application installing the set gets one package from a different release than
+      # every other. The group is the release contract, so membership is checked rather than trusted.
+      - name: Every published package is in the fixed group
+        run: |
+          missing=$(
+            for pkg in stone-js*/package.json; do
+              jq -r 'select(.private != true) | .name' "$pkg"
+            done | while read -r name; do
+              jq -e --arg n "$name" '.fixed[0] | index($n)' .changeset/config.json > /dev/null || echo "  $name"
+            done
+          )
+          if [ -n "$missing" ]; then
+            echo "::error::These published packages are absent from the \`fixed\` group in .changeset/config.json, so they would version on their own instead of on the shared line:%0A$missing"
+            exit 1
+          fi
+          echo "Every published package is in the fixed group."
+
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:

@@ -56,7 +56,9 @@
       "@stone-js/starters",
       "@stone-js/blog-starters",
       "@stone-js/i18n",
-      "@stone-js/react-native-adapter"
+      "@stone-js/react-native-adapter",
+      "@stone-js/store",
+      "@stone-js/rate-limit"
     ]
   ],
   "linked": [],

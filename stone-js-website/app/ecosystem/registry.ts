@@ -81,6 +81,7 @@ export const CATALOG: CatalogTier[] = [
       { name: '@stone-js/i18n', desc: 'Isomorphic i18n: zero-config catalogs, per-request locale, native Intl, lazy by default.', href: '/docs/extensions/i18n' },
       { name: '@stone-js/cloud-file', desc: 'File storage over S3, GCS and Azure Blob, with signed URLs.', href: '/docs/extensions/cloud-file' },
       { name: '@stone-js/cache', desc: 'Memory and Redis caching with a single API.', href: '/docs/extensions/cache' },
+      { name: '@stone-js/rate-limit', desc: 'Budgets declared on the route, keyed on the subject rather than the address.', href: '/docs/extensions/rate-limit' },
       { name: '@stone-js/queue', desc: 'Dispatch now or later, process with a worker, retry with backoff.', href: '/docs/extensions/queue' },
       { name: '@stone-js/realtime', desc: 'One Broadcaster API, backend and frontend: channels and presence.', href: '/docs/extensions/realtime' },
       { name: '@stone-js/event-bus', desc: 'Emit domain events to local and cloud targets; route them anywhere.', href: '/docs/extensions/event-bus' },

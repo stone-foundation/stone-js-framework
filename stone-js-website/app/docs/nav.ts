@@ -170,6 +170,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'i18n', path: '/docs/extensions/i18n' },
       { title: 'Cloud File (storage)', path: '/docs/extensions/cloud-file' },
       { title: 'Cache', path: '/docs/extensions/cache' },
+      { title: 'Rate limit', path: '/docs/extensions/rate-limit' },
       { title: 'Queue', path: '/docs/extensions/queue' },
       { title: 'Realtime', path: '/docs/extensions/realtime' },
       { title: 'Event Bus', path: '/docs/extensions/event-bus' },
