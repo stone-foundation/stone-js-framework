@@ -76,6 +76,17 @@ export class CanRouteMiddleware {
    * @throws {AuthorizationError} When the caller may not proceed.
    */
   private async enforce (event: IncomingEvent, declared: CanInput): Promise<void> {
+    // A chain is a conjunction of gates, enforced in declaration order: the group's policy first,
+    // then the child's, because that is the order the group composed them in and the outer gate is
+    // the one that must not be reachable past. The first denial answers, and later gates never run,
+    // for the same reason a guard runs before a transform.
+    if (Array.isArray(declared)) {
+      for (const gate of declared) {
+        await this.enforce(event, gate)
+      }
+      return
+    }
+
     if (typeof declared === 'string') {
       const policy = this.policy(declared)
       if (!(await policy.authorize(event))) {

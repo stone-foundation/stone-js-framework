@@ -46,7 +46,10 @@ export const authzBlueprint: AuthzBlueprint = {
     router: {
       middleware: [
         MetaCanRouteMiddleware
-      ]
+      ],
+      // A policy is a gate, and a gate on a group must hold for every child on top of the child's
+      // own. Declaring the key composable is how the router learns that without ever naming authz.
+      composableProps: ['authz']
     }
   }
 }

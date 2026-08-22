@@ -315,6 +315,9 @@ importers:
       '@stone-js/http-core':
         specifier: workspace:*
         version: link:../stone-js-http-core
+      '@stone-js/router':
+        specifier: workspace:*
+        version: link:../stone-js-router
       '@types/node':
         specifier: ^24.0.7
         version: 24.13.3

@@ -523,6 +523,15 @@ export interface RouterOptions<
   /** Base path prefix applied to all routes. */
   prefix?: string
 
+  /**
+   * Module props that compose down a group instead of being replaced by the child's value.
+   *
+   * Contributed by modules through their blueprints (`stone.router.composableProps`), never named by
+   * the router itself: `@stone-js/authz` declares `authz` composable so a group policy holds for
+   * every child on top of the child's own.
+   */
+  composableProps?: string[]
+
   /** Enables strict path matching. */
   strict?: boolean
 
