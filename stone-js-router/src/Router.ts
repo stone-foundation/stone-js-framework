@@ -37,6 +37,8 @@ export class Router<
   private groupDefinition?: FunctionalRouteGroupDefinition
   private currentRoute?: Route<IncomingEventType, OutgoingResponseType>
   private routes: RouteCollection<IncomingEventType, OutgoingResponseType>
+  /** Peeked routes, one per event, so asking twice matches once. Weak, so an event owns its entry. */
+  private readonly peekedRoutes = new WeakMap<object, Route<IncomingEventType, OutgoingResponseType>>()
 
   /**
    * Factory method for creating a router instance.
@@ -436,6 +438,69 @@ export class Router<
     this.currentRoute = this.routes.match(event)
 
     return this.currentRoute
+  }
+
+  /**
+   * The route this event resolves to, bound, from any layer.
+   *
+   * Before routing (a kernel or group middleware), no route exists on the event yet, and even on the
+   * router layer the parameters are only bound after the route middleware have run. Reading a
+   * parameter therefore took a three-line dance everywhere: find the route, bind it, read it. This is
+   * that dance, done once and remembered per event.
+   *
+   * It is a peek, not a dispatch: nothing is emitted, `currentRoute` is untouched, and the router's
+   * own resolution later proceeds exactly as if nobody had looked. The event's already-resolved route
+   * is reused when there is one, so asking after routing costs one map lookup.
+   *
+   * @param event - The incoming event.
+   * @returns The bound route.
+   * @throws {RouteNotFoundError} When no route matches the event.
+   */
+  async getBoundRoute (event: IncomingEventType): Promise<Route<IncomingEventType, OutgoingResponseType>> {
+    const peeked = this.peekedRoutes.get(event)
+    if (peeked !== undefined) { return peeked }
+
+    let route = event.getRoute?.<IncomingEventType, OutgoingResponseType>()
+
+    if (route === undefined) {
+      this.ensureUriWithinLimit(event)
+      route = this.routes.match(event)
+    }
+
+    await route.bind(event)
+    this.peekedRoutes.set(event, route)
+
+    return route
+  }
+
+  /**
+   * One parameter of the route this event resolves to, from any layer.
+   *
+   * The sugar over {@link getBoundRoute} for the common case: a group middleware reading the
+   * `orgCode` its guard needs, a locale middleware reading `:lang`. Named alongside
+   * {@link findRoute}, because `find*` is the family that takes an event and may match, where
+   * {@link getParam} reads the already-dispatched current route.
+   *
+   * A parameter of a route that does not exist is simply absent, so a miss answers the fallback
+   * rather than throwing: deciding that a request is a 404 is the router's job at dispatch, not the
+   * caller's at peek.
+   *
+   * @param event - The incoming event.
+   * @param name - The parameter to read.
+   * @param fallback - What to answer when the route has no such parameter, or no route matches.
+   * @returns The parameter's value, or the fallback.
+   */
+  async findParam<TReturn = unknown> (
+    event: IncomingEventType,
+    name: string,
+    fallback?: TReturn
+  ): Promise<TReturn | undefined> {
+    try {
+      return (await this.getBoundRoute(event)).getParam<TReturn>(name, fallback as TReturn)
+    } catch (error) {
+      if (error instanceof RouteNotFoundError) { return fallback }
+      throw error
+    }
   }
 
   /**
