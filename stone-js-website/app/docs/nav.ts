@@ -124,6 +124,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'Error pages', path: '/docs/frontend/error-pages' },
       { title: 'Assets', path: '/docs/frontend/assets' },
       { title: 'Rendering: CSR, SSR, SSG', path: '/docs/frontend/rendering' },
+      { title: 'Native screens', path: '/docs/frontend/native' },
       { title: 'use-view', path: '/docs/frontend/use-view' }
     ]
   },

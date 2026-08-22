@@ -1,10 +1,33 @@
 import { JSX } from 'react'
 import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
+import { StoneLink } from '@stone-js/use-react'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, H3, Callout, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/extending/cli-plugins'
+
+const TARGET = `
+import { StoneBuilderDefinition, StoneCliPlugin } from '@stone-js/cli'
+
+export const myBuilderDefinition: StoneBuilderDefinition = {
+  target: 'my-target',
+  priority: 10,
+  devMode: 'self-hosted',                     // or 'supervised', if the CLI runs the process
+  devEntry: () => buildPath('server.mjs'),
+  previewEntry: () => buildPath('preview.mjs'),
+  match: (blueprint) => hasMySources(blueprint),
+  resolver: (context) => new MyBuilder(context)
+}
+
+export function myCliPlugin (): StoneCliPlugin {
+  return {
+    name: '@acme/my-renderer',
+    description: 'Adds the my-target build.',
+    blueprintMiddleware: [{ module: SetMyBuilderMiddleware, priority: 4 }]
+  }
+}
+`
 
 /**
  * Extending: participate in the build with a CLI plugin.
@@ -154,6 +177,31 @@ export default defineBuilderConfig({
           The i18n plugin that gives you zero-config translations is built exactly this way. It has
           no privileged access: a community package that writes a module in <code>onPrepare</code>
           and adds it with <code>addModule</code> participates in the build as an equal.
+        </Callout>
+
+        <H2>Register a whole build target</H2>
+        <p>
+          A plugin can go further than contributing to a build: it can <em>be</em> one. A target is a
+          declaration on the Blueprint, so a package that knows how to turn its own sources into an
+          application says so, and the CLI resolves it like any other.
+        </p>
+        <Code file='src/cli/index.ts'>{TARGET}</Code>
+        <p>
+          Three fields carry the whole contract. <code>match</code> answers whether this target is the
+          one for this project, so detection stays with the package that can detect it.{' '}
+          <code>devMode</code> says whether the CLI supervises a process it started or follows one
+          that hosts itself. <code>resolver</code> returns the builder, whose middleware pipelines are
+          ordinary pipelines: a plugin can insert into them by priority.
+        </p>
+
+        <Callout kind='future' title='The framework did this to itself, and it is the proof'>
+          The CLI used to know how to build a React application, and shipped Vite to prove it, so a
+          backend project installed a web bundler it never ran. That knowledge now lives in{' '}
+          <StoneLink to='/docs/frontend'>the renderer</StoneLink>, registered through this exact
+          mechanism, and the CLI keeps one target of its own. Its dependency on the renderer is gone
+          with it. Nothing about the public path was reserved for first-party packages: the React
+          target and a target of yours are declared by the same key, which is the only way the public
+          path is worth anything.
         </Callout>
 
         <SeeAlso links={[

@@ -30,6 +30,16 @@ export class Testing implements IPage<ReactIncomingEvent> {
 
         <H2>Install</H2>
         <Code file='terminal' lang='bash'>{`npm i -D @stone-js/testing`}</Code>
+        <p>
+          The package itself knows about no platform: the main entry imports neither an HTTP package
+          nor a browser one. The event factories sit behind subpaths, so a native application, a CLI
+          one or a worker installs nothing it does not use.
+        </p>
+        <PropsTable nameHeader='Entry' rows={[
+          { name: '@stone-js/testing', type: 'always', desc: 'createTestApp, the client, container substitutions, and makeIncomingEvent for a platform-agnostic cause.' },
+          { name: '@stone-js/testing/http', type: 'needs @stone-js/http-core', desc: 'makeIncomingHttpEvent, for an application served over HTTP.' },
+          { name: '@stone-js/testing/browser', type: 'needs @stone-js/browser-core', desc: 'makeIncomingBrowserEvent, for a browser or a React Native application.' }
+        ]} />
 
         <H2>Behaviour over mocks</H2>
         <Principle
@@ -115,7 +125,10 @@ expect(response.html()).toContain('<h1>Tasks</h1>')`}</Code>
           { name: 'options.envFile', type: 'string | false', desc: 'Env file to load before booting. Defaults to .env.test; a missing file is not an error.' },
           { name: 'options.bindings', type: 'Record<string, unknown>', desc: 'Container substitutions by alias, bound after the app\'s own registrations.' },
           { name: 'app.send(event)', type: '(event) => Promise<Response>', desc: 'Dispatch an event through the full kernel.' },
-          { name: 'makeIncomingHttpEvent(opts)', type: '(opts) => event', desc: 'Build an event: { method, url, body, headers, query }.' },
+          { name: 'options.blueprint', type: 'Partial<StoneBlueprint>', desc: 'Configuration to force, merged after the app\'s own modules so it wins. The counterpart of bindings: one replaces a service, the other replaces a value.' },
+          { name: 'options.platform', type: 'string', desc: 'The context to run as, when an app stacks several. A browser or native renderer registers itself against it.' },
+          { name: 'makeIncomingHttpEvent(opts)', type: '(opts) => event', desc: 'From /http. Build an HTTP event: { method, url, body, headers, ip }.' },
+          { name: 'makeIncomingBrowserEvent(opts)', type: '(opts) => event', desc: 'From /browser. Build the event a browser or native app receives: { url, metadata }. Keeps your own scheme, so myapp://tasks/42 reaches the route a phone reaches.' },
           { name: 'response.statusCode', type: 'number', desc: 'The response status.' },
           { name: 'response.json()', type: '<T>() => T', desc: 'The body as data: parsed when the payload is a JSON string.' },
           { name: 'response.html() / text()', type: '() => string', desc: 'The body as text, for a rendered page.' }
@@ -132,6 +145,20 @@ expect(response.html()).toContain('<h1>Tasks</h1>')`}</Code>
           <code> makeIncomingEvent</code> builds a generic one, so the same <code>app.send()</code>
           exercises a CLI command or an agent tool call, no server and no argv parsing required.
         </p>
+        <p>
+          An application that <em>renders</em> needs its own: a browser and a phone receive an
+          <code> IncomingBrowserEvent</code>, and the React renderer keys its hydration snapshot on
+          that event's identity. Name the platform, send the event that platform delivers, and a
+          native application is tested exactly like a web one.
+        </p>
+        <Code file='tests/TaskScreen.spec.ts'>{`import { createTestApp } from '@stone-js/testing'
+import { makeIncomingBrowserEvent } from '@stone-js/testing/browser'
+import { REACT_NATIVE_PLATFORM } from '@stone-js/react-native-adapter'
+
+const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM })
+const response = await app.send(makeIncomingBrowserEvent({ url: 'myapp://tasks/42' }))
+
+expect(response.statusCode).toBe(200)`}</Code>
         <Code file='tests/prune.test.ts'>{`import { createTestApp, makeIncomingEvent } from '@stone-js/testing'
 
 const app = await createTestApp({ modules: [PruneCommand, TaskService] })
