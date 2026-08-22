@@ -542,6 +542,16 @@ export class Route<IncomingEventType extends IIncomingEvent = IIncomingEvent, Ou
     // Collapse redundant slashes in the path only (never touches the domain's `://`).
     path = path.replace(/\/{2,}/g, '/')
 
+    // The canonical path, which is what the route declared: the segment loop appends a separator
+    // after every segment, and that artefact leaked into every generated URL. Harmless to this
+    // router, whose matching tolerates it, but `/v1/openapi.json/` is a URL a CDN, a cache or a
+    // strict gateway may treat as a different resource than `/v1/openapi.json`. The root keeps its
+    // slash, being made of nothing else. Counted rather than matched: `/\/+$/` backtracks on a long
+    // run of slashes, the same super-linear pattern this codebase has removed before.
+    let end = path.length
+    while (end > 1 && path[end - 1] === '/') { end-- }
+    path = path.slice(0, end)
+
     // Combine domain, path, query, and hash.
     return [`${domainPart}${path}`, queryParams.length > 0 ? `?${queryParams}` : '', formatHash(hash)]
       .filter(part => part.length > 0)

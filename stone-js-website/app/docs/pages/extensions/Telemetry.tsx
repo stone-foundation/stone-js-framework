@@ -94,6 +94,14 @@ export class DatabaseCheck {
           { name: 'stone.telemetry.health.checks', type: 'MetaHealthCheck[]', desc: 'The registered checks. A module or an application adds to this list; the decorator does it for you.' },
           { name: 'stone.telemetry.health.timeout', type: 'number', default: '2000', desc: 'How long a single check may take before it counts as failed.' }
         ]} />
+        <Callout kind='note' title='Outside the API version, deliberately'>
+          Both operational endpoints escape the router's global prefix: under a <code>/v1</code>{' '}
+          router, the probe answers at <code>/health</code>, not <code>/v1/health</code>. A load
+          balancer knows no version, and a probe that moves the day the API version does is a probe
+          that goes dark. The declared path is served exactly as declared; write the version into
+          {' '}<code>stone.telemetry.health.path</code> yourself if you truly want it versioned.
+        </Callout>
+
         <Callout kind='note' title='It never hangs, and never stops at the first failure'>
           A check that does not answer within its timeout is a failed check, because a probe that waits
           is worse than one that fails: the platform waits with it. And a check that throws reports its
