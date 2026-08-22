@@ -1,5 +1,16 @@
 # @stone-js/use-react-core
 
+## 0.8.15
+
+### Patch Changes
+
+- @stone-js/core@0.8.15
+- @stone-js/config@0.8.15
+- @stone-js/http-core@0.8.15
+- @stone-js/router@0.8.15
+- @stone-js/browser-core@0.8.15
+- @stone-js/use-view@0.8.15
+
 ## 0.8.14
 
 ### Patch Changes
