@@ -150,6 +150,23 @@ describe('SetLocaleMiddleware', () => {
     expect(route.bind).toHaveBeenCalledWith(event)
   })
 
+  it('asks the router its one-call peek when it has one, instead of the find-bind-read dance', async () => {
+    // The router matches once per event however many middleware ask, so the peek is preferred the
+    // moment it exists; the dance stays for an older router that lacks it.
+    const router = {
+      findParam: vi.fn().mockResolvedValue('fr'),
+      findRoute: vi.fn() // must not be consulted when the peek exists
+    }
+    const container = { bound: (k: string) => k === 'router', make: () => router }
+    const event: any = { getHeader: () => 'en' }
+    const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang' }, event, container)
+    await result
+
+    expect(meta.locale).toBe('fr')
+    expect(router.findParam).toHaveBeenCalledWith(expect.anything(), 'lang')
+    expect(router.findRoute).not.toHaveBeenCalled()
+  })
+
   it('falls back to event sources when the router is not available', async () => {
     const event: any = { getHeader: (n: string) => (n.toLowerCase() === 'x-locale' ? 'fr' : undefined) }
     const { meta, result } = run({ locales: ['en', 'fr'], param: 'lang' }, event) // no router

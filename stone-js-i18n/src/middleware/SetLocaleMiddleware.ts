@@ -6,6 +6,8 @@ import { IBlueprint, IContainer, IncomingEvent, NextMiddleware, OutgoingResponse
 /** Duck-typed router/route, so i18n never imports `@stone-js/router` (stays platform-agnostic). */
 interface RouterLike {
   findRoute: (event: unknown) => Promise<RouteLike | undefined>
+  /** The one-call peek, when the router offers it: find, bind and read in a single question. */
+  findParam?: <T = string>(event: unknown, name: string, fallback?: T) => Promise<T | undefined>
 }
 interface RouteLike {
   bind: (event: unknown) => Promise<void>
@@ -101,7 +103,15 @@ export class SetLocaleMiddleware {
     if (this.options.param === undefined || !this.container.bound('router')) { return undefined }
 
     try {
-      const route = await this.container.make<RouterLike>('router').findRoute(event)
+      const router = this.container.make<RouterLike>('router')
+
+      // The router's own peek, when it has one: the find-bind-read dance in a single question,
+      // matched once per event however many middleware ask.
+      if (typeof router.findParam === 'function') {
+        return negotiate(await router.findParam<string>(event, this.options.param), this.options.locales)
+      }
+
+      const route = await router.findRoute(event)
       if (route === undefined) { return undefined }
       await route.bind(event)
       return negotiate(route.getParam<string>(this.options.param), this.options.locales)

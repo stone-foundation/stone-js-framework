@@ -60,6 +60,11 @@ export interface IIncomingEvent extends IncomingEvent {
   isMethod: (method: HttpMethod) => boolean
   getUri: (withDomain: boolean) => string | undefined
   setRouteResolver: <U extends IIncomingEvent, V = unknown>(resolver: () => Route<U, V>) => void
+  /**
+   * The resolved route, once routing has set one. Optional: before routing there is nothing to get,
+   * and the router itself only reads it as a shortcut.
+   */
+  getRoute?: <U extends IIncomingEvent, V = unknown>() => Route<U, V> | undefined
 }
 
 /**
@@ -81,6 +86,11 @@ export interface StoneIncomingEvent extends IncomingEvent {
   acceptsTypes: (...types: string[]) => boolean | string
   preferredType: (types: string[], defaultType?: string) => string
   setRouteResolver: <U extends IIncomingEvent, V = unknown>(resolver: () => Route<U, V>) => void
+  /**
+   * The resolved route, once routing has set one. Optional: before routing there is nothing to get,
+   * and the router itself only reads it as a shortcut.
+   */
+  getRoute?: <U extends IIncomingEvent, V = unknown>() => Route<U, V> | undefined
 }
 
 /**
