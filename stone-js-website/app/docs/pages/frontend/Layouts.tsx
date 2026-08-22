@@ -102,30 +102,33 @@ export const pages = [definePage(AdminPage, { path: '/admin', layout: 'admin' },
         </p>
         <CodeTabs
           file='app/AppProviders.tsx'
-          decl={`import { ViewProvider, IViewProvider } from '@stone-js/use-react'
-import { ReactNode } from 'react'
+          decl={`import { Component, ReactNode } from 'react'
+import { ViewProvider } from '@stone-js/use-react'
 
-@ViewProvider()
-export class AppProviders implements IViewProvider {
-  render ({ children }: { children: ReactNode }) {
+// A React component class, decorated. The build discovers it among your modules.
+@ViewProvider({ priority: 10 })
+export class AppProviders extends Component<{ children: ReactNode }> {
+  render () {
     return (
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
-          {children}
+          {this.props.children}
         </QueryClientProvider>
       </ThemeProvider>
     )
   }
 }`}
           imp={`import { defineViewProvider } from '@stone-js/use-react'
+import { ReactNode } from 'react'
 
-const AppProviders = () => ({
-  render: ({ children }) => (
-    <ThemeProvider><QueryClientProvider client={queryClient}>{children}</QueryClientProvider></ThemeProvider>
-  )
-})
+const AppProviders = ({ children }: { children: ReactNode }) => (
+  <ThemeProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  </ThemeProvider>
+)
 
-export const viewProviders = [defineViewProvider(AppProviders, {}, true)]`}
+// Ordering is by priority, whichever form you use, and the two can be mixed.
+export const viewProviders = [defineViewProvider(AppProviders, { priority: 10 })]`}
         />
         <Callout kind='note' title='Provider vs layout'>
           A layout frames a page's visible chrome and can differ per page. A view provider supplies

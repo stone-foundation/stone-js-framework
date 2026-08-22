@@ -129,6 +129,37 @@ import { i18nBlueprint } from '@stone-js/i18n'
 
 export const Application = defineStoneApp(handler, { name: 'my-app' }, [i18nBlueprint])`}</Code>
 
+        <Callout kind='important' title='The scan declares your locales, so negotiation just works'>
+          <p>
+            The build does not only collect the catalogs; it declares which locales exist. That matters
+            because content negotiation is skipped entirely when the framework does not know the list:
+            without it every caller gets the fallback language whatever they asked for, and under lazy
+            loading (the default) that is how an application answers raw keys, since only the resolved
+            locale is fetched and the resolved locale was never the caller's.
+          </p>
+          <p>
+            So <code>Accept-Language: fr-CA</code> resolves to your <code>fr</code> catalog with no
+            configuration at all. State <code>locales</code> yourself only to restrict the set.
+          </p>
+        </Callout>
+
+        <Callout kind='note' title='It says when it has nothing to translate with'>
+          <p>
+            A translation module with no catalogs never fails: <code>t('SOME_KEY')</code> answers{' '}
+            <code>SOME_KEY</code>, which reads like a missing entry rather than a missing module, passes
+            every in-process test, passes the build, and reaches production in the user's language. So
+            it speaks at both ends. The build reports what it found:
+          </p>
+          <Code file='terminal' lang='bash'>{`● [stone] i18n: 2 catalog(s), 2 locale(s) (en, fr)
+● [stone] i18n: no catalog found. Expected \`<root>/**/i18n/<locale>/<namespace>.json\``}</Code>
+          <p>
+            And the application warns at boot when nothing was registered, naming the four causes in the
+            order worth checking. The first is the one that actually bites: a configuration replacing the
+            whole <code>stone.i18n</code> bucket with <code>blueprint.set('stone.i18n', {'{'} … {'}'})</code>,
+            which drops what the build injected into it. Set the keys one at a time.
+          </p>
+        </Callout>
+
         <Callout kind='note' title='An injected i18n speaks the caller language'>
           The middleware moves the request's own i18n instance to the resolved locale, so code that
           never sees the event still translates correctly: a service written{' '}

@@ -93,7 +93,7 @@ create (event) {
         </p>
         <Code file='coupled-vs-deferred.ts'>{`// Coupled: knows the platform exactly. Runs on Node, and only Node.
 create (req, res) {
-  res.status(201).json(store.add({ title: req.body.title }))   // Express-shaped, forever
+  res.status(201).json(store.add({ title: req.body.title }))   // welded to these objects, forever
 }
 
 // Deferred: reads an intention, returns a value. Runs on every context.

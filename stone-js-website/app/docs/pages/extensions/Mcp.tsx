@@ -124,7 +124,7 @@ export default defineBuilderConfig({
         </p>
         <p>
           So the running application publishes its own truth, and the <strong>build</strong> arranges
-          it — not your application. Introspection is a development concern: this package ships a CLI
+          it, not your application. Introspection is a development concern: this package ships a CLI
           plugin, the CLI auto-discovers it from your direct dependencies, and on a development build
           it injects a hook that writes the resolved configuration to
           {' '}<code>.stone/app-context.json</code>. Your app never imports this module, and a
@@ -140,7 +140,7 @@ export default defineBuilderConfig({
         </p>
         <Callout kind='future' title='A file, not a dev endpoint'>
           The Blueprint is the setup dimension: assembled once before the first event, then read. So
-          publishing it at boot is not a snapshot of something moving, it <em>is</em> the value — which
+          publishing it at boot is not a snapshot of something moving, it <em>is</em> the value, which
           means no port to discover, no route added to your application, no token to protect, and it
           works for a CLI or an edge context that has no HTTP surface at all. What genuinely moves at
           run time is a different question, and will get a different tool.

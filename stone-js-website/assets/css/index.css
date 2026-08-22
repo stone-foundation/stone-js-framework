@@ -201,6 +201,13 @@ pre { margin: 0; padding: 26px 28px; overflow-x: auto; font-family: var(--mono);
 @keyframes shock { from { opacity: .6; transform: scale(.28); } to { opacity: 0; transform: scale(1.04); } }
 .atom-caption { font-family: var(--mono); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--gres); margin: 0 0 26px; min-height: 18px; }
 .atom-caption b { color: var(--braise-txt); font-weight: 500; }
+/* One instruction, chosen by what the device can do rather than by what we assume. Done in CSS
+   because the page is pre-rendered: `matchMedia` would paint the wrong word and swap it on load. */
+.atom-caption .on-touch { display: none; }
+@media (hover: none) {
+  .atom-caption .on-hover { display: none; }
+  .atom-caption .on-touch { display: inline; }
+}
 
 .mono-title { font-size: clamp(40px, 6.2vw, 78px); line-height: 1.03; letter-spacing: -.012em; }
 .mono-title .shimmer {

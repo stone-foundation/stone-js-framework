@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, H3, Callout, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/start/troubleshooting'
 
@@ -99,7 +99,7 @@ export default defineConfig({
           everything is correct. Use <code>Reflect.ownKeys()</code> instead.
         </p>
         <Code file='node' lang='js'>{`Reflect.ownKeys(MyClass[Symbol.metadata] ?? {})   // the real keys
-JSON.stringify(MyClass[Symbol.metadata])          // always "{}" — do not trust it`}</Code>
+JSON.stringify(MyClass[Symbol.metadata])          // always "{}", so do not trust it`}</Code>
         <Callout kind='important' title='Node version'>
           Stone.js targets <code>Node &gt;= 20.11</code> and is <strong>ESM-only</strong>. On an older
           Node, or with <code>"type": "commonjs"</code>, decorators and <code>Symbol.metadata</code>
@@ -143,6 +143,31 @@ npm run dev            # or: npm run build`}</Code>
           precedence (static beats dynamic), host/domain constraints, and the HTTP method. Add a
           fallback route for a friendly page. See <a href='/docs/routing/matching'>Matching &amp;
           precedence</a>.
+        </p>
+
+        <H2>Translations answer their own keys</H2>
+        <p>
+          <code>t('SOME_KEY')</code> returns <code>SOME_KEY</code>. Nothing failed, which is the whole
+          problem: it reads like a missing entry rather than a missing module, and it survives every
+          in-process test. The application says so at boot now, and the causes are worth knowing in
+          order.
+        </p>
+        <PropsTable nameHeader='Cause' rows={[
+          { name: 'A configuration replaced the bucket', type: 'most common', desc: "blueprint.set('stone.i18n', { … }) overwrites what the build injected. Set keys one at a time: stone.i18n.locale." },
+          { name: 'The scan found nothing', type: '', desc: 'Catalogs must sit at <root>/**/i18n/<locale>/<namespace>.json. The build line says how many it found.' },
+          { name: 'The build plugin did not run', type: '', desc: '@stone-js/i18n must be a direct dependency of the app being built, and stone.builder.autoDiscover must not be false.' },
+          { name: 'Locales are unknown', type: 'wrong language', desc: 'Negotiation is skipped when the list is empty, so every caller gets the fallback. The build declares it; check the line it prints.' }
+        ]} />
+
+        <H2><code>Unknown file extension ".ts"</code> when running tests</H2>
+        <p>
+          Discovery imports your application's modules at run time, and an installed package doing that
+          sits outside the runner's transform, so Node is asked to load a <code>.ts</code> file directly.
+          {' '}<code>stone test</code> inlines the framework in the config it generates, which is what
+          puts those imports back through the transform. If you maintain your own Vitest config, keep
+          {' '}<code>server.deps.inline</code> with <code>'@stone-js/'</code> in it, as a string and not
+          a regular expression: the generated config is written as JSON, where a{' '}
+          <code>RegExp</code> becomes <code>{'{}'}</code> and the runner then finds no tests at all.
         </p>
 
         <H2>FAQ</H2>

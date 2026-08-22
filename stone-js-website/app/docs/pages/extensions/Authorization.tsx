@@ -128,6 +128,36 @@ export const abilityFor = (user) => defineAbility((can, cannot) => {
   return this.tasks.update(task, event.get('body'))
 }`}</Code>
 
+        <H3>A policy reads its own event, and holds its own services</H3>
+        <p>
+          A policy answers what <em>this</em> caller may do to <em>this</em> record, so it usually needs
+          both the event and whatever loads the record. It says which event it reads, and the container
+          builds it like any other class:
+        </p>
+        <Code file='app/policies/PostPolicy.ts'>{`@Policy('post.update')
+export class PostPolicy implements IPolicy<IncomingHttpEvent> {
+  constructor ({ posts }) { this.posts = posts }        // resolved, like any service
+
+  async authorize (event: IncomingHttpEvent): Promise<boolean> {
+    const post = await this.posts.find(event.get('id'))
+    return post.authorId === event.getUser<Actor>()?.id
+  }
+}`}</Code>
+        <p>
+          The type parameter is what makes <code>implements</code> usable at all: without it, narrowing
+          the parameter is rejected under a strict configuration and the clause has to be dropped. It
+          defaults to the agnostic <code>IncomingEvent</code>, so a policy that reads nothing
+          platform-specific writes nothing. <code>IAuthorizer&lt;User&gt;</code> does the same for a
+          custom authorizer that reasons about your own user type.
+        </p>
+        <Callout kind='note' title='A declaration is a service'>
+          <code>@Policy</code> declares three things at once: the class is a singleton service (so that
+          constructor works), it is bound under the prefixed alias <code>policy:post.update</code>, and
+          it activates the module. Prefixed on purpose: a policy named after a domain concept must not
+          compete with your own binding for that word. <code>@ValidationSchema</code>,
+          {' '}<code>@ApiResource</code> and <code>@HealthCheck</code> follow the same three rules.
+        </Callout>
+
         <H3>Reuse in the UI</H3>
         <p>
           Because the ability is a value, the frontend asks the same question before rendering a

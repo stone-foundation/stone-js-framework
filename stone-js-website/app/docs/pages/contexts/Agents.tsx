@@ -1,32 +1,11 @@
 import { JSX } from 'react'
-import { Code, CodeTabs } from '../../components/Code'
+import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, Callout, Principle, Aphorism, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/contexts/agents'
 
-const DECL = `
-import { StoneApp } from '@stone-js/core'
-import { Routing } from '@stone-js/router'
-import { McpDev } from '@stone-js/mcp-dev'
-
-@McpDev()   // 'stone mcp' serves the framework + this app to your coding agent
-@Routing()
-@StoneApp()
-export class Application {}
-`
-
-const IMP = `
-import { defineStoneApp } from '@stone-js/core'
-import { routerBlueprint } from '@stone-js/router'
-import { mcpDevBlueprint } from '@stone-js/mcp-dev'
-
-export const App = defineStoneApp(
-  { name: 'tasks' },
-  [routerBlueprint, mcpDevBlueprint]
-)
-`
 
 /**
  * Contexts: agents (MCP).
@@ -72,12 +51,20 @@ export class Agents implements IPage<ReactIncomingEvent> {
 
         <H2>Serve the agent that builds with you</H2>
         <p>
-          Add <code>@McpDev()</code> and the manifest gains one command, <code>stone mcp</code>. Run
-          <code>npx stone mcp --init</code> once and your coding agent starts the server itself, over
-          stdio, to reach the framework's knowledge and a live, read-only view of <em>this</em> app:
-          its routes, commands, providers and config.
+          Nothing enters your application. <code>@stone-js/mcp-dev</code> is a development dependency
+          whose CLI plugin registers one command, <code>stone mcp</code>. Run it once with{' '}
+          <code>--init</code> and your coding agent starts the server itself, over stdio, to reach the
+          framework's knowledge and a live, read-only view of <em>this</em> app: its routes, commands,
+          providers and config.
         </p>
-        <CodeTabs file='app/Application.ts' decl={DECL} imp={IMP} />
+        <Code file='terminal' lang='bash'>{`npm i -D @stone-js/mcp-dev
+npx stone mcp --init          # writes .mcp.json; your agent spawns the server itself`}</Code>
+        <Callout kind='note' title='Development tooling stays out of the application'>
+          There is no decorator and no blueprint to add, deliberately: an application should not carry a
+          module that only exists while you build it. The plugin is discovered from your
+          devDependencies, so the command appears without a line of configuration and ships with
+          nothing.
+        </Callout>
         <Code file='agent session' lang='text'>{`agent → tools/list
 stone ← stone_routes · stone_app · stone_search · stone_brief
 agent → stone_routes

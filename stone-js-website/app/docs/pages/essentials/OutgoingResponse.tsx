@@ -2,7 +2,7 @@ import { JSX } from 'react'
 import { Code } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, Callout, Principle, PropsTable, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/essentials/outgoing-response'
 
@@ -64,6 +64,28 @@ create (event: IncomingHttpEvent) {
   response.setHeader('Location', \`/tasks/\${task.id}\`)
   return response
 }`}</Code>
+
+        <H3>A status without naming a platform</H3>
+        <p>
+          Those helpers are HTTP, which is right in a handler that knows it serves HTTP and wrong in a
+          module meant to run anywhere. There are two portable ways to answer with a status, and both
+          leave the shaping to the boundary:
+        </p>
+        <Code file='app/Tasks.ts'>{`// on the route, when the status is a constant of the endpoint
+@Post('/', { response: { type: 'json', status: 201 } })
+create (event: IncomingHttpEvent) { return this.tasks.add(event.get('title')) }
+
+// from the handler, when the status is decided at run time
+async handle (event: IncomingEvent) {
+  const report = await this.checks.run()
+  return { content: report, statusCode: report.ok ? 200 : 503 }
+}`}</Code>
+        <p>
+          The second form is the kernel's own: an object carrying a <code>statusCode</code> is handed to
+          the platform's resolver, which turns it into an HTTP response here and into an exit code on a
+          CLI. Building the agnostic <code>OutgoingResponse</code> works too and takes the same road.
+          Nothing in either form names a platform, which is what lets a module serve every context.
+        </p>
 
         <H2>Response helpers</H2>
         <PropsTable nameHeader='Helper' rows={[

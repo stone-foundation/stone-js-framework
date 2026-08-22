@@ -2,7 +2,15 @@ import { Portal } from '../components/brand/Portal'
 import { CSSProperties, JSX, useRef, useState } from 'react'
 
 const MANIFESTO_URL = 'https://evens-stone.github.io/continuum-manifesto/manifesto'
-const CAPTION = 'hover the atom · observe · collapse ψ'
+/**
+ * The instruction, in the two forms a visitor can act on.
+ *
+ * Both are rendered and CSS picks one, because the page is pre-rendered: asking `matchMedia` would
+ * paint the wrong word first and swap it, and telling half the visitors to hover a screen they can
+ * only touch is worse than either.
+ */
+const CAPTION_HOVER = 'hover the atom · observe · collapse ψ'
+const CAPTION_TOUCH = 'tap the atom · observe · collapse ψ'
 
 interface Electron { name: string, th: string, r: string, fd: string, fD: string }
 interface Dot { th: string, r: string, sz: string, copper?: boolean }
@@ -119,7 +127,12 @@ export function HeroAtom (): JSX.Element {
         </div>
 
         <p className='atom-caption'>
-          {chosen === null ? CAPTION : <>ψ collapsed → <b>{chosen}</b></>}
+          {chosen === null
+            ? <>
+              <span className='on-hover'>{CAPTION_HOVER}</span>
+              <span className='on-touch'>{CAPTION_TOUCH}</span>
+            </>
+            : <>ψ collapsed → <b>{chosen}</b></>}
         </p>
         <span className='sr-live' role='status'>{chosen === null ? '' : `Wave function collapsed. Running on ${chosen}.`}</span>
 
