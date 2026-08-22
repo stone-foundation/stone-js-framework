@@ -128,6 +128,32 @@ export const abilityFor = (user) => defineAbility((can, cannot) => {
   return this.tasks.update(task, event.get('body'))
 }`}</Code>
 
+        <H3>Group policies, composed</H3>
+        <p>
+          A gate on a group holds for every child, on top of the child's own. Declare the parent's
+          policy on the handler and the child's on the route: the request passes both, parent first,
+          because the group encloses its routes, exactly the order group middleware runs in.
+        </p>
+        <Code file='app/AdminController.ts'>{`@EventHandler('/', { authz: 'policy.parent' })
+export class AdminController {
+  @Get('/name', { authz: 'platform.operate' })
+  name () { … }        // enforced: policy.parent, then platform.operate
+}`}</Code>
+        <p>
+          <code>authz</code> also takes an array outright, so a route composes its own chain:
+          {' '}<code>{"authz: ['policy.parent', 'platform.operate']"}</code>. A chain is a conjunction:
+          the first gate that says no answers, names itself, and the later gates never run, since a
+          child policy has no business running for a caller the group already refused.
+        </p>
+        <Callout kind='note' title='How the router composes without knowing authz'>
+          The router carries module props without naming them, and its default merge is child-wins,
+          which is right for most: a child's <code>contract</code> is its contract. A module whose prop
+          is a gate declares it composable through its blueprint
+          (<code>stone.router.composableProps</code>), and the router then flattens parent and child
+          values in order. <code>@stone-js/authz</code> declares <code>authz</code>; the router still
+          names no module.
+        </Callout>
+
         <H3>A policy reads its own event, and holds its own services</H3>
         <p>
           A policy answers what <em>this</em> caller may do to <em>this</em> record, so it usually needs
