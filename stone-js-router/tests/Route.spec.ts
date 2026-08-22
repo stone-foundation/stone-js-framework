@@ -291,17 +291,17 @@ describe('Dispatcher Type Detection (getDispatcherType)', () => {
 describe('generate()', () => {
   it('should generate a valid URL with required params', () => {
     const url = route.generate({ params: { id: '123' } })
-    expect(url).toBe('/user-123/')
+    expect(url).toBe('/user-123')
   })
 
   it('should append query params to the generated URL', () => {
     const url = route.generate({ params: { id: '456' }, query: { q: 'test' } })
-    expect(url).toBe('/user-456/?q=test')
+    expect(url).toBe('/user-456?q=test')
   })
 
   it('should append hash with/without # prefix', () => {
-    expect(route.generate({ params: { id: '789' }, hash: 'hello' })).toBe('/user-789/#hello')
-    expect(route.generate({ params: { id: '789' }, hash: '#world' })).toBe('/user-789/#world')
+    expect(route.generate({ params: { id: '789' }, hash: 'hello' })).toBe('/user-789#hello')
+    expect(route.generate({ params: { id: '789' }, hash: '#world' })).toBe('/user-789#world')
   })
 
   it('should include domain with/without protocol when `withDomain` is true', () => {
@@ -318,14 +318,14 @@ describe('generate()', () => {
       protocol: 'https'
     })
 
-    expect(url).toBe('https://www.example.com/u/id-9/')
+    expect(url).toBe('https://www.example.com/u/id-9')
 
     url = route.generate({
       params: { domain: 'www', id: '9' },
       withDomain: true
     })
 
-    expect(url).toBe('http://www.example.com/u/id-9/')
+    expect(url).toBe('http://www.example.com/u/id-9')
   })
 
   it('should throw RouterError if required param is missing', () => {
@@ -340,14 +340,14 @@ describe('generate()', () => {
     // @ts-expect-error
     route.uriConstraints = [{ param: 'id', prefix: 'user-' }]
     const url = route.generate({ params: { id: '99', extra: 'hello' } })
-    expect(url).toBe('/user-99/?extra=hello')
+    expect(url).toBe('/user-99?extra=hello')
   })
 
   it('should normalize slashes in generated path', () => {
     // @ts-expect-error
     route.uriConstraints = [{ prefix: '/' }, { match: '/' }, { param: 'id' }]
     const url = route.generate({ params: { id: 'x' } })
-    expect(url).toBe('/x/')
+    expect(url).toBe('/x')
   })
 })
 

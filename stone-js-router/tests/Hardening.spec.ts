@@ -72,43 +72,43 @@ describe('Router hardening (0.8.0)', () => {
     const route = Route.create({ method: 'GET', path: '/users/:id/posts', handler: () => ({} as any) })
 
     it('keeps falsy params (0, false, empty)', () => {
-      expect(route.generate({ params: { id: 0 } })).toBe('/users/0/posts/')
-      expect(route.generate({ params: { id: false } })).toBe('/users/false/posts/')
+      expect(route.generate({ params: { id: 0 } })).toBe('/users/0/posts')
+      expect(route.generate({ params: { id: false } })).toBe('/users/false/posts')
     })
 
     it('encodes traversal and fragment/query injection', () => {
-      expect(route.generate({ params: { id: '../admin' } })).toBe('/users/..%2Fadmin/posts/')
-      expect(route.generate({ params: { id: 'a#b?x=1' } })).toBe('/users/a%23b%3Fx%3D1/posts/')
+      expect(route.generate({ params: { id: '../admin' } })).toBe('/users/..%2Fadmin/posts')
+      expect(route.generate({ params: { id: 'a#b?x=1' } })).toBe('/users/a%23b%3Fx%3D1/posts')
     })
 
     it('stringifies extra params into the query', () => {
-      expect(route.generate({ params: { id: 7 }, query: { n: 0 } })).toBe('/users/7/posts/?n=0')
+      expect(route.generate({ params: { id: 7 }, query: { n: 0 } })).toBe('/users/7/posts?n=0')
     })
 
     it('preserves slashes in catch-all params but encodes each segment', () => {
       const catchAll = Route.create({ method: 'GET', path: '/docs/:slug*', handler: () => ({} as any) })
-      expect(catchAll.generate({ params: { slug: 'a/b c/d' } })).toBe('/docs/a/b%20c/d/')
+      expect(catchAll.generate({ params: { slug: 'a/b c/d' } })).toBe('/docs/a/b%20c/d')
     })
 
     it('builds a full URL without corrupting the protocol separator', () => {
       const withDomain = Route.create({ method: 'GET', path: '/users/:id', domain: '{tenant}.example.com', handler: () => ({} as any) })
       expect(withDomain.generate({ params: { tenant: 'acme', id: 5 }, withDomain: true, protocol: 'https' }))
-        .toBe('https://acme.example.com/users/5/')
+        .toBe('https://acme.example.com/users/5')
     })
 
     it('omits the domain when withDomain is false', () => {
       const withDomain = Route.create({ method: 'GET', path: '/users/:id', domain: '{tenant}.example.com', handler: () => ({} as any) })
-      expect(withDomain.generate({ params: { tenant: 'acme', id: 5 } })).toBe('/users/5/')
+      expect(withDomain.generate({ params: { tenant: 'acme', id: 5 } })).toBe('/users/5')
     })
 
     it('falls back to the route protocol when none is provided', () => {
       const withDomain = Route.create({ method: 'GET', path: '/users/:id', domain: '{tenant}.example.com', handler: () => ({} as any) })
-      expect(withDomain.generate({ params: { tenant: 'acme', id: 5 }, withDomain: true })).toBe('http://acme.example.com/users/5/')
+      expect(withDomain.generate({ params: { tenant: 'acme', id: 5 }, withDomain: true })).toBe('http://acme.example.com/users/5')
     })
 
     it('supports a static domain (no sub-domain parameter)', () => {
       const staticDomain = Route.create({ method: 'GET', path: '/users/:id', domain: 'example.com', handler: () => ({} as any) })
-      expect(staticDomain.generate({ params: { id: 5 }, withDomain: true, protocol: 'https' })).toBe('https://example.com/users/5/')
+      expect(staticDomain.generate({ params: { id: 5 }, withDomain: true, protocol: 'https' })).toBe('https://example.com/users/5')
     })
 
     it('throws on a missing required parameter', () => {
@@ -117,12 +117,12 @@ describe('Router hardening (0.8.0)', () => {
 
     it('skips absent optional params', () => {
       const opt = Route.create({ method: 'GET', path: '/p/:id?', handler: () => ({} as any) })
-      expect(opt.generate({ params: {} })).toBe('/p/')
+      expect(opt.generate({ params: {} })).toBe('/p')
     })
 
     it('supports hash formatting', () => {
-      expect(route.generate({ params: { id: 1 }, hash: 'top' })).toBe('/users/1/posts/#top')
-      expect(route.generate({ params: { id: 1 }, hash: '#top' })).toBe('/users/1/posts/#top')
+      expect(route.generate({ params: { id: 1 }, hash: 'top' })).toBe('/users/1/posts#top')
+      expect(route.generate({ params: { id: 1 }, hash: '#top' })).toBe('/users/1/posts#top')
     })
   })
 

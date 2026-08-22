@@ -124,3 +124,27 @@ describe('declaring a check', () => {
     expect(service).toMatchObject({ singleton: true, isClass: true, alias: 'health:database' })
   })
 })
+
+describe('where the operational endpoints live, relative to the API version', () => {
+  const definitionsOf = async (): Promise<any[]> => {
+    const added: any[] = []
+    const blueprint: any = {
+      get: (key: string, fallback?: unknown) => (key === 'stone.telemetry' ? {} : fallback),
+      add: (key: string, value: unknown[]) => added.push(...value as any[])
+    }
+    const { TelemetryRoutesMiddleware } = await import('../src/middleware/TelemetryRoutesMiddleware')
+    await TelemetryRoutesMiddleware({ blueprint } as any, (async () => blueprint) as any)
+    return added
+  }
+
+  it('both escape the router global prefix, because a load balancer knows no version', async () => {
+    // Served under /v1, the probe answers 404 at /health where the platform looks, and moves to
+    // /v2/health the day the API version does. A probe that changes address is a probe that goes
+    // dark, and which build answers is a question about the process, not about one version of its
+    // API.
+    const definitions = await definitionsOf()
+
+    expect(definitions).toHaveLength(2)
+    definitions.forEach((definition) => expect(definition.prefix).toBe(false))
+  })
+})

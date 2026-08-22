@@ -23,6 +23,12 @@ import { testAdapterBlueprint, testAdapterBlueprintFor } from './options/TestAda
  *
  * @example
  * ```ts
+ * import { createTestApp } from '@stone-js/testing'
+ * // Subpath on purpose: the event factories are platform-specific, and an agnostic application
+ * // should not carry the HTTP one. `makeIncomingEvent` (from the main entry) is NOT a substitute:
+ * // it builds the generic event, with no URL and no HTTP methods.
+ * import { makeIncomingHttpEvent } from '@stone-js/testing/http'
+ *
  * const app = await createTestApp()                                  // discovers app/**
  * const app = await createTestApp({ appDir: 'src' })                 // another layout
  * const app = await createTestApp({ modules: [Application, Tasks] }) // exactly these

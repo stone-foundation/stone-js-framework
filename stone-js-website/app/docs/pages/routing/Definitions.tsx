@@ -94,6 +94,7 @@ export class Definitions implements IPage<ReactIncomingEvent> {
           { name: 'bindings', type: 'Record<string, Resolver>', desc: 'Resolve a parameter into a model.' },
           { name: 'defaults', type: 'Record<string, unknown>', desc: 'Default values for optional parameters.' },
           { name: 'redirect', type: 'string | object', desc: 'Redirect instead of handling.' },
+          { name: 'prefix', type: 'string | false', desc: "This route's relation to the router's global prefix: unset inherits it, false escapes it, a string replaces it. Per-route wins, like strict." },
           { name: 'response', type: '{ type?, status?, headers? }', desc: 'What the route answers with. The handler returns the payload; the framework builds the response.' }
         ]} />
 

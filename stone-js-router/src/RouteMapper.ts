@@ -200,7 +200,13 @@ export class RouteMapper<
       bindings: { ...this.options.bindings, ...definition.bindings },
       defaults: { ...this.options.defaults, ...definition.defaults },
       name: definition.name?.replace(/\.{2,}/g, '.').replace(/^\.+|\.+$/g, ''),
-      path: ['/', this.options.prefix, definition.path].filter(Boolean).join('/').replace(/\/{2,}/g, '/')
+      // Per-route value wins, global is the fallback, `false` escapes: symmetric with `strict` and
+      // `protocolPolicy` above. A probe or a webhook must be able to hold its address while the API
+      // version in the global prefix moves.
+      path: ['/', definition.prefix === false ? undefined : (definition.prefix ?? this.options.prefix), definition.path]
+        .filter((part): part is string => typeof part === 'string' && part.length > 0)
+        .join('/')
+        .replace(/\/{2,}/g, '/')
     }
   }
 }

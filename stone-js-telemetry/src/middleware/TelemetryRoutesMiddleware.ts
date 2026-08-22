@@ -30,6 +30,12 @@ export const TelemetryRoutesMiddleware = async (
         path: pathOf(health.path, DEFAULT_HEALTH_PATH),
         method: 'GET',
         name: 'telemetry.health',
+        // Outside the router's global prefix, deliberately. A probe is asked by a load balancer that
+        // knows no API version: served under `/v1`, it answers 404 at `/health` today and moves to
+        // `/v2/health` the day the API version does, and a probe that changes address is a probe
+        // that goes dark. The declared path is served exactly as declared; an application that wants
+        // it versioned writes the version into the path itself.
+        prefix: false,
         // Kept out of the API surface, like the one below: a contract describing `/health` tells a
         // consumer nothing they can use.
         contract: false,
@@ -44,6 +50,9 @@ export const TelemetryRoutesMiddleware = async (
         path: pathOf(version.path, DEFAULT_VERSION_PATH),
         method: 'GET',
         name: 'telemetry.version',
+        // Same reasoning as the probe: which build answers is a question about the process, not
+        // about one version of its API.
+        prefix: false,
         contract: false,
         handler: { module: VersionHandler, action: 'handle', isClass: true }
       }

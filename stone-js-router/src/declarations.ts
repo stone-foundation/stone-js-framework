@@ -464,6 +464,17 @@ export interface RouteDefinition<
 > {
   name?: string
   strict?: boolean
+  /**
+   * This route's relation to the router's global `prefix`.
+   *
+   * Unset, the global prefix applies, which is what an API route wants: `/tasks` under a `/v1`
+   * router is `/v1/tasks`. `false` escapes it, for the routes that must not move when the API
+   * version does: a health probe is asked by a load balancer that knows no version, and a probe
+   * that changes address on a `/v2` migration is a probe that goes dark. A string replaces the
+   * global prefix for this route alone, the same per-route-wins rule as `strict` and
+   * `protocolPolicy`.
+   */
+  prefix?: string | false
   fallback?: boolean
   method?: HttpMethod
   methods?: HttpMethod[]
