@@ -1,5 +1,5 @@
 import { cloneValue } from '@stone-js/config'
-import { StoreDefinition } from '../defineStore'
+import { StoreRegistration } from '../defineStore'
 import { storeBlueprint } from '../options/StoreBlueprint'
 import { addBlueprint, classDecoratorLegacyWrapper, ClassType } from '@stone-js/core'
 
@@ -8,7 +8,7 @@ import { addBlueprint, classDecoratorLegacyWrapper, ClassType } from '@stone-js/
  */
 export interface StoreDecoratorOptions {
   /** The stores this application declares. */
-  stores?: StoreDefinition[]
+  stores?: StoreRegistration[]
   /** The snapshot key the hydrated states live under. */
   snapshotKey?: string
 }
