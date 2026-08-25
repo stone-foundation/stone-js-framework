@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.8.16
+
+### Patch Changes
+
+- Updated dependencies [7b78b7a]
+- Updated dependencies [2c11b54]
+- Updated dependencies [324b985]
+- Updated dependencies [6d3a36e]
+  - @stone-js/router@0.8.16
+  - @stone-js/http-core@0.8.16
+  - @stone-js/cli@0.8.16
+  - @stone-js/use-react-core@0.8.16
+  - @stone-js/use-view@0.8.16
+  - @stone-js/core@0.8.16
+  - @stone-js/pipeline@0.8.16
+  - @stone-js/config@0.8.16
+  - @stone-js/filesystem@0.8.16
+  - @stone-js/browser-core@0.8.16
+  - @stone-js/browser-adapter@0.8.16
+  - @stone-js/node-cli-adapter@0.8.16
+
 ## 0.8.15
 
 ### Patch Changes

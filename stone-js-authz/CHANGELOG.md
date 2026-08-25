@@ -1,5 +1,34 @@
 # @stone-js/authz
 
+## 0.8.16
+
+### Patch Changes
+
+- 7b78b7a: feat: a group's policy holds for every child, and authz composes
+
+  A policy on a group used to be replaced by the child's own, silently: the router's default merge is child-wins, which is right for most module props (a child's `contract` is its contract) and wrong for a gate. Now:
+
+  ```ts
+  @EventHandler("/", { authz: "policy.parent" })
+  export class AdminController {
+    @Get("/name", { authz: "platform.operate" })
+    name() {} // enforced: policy.parent, then platform.operate
+  }
+  ```
+
+  Both gates hold, parent first, because the group encloses its routes, the same order group middleware runs in. `authz` also accepts an array outright (`authz: ['a', 'b']`), so a route composes its own chain: a conjunction where the first denial answers, names itself, and later gates never run, since a child policy has no business running for a caller the group already refused.
+
+  The router learned this without learning authz: a module declares its own prop composable through its blueprint (`stone.router.composableProps`), and the router flattens parent and child values in order for the declared keys only. Everything undeclared keeps child-wins, unchanged.
+
+- 8c79868: test: the coverage gauge runs again on the two packages that chain a type check
+
+  `npm run test -- --coverage` appends the flag to the end of a compound script, so on the two packages whose `test` also runs `tsc -p tsconfig.types.json` the flag landed on the type check instead of on vitest, and the coverage gauge silently stopped running. Found by auditing the CI log for the `Coverage enabled` line per package rather than trusting the green exit code. `test:cvg` now states `--coverage` explicitly.
+
+- Updated dependencies [2c11b54]
+  - @stone-js/http-core@0.8.16
+  - @stone-js/core@0.8.16
+  - @stone-js/config@0.8.16
+
 ## 0.8.15
 
 ### Patch Changes

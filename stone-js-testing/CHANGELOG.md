@@ -1,5 +1,23 @@
 # @stone-js/testing
 
+## 0.8.16
+
+### Patch Changes
+
+- 6d3a36e: fix: the probe escapes the API version, and a generated URL is the canonical address
+
+  Three pilot findings, each measured before it was touched.
+
+  - **The health probe was served under the router's global prefix** (`/v1/health`), and `/health` answered 404, where a load balancer actually looks. A probe is asked by a platform that knows no API version, and a probe that moves the day the API version does is a probe that goes dark. Routes can now say their relation to the global prefix, `prefix: string | false` on the definition (unset inherits, `false` escapes, a string replaces, per-route wins like `strict`), and both operational endpoints declare `prefix: false`. Measured on a real server under a `/v1` router: `/health` 200, `/v1/health` 404, the API untouched under `/v1`.
+  - **`route.generate()` appended a trailing slash to every URL** (`/v1/openapi.json/`): an artefact of the segment loop that this router's own matching tolerates, but that a CDN, a cache or a strict gateway may treat as a different resource. Generated URLs are the canonical declared path now, root excepted.
+  - **`makeIncomingHttpEvent` moved to `@stone-js/testing/http`** without its documentation following: the `createTestApp` example now states both imports, and says why `makeIncomingEvent` from the main entry is not a substitute (it builds the generic event, with no URL and no HTTP methods).
+
+- Updated dependencies [2c11b54]
+  - @stone-js/http-core@0.8.16
+  - @stone-js/core@0.8.16
+  - @stone-js/filesystem@0.8.16
+  - @stone-js/browser-core@0.8.16
+
 ## 0.8.15
 
 ### Patch Changes

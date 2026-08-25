@@ -1,5 +1,53 @@
 # Changelog
 
+## 0.8.16
+
+### Patch Changes
+
+- 7b78b7a: feat: a group's policy holds for every child, and authz composes
+
+  A policy on a group used to be replaced by the child's own, silently: the router's default merge is child-wins, which is right for most module props (a child's `contract` is its contract) and wrong for a gate. Now:
+
+  ```ts
+  @EventHandler("/", { authz: "policy.parent" })
+  export class AdminController {
+    @Get("/name", { authz: "platform.operate" })
+    name() {} // enforced: policy.parent, then platform.operate
+  }
+  ```
+
+  Both gates hold, parent first, because the group encloses its routes, the same order group middleware runs in. `authz` also accepts an array outright (`authz: ['a', 'b']`), so a route composes its own chain: a conjunction where the first denial answers, names itself, and later gates never run, since a child policy has no business running for a caller the group already refused.
+
+  The router learned this without learning authz: a module declares its own prop composable through its blueprint (`stone.router.composableProps`), and the router flattens parent and child values in order for the declared keys only. Everything undeclared keeps child-wins, unchanged.
+
+- 324b985: feat(router): read a route parameter from any layer, in one call
+
+  A kernel or group middleware runs before routing, so reading a parameter took a three-line dance everywhere: find the route, bind it, read it. Even on the router layer, parameters are only bound after the route middleware have run. The router does the dance itself now:
+
+  ```ts
+  // A group middleware guarding /orgs/:orgCode, before any routing has happened:
+  const orgCode = await router.findParam(event, "orgCode", "");
+
+  // Or the bound route itself, for reading several things:
+  const route = await router.getBoundRoute(event);
+  ```
+
+  Three properties make it safe to call from anywhere. It is a **peek, not a dispatch**: nothing is emitted, `currentRoute` is untouched, and the router's own resolution later proceeds as if nobody had looked. The match is **remembered per event**, so a guard reading `orgCode` and a locale middleware reading `lang` pay for one match, not two. And `findParam` answers the **fallback when no route matches**, because deciding that a request is a 404 is the router's job at dispatch, not the caller's at peek (`getBoundRoute` throws, since asking for a route that does not exist is a different question).
+
+  Named in the `find*` family on purpose: `findParam` takes an event and may match, where the existing `getParam` reads the already-dispatched current route.
+
+  `@stone-js/i18n` dogfoods it: the locale middleware asks the router the one question when the router offers it, and keeps the old dance for older routers.
+
+- 6d3a36e: fix: the probe escapes the API version, and a generated URL is the canonical address
+
+  Three pilot findings, each measured before it was touched.
+
+  - **The health probe was served under the router's global prefix** (`/v1/health`), and `/health` answered 404, where a load balancer actually looks. A probe is asked by a platform that knows no API version, and a probe that moves the day the API version does is a probe that goes dark. Routes can now say their relation to the global prefix, `prefix: string | false` on the definition (unset inherits, `false` escapes, a string replaces, per-route wins like `strict`), and both operational endpoints declare `prefix: false`. Measured on a real server under a `/v1` router: `/health` 200, `/v1/health` 404, the API untouched under `/v1`.
+  - **`route.generate()` appended a trailing slash to every URL** (`/v1/openapi.json/`): an artefact of the segment loop that this router's own matching tolerates, but that a CDN, a cache or a strict gateway may treat as a different resource. Generated URLs are the canonical declared path now, root excepted.
+  - **`makeIncomingHttpEvent` moved to `@stone-js/testing/http`** without its documentation following: the `createTestApp` example now states both imports, and says why `makeIncomingEvent` from the main entry is not a substitute (it builds the generic event, with no URL and no HTTP methods).
+  - @stone-js/core@0.8.16
+  - @stone-js/pipeline@0.8.16
+
 ## 0.8.15
 
 ### Patch Changes
