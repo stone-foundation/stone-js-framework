@@ -249,3 +249,44 @@ describe('what a refusal carries', () => {
     expect(error.code).toBe('MINE')
   })
 })
+
+describe('a rule that names no subject at all', () => {
+  // `by` is required, and the type enforces that for TypeScript. Stone.js is JavaScript as much as
+  // TypeScript, so the doctrine cannot rest on a type: a vanilla application would otherwise get the
+  // silent default this module argues against, which is the exact failure the requirement removes.
+  const eventWith = (rateLimit: unknown): any => ({
+    ip: '1.2.3.4',
+    pathname: '/notes',
+    get: () => { throw new Error('Event is not bound') },
+    getRoute: () => ({
+      getOption: <T>(k: string): T | undefined => ({ name: 'notes', method: 'GET', path: '/notes', rateLimit } as any)[k]
+    })
+  })
+
+  it('says so out loud, naming the route and the way out', async () => {
+    const { middleware, warnings } = enforcerFor()
+
+    await middleware.handle(eventWith({ max: 2, window: 60 }), next)
+
+    const said = warnings.filter(([m]) => String(m).includes('declares no `by`'))
+    expect(said).toHaveLength(1)
+    expect(said[0][0]).toMatch(/by: 'address'/)
+    expect(said[0][1]).toMatchObject({ scope: 'notes:GET /notes', limit: 2 })
+  })
+
+  it('is still enforced, on the address, rather than waved through', async () => {
+    const { middleware } = enforcerFor()
+
+    await middleware.handle(eventWith({ max: 1, window: 60 }), next)
+
+    await expect(middleware.handle(eventWith({ max: 1, window: 60 }), next)).rejects.toThrow(RateLimitError)
+  })
+
+  it('says nothing once the word is there', async () => {
+    const { middleware, warnings } = enforcerFor()
+
+    await middleware.handle(eventWith({ max: 2, window: 60, by: 'address' }), next)
+
+    expect(warnings.filter(([m]) => String(m).includes('declares no `by`'))).toHaveLength(0)
+  })
+})

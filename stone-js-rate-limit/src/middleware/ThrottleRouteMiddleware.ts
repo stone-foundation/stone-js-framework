@@ -81,7 +81,8 @@ export class ThrottleRouteMiddleware {
     const scope = scopeOf(event.getRoute?.(), event.pathname ?? 'unknown')
     let tightest: Budget | undefined
 
-    for (const rule of rules) {
+    for (const declared of rules) {
+      const rule = this.applied(declared, scope)
       const windowMs = Math.max(1, rule.window) * 1000
       const subject = await this.subjectOf(event, rule)
 
@@ -125,6 +126,30 @@ export class ThrottleRouteMiddleware {
     }
 
     return tightest
+  }
+
+  /**
+   * The rule as it will be enforced, with the one thing a type cannot guarantee filled in.
+   *
+   * `by` is required, and the type says so. It says so to TypeScript only, and Stone.js is
+   * JavaScript as much as TypeScript, so the rule that matters most in this module cannot rest on a
+   * type alone. A rule arriving without a subject is still enforced, on the address, and says out
+   * loud that it is doing the one thing this module argues against.
+   *
+   * @param rule - What was declared.
+   * @param scope - What it applies to, for the log.
+   * @returns The rule to enforce.
+   */
+  private applied (rule: RateLimitRule, scope: string): RateLimitRule {
+    if (rule.by !== undefined) { return rule }
+
+    this.logger()?.warn(
+      'Rate limit rule declares no `by`, so it is counted on the caller address. Name the subject ' +
+      'it should belong to, or write `by: \'address\'` to say you meant it.',
+      { scope, limit: rule.max, window: rule.window }
+    )
+
+    return { ...rule, by: 'address' }
   }
 
   /**

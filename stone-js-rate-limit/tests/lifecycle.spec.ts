@@ -1,3 +1,4 @@
+import { clearProcessScope } from '@stone-js/core'
 import { RateLimitManager } from '../src/RateLimitManager'
 import { MemoryRateLimiter } from '../src/drivers/MemoryRateLimiter'
 import { RateLimitServiceProvider } from '../src/RateLimitServiceProvider'
@@ -15,7 +16,7 @@ const newContainer = (config: any): any => {
 const managerOf = (container: any): RateLimitManager => container.instanceIf.mock.calls[0][1]
 
 describe('a limiter has to outlive the event it is counting', () => {
-  afterEach(() => { RateLimitManager.setInstance(undefined) })
+  afterEach(() => { clearProcessScope(); RateLimitManager.setInstance(undefined) })
 
   it('keeps counting across container rebuilds', async () => {
     // The bug this pins was total and silent: the container is an execution context, rebuilt for
@@ -56,7 +57,8 @@ describe('a limiter has to outlive the event it is counting', () => {
     const first = newContainer({})
     new RateLimitServiceProvider(first).register()
 
-    // `setInstance(undefined)` is what a new process looks like from here.
+    // Dropping the process scope is what a new process looks like from here.
+    clearProcessScope()
     RateLimitManager.setInstance(undefined)
 
     const second = newContainer({})
@@ -67,7 +69,7 @@ describe('a limiter has to outlive the event it is counting', () => {
 })
 
 describe('a limiter an application builds itself', () => {
-  afterEach(() => { RateLimitManager.setInstance(undefined) })
+  afterEach(() => { clearProcessScope(); RateLimitManager.setInstance(undefined) })
 
   it('is declared with the other limiters, and survives every rebuild', async () => {
     // Registering it on the manager from a provider reads well and does not survive: the provider

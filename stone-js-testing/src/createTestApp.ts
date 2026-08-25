@@ -1,4 +1,4 @@
-import { StoneFactory } from '@stone-js/core'
+import { clearProcessScope, StoneFactory } from '@stone-js/core'
 import { TestClient } from './TestClient'
 import { loadTestEnv } from './loadTestEnv'
 import { TestAppOptions } from './declarations'
@@ -40,6 +40,12 @@ import { testAdapterBlueprint, testAdapterBlueprintFor } from './options/TestAda
  * ```
  */
 export async function createTestApp (options: TestAppOptions = {}): Promise<TestClient> {
+  // A test application is a new process, so it starts with nothing held per process. Without this,
+  // a module that legitimately keeps state across events, a cache's stores, a limiter's counters,
+  // would carry it from one test's application into the next one's, and a suite would pass or fail
+  // on the order its files happened to run in.
+  clearProcessScope()
+
   // Before the modules are imported: a `@Configuration` reading the environment runs at import time,
   // so loading the file afterwards would be too late to matter.
   if (options.envFile !== false) { loadTestEnv(options.envFile) }

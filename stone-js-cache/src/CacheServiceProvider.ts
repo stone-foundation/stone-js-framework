@@ -2,7 +2,7 @@ import { CacheManager } from './CacheManager'
 import { CacheError } from './errors/CacheError'
 import { MemoryCacheStore } from './drivers/MemoryCacheStore'
 import { RedisCacheStore } from './drivers/RedisCacheStore'
-import { IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
+import { IBlueprint, IContainer, IServiceProvider, perProcess, Promiseable } from '@stone-js/core'
 import { CacheConfig, StoreConfig, CacheStoreFactory } from './declarations'
 
 /**
@@ -34,17 +34,10 @@ export class CacheServiceProvider implements IServiceProvider {
   register (): Promiseable<void> {
     const config = this.container.make<IBlueprint>('blueprint').get<CacheConfig>('stone.cache', {})
 
-    // One manager per **process**, not per container.
-    //
-    // The container is an execution context: it is rebuilt for every event, and providers register
-    // again with it. A manager rebuilt on that rhythm takes its stores with it, so the memory store
-    // is empty on arrival every time and the cache never returns a hit: measured on a Node HTTP
-    // server, `remember` recomputed on every single request while reporting nothing wrong. Cached
-    // values have to outlive the event that computed them, by definition, so the manager is
-    // process-scoped and the container merely gets a handle on it.
-    //
-    // It is also what makes a store an application registered stay registered.
-    const manager = CacheManager.getInstance() ?? CacheManager.create(config.default ?? 'memory')
+    // Cached values have to outlive the event that computed them, by definition. The container does
+    // not: it is rebuilt for every event, and a manager rebuilt with it arrived empty every time, so
+    // a read never saw the previous request's write and `remember` recomputed forever.
+    const manager = perProcess(CacheManager, () => CacheManager.create(config.default ?? 'memory'))
 
     // Always-available zero-config default.
     manager.registerFactory('memory', () => MemoryCacheStore.create({ name: 'memory' }))

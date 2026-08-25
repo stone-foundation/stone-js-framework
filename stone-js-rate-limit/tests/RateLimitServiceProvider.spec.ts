@@ -1,3 +1,4 @@
+import { clearProcessScope } from '@stone-js/core'
 import { RateLimitManager } from '../src/RateLimitManager'
 import { MemoryRateLimiter } from '../src/drivers/MemoryRateLimiter'
 import { RedisRateLimiter } from '../src/drivers/RedisRateLimiter'
@@ -16,7 +17,7 @@ const makeContainer = (config: any): any => {
 const managerOf = (container: any): RateLimitManager => container.instanceIf.mock.calls[0][1]
 
 describe('wiring the module up', () => {
-  afterEach(() => { RateLimitManager.setInstance(undefined) })
+  afterEach(() => { clearProcessScope(); RateLimitManager.setInstance(undefined) })
 
   it('binds the manager and publishes it, so code outside the container can reach it', () => {
     const container = makeContainer({})

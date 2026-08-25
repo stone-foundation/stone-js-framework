@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { CodeTabs } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
 import { ArticleTop, Lead, H2, H3, Callout, PropsTable, SeeAlso, Pager } from '../../components/content'
@@ -96,6 +96,48 @@ export class Providers implements IPage<ReactIncomingEvent> {
           factory, never a plain function. This is the one place the three forms are restricted, and
           the restriction is just the definition of what a provider is.
         </p>
+
+        <H2>State that must outlive the event</H2>
+        <p>
+          The container is an execution context: it is created for one event and thrown away with it,
+          and every provider registers again with the next one. That is what makes an event's work
+          isolated from the next event's, and it is the one thing to know before a provider builds
+          something that holds state.
+        </p>
+        <Callout kind='important' title='A provider runs again for every event'>
+          <p>
+            Anything a provider builds is rebuilt with it: a cache's stores, a rate limiter's
+            counters, a queue of pending jobs, a set of open subscriptions. The state is gone before
+            anything reads it back, and nothing says so. Two shipped modules failed exactly this way,
+            a limiter that refused nothing and a cache that never returned a hit, both with a green
+            test suite, because a test builds the thing once.
+          </p>
+        </Callout>
+        <p>
+          State that must outlive the event does not belong to the container. It belongs to the
+          process, and <code>perProcess</code> is how a provider says so. The factory runs at most
+          once; the container still hands the value out, so nothing changes for whoever injects it.
+        </p>
+        <Code file='app/CacheServiceProvider.ts'>{`import { perProcess } from '@stone-js/core'
+
+export class CacheServiceProvider {
+  constructor (private readonly container) {}
+
+  register () {
+    const manager = perProcess(CacheManager, () => CacheManager.create('memory'))
+
+    this.container.instanceIf(CacheManager, manager)
+  }
+}`}</Code>
+        <p>
+          The test that catches this is the one that registers the provider <em>twice</em> and asserts
+          the state survived. A test that registers it once passes either way, which is precisely why
+          the failure shipped.
+        </p>
+        <Callout kind='note' title='In tests'>
+          <code>createTestApp</code> clears the process scope on every boot, since a test application
+          is a new process. Outside it, <code>clearProcessScope()</code> between tests does the same.
+        </Callout>
 
         <Callout kind='future' title='This is how the ecosystem attaches'>
           When you stack <code>@NodeHttp()</code> or add <code>@stone-js/auth</code>, you are adding

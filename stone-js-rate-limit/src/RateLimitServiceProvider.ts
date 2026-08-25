@@ -2,7 +2,7 @@ import { RateLimitManager } from './RateLimitManager'
 import { MemoryRateLimiter } from './drivers/MemoryRateLimiter'
 import { RedisRateLimiter } from './drivers/RedisRateLimiter'
 import { RateLimitConfigurationError } from './errors/RateLimitConfigurationError'
-import { IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
+import { IBlueprint, IContainer, IServiceProvider, perProcess, Promiseable } from '@stone-js/core'
 import { LimiterConfig, RateLimitConfig, RateLimiter, RateLimiterFactory } from './declarations'
 
 /** The drivers this package ships. Anything else is a factory the application registered. */
@@ -23,17 +23,10 @@ export class RateLimitServiceProvider implements IServiceProvider {
   register (): Promiseable<void> {
     const config = this.container.make<IBlueprint>('blueprint').get<RateLimitConfig>('stone.rateLimit', {})
 
-    // One manager per **process**, not per container.
-    //
-    // The container is an execution context: it is rebuilt for every event, and providers register
-    // again with it. A manager rebuilt on that rhythm takes its counters with it, so the memory
-    // limiter starts every request at zero and refuses nothing: a declared budget of two answered
-    // 200 forever, with the headers cheerfully reporting one request remaining. Counters have to
-    // outlive the event they are counting, by definition, so the manager is process-scoped and the
-    // container merely gets a handle on it.
-    //
-    // It is also what makes a limiter an application registered stay registered.
-    const manager = RateLimitManager.getInstance() ?? RateLimitManager.create(config.default ?? 'memory')
+    // Counters have to outlive the event they are counting, by definition. The container does not:
+    // it is rebuilt for every event, and a manager rebuilt with it started every request at zero,
+    // so a declared budget of two answered 200 forever while the headers reported one remaining.
+    const manager = perProcess(RateLimitManager, () => RateLimitManager.create(config.default ?? 'memory'))
 
     for (const limiter of config.limiters ?? []) {
       this.registerLimiter(manager, limiter)

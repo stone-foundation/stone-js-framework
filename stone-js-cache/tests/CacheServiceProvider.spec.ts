@@ -1,3 +1,4 @@
+import { clearProcessScope } from '@stone-js/core'
 import { CacheManager } from '../src/CacheManager'
 import { CacheError } from '../src/errors/CacheError'
 import { CacheServiceProvider } from '../src/CacheServiceProvider'
@@ -17,7 +18,7 @@ const cacheFactory = (container: any): (() => unknown) =>
   container.singletonIf.mock.calls.find((c: any[]) => c[0] === 'cache')[1]
 
 describe('CacheServiceProvider', () => {
-  afterEach(() => { CacheManager.setInstance(undefined) })
+  afterEach(() => { clearProcessScope(); CacheManager.setInstance(undefined) })
 
   it('binds the manager as `cacheManager`, the default store as `cache`, and publishes the instance', () => {
     const container = makeContainer({ default: 'redis', stores: [{ name: 'redis', driver: 'redis', url: 'redis://x' }] })
@@ -55,7 +56,7 @@ describe('CacheServiceProvider', () => {
 })
 
 describe('a cached value has to outlive the event that computed it', () => {
-  afterEach(() => { CacheManager.setInstance(undefined) })
+  afterEach(() => { clearProcessScope(); CacheManager.setInstance(undefined) })
 
   it('keeps what it stored across container rebuilds', async () => {
     // The bug this pins was total and silent. The container is an execution context, rebuilt for
@@ -91,7 +92,8 @@ describe('a cached value has to outlive the event that computed it', () => {
     const first = makeContainer({})
     new CacheServiceProvider(first).register()
 
-    // `setInstance(undefined)` is what a new process looks like from here.
+    // Dropping the process scope is what a new process looks like from here.
+    clearProcessScope()
     CacheManager.setInstance(undefined)
 
     const second = makeContainer({})
