@@ -66,12 +66,14 @@ On a route, which is the usual place:
 sendCode (event: IncomingHttpEvent) { … }
 ```
 
+`by` is required. The only default it could have is `'address'`, and that is the one thing this module argues against, so a rule that omitted the word would quietly mean the opposite of what is recommended here. Whoever wants the address writes `'address'`.
+
 On a group, which every child inherits:
 
 ```ts
-@EventHandler('/api', { rateLimit: { max: 100, window: 60, scope: 'api' } })
+@EventHandler('/api', { rateLimit: { max: 100, window: 60, by: 'address', scope: 'api' } })
 export class ApiHandler {
-  @Get('/notes', { rateLimit: { max: 20, window: 60 } })
+  @Get('/notes', { rateLimit: { max: 20, window: 60, by: 'address' } })
   notes (event: IncomingHttpEvent) { … }
 }
 ```
@@ -95,7 +97,7 @@ Or once, for everything that declares nothing, through `stone.rateLimit.global`.
 |---|---|
 | `max` | How many requests the window allows. |
 | `window` | How long the window lasts, in seconds. |
-| `by` | What the budget belongs to: a request field (`'email'`), alternatives (`'phone\|email'`, first present wins), `'user'` for the authenticated principal, or `'address'`. Defaults to `'address'`. |
+| `by` | **Required.** What the budget belongs to: a request field (`'email'`), alternatives (`'phone\|email'`, first present wins), `'user'` for the authenticated principal, `'address'`, or a function `(event) => string \| undefined`. |
 | `backstop` | The per-address bucket that runs alongside a subject budget, as a multiple of `max`. Defaults to ten times. `false` runs the subject budget alone. |
 | `scope` | A bucket shared with every rule naming it, instead of one per route. This is how a ceiling spanning several routes is expressed. |
 | `limiter` | Which configured limiter counts this rule. |
@@ -108,6 +110,33 @@ So the budget belongs to the thing being protected: the account, the mailbox, th
 
 Subjects are hashed before they are used as keys. A key is read by whoever debugs the store, and a mailbox has no business being there.
 
+### Where the subject lives
+
+A field name covers the common cases: this module reads it from the route parameters, then the body,
+then the query. Anything else is a function, and that is the honest answer, because an application
+knows where its subject lives and this module would only be guessing:
+
+```ts
+@Post('/auth/code', { rateLimit: { max: 3, window: 900, by: (event) => event.getHeader('x-account') } })
+```
+
+A subject read never breaks the route. Whatever fails, a resolver that throws included, the request
+falls back to the address bucket at the backstop, and a warning says which rule was downgraded.
+
+### `by: 'user'` runs before authentication
+
+Enforcement sits ahead of authentication on purpose, so at that point nothing has resolved a
+principal yet unless the application resolved one earlier. Say where yours lives:
+
+```ts
+blueprint.set('stone.rateLimit.principal', (event) => event.getUser()?.userId)
+```
+
+The default reads `event.getUser?.()` and takes its `id`, `sub` or `userId`. With nothing to bill,
+the rule falls back to the address at the backstop, ten times the limit, and warns: correct as a
+behaviour, unacceptable as a silence, since a budget of three would otherwise allow thirty with every
+test still green.
+
 ### Why `scope` exists
 
 A rule declared on a group is copied onto each child, and at enforcement time nothing records which ancestor a rule came from. Unscoped, a group's `max: 100` is therefore a hundred *per child route*. Naming a scope makes it the shared ceiling it looks like, and lets unrelated routes share one budget too.
@@ -118,24 +147,28 @@ A rule declared on a group is copied onto each child, and at enforcement time no
 
 `redis` is the one to use wherever the application runs as more than one process. One round trip per request, no read: the window index is part of the key, so a new window is a new key starting at zero, and the counter expires on its own.
 
-A deployment that already has a store can plug it in, which is how a serverless application counts where its state lives:
+A deployment that already has a store can plug it in, which is how a serverless application counts
+where its state lives. Declare it with the other limiters, not from a provider: the container is
+rebuilt for every event, so anything registered imperatively during one event is gone for the next.
 
 ```ts
-export class TableLimiterProvider implements IServiceProvider {
-  constructor (private readonly container: IContainer) {}
-
-  register (): void {
-    this.container.make<RateLimitManager>(RateLimitManager)
-      .register('table', { hit: async (key, limit, windowMs) => await countInMyTable(key, limit, windowMs) })
-  }
-}
+blueprint.set('stone.rateLimit', {
+  default: 'table',
+  limiters: [{
+    name: 'table',
+    factory: () => ({ hit: async (key, limit, windowMs) => await countInMyTable(key, limit, windowMs) })
+  }]
+})
 ```
 
 `hit` receives the limit rather than holding it, so an implementation that can refuse atomically through a conditional write has what it needs to express the condition, and pays nothing for a refusal.
 
 ## What a caller is told
 
-A refusal answers `429` with `Retry-After`. The error carries its own status, so an HTTP platform answers `429` and a CLI or queue consumer reads `RateLimitError` directly.
+A refusal answers `429` with `Retry-After`. The error carries its own status, so an HTTP platform
+answers `429` and a CLI or queue consumer reads `RateLimitError` directly. It also carries the stable
+code `RATE_LIMIT_EXCEEDED`, so an application maps it to its own error envelope without importing
+this package into its error handler.
 
 While a caller is within its budget, the response carries `RateLimit-Limit`, `RateLimit-Remaining` and `RateLimit-Reset`, reporting the budget closest to being exceeded. Set `stone.rateLimit.headers` to `false` to publish nothing.
 

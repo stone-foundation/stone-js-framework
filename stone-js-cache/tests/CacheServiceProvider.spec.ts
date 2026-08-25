@@ -53,3 +53,50 @@ describe('CacheServiceProvider', () => {
     expect(() => new CacheServiceProvider(container).register()).toThrow(CacheError)
   })
 })
+
+describe('a cached value has to outlive the event that computed it', () => {
+  afterEach(() => { CacheManager.setInstance(undefined) })
+
+  it('keeps what it stored across container rebuilds', async () => {
+    // The bug this pins was total and silent. The container is an execution context, rebuilt for
+    // every event, and the provider used to build a new manager with it, taking the memory store
+    // along. So the store was empty on arrival every single time: measured on a real Node HTTP
+    // server, `get` after `set` returned nothing on the next request, and `remember` recomputed
+    // forever while reporting nothing wrong.
+    const config = {}
+
+    const first = makeContainer(config)
+    new CacheServiceProvider(first).register()
+    await managerArg(first).store().set('k', 'v', { ttl: 300 })
+
+    const second = makeContainer(config)
+    new CacheServiceProvider(second).register()
+
+    await expect(managerArg(second).store().get('k')).resolves.toBe('v')
+  })
+
+  it('hands every container the same manager', () => {
+    const config = {}
+
+    const first = makeContainer(config)
+    new CacheServiceProvider(first).register()
+
+    const second = makeContainer(config)
+    new CacheServiceProvider(second).register()
+
+    expect(managerArg(second)).toBe(managerArg(first))
+  })
+
+  it('starts fresh in a new process, which is where a cache legitimately empties', () => {
+    const first = makeContainer({})
+    new CacheServiceProvider(first).register()
+
+    // `setInstance(undefined)` is what a new process looks like from here.
+    CacheManager.setInstance(undefined)
+
+    const second = makeContainer({})
+    new CacheServiceProvider(second).register()
+
+    expect(managerArg(second)).not.toBe(managerArg(first))
+  })
+})

@@ -33,7 +33,18 @@ export class CacheServiceProvider implements IServiceProvider {
    */
   register (): Promiseable<void> {
     const config = this.container.make<IBlueprint>('blueprint').get<CacheConfig>('stone.cache', {})
-    const manager = CacheManager.create(config.default ?? 'memory')
+
+    // One manager per **process**, not per container.
+    //
+    // The container is an execution context: it is rebuilt for every event, and providers register
+    // again with it. A manager rebuilt on that rhythm takes its stores with it, so the memory store
+    // is empty on arrival every time and the cache never returns a hit: measured on a Node HTTP
+    // server, `remember` recomputed on every single request while reporting nothing wrong. Cached
+    // values have to outlive the event that computed them, by definition, so the manager is
+    // process-scoped and the container merely gets a handle on it.
+    //
+    // It is also what makes a store an application registered stay registered.
+    const manager = CacheManager.getInstance() ?? CacheManager.create(config.default ?? 'memory')
 
     // Always-available zero-config default.
     manager.registerFactory('memory', () => MemoryCacheStore.create({ name: 'memory' }))

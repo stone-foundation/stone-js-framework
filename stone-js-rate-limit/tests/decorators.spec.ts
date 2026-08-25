@@ -71,7 +71,7 @@ describe('declaring what a handler is throttled by', () => {
       @Throttle({ max: 3, window: 900, by: 'email' })
       sendCode (): string { return 'sent' }
 
-      @Throttle({ max: 10, window: 60 })
+      @Throttle({ max: 10, window: 60, by: 'address' })
       verify (): string { return 'ok' }
     }
 
@@ -83,10 +83,10 @@ describe('declaring what a handler is throttled by', () => {
 
   it('is enforced for the action the event is dispatched to', async () => {
     class AuthController {
-      @Throttle({ max: 1, window: 60 })
+      @Throttle({ max: 1, window: 60, by: 'address' })
       sendCode (): string { return 'sent' }
 
-      @Throttle({ max: 5, window: 60 })
+      @Throttle({ max: 5, window: 60, by: 'address' })
       verify (): string { return 'ok' }
     }
 
@@ -101,7 +101,8 @@ describe('declaring what a handler is throttled by', () => {
     const event = (action: string): any => ({
       ip: '1.2.3.4',
       pathname: '/auth',
-      get: <T>(_k: string, fallback?: T) => fallback,
+      get: () => { throw new Error('Event is not bound') },
+      getFromBody: <T>(_k: string, fallback?: T) => fallback,
       getRoute: () => ({
         getOption: <T>(key: string): T | undefined => ({
           name: `auth.${action}`,
@@ -123,7 +124,7 @@ describe('declaring what a handler is throttled by', () => {
 
   it('lets a route override what the handler declared', async () => {
     class AuthController {
-      @Throttle({ max: 1, window: 60 })
+      @Throttle({ max: 1, window: 60, by: 'address' })
       sendCode (): string { return 'sent' }
     }
 
@@ -138,13 +139,14 @@ describe('declaring what a handler is throttled by', () => {
     const event = (): any => ({
       ip: '1.2.3.4',
       pathname: '/auth/sendCode',
-      get: <T>(_k: string, fallback?: T) => fallback,
+      get: () => { throw new Error('Event is not bound') },
+      getFromBody: <T>(_k: string, fallback?: T) => fallback,
       getRoute: () => ({
         getOption: <T>(key: string): T | undefined => ({
           name: 'auth.sendCode',
           method: 'POST',
           path: '/auth/sendCode',
-          rateLimit: { max: 3, window: 60 },
+          rateLimit: { max: 3, window: 60, by: 'address' },
           handler: { module: AuthController, action: 'sendCode' }
         } as any)[key]
       })

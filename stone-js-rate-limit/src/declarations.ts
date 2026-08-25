@@ -33,6 +33,17 @@ export interface RateLimiter {
 /** How a limiter is built from what the application configured. */
 export type RateLimiterFactory = (config: LimiterConfig) => RateLimiter
 
+/**
+ * How an application resolves what a request should be billed to.
+ *
+ * The escape hatch that keeps this module out of the business of guessing: an application knows
+ * where its subject lives, whether that is a claim in a token, a field of a body, a header its own
+ * edge signs, or a lookup a middleware of its own already did. Return nothing when the request
+ * carries none, and never throw: a subject that cannot be read must degrade, not break the route.
+ */
+export type RateLimitSubjectResolver<EventType = any> = (event: EventType) =>
+string | undefined | Promise<string | undefined>
+
 /** The drivers shipped here. Any other string is a driver an application registered itself. */
 export type RateLimitDriver = 'memory' | 'redis' | (string & {})
 
@@ -40,8 +51,17 @@ export type RateLimitDriver = 'memory' | 'redis' | (string & {})
 export interface LimiterConfig {
   /** The name it is resolved under. */
   name: string
-  /** Which driver builds it. Defaults to `memory`. */
+  /** Which driver builds it. Defaults to `memory`, and ignored when `factory` is given. */
   driver?: RateLimitDriver
+  /**
+   * Build the limiter yourself, instead of naming a driver this package ships.
+   *
+   * This is how a deployment counts in the store it already runs on. It is declared here, next to
+   * the other limiters, rather than registered on the manager from a provider: the container is
+   * rebuilt for every event, so anything registered imperatively during one event is gone for the
+   * next, and an application should not have to know that to plug in a driver.
+   */
+  factory?: RateLimiterFactory
   /** Anything the driver needs. */
   [key: string]: unknown
 }
@@ -67,11 +87,18 @@ export interface RateLimitRule {
   /** How long the window lasts, in seconds. */
   window: number
   /**
-   * What the budget belongs to: a field of the request (`'email'`), several alternatives
-   * (`'phone|email'`, first present wins), `'user'` for the authenticated principal, or `'address'`
-   * for the caller's address. Defaults to `'address'`.
+   * What the budget belongs to. **Required**, and deliberately so.
+   *
+   * A field of the request (`'email'`), several alternatives (`'phone|email'`, first present wins),
+   * `'user'` for the authenticated principal, `'address'` for the caller's address, or a function
+   * resolving it from the event.
+   *
+   * There is no default because the only plausible one is `'address'`, and that is the single thing
+   * this module exists to argue against (see {@link RateLimitConfig}). A rule that omitted the word
+   * therefore meant the opposite of what the module recommends, and nothing in a review showed it.
+   * Whoever wants the address writes `'address'`, and it becomes a decision on the page.
    */
-  by?: string
+  by: 'address' | 'user' | (string & {}) | RateLimitSubjectResolver
   /**
    * The per-address backstop that runs alongside a subject budget, as a multiple of `max`.
    *
@@ -122,6 +149,27 @@ export interface RateLimitConfig {
   default?: string
   /** The limiters this application configures. */
   limiters?: LimiterConfig[]
+  /**
+   * How to resolve the authenticated principal, for a rule that says `by: 'user'`.
+   *
+   * Needed because this module runs **before** authentication, deliberately: refusing a caller past
+   * its budget is worth nothing once the token has been verified and the account loaded. So at that
+   * point nothing has resolved a principal yet, unless the application resolved one earlier, and
+   * where it lives is the application's business, not this module's.
+   *
+   * Point it at whatever already knows:
+   *
+   * ```ts
+   * principal: (event) => event.getUser()?.userId
+   * principal: (event) => decodeToken(event.getHeader('authorization'))?.sub
+   * ```
+   *
+   * The default reads `event.getUser?.()` and takes its `id`, `sub` or `userId`. When nothing
+   * resolves, the rule falls back to the address bucket and says so in the log: correct as a
+   * behaviour, unacceptable as a silence.
+   */
+  principal?: RateLimitSubjectResolver
+
   /**
    * A rule applied to every route that declares none.
    *
