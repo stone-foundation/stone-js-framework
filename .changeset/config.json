@@ -57,6 +57,7 @@
       "@stone-js/blog-starters",
       "@stone-js/i18n",
       "@stone-js/react-native-adapter",
+      "@stone-js/mcp",
       "@stone-js/store",
       "@stone-js/rate-limit"
     ]

@@ -88,6 +88,7 @@ export const CATALOG: CatalogTier[] = [
       { name: '@stone-js/config-source', desc: 'Load config from env, files, SSM, Secrets Manager, HTTP and KMS.', href: '/docs/extensions/config-source' },
       { name: '@stone-js/openapi', desc: 'A public contract derived from your schemas.', href: '/docs/extensions/openapi' },
       { name: '@stone-js/testing', desc: 'Boot the real app in memory; dispatch real events.', href: '/docs/extensions/testing' },
+      { name: '@stone-js/mcp', desc: 'Your routes as tools an AI agent can call, through the chain that protects them.', href: '/docs/extensions/mcp-server' },
       { name: '@stone-js/mcp-dev', desc: 'Serve the framework knowledge + your app to a coding agent via `stone mcp`.', href: '/docs/extensions/mcp' },
       { name: '@stone-js/telemetry', desc: 'Observability: metrics, traces and structured logs behind one agnostic API.', href: '/docs/extensions/telemetry' }
     ]
