@@ -178,6 +178,7 @@ export const DOC_NAV: DocSection[] = [
       { title: 'OpenAPI', path: '/docs/extensions/openapi' },
       { title: 'Store (universal state)', path: '/docs/extensions/store' },
       { title: 'Testing', path: '/docs/extensions/testing' },
+      { title: 'MCP server', path: '/docs/extensions/mcp-server' },
       { title: 'MCP dev server', path: '/docs/extensions/mcp' },
       { title: 'Telemetry', path: '/docs/extensions/telemetry' }
     ]
