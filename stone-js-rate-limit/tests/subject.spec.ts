@@ -5,6 +5,16 @@ import { MemoryRateLimiter } from '../src/drivers/MemoryRateLimiter'
 import { rateLimitBlueprint } from '../src/options/RateLimitBlueprint'
 import { ThrottleRouteMiddleware } from '../src/middleware/ThrottleRouteMiddleware'
 
+/**
+ * A store nobody else counts in.
+ *
+ * The memory limiter keeps its counters under its configured name, because a store is where
+ * inter-request state belongs. Two tests sharing a name would share the counting, so each test asks
+ * for its own, which is also how two limiters are separated in an application.
+ */
+let stores = 0
+const ownStore = (): any => MemoryRateLimiter.create({ name: `test-${++stores}` })
+
 const next = (async () => ({ setHeader: () => {} })) as any
 
 /** Only the downgrade warnings: a refusal warns too, and that is a different event. */
@@ -16,7 +26,7 @@ const enforcerFor = (config: Record<string, unknown> = {}, extras: Record<string
   warnings: any[]
 } => {
   const manager = RateLimitManager.create()
-  manager.register('memory', MemoryRateLimiter.create())
+  manager.register('memory', ownStore())
   const warnings: any[] = []
 
   const bound: Record<string, unknown> = { logger: { warn: (...args: any[]) => warnings.push(args), debug: () => {} }, ...extras }

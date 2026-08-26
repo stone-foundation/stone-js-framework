@@ -158,36 +158,3 @@ describe('createTestApp with a named context', () => {
     expect(response.json()).toEqual({ ok: true })
   })
 })
-
-describe('a test application is a new process', () => {
-  it('starts with nothing held per process, so one test cannot seed the next', async () => {
-    // Modules keep what has to outlive an event outside the container: a cache's stores, a limiter's
-    // counters. Carried from one test application into the next, that state would make a suite pass
-    // or fail on the order its files happened to run in, which is the least debuggable kind of test.
-    const { perProcess } = await import('@stone-js/core')
-
-    class CounterHandler {
-      handle (): any {
-        const held = perProcess('counter', () => ({ hits: 0 }))
-        held.hits++
-        return jsonHttpResponse({ hits: held.hits }, 200)
-      }
-    }
-
-    const boot = async (): Promise<any> => await createTestApp({
-      modules: [{ stone: { kernel: { eventHandler: { module: CounterHandler, isClass: true } } } }] as any
-    })
-
-    const first = await boot()
-    await first.send(makeIncomingHttpEvent({ method: 'GET', url: '/x' }))
-    const again: any = await first.send(makeIncomingHttpEvent({ method: 'GET', url: '/x' }))
-
-    // Within one application it is kept, which is the whole point of holding it there.
-    expect(JSON.parse(again.content)).toEqual({ hits: 2 })
-
-    const second = await boot()
-    const fresh: any = await second.send(makeIncomingHttpEvent({ method: 'GET', url: '/x' }))
-
-    expect(JSON.parse(fresh.content)).toEqual({ hits: 1 })
-  })
-})

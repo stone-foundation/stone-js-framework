@@ -9,6 +9,16 @@ import { rateLimitBlueprint } from '../src/options/RateLimitBlueprint'
 import { RateLimitServiceProvider } from '../src/RateLimitServiceProvider'
 import { ThrottleRouteMiddleware } from '../src/middleware/ThrottleRouteMiddleware'
 
+/**
+ * A store nobody else counts in.
+ *
+ * The memory limiter keeps its counters under its configured name, because a store is where
+ * inter-request state belongs. Two tests sharing a name would share the counting, so each test asks
+ * for its own, which is also how two limiters are separated in an application.
+ */
+let stores = 0
+const ownStore = (): any => MemoryRateLimiter.create({ name: `test-${++stores}` })
+
 describe('activating the module', () => {
   it('contributes the provider and the enforcement, declaratively', () => {
     @RateLimit()
@@ -91,7 +101,7 @@ describe('declaring what a handler is throttled by', () => {
     }
 
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: { get: (_key: string, fallback?: unknown) => fallback } as any,
@@ -129,7 +139,7 @@ describe('declaring what a handler is throttled by', () => {
     }
 
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: { get: (_key: string, fallback?: unknown) => fallback } as any,

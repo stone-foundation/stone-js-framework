@@ -2,7 +2,7 @@ import { CacheManager } from './CacheManager'
 import { CacheError } from './errors/CacheError'
 import { MemoryCacheStore } from './drivers/MemoryCacheStore'
 import { RedisCacheStore } from './drivers/RedisCacheStore'
-import { IBlueprint, IContainer, IServiceProvider, perProcess, Promiseable } from '@stone-js/core'
+import { IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
 import { CacheConfig, StoreConfig, CacheStoreFactory } from './declarations'
 
 /**
@@ -34,10 +34,10 @@ export class CacheServiceProvider implements IServiceProvider {
   register (): Promiseable<void> {
     const config = this.container.make<IBlueprint>('blueprint').get<CacheConfig>('stone.cache', {})
 
-    // Cached values have to outlive the event that computed them, by definition. The container does
-    // not: it is rebuilt for every event, and a manager rebuilt with it arrived empty every time, so
-    // a read never saw the previous request's write and `remember` recomputed forever.
-    const manager = perProcess(CacheManager, () => CacheManager.create(config.default ?? 'memory'))
+    // Built for this event, like everything else in the container. What has to outlive the event is
+    // not the manager, which is a registry of factories: it is the cached values, and those belong
+    // to the store the application chose.
+    const manager = CacheManager.create(config.default ?? 'memory')
 
     // Always-available zero-config default.
     manager.registerFactory('memory', () => MemoryCacheStore.create({ name: 'memory' }))

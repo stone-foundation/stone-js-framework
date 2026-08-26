@@ -5,6 +5,16 @@ import { rateLimitBlueprint } from '../src/options/RateLimitBlueprint'
 import { ThrottleRouteMiddleware } from '../src/middleware/ThrottleRouteMiddleware'
 
 /**
+ * A store nobody else counts in.
+ *
+ * The memory limiter keeps its counters under its configured name, because a store is where
+ * inter-request state belongs. Two tests sharing a name would share the counting, so each test asks
+ * for its own, which is also how two limiters are separated in an application.
+ */
+let stores = 0
+const ownStore = (): any => MemoryRateLimiter.create({ name: `test-${++stores}` })
+
+/**
  * The mapper as the blueprint configures it, so the composition under test is the real one.
  *
  * Routes are looked up by path rather than by position: a declared `GET` is mapped to a `GET` and a
@@ -32,7 +42,7 @@ const mapRoutes = async (definitions: any[]): Promise<(path: string) => any> => 
 
 const enforcerFor = (): ThrottleRouteMiddleware => {
   const manager = RateLimitManager.create()
-  manager.register('memory', MemoryRateLimiter.create())
+  manager.register('memory', ownStore())
 
   return new ThrottleRouteMiddleware({
     blueprint: { get: (_key: string, fallback?: unknown) => fallback } as any,

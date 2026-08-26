@@ -1,10 +1,21 @@
 import { MemoryCacheStore } from '../../src/drivers/MemoryCacheStore'
 
-const store = (over: any = {}): MemoryCacheStore => MemoryCacheStore.create(over)
+/**
+ * A store nobody else writes to.
+ *
+ * The memory store keeps its values under its configured name, because a store is where
+ * inter-request state belongs. Two tests sharing a name would share the values, so each test asks
+ * for its own, which is also how two stores are separated in an application.
+ */
+let stores = 0
+const store = (over: any = {}): MemoryCacheStore =>
+  MemoryCacheStore.create({ name: `test-${++stores}`, ...over })
 
 describe('MemoryCacheStore', () => {
   it('defaults its name and honours a custom one', () => {
-    expect(store().name).toBe('memory')
+    // Built directly, because the helper above names every store to keep the tests apart, and the
+    // default is exactly what is under test here.
+    expect(MemoryCacheStore.create().name).toBe('memory')
     expect(store({ name: 'ephemeral' }).name).toBe('ephemeral')
   })
 

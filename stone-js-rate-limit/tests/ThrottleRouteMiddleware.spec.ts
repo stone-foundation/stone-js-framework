@@ -4,6 +4,16 @@ import { MemoryRateLimiter } from '../src/drivers/MemoryRateLimiter'
 import { rateLimitBlueprint } from '../src/options/RateLimitBlueprint'
 import { MetaThrottleRouteMiddleware, ThrottleRouteMiddleware } from '../src/middleware/ThrottleRouteMiddleware'
 
+/**
+ * A store nobody else counts in.
+ *
+ * The memory limiter keeps its counters under its configured name, because a store is where
+ * inter-request state belongs. Two tests sharing a name would share the counting, so each test asks
+ * for its own, which is also how two limiters are separated in an application.
+ */
+let stores = 0
+const ownStore = (): any => MemoryRateLimiter.create({ name: `test-${++stores}` })
+
 const makeEvent = (over: {
   rateLimit?: unknown
   body?: Record<string, unknown>
@@ -35,7 +45,7 @@ const makeEvent = (over: {
 
 const middlewareWith = (config: Record<string, unknown> = {}): ThrottleRouteMiddleware => {
   const manager = RateLimitManager.create()
-  manager.register('memory', MemoryRateLimiter.create())
+  manager.register('memory', ownStore())
 
   return new ThrottleRouteMiddleware({
     blueprint: { get: (key: string, fallback?: unknown) => (key === 'stone.rateLimit' ? config : fallback) } as any,
@@ -391,7 +401,7 @@ describe('reaching the limiter and the log', () => {
     // A single-handler application or a command has no route middleware container to read from, and a
     // limit must still be a limit there.
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
     RateLimitManager.setInstance(manager)
 
     const middleware = new ThrottleRouteMiddleware({
@@ -417,7 +427,7 @@ describe('reaching the limiter and the log', () => {
     // and nothing that identifies whoever was refused.
     const warned: any[] = []
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: { get: (key: string, fallback?: unknown) => (key === 'stone.rateLimit' ? {} : fallback) } as any,
@@ -443,7 +453,7 @@ describe('an event with no route at all', () => {
   it('is throttled on the global rule, keyed on where it arrived', async () => {
     // A command or a queue consumer carries no route, and a global budget still has to mean something.
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: {
@@ -472,7 +482,7 @@ describe('an event with no route at all', () => {
     }
 
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: {
@@ -498,7 +508,7 @@ describe('an event with no route at all', () => {
     }
 
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: {

@@ -2,22 +2,56 @@ import { windowOf } from '../utils'
 import { LimiterConfig, RateLimiter, RateLimitHit } from '../declarations'
 
 /**
- * Per-process fixed-window limiter. The zero-config default, and the right one for a single server.
+ * The counters, held by the store rather than by anything the framework owns.
  *
- * **Wrong for a function-as-a-service deployment**, and worth saying plainly: each cold instance keeps
- * its own counters, so every new instance grants the full budget again, which is no limit at all under
- * the traffic that warrants one. Configure a shared driver there.
+ * This is the one place inter-request state may live, and it lives here because **a store is the
+ * persistence boundary**: choosing this driver is choosing where the counting is kept. Everything
+ * else in Stone.js is rebuilt for every event, deliberately, and nothing in the framework offers a
+ * place to keep things across them.
+ *
+ * Keyed by the limiter's configured name, so two limiters both backed by memory count separately,
+ * exactly as two Redis limiters with different prefixes would.
+ */
+const backings = new Map<string, Map<string, { count: number, resetAt: number }>>()
+
+/** The map a named limiter counts in, created the first time that name is used. */
+function backingFor (name: string): Map<string, { count: number, resetAt: number }> {
+  const existing = backings.get(name)
+
+  if (existing !== undefined) { return existing }
+
+  const created = new Map<string, { count: number, resetAt: number }>()
+  backings.set(name, created)
+
+  return created
+}
+
+/**
+ * Fixed-window limiter counting in this process. The zero-config default, and the right one for a
+ * single server.
+ *
+ * **It is not a limit on a function-as-a-service deployment, and that is worth saying plainly.** Each
+ * instance counts on its own, so a budget of three allows three per warm container, resets on every
+ * cold start, and grants the whole budget again to every new instance. Under the traffic that
+ * warrants a limiter at all, that is no limiter. Configure a shared one there, or register your own
+ * with `limiters: [{ name, factory }]`.
  */
 export class MemoryRateLimiter implements RateLimiter {
   private lastSweep = Date.now()
-  private readonly buckets = new Map<string, { count: number, resetAt: number }>()
+  private readonly buckets: Map<string, { count: number, resetAt: number }>
 
   /**
-   * @param _config - Accepted for driver parity; nothing here needs it.
+   * @param config - Names the limiter, which is what its counters are filed under.
    * @returns A limiter.
    */
-  static create (_config: LimiterConfig = { name: 'memory' }): MemoryRateLimiter {
-    return new this()
+  static create (config: LimiterConfig = { name: 'memory' }): MemoryRateLimiter {
+    return new this(config.name ?? 'memory')
+  }
+
+  constructor (name: string = 'memory') {
+    // The instance is rebuilt with the container, on every event. The counting is not, because it is
+    // the store's, and a limiter that started again on every request would refuse nothing at all.
+    this.buckets = backingFor(name)
   }
 
   /**
@@ -52,6 +86,16 @@ export class MemoryRateLimiter implements RateLimiter {
       resetAt: existing.resetAt,
       remaining: Math.max(0, limit - existing.count)
     }
+  }
+
+  /**
+   * Forget everything counted so far.
+   *
+   * A store that can only grow is not a store. Mostly for a test that wants a clean slate: an
+   * application calling this mid-flight is handing every caller a fresh budget.
+   */
+  clear (): void {
+    this.buckets.clear()
   }
 
   /** Drop expired buckets now and then, so the map cannot grow forever. */
