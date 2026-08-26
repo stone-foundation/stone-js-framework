@@ -16,3 +16,6 @@ So the state moved to where it belongs: **the store**. A driver owns its own bac
 Both memory drivers now say plainly what they are: one process wide, right for a single server and for tests, and **not** a shared limit or a shared cache anywhere else. An application that needs one across instances configures Redis, or registers its own driver with `limiters: [{ name, factory }]`, which is the seam for counting in the store a deployment already runs on.
 
 After the fix, on the same server: `200, 200, 429`, and a cache read that sees the previous request's write.
+
+One more consequence of managers being rebuilt per event: the Redis drivers rebuilt their **client** with them, so a busy server opened a TCP connection per request and kept opening them. A connection is a resource, not state, since the values and the counters are in Redis and rebuilding a client loses nothing. So both Redis drivers now open one connection per **connection target**, shared by every store or limiter pointing at it, with `disconnect()` to close them for a graceful shutdown or a test. A client the application supplies is left entirely alone: whoever opened it closes it.
+

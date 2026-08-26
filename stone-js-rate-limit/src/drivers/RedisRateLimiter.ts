@@ -3,6 +3,24 @@ import { RateLimitConfigurationError } from '../errors/RateLimitConfigurationErr
 import { RateLimiter, RateLimitHit, RedisLimiterConfig } from '../declarations'
 
 /**
+ * The clients, by what they connect to.
+ *
+ * A connection is a **resource**, not state. The memory driver holds counters because those must
+ * survive; a client holds nothing, since the counting is in Redis, and rebuilding one loses nothing
+ * at all. What it costs is a TCP handshake, and the driver is rebuilt with the container on every
+ * event: without this, a busy server opens a connection per request and keeps opening them.
+ *
+ * Keyed by the connection target rather than by the limiter's name, so two limiters pointing at the
+ * same Redis share one connection, which is what a connection pool is for.
+ */
+const clients = new Map<string, Promise<any>>()
+
+/** What identifies a connection: the URL, or the options it would be built from. */
+function targetOf (config: RedisLimiterConfig): string {
+  return typeof config.url === 'string' ? config.url : JSON.stringify(config.options ?? {})
+}
+
+/**
  * Shared fixed-window limiter, over Redis.
  *
  * The one to use wherever the application runs as more than one process, which is the case that
@@ -20,7 +38,6 @@ import { RateLimiter, RateLimitHit, RedisLimiterConfig } from '../declarations'
 export class RedisRateLimiter implements RateLimiter {
   private readonly prefix: string
   private readonly config: RedisLimiterConfig
-  private clientPromise?: Promise<any>
 
   /**
    * @param config - The limiter's configuration.
@@ -60,20 +77,56 @@ export class RedisRateLimiter implements RateLimiter {
     return { allowed: count <= limit, resetAt, remaining: Math.max(0, limit - count) }
   }
 
-  /** The client, built once. */
+  /**
+   * Close every connection this driver opened, and forget them.
+   *
+   * For a graceful shutdown, and for a test that wants none left behind. An application that never
+   * calls it loses nothing: the connections go with the process.
+   */
+  static async disconnect (): Promise<void> {
+    const pending = [...clients.values()]
+
+    clients.clear()
+
+    await Promise.all(pending.map(async (client) => {
+      await client
+        .then(async (c: any) => {
+          // Whichever the driver exposes; a client that offers neither is simply dropped.
+          const closing = c?.quit?.() ?? c?.disconnect?.()
+
+          if (closing !== undefined && closing !== null) { await closing }
+        })
+        // A connection that was never opened, or already gone, has nothing to close.
+        .catch(() => undefined)
+    }))
+  }
+
+  /** The client for this configuration, opened once. */
   private async client (): Promise<any> {
-    this.clientPromise = this.clientPromise ?? this.build()
-    return await this.clientPromise
+    const configured = this.config.client
+
+    // A client the application built is the application's to manage, connection included.
+    if (configured !== undefined && configured !== null) { return configured }
+
+    const target = targetOf(this.config)
+    const existing = clients.get(target)
+
+    if (existing !== undefined) { return await existing }
+
+    // A failed connection is forgotten rather than remembered: a missing package is a setup mistake
+    // that will not fix itself, but a cached rejection would also outlive the fix.
+    const created = this.build().catch((error: any) => {
+      clients.delete(target)
+      throw error
+    })
+
+    clients.set(target, created)
+
+    return await created
   }
 
   /** Build the client from what was configured, or fail saying what is missing. */
   private async build (): Promise<any> {
-    const configured = this.config.client
-
-    if (configured !== undefined && configured !== null) {
-      return configured
-    }
-
     const IORedis = await this.loadIORedis()
 
     return typeof this.config.url === 'string'

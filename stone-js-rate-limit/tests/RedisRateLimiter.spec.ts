@@ -73,18 +73,18 @@ describe('the shared limiter', () => {
     expect(String(client.calls[0][1]).startsWith('noowow:k:')).toBe(true)
   })
 
-  it('resolves its client once, however many hits it counts', async () => {
-    // A client per hit means a connection per request, which is the one thing a limiter must not add to
-    // a system already under load.
-    let reads = 0
+  it('uses the client it was given, and opens nothing of its own', async () => {
+    // A client per hit means a connection per request, which is the one thing a limiter must not add
+    // to a system already under load. When one is supplied there is nothing to open at all: the
+    // pooling below covers the case where the driver opens its own.
     const client = fakeClient()
-    const limiter = RedisRateLimiter.create({ name: 'shared', get client () { reads++; return client } })
+    const limiter = RedisRateLimiter.create({ name: 'shared', client })
 
     await limiter.hit('k', 5, 60_000)
     await limiter.hit('k', 5, 60_000)
     await limiter.hit('k', 5, 60_000)
 
-    expect(reads).toBe(1)
+    expect(client.calls.filter(([command]: any[]) => command === 'incr')).toHaveLength(3)
   })
 
   it('builds its client from a url, or from options, whichever was configured', async () => {
@@ -156,5 +156,68 @@ describe('the shared limiter', () => {
 
     vi.doUnmock('ioredis')
     vi.resetModules()
+  })
+})
+
+describe('the connection a shared limiter opens', () => {
+  afterEach(async () => { await RedisRateLimiter.disconnect() })
+
+  it('is opened once for one target, however many limiters point at it', async () => {
+    // The driver is rebuilt with the container, on every event. Without pooling, a busy server opens
+    // a TCP connection per request and keeps opening them. A connection is a resource, not state:
+    // the counting is in Redis, so reusing one loses nothing and saves a handshake.
+    vi.resetModules()
+    let built = 0
+    class FakeRedis {
+      constructor () { built++ }
+      multi (): any { return { incr: () => this.multi(), pexpire: () => this.multi(), exec: async () => [[null, 1], [null, 1]] } }
+      async quit (): Promise<void> {}
+    }
+    vi.doMock('ioredis', () => ({ default: FakeRedis }))
+
+    const { RedisRateLimiter: Fresh } = await import('../src/drivers/RedisRateLimiter')
+
+    // Two limiters, two names, one Redis: the same connection.
+    await Fresh.create({ name: 'a', url: 'redis://one:6379' }).hit('k', 1, 1000)
+    await Fresh.create({ name: 'b', url: 'redis://one:6379' }).hit('k', 1, 1000)
+
+    expect(built).toBe(1)
+
+    // A different target is a different connection.
+    await Fresh.create({ name: 'c', url: 'redis://two:6379' }).hit('k', 1, 1000)
+
+    expect(built).toBe(2)
+
+    await Fresh.disconnect()
+    vi.doUnmock('ioredis')
+    vi.resetModules()
+  })
+
+  it('forgets a connection that failed, so a fixed setup is not held to the old failure', async () => {
+    vi.resetModules()
+    let attempts = 0
+    vi.doMock('ioredis', () => { attempts++; throw new Error('not installed') })
+
+    const { RedisRateLimiter: Fresh } = await import('../src/drivers/RedisRateLimiter')
+
+    await expect(Fresh.create({ name: 'a', url: 'redis://x' }).hit('k', 1, 1000)).rejects.toThrow(/ioredis/)
+    await expect(Fresh.create({ name: 'a', url: 'redis://x' }).hit('k', 1, 1000)).rejects.toThrow(/ioredis/)
+
+    // Tried again rather than answering a remembered rejection.
+    expect(attempts).toBe(2)
+
+    vi.doUnmock('ioredis')
+    vi.resetModules()
+  })
+
+  it('leaves a client the application built to the application', async () => {
+    // Its lifetime is not this driver's business: whoever opened it closes it.
+    const client = fakeClient()
+
+    await RedisRateLimiter.create({ name: 'a', client }).hit('k', 1, 1000)
+    await RedisRateLimiter.disconnect()
+
+    // Still usable, because nothing here closed it.
+    await expect(RedisRateLimiter.create({ name: 'a', client }).hit('k', 1, 1000)).resolves.toBeDefined()
   })
 })

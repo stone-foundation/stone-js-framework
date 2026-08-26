@@ -10,6 +10,24 @@ import { CacheStore, CacheSetOptions, RedisStoreOptions } from '../declarations'
  * **lazily** and is an optional peer dependency, so this module carries no Redis weight until a
  * Redis store is actually used.
  */
+/**
+ * The clients, by what they connect to.
+ *
+ * A connection is a **resource**, not state. The memory store holds values because those must
+ * survive; a client holds nothing, since the values are in Redis, and rebuilding one loses nothing
+ * at all. What it costs is a TCP handshake, and the store is rebuilt with the container on every
+ * event: without this, a busy server opens a connection per request and keeps opening them.
+ *
+ * Keyed by the connection target rather than by the store's name, so two stores pointing at the same
+ * Redis share one connection, which is what a connection pool is for.
+ */
+const clients = new Map<string, Promise<any>>()
+
+/** What identifies a connection: the URL, or the options it would be built from. */
+function targetOf (options: RedisStoreOptions): string {
+  return typeof options.url === 'string' ? options.url : JSON.stringify(options.options ?? {})
+}
+
 export class RedisCacheStore implements CacheStore {
   readonly name: string
 
@@ -17,7 +35,6 @@ export class RedisCacheStore implements CacheStore {
   private readonly defaultTtl: number
   private readonly options: RedisStoreOptions
   private readonly inflight = new Map<string, Promise<any>>()
-  private clientPromise?: Promise<any>
 
   /**
    * Create a Redis store.
@@ -191,8 +208,50 @@ export class RedisCacheStore implements CacheStore {
    * @throws {CacheError} When `ioredis` is not installed.
    */
   private async client (): Promise<any> {
-    this.clientPromise = this.clientPromise ?? this.build()
-    return await this.clientPromise
+    const configured = this.options.client
+
+    // A client the application built is the application's to manage, connection included.
+    if (configured !== undefined && configured !== null) { return configured }
+
+    const target = targetOf(this.options)
+    const existing = clients.get(target)
+
+    if (existing !== undefined) { return await existing }
+
+    // A failed connection is forgotten rather than remembered: a missing package is a setup mistake
+    // that will not fix itself, but a cached rejection would also outlive the fix.
+    const created = this.build().catch((error: any) => {
+      clients.delete(target)
+      throw error
+    })
+
+    clients.set(target, created)
+
+    return await created
+  }
+
+  /**
+   * Close every connection this store opened, and forget them.
+   *
+   * For a graceful shutdown, and for a test that wants none left behind. An application that never
+   * calls it loses nothing: the connections go with the process.
+   */
+  static async disconnect (): Promise<void> {
+    const pending = [...clients.values()]
+
+    clients.clear()
+
+    await Promise.all(pending.map(async (client) => {
+      await client
+        .then(async (c: any) => {
+          // Whichever the driver exposes; a client that offers neither is simply dropped.
+          const closing = c?.quit?.() ?? c?.disconnect?.()
+
+          if (closing !== undefined && closing !== null) { await closing }
+        })
+        // A connection that was never opened, or already gone, has nothing to close.
+        .catch(() => undefined)
+    }))
   }
 
   /**
@@ -202,10 +261,6 @@ export class RedisCacheStore implements CacheStore {
    * @throws {CacheError} When `ioredis` is not installed.
    */
   private async build (): Promise<any> {
-    if (this.options.client !== undefined && this.options.client !== null) {
-      return this.options.client
-    }
-
     const IORedis = await import('ioredis').then(resolveModuleDefault).catch(() => {
       throw new CacheError('The Redis store requires "ioredis". Install it: npm i ioredis')
     })
