@@ -1,0 +1,114 @@
+{
+  "name": "@stone-js/notifications",
+  "version": "0.8.16",
+  "description": "Notifications for Stone.js: one declaration reaches a person wherever they are, delivered out of band.",
+  "author": "Mr. Stone <evensstone@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stone-foundation/stone-js-framework.git",
+    "directory": "stone-js-notifications"
+  },
+  "homepage": "https://stonejs.dev",
+  "bugs": {
+    "url": "https://github.com/stone-foundation/stone-js-framework/issues"
+  },
+  "keywords": [
+    "StoneJS",
+    "notifications",
+    "email",
+    "sms",
+    "push",
+    "in-app"
+  ],
+  "files": [
+    "/dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "lint": "ts-standard src",
+    "lint:fix": "ts-standard --fix src tests",
+    "predoc": "rimraf docs",
+    "doc": "typedoc",
+    "clean": "rimraf dist",
+    "build": "rollup -c",
+    "test": "vitest run",
+    "test:cvg": "npm run test -- --coverage",
+    "test:text": "npm run test:cvg -- --coverage.reporter=text",
+    "test:html": "npm run test:cvg -- --coverage.reporter=html",
+    "test:clover": "npm run test:cvg -- --coverage.reporter=clover",
+    "prepare": "husky"
+  },
+  "peerDependencies": {
+    "@stone-js/core": "workspace:*",
+    "@stone-js/queue": "workspace:*",
+    "@stone-js/realtime": "workspace:*",
+    "@stone-js/i18n": "workspace:*",
+    "nodemailer": "^6.9.0"
+  },
+  "dependencies": {
+    "@stone-js/config": "workspace:*"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-multi-entry": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@stone-js/core": "workspace:*",
+    "@stone-js/http-core": "workspace:*",
+    "@stone-js/i18n": "workspace:*",
+    "@stone-js/queue": "workspace:*",
+    "@stone-js/realtime": "workspace:*",
+    "@stone-js/router": "workspace:*",
+    "@types/node": "^24.0.7",
+    "@vitest/coverage-v8": "^3.2.4",
+    "husky": "^9.1.7",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.44.1",
+    "rollup-plugin-node-externals": "^8.0.1",
+    "ts-standard": "^12.0.2",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.28.6",
+    "typedoc-plugin-markdown": "^4.7.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  },
+  "ts-standard": {
+    "globals": [
+      "it",
+      "test",
+      "vi",
+      "expect",
+      "describe",
+      "beforeEach",
+      "afterEach"
+    ]
+  },
+  "peerDependenciesMeta": {
+    "@stone-js/queue": {
+      "optional": true
+    },
+    "@stone-js/realtime": {
+      "optional": true
+    },
+    "@stone-js/i18n": {
+      "optional": true
+    },
+    "nodemailer": {
+      "optional": true
+    }
+  }
+}
