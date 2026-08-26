@@ -31,7 +31,7 @@ npm install @stone-js/notifications
 npm install @stone-js/queue      # deliver out of band rather than in the request
 npm install @stone-js/realtime   # reach the tab someone already has open
 npm install @stone-js/i18n       # write in the recipient's own language
-npm install nodemailer           # the SMTP channel
+npm install nodemailer           # the SMTP channel (9.0.1 or later)
 ```
 
 > Peer dependency: `@stone-js/core`. Everything else is optional, and the module degrades to
