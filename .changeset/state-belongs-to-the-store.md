@@ -17,5 +17,7 @@ Both memory drivers now say plainly what they are: one process wide, right for a
 
 After the fix, on the same server: `200, 200, 429`, and a cache read that sees the previous request's write.
 
-One more consequence of managers being rebuilt per event: the Redis drivers rebuilt their **client** with them, so a busy server opened a TCP connection per request and kept opening them. A connection is a resource, not state, since the values and the counters are in Redis and rebuilding a client loses nothing. So both Redis drivers now open one connection per **connection target**, shared by every store or limiter pointing at it, with `disconnect()` to close them for a graceful shutdown or a test. A client the application supplies is left entirely alone: whoever opened it closes it.
+One more consequence of a container rebuilt per event, and it predates this change: the Redis driver rebuilt its **client** with it, so a busy server opened a TCP connection per request and kept opening them. A connection is a resource, not state, since the counters are in Redis and rebuilding a client loses nothing at all. `@stone-js/rate-limit` now opens one connection per **connection target**, shared by every limiter pointing at it, with `disconnect()` to close them for a graceful shutdown or a test. A client the application supplies is left entirely alone: whoever opened it closes it.
+
+`@stone-js/cache`, `@stone-js/queue` and `@stone-js/realtime` have the same connection behaviour, unchanged here and tracked with their state issue, so each is fixed with its own measurement rather than by analogy.
 
