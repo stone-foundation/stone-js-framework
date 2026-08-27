@@ -1,8 +1,7 @@
-import { AZURE_FUNCTIONS_HTTP_PLATFORM } from '../constants'
+import { IP_HEADERS, AZURE_FUNCTIONS_HTTP_PLATFORM } from '../constants'
 import { IBlueprint, NextMiddleware, type MetaMiddleware } from '@stone-js/core'
-import { CookieCollection } from '@stone-js/http-core'
+import { CookieCollection, normalizeWebRequest, NormalizedWebRequest } from '@stone-js/http-core'
 import { AzureFunctionsHttpAdapterError } from '../errors/AzureFunctionsHttpAdapterError'
-import { normalizeRequest, NormalizedRequest } from '../request-normalizer'
 import { AzureFunctionsHttpAdapterContext, AzureFunctionsHttpAdapterResponseBuilder } from '../declarations'
 
 /**
@@ -37,7 +36,7 @@ export class IncomingEventMiddleware {
     }
 
     const request = context.rawEvent
-    const normalized = await normalizeRequest(request)
+    const normalized = await normalizeWebRequest(request, IP_HEADERS)
 
     context
       .incomingEventBuilder
@@ -62,7 +61,7 @@ export class IncomingEventMiddleware {
    * @param normalized - The normalized request.
    * @returns The parsed body object, or an empty object.
    */
-  private parseBody (normalized: NormalizedRequest): Record<string, unknown> {
+  private parseBody (normalized: NormalizedWebRequest): Record<string, unknown> {
     if (typeof normalized.rawBody !== 'string') { return {} }
 
     const contentType = normalized.headers['content-type'] ?? ''

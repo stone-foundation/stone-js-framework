@@ -3,8 +3,7 @@ import {
   resolveUrl,
   readRawBody,
   normalizeRequest,
-  headersToRecord,
-  isTextualContentType
+  headersToRecord
 } from '../src/request-normalizer'
 import { AlibabaFcHttpRequest } from '../src/declarations'
 
@@ -25,22 +24,14 @@ describe('headersToRecord', () => {
 })
 
 describe('resolveIp', () => {
+  // The header fallback itself lives in `@stone-js/http-core` and is tested there. What is asserted
+  // here is the FC-specific part: the platform's own field wins over anything a caller forwarded.
   it('prefers FC clientIP, then x-forwarded-for (first hop), then other headers', () => {
     expect(resolveIp('1.2.3.4', {})).toBe('1.2.3.4')
     expect(resolveIp(undefined, { 'x-forwarded-for': '3.3.3.3, 4.4.4.4' })).toBe('3.3.3.3')
     expect(resolveIp('', { 'x-real-ip': '2.2.2.2' })).toBe('2.2.2.2')
     expect(resolveIp(undefined, { 'x-client-ip': '5.5.5.5' })).toBe('5.5.5.5')
     expect(resolveIp(undefined, {})).toBe('')
-  })
-})
-
-describe('isTextualContentType', () => {
-  it('treats missing and textual types as text, binary as non-text', () => {
-    expect(isTextualContentType(undefined)).toBe(true)
-    expect(isTextualContentType('application/json')).toBe(true)
-    expect(isTextualContentType('text/html')).toBe(true)
-    expect(isTextualContentType('application/x-www-form-urlencoded')).toBe(true)
-    expect(isTextualContentType('image/png')).toBe(false)
   })
 })
 

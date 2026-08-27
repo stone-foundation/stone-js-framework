@@ -1,28 +1,15 @@
+import { isTextualContentType, NormalizedWebRequest, resolveIp as resolveIpFromHeaders } from '@stone-js/http-core'
 import { AlibabaFcHttpRequest } from './declarations'
 
 /**
  * A canonical HTTP request derived from an Alibaba FC HTTP request.
  *
- * FC hands the handler a plain request object with the body already read into a `Buffer`, so
- * normalisation lifts headers/cookies/ip/body into a plain, agnostic shape the rest of the adapter
- * can use without ever touching an FC-specific API.
+ * The same shape every adapter produces, so it is the one `@stone-js/http-core` declares rather than
+ * a fourth copy of the same seven fields. What is FC-specific is how the shape gets filled: FC hands
+ * the handler a plain object whose headers are a record of strings or arrays and whose body is
+ * already a `Buffer`, so there is no Web `Request` here to normalise.
  */
-export interface NormalizedRequest {
-  /** The HTTP method (upper-case). */
-  method: string
-  /** The absolute request URL. */
-  url: URL
-  /** Lower-cased headers. */
-  headers: Record<string, string>
-  /** The raw query string (without the leading `?`). */
-  rawQueryString: string
-  /** Raw cookie strings (e.g. `['a=1', 'b=2']`). */
-  cookies: string[]
-  /** Best-effort client IP (FC `clientIP`, then forwarding headers). */
-  ip: string
-  /** The raw request body (text for textual content types, bytes otherwise, `undefined` if none). */
-  rawBody?: string | Uint8Array
-}
+export type NormalizedRequest = NormalizedWebRequest
 
 /** Header names carrying the client IP, in order of preference (FC front end sets x-forwarded-for). */
 const IP_HEADERS = ['x-forwarded-for', 'x-real-ip', 'x-client-ip']
@@ -35,15 +22,21 @@ const IP_HEADERS = ['x-forwarded-for', 'x-real-ip', 'x-client-ip']
  */
 export function headersToRecord (headers: Record<string, string | string[] | undefined>): Record<string, string> {
   const out: Record<string, string> = {}
+
   for (const [key, value] of Object.entries(headers)) {
     if (value === undefined) { continue }
     out[key.toLowerCase()] = Array.isArray(value) ? value.join(', ') : value
   }
+
   return out
 }
 
 /**
  * Resolves the best-effort client IP: FC's `clientIP`, then forwarding headers.
+ *
+ * FC's own field comes first because the platform sets it, and a forwarding header is written by
+ * whoever spoke last. The header fallback is the shared one, since reading a list of forwarded
+ * headers is not an FC concern.
  *
  * @param clientIP - The FC-provided client IP, if any.
  * @param headers - The normalized headers.
@@ -52,24 +45,7 @@ export function headersToRecord (headers: Record<string, string | string[] | und
 export function resolveIp (clientIP: string | undefined, headers: Record<string, string>): string {
   if (typeof clientIP === 'string' && clientIP.length > 0) { return clientIP }
 
-  for (const name of IP_HEADERS) {
-    const value = headers[name]
-    if (typeof value === 'string' && value.length > 0) {
-      return value.split(',')[0].trim()
-    }
-  }
-  return ''
-}
-
-/**
- * Whether a content type is textual (and can be safely decoded to a string).
- *
- * @param contentType - The `content-type` header value.
- * @returns True for textual payloads.
- */
-export function isTextualContentType (contentType: string | undefined): boolean {
-  if (contentType === undefined) { return true }
-  return /^(text\/|application\/(json|xml|.*\+json|.*\+xml|x-www-form-urlencoded|javascript))/i.test(contentType)
+  return resolveIpFromHeaders(headers, IP_HEADERS)
 }
 
 /**
