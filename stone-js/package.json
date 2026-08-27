@@ -47,10 +47,10 @@
     "@stone-js/cli": "workspace:*"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "@vitest/coverage-v8": "^4.1.11",
     "husky": "^9.1.7",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.11"
   }
 }
