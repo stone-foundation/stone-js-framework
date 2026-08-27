@@ -47,6 +47,18 @@ export const AuthController = defineEventHandler({}, {
 })
 `
 
+const CUSTOM_LIMITER = `
+blueprint.set('stone.rateLimit', {
+  default: 'table',
+  limiters: [{
+    name: 'table',
+    factory: () => ({
+      hit: async (key, limit, windowMs) => await countInMyTable(key, limit, windowMs)
+    })
+  }]
+})
+`
+
 /**
  * Extensions: Rate limit.
  */
@@ -103,9 +115,9 @@ npm i ioredis   # only for the shared Redis limiter`}</Code>
           A budget on a group holds for every route under it, alongside each route's own. Both promises
           are kept, counted separately, and enforced group-first.
         </p>
-        <Code file='app/ApiHandler.ts'>{`@EventHandler('/api', { rateLimit: { max: 100, window: 60, scope: 'api' } })
+        <Code file='app/ApiHandler.ts'>{`@EventHandler('/api', { rateLimit: { max: 100, window: 60, by: 'address', scope: 'api' } })
 export class ApiHandler {
-  @Get('/notes', { rateLimit: { max: 20, window: 60 } })
+  @Get('/notes', { rateLimit: { max: 20, window: 60, by: 'address' } })
   notes (event: IncomingHttpEvent) { /* ... */ }
 }`}</Code>
         <Callout kind='important' title='Why the group names a scope'>
@@ -136,9 +148,9 @@ class AuthController {
           { name: 'window', type: 'number', required: true, desc: 'How long the window lasts, in seconds.' },
           {
             name: 'by',
-            type: 'string',
-            default: "'address'",
-            desc: <>What the budget belongs to: a request field (<code>'email'</code>), alternatives (<code>'phone|email'</code>, first present wins), <code>'user'</code> for the authenticated principal, or <code>'address'</code>.</>
+            type: 'string | function',
+            required: true,
+            desc: <>What the budget belongs to: a request field (<code>'email'</code>), alternatives (<code>'phone|email'</code>, first present wins), <code>'user'</code> for the authenticated principal, <code>'address'</code>, or a function <code>(event) =&gt; string | undefined</code>.</>
           },
           {
             name: 'backstop',
@@ -153,6 +165,15 @@ class AuthController {
           },
           { name: 'limiter', type: 'string', desc: 'Which configured limiter counts this rule. Defaults to the application default.' }
         ]} />
+
+        <Callout kind='important' title='`by` has no default, on purpose'>
+          <p>
+            The only default it could have is <code>'address'</code>, and that is the single thing this
+            module argues against. A rule that omitted the word therefore meant the opposite of what
+            is recommended here, and nothing in a review showed it: whoever wants the address writes
+            it, and it becomes a decision on the page.
+          </p>
+        </Callout>
 
         <H2>Throttle the subject, not the address</H2>
         <Aphorism>
@@ -171,6 +192,35 @@ class AuthController {
           so a malformed request cannot spend an account's budget, and omitting a field is not a way to
           buy an unlimited one.
         </p>
+        <H3>Where the subject lives</H3>
+        <p>
+          A field name covers the common cases: it is read from the route parameters, then the body,
+          then the query. Anything else is a function, which is the honest answer, because an
+          application knows where its subject lives and this module would only be guessing.
+        </p>
+        <Code file='app/AuthController.ts'>{`@Post('/auth/code', {
+  rateLimit: { max: 3, window: 900, by: (event) => event.getHeader('x-account') }
+})`}</Code>
+        <p>
+          A subject read never breaks the route. Whatever fails, a resolver that throws included, the
+          request falls back to the address bucket at the backstop and a warning names the rule that
+          was downgraded.
+        </p>
+
+        <H3><code>by: 'user'</code> runs before authentication</H3>
+        <p>
+          Enforcement sits ahead of authentication deliberately, so at that point nothing has resolved
+          a principal yet unless the application resolved one earlier. Say where yours lives, and the
+          ordering stops mattering.
+        </p>
+        <Code file='app/AppConfig.ts'>{`blueprint.set('stone.rateLimit.principal', (event) => event.getUser()?.userId)`}</Code>
+        <p>
+          The default reads <code>event.getUser?.()</code> and takes its <code>id</code>,
+          <code> sub</code> or <code>userId</code>. With nothing to bill, the rule falls back to the
+          address at the backstop, ten times the limit, and warns: correct as a behaviour, unacceptable
+          as a silence, since a budget of three would otherwise allow thirty with every test green.
+        </p>
+
         <Callout kind='note' title='Keys carry no identities'>
           Subjects are hashed before they are used as keys, and a refusal is logged without the subject,
           the address or the body. A key is read by whoever debugs the store, and a mailbox has no
@@ -186,26 +236,22 @@ class AuthController {
         <p>
           A limiter receives the limit rather than holding it, so an implementation that can refuse
           atomically through a conditional write has what it needs to express the condition, and pays
-          nothing for a refusal.
+          nothing for a refusal. Declare it with the other limiters, through a <code>factory</code>.
         </p>
-        <Code file='app/TableLimiterProvider.ts'>{`import { RateLimitManager } from '@stone-js/rate-limit'
-
-export class TableLimiterProvider implements IServiceProvider {
-  constructor (private readonly container: IContainer) {}
-
-  register (): void {
-    this.container.make<RateLimitManager>(RateLimitManager).register('table', {
-      hit: async (key, limit, windowMs) => await countInMyTable(key, limit, windowMs)
-    })
-  }
-}`}</Code>
+        <Code file='app/AppConfig.ts'>{CUSTOM_LIMITER.trim()}</Code>
+        <Callout kind='note' title='Why config and not a provider'>
+          The container is an execution context, rebuilt for every event. A limiter registered
+          imperatively during one event is gone for the next, and an application should not have to
+          know that to plug in a driver. Declared here, it is simply always there.
+        </Callout>
 
         <H2>What a caller is told</H2>
         <p>
           A refusal answers <code>429</code> with <code>Retry-After</code>. The error carries its own
           status, so an HTTP platform answers <code>429</code> while a CLI or a queue consumer reads
           <code> RateLimitError</code> directly: nothing in this module knows which platform is
-          answering.
+          answering. It carries the stable code <code>RATE_LIMIT_EXCEEDED</code>, so an application
+          maps it to its own error envelope without importing this package into its error handler.
         </p>
         <p>
           Within budget, the response carries <code>RateLimit-Limit</code>,

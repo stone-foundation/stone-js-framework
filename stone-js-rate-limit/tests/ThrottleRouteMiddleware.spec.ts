@@ -4,6 +4,16 @@ import { MemoryRateLimiter } from '../src/drivers/MemoryRateLimiter'
 import { rateLimitBlueprint } from '../src/options/RateLimitBlueprint'
 import { MetaThrottleRouteMiddleware, ThrottleRouteMiddleware } from '../src/middleware/ThrottleRouteMiddleware'
 
+/**
+ * A store nobody else counts in.
+ *
+ * The memory limiter keeps its counters under its configured name, because a store is where
+ * inter-request state belongs. Two tests sharing a name would share the counting, so each test asks
+ * for its own, which is also how two limiters are separated in an application.
+ */
+let stores = 0
+const ownStore = (): any => MemoryRateLimiter.create({ name: `test-${++stores}` })
+
 const makeEvent = (over: {
   rateLimit?: unknown
   body?: Record<string, unknown>
@@ -14,7 +24,12 @@ const makeEvent = (over: {
 } = {}): any => ({
   ip: over.address ?? '1.2.3.4',
   pathname: '/login',
-  get: <T>(key: string, fallback?: T) => (over.body?.[key] as T) ?? fallback,
+  // `get()` throws on purpose, exactly as the real event does before the router has bound it: on the
+  // router layer the parameters are bound only after the route middleware have run. A subject read
+  // that went through it turned every declared budget into a 500 on the route it was protecting, so
+  // the fake keeps the trap armed.
+  get: () => { throw new Error('Event is not bound') },
+  getFromBody: <T>(key: string, fallback?: T) => (over.body?.[key] as T) ?? fallback,
   getHeader: <T>(name: string, fallback?: T) => (over.headers?.[name.toLowerCase()] as T) ?? fallback,
   getUser: () => over.user,
   getRoute: () => ({
@@ -30,7 +45,7 @@ const makeEvent = (over: {
 
 const middlewareWith = (config: Record<string, unknown> = {}): ThrottleRouteMiddleware => {
   const manager = RateLimitManager.create()
-  manager.register('memory', MemoryRateLimiter.create())
+  manager.register('memory', ownStore())
 
   return new ThrottleRouteMiddleware({
     blueprint: { get: (key: string, fallback?: unknown) => (key === 'stone.rateLimit' ? config : fallback) } as any,
@@ -46,7 +61,7 @@ const next = (async () => ({ setHeader: () => {} })) as any
 describe('what a route declared about its budget', () => {
   it('lets the allowance through and refuses past it', async () => {
     const middleware = middlewareWith()
-    const rule = { max: 2, window: 60 }
+    const rule = { max: 2, window: 60, by: 'address' }
 
     await expect(middleware.handle(makeEvent({ rateLimit: rule }), next)).resolves.toBeDefined()
     await expect(middleware.handle(makeEvent({ rateLimit: rule }), next)).resolves.toBeDefined()
@@ -56,9 +71,9 @@ describe('what a route declared about its budget', () => {
   it('says when to come back, so a refusal does not invite a retry storm', async () => {
     const middleware = middlewareWith()
 
-    await middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60 } }), next)
+    await middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60, by: 'address' } }), next)
 
-    await middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60 } }), next).catch((error: RateLimitError) => {
+    await middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60, by: 'address' } }), next).catch((error: RateLimitError) => {
       expect(error.retryAfter).toBeGreaterThan(0)
       expect(error.statusCode).toBe(429)
       expect(error.headers['Retry-After']).toBe(String(error.retryAfter))
@@ -70,7 +85,7 @@ describe('what a route declared about its budget', () => {
   })
 
   it('applies the global rule to a route that declares none', async () => {
-    const middleware = middlewareWith({ global: { max: 1, window: 60 } })
+    const middleware = middlewareWith({ global: { max: 1, window: 60, by: 'address' } })
 
     await middleware.handle(makeEvent(), next)
 
@@ -216,7 +231,7 @@ describe('the address the budget is keyed on', () => {
     // A forwarded header is client-spoofable unless a proxy overwrites it. Reading one by default
     // would hand every caller an unlimited supply of identities.
     const middleware = middlewareWith()
-    const rule = { max: 1, window: 60 }
+    const rule = { max: 1, window: 60, by: 'address' }
 
     await middleware.handle(makeEvent({ rateLimit: rule, headers: { 'x-forwarded-for': '5.5.5.5' } }), next)
 
@@ -227,7 +242,7 @@ describe('the address the budget is keyed on', () => {
 
   it('reads the header the application does trust', async () => {
     const middleware = middlewareWith({ trustedAddressHeaders: ['cloudfront-viewer-address'] })
-    const rule = { max: 1, window: 60 }
+    const rule = { max: 1, window: 60, by: 'address' }
 
     await middleware.handle(makeEvent({ rateLimit: rule, headers: { 'cloudfront-viewer-address': '5.5.5.5:1234' } }), next)
 
@@ -238,7 +253,7 @@ describe('the address the budget is keyed on', () => {
 
   it('skips a trusted header the request did not carry, and keeps looking', async () => {
     const middleware = middlewareWith({ trustedAddressHeaders: ['cloudfront-viewer-address', 'true-client-ip'] })
-    const rule = { max: 1, window: 60 }
+    const rule = { max: 1, window: 60, by: 'address' }
 
     await middleware.handle(makeEvent({ rateLimit: rule, headers: { 'true-client-ip': '7.7.7.7' } }), next)
 
@@ -251,7 +266,7 @@ describe('the address the budget is keyed on', () => {
     // An edge that sets the header unconditionally sends an empty one for a request it could not
     // resolve, and an empty string is one bucket for everybody.
     const middleware = middlewareWith({ trustedAddressHeaders: ['cloudfront-viewer-address'] })
-    const rule = { max: 1, window: 60 }
+    const rule = { max: 1, window: 60, by: 'address' }
 
     await middleware.handle(makeEvent({ rateLimit: rule, headers: { 'cloudfront-viewer-address': '  ' }, address: '4.4.4.4' }), next)
 
@@ -269,7 +284,7 @@ describe('the address the budget is keyed on', () => {
       get: <T>(_k: string, fallback?: T) => fallback,
       getRoute: () => ({
         getOption: <T>(key: string): T | undefined => (
-          { name: 'login', method: 'POST', path: '/login', rateLimit: { max: 1, window: 60 } } as any
+          { name: 'login', method: 'POST', path: '/login', rateLimit: { max: 1, window: 60, by: 'address' } } as any
         )[key]
       })
     })
@@ -281,7 +296,7 @@ describe('the address the budget is keyed on', () => {
 
   it('strips the port, so one caller cannot reconnect for a fresh budget', async () => {
     const middleware = middlewareWith({ trustedAddressHeaders: ['cloudfront-viewer-address'] })
-    const rule = { max: 1, window: 60 }
+    const rule = { max: 1, window: 60, by: 'address' }
 
     await middleware.handle(makeEvent({ rateLimit: rule, headers: { 'cloudfront-viewer-address': '5.5.5.5:1111' } }), next)
 
@@ -295,7 +310,7 @@ describe('several rules that all apply', () => {
   it('enforces them in order and refuses on the first exceeded', async () => {
     // What a group's budget composed with a route's looks like once the router has flattened them.
     const middleware = middlewareWith()
-    const rules = [{ max: 5, window: 60 }, { max: 1, window: 60 }]
+    const rules = [{ max: 5, window: 60, by: 'address' }, { max: 1, window: 60, by: 'address' }]
 
     await middleware.handle(makeEvent({ rateLimit: rules }), next)
 
@@ -309,7 +324,7 @@ describe('telling the caller where it stands', () => {
     const middleware = middlewareWith()
 
     await middleware.handle(
-      makeEvent({ rateLimit: { max: 5, window: 60 } }),
+      makeEvent({ rateLimit: { max: 5, window: 60, by: 'address' } }),
       (async () => ({ setHeader: (name: string, value: string) => { headers[name] = value } })) as any
     )
 
@@ -331,7 +346,7 @@ describe('telling the caller where it stands', () => {
     })
 
     await middleware.handle(
-      makeEvent({ rateLimit: { max: 5, window: 60 } }),
+      makeEvent({ rateLimit: { max: 5, window: 60, by: 'address' } }),
       (async () => ({ setHeader: (name: string, value: string) => { headers[name] = value } })) as any
     )
 
@@ -349,7 +364,7 @@ describe('telling the caller where it stands', () => {
     })
 
     await middleware.handle(
-      makeEvent({ rateLimit: [{ max: 5, window: 60 }, { max: 2, window: 60 }] }),
+      makeEvent({ rateLimit: [{ max: 5, window: 60, by: 'address' }, { max: 2, window: 60, by: 'address' }] }),
       (async () => ({ setHeader: (name: string, value: string) => { headers[name] = value } })) as any
     )
 
@@ -362,7 +377,7 @@ describe('telling the caller where it stands', () => {
     const middleware = middlewareWith({ headers: false })
 
     await middleware.handle(
-      makeEvent({ rateLimit: { max: 5, window: 60 } }),
+      makeEvent({ rateLimit: { max: 5, window: 60, by: 'address' } }),
       (async () => ({ setHeader: (name: string, value: string) => { headers[name] = value } })) as any
     )
 
@@ -373,7 +388,7 @@ describe('telling the caller where it stands', () => {
     const middleware = middlewareWith()
 
     await expect(middleware.handle(
-      makeEvent({ rateLimit: { max: 5, window: 60 } }),
+      makeEvent({ rateLimit: { max: 5, window: 60, by: 'address' } }),
       (async () => 'a plain value') as any
     )).resolves.toBe('a plain value')
   })
@@ -386,16 +401,16 @@ describe('reaching the limiter and the log', () => {
     // A single-handler application or a command has no route middleware container to read from, and a
     // limit must still be a limit there.
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
     RateLimitManager.setInstance(manager)
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: { get: (_key: string, fallback?: unknown) => fallback } as any
     })
 
-    await middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60 } }), next)
+    await middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60, by: 'address' } }), next)
 
-    await expect(middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60 } }), next))
+    await expect(middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60, by: 'address' } }), next))
       .rejects.toThrow(RateLimitError)
   })
 
@@ -404,7 +419,7 @@ describe('reaching the limiter and the log', () => {
       blueprint: { get: (_key: string, fallback?: unknown) => fallback } as any
     })
 
-    await expect(middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60 } }), next)).resolves.toBeDefined()
+    await expect(middleware.handle(makeEvent({ rateLimit: { max: 1, window: 60, by: 'address' } }), next)).resolves.toBeDefined()
   })
 
   it('logs a refusal without the subject, the address or the body', async () => {
@@ -412,7 +427,7 @@ describe('reaching the limiter and the log', () => {
     // and nothing that identifies whoever was refused.
     const warned: any[] = []
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: { get: (key: string, fallback?: unknown) => (key === 'stone.rateLimit' ? {} : fallback) } as any,
@@ -438,11 +453,11 @@ describe('an event with no route at all', () => {
   it('is throttled on the global rule, keyed on where it arrived', async () => {
     // A command or a queue consumer carries no route, and a global budget still has to mean something.
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: {
-        get: (key: string, fallback?: unknown) => (key === 'stone.rateLimit' ? { global: { max: 1, window: 60 } } : fallback)
+        get: (key: string, fallback?: unknown) => (key === 'stone.rateLimit' ? { global: { max: 1, window: 60, by: 'address' } } : fallback)
       } as any,
       container: { has: (key: unknown) => key === RateLimitManager, make: () => manager } as any
     })
@@ -462,12 +477,12 @@ describe('an event with no route at all', () => {
     const { Throttle } = await import('../src/decorators/Throttle')
 
     class ImportCommand {
-      @Throttle({ max: 1, window: 60 })
+      @Throttle({ max: 1, window: 60, by: 'address' })
       handle (): string { return 'done' }
     }
 
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: {
@@ -493,7 +508,7 @@ describe('an event with no route at all', () => {
     }
 
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: {

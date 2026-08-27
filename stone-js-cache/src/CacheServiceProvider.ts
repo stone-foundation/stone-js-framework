@@ -33,6 +33,10 @@ export class CacheServiceProvider implements IServiceProvider {
    */
   register (): Promiseable<void> {
     const config = this.container.make<IBlueprint>('blueprint').get<CacheConfig>('stone.cache', {})
+
+    // Built for this event, like everything else in the container. What has to outlive the event is
+    // not the manager, which is a registry of factories: it is the cached values, and those belong
+    // to the store the application chose.
     const manager = CacheManager.create(config.default ?? 'memory')
 
     // Always-available zero-config default.

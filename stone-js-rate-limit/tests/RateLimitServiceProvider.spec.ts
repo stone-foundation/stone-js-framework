@@ -16,7 +16,7 @@ const makeContainer = (config: any): any => {
 const managerOf = (container: any): RateLimitManager => container.instanceIf.mock.calls[0][1]
 
 describe('wiring the module up', () => {
-  afterEach(() => { RateLimitManager.setInstance(undefined) })
+  afterEach(() => { MemoryRateLimiter.create().clear(); RateLimitManager.setInstance(undefined) })
 
   it('binds the manager and publishes it, so code outside the container can reach it', () => {
     const container = makeContainer({})

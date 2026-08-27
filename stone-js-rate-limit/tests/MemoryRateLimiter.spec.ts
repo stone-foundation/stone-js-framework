@@ -1,6 +1,11 @@
 import { MemoryRateLimiter } from '../src/drivers/MemoryRateLimiter'
 
 describe('the per-process limiter', () => {
+  // The counters belong to the store, not to the instance: two limiters of the same name count in
+  // the same place, which is the whole reason a limiter survives a container being rebuilt. A suite
+  // therefore starts from a clean store rather than from a fresh object.
+  beforeEach(() => { MemoryRateLimiter.create().clear() })
+
   it('allows up to the limit and refuses past it', async () => {
     const limiter = MemoryRateLimiter.create()
 

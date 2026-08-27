@@ -1,6 +1,9 @@
 import { IntegrationError } from '@stone-js/core'
 import type { ErrorOptions } from '@stone-js/core'
 
+/** The code a refusal carries, for an application mapping it to its own error envelope. */
+export const RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED'
+
 /** What a refusal carries, so a caller knows when to come back. */
 export interface RateLimitErrorOptions extends ErrorOptions {
   /** Seconds to wait before retrying. */
@@ -31,7 +34,10 @@ export class RateLimitError extends IntegrationError {
   readonly limit: number
 
   constructor (message: string, options: RateLimitErrorOptions) {
-    super(message, options)
+    // A stable code, so an application maps this to its own error envelope without importing the
+    // class into its error handler: `error.code === 'RATE_LIMIT_EXCEEDED'` needs no dependency on
+    // this package at the one place that should not have one.
+    super(message, { code: RATE_LIMIT_EXCEEDED, ...options })
     this.name = 'RateLimitError'
     this.retryAfter = options.retryAfter
     this.resetAt = options.resetAt

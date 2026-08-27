@@ -22,6 +22,10 @@ interface ThrottledEvent extends IncomingEvent {
   getHeader?: <T = string>(name: string, fallback?: T) => T | undefined
   getRoute?: () => RouteLike | undefined
   getUser?: <T>() => T | undefined
+  // Read separately rather than through `get()`, which consults the route parameters first and
+  // therefore raises before the router has bound the event. See `fieldOf`.
+  getFromBody?: <T>(name: string, fallback?: T) => T | undefined
+  getFromQueryParams?: <T>(name: string, fallback?: T) => T | undefined
 }
 
 /**
@@ -77,9 +81,21 @@ export class ThrottleRouteMiddleware {
     const scope = scopeOf(event.getRoute?.(), event.pathname ?? 'unknown')
     let tightest: Budget | undefined
 
-    for (const rule of rules) {
+    for (const declared of rules) {
+      const rule = this.applied(declared, scope)
       const windowMs = Math.max(1, rule.window) * 1000
-      const subject = this.subjectOf(event, rule)
+      const subject = await this.subjectOf(event, rule)
+
+      if (subject === undefined && rule.by !== 'address') {
+        // The downgrade below is the right behaviour and the wrong silence. A rule that asked for a
+        // subject and got none is now billed to the address at the backstop, so a budget of three
+        // allows thirty, with no error and every test still green. On a shared address that means
+        // unrelated callers paying for one, which is the failure this module exists to prevent.
+        this.logger()?.warn(
+          'Rate limit rule names a subject the request does not carry, falling back to the address bucket',
+          { scope, by: typeof rule.by === 'function' ? 'resolver' : rule.by, limit: rule.max }
+        )
+      }
 
       // Every rule counts in a bucket of its own. Two rules that shared one counter would each spend
       // the other's allowance, so a group's generous budget would exhaust a route's strict one on the
@@ -87,12 +103,12 @@ export class ThrottleRouteMiddleware {
       //
       // A rule that names a scope is counted there instead of per route, which is how a ceiling shared
       // by several routes is expressed. See `RateLimitRule.scope`.
-      const bucket = `${rule.scope ?? scope}|${rule.max}|${windowMs}|${rule.by ?? 'address'}`
+      const bucket = `${rule.scope ?? scope}|${rule.max}|${windowMs}|${typeof rule.by === 'function' ? 'resolver' : rule.by}`
 
       // The subject's own budget, which is the real guarantee.
       if (subject !== undefined) {
         const hit = await manager.hit(`${bucket}:${subject}`, rule.max, windowMs, rule.limiter)
-        this.refuseIfSpent(hit, rule.max, { scope, by: rule.by })
+        this.refuseIfSpent(hit, rule.max, { scope, by: typeof rule.by === 'function' ? 'resolver' : rule.by })
         tightest = this.tighter(tightest, { limit: rule.max, remaining: hit.remaining, resetAt: hit.resetAt })
       }
 
@@ -113,6 +129,30 @@ export class ThrottleRouteMiddleware {
   }
 
   /**
+   * The rule as it will be enforced, with the one thing a type cannot guarantee filled in.
+   *
+   * `by` is required, and the type says so. It says so to TypeScript only, and Stone.js is
+   * JavaScript as much as TypeScript, so the rule that matters most in this module cannot rest on a
+   * type alone. A rule arriving without a subject is still enforced, on the address, and says out
+   * loud that it is doing the one thing this module argues against.
+   *
+   * @param rule - What was declared.
+   * @param scope - What it applies to, for the log.
+   * @returns The rule to enforce.
+   */
+  private applied (rule: RateLimitRule, scope: string): RateLimitRule {
+    if (rule.by !== undefined) { return rule }
+
+    this.logger()?.warn(
+      'Rate limit rule declares no `by`, so it is counted on the caller address. Name the subject ' +
+      'it should belong to, or write `by: \'address\'` to say you meant it.',
+      { scope, limit: rule.max, window: rule.window }
+    )
+
+    return { ...rule, by: 'address' }
+  }
+
+  /**
    * How much the address bucket allows for this rule, or nothing when it does not apply.
    *
    * @param rule - What was declared.
@@ -122,7 +162,7 @@ export class ThrottleRouteMiddleware {
   private addressLimitFor (rule: RateLimitRule, hasSubject: boolean): number | undefined {
     // A rule that names no subject bills the address for the whole budget: it is the only identity
     // the request offers.
-    if ((rule.by ?? 'address') === 'address') { return rule.max }
+    if (rule.by === 'address') { return rule.max }
 
     const factor = typeof rule.backstop === 'number' ? rule.backstop : IP_BACKSTOP_FACTOR
     const backstop = Math.max(1, Math.round(rule.max * factor))
@@ -191,27 +231,125 @@ export class ThrottleRouteMiddleware {
    * @param rule - What was declared.
    * @returns The subject key, or nothing when the rule names none or the request carries none.
    */
-  private subjectOf (event: ThrottledEvent, rule: RateLimitRule): string | undefined {
-    const by = rule.by ?? 'address'
+  private async subjectOf (event: ThrottledEvent, rule: RateLimitRule): Promise<string | undefined> {
+    const by = rule.by
 
     if (by === 'address') { return undefined }
 
+    // A resolver the application supplied: it knows where its subject lives, and this module has no
+    // business guessing. Prefixed so it can never collide with a field of the same name.
+    if (typeof by === 'function') {
+      const hashed = hashSubject(await this.attempt(async () => await by(event)))
+      return hashed === undefined ? undefined : `subject:${hashed}`
+    }
+
     if (by === 'user') {
-      const user = event.getUser?.<{ id?: unknown }>()
-      const hashed = hashSubject(typeof user === 'object' && user !== null ? String((user as any).id ?? '') : user)
+      const hashed = hashSubject(await this.attempt(async () => await this.principalOf(event)))
       return hashed === undefined ? undefined : `user:${hashed}`
     }
 
+    // A field spec accepts alternatives, first present wins, each prefixed by its field name so a
+    // phone and an email can never land on one bucket.
     for (const field of by.split('|')) {
       const name = field.trim()
-      const hashed = hashSubject(event.get<string>(name, ''))
+      const hashed = hashSubject(await this.attempt(async () => await this.fieldOf(event, name)))
       if (hashed !== undefined) { return `${name}:${hashed}` }
     }
 
     // A rule that wanted a subject and did not get one falls through to the address bucket, at the
     // looser backstop: a malformed request must not spend the strict per-subject budget, and must not
-    // be waved through either.
+    // be waved through either. The caller logs it, because a silent downgrade is how a budget of
+    // three came to allow thirty with every test still green.
     return undefined
+  }
+
+  /**
+   * The authenticated principal, as the application resolves it.
+   *
+   * The default reads `event.getUser?.()` and takes its `id`, `sub` or `userId`: the three shapes a
+   * principal almost always has, `sub` being the one a token carries. Anything else is what
+   * `stone.rateLimit.principal` is for, because a framework that started inferring the shape of an
+   * application's principal would be wrong for somebody on every release.
+   *
+   * @param event - The incoming event.
+   * @returns The principal's identity, or nothing.
+   */
+  private async principalOf (event: ThrottledEvent): Promise<string | undefined> {
+    const resolver = this.options().principal
+
+    if (resolver !== undefined) { return await resolver(event) }
+
+    const user = event.getUser?.<Record<string, unknown>>()
+
+    if (typeof user === 'string' || typeof user === 'number') { return String(user) }
+    if (typeof user !== 'object' || user === null) { return undefined }
+
+    const identity = user.id ?? user.sub ?? user.userId
+
+    return identity === undefined || identity === null ? undefined : String(identity)
+  }
+
+  /**
+   * One field of the request, read in the order `event.get` reads it, minus the ways it can throw.
+   *
+   * `event.get()` cannot be used here. It consults the route parameters first, and on the router
+   * layer the parameters are bound only **after** the route middleware have run, so it raises
+   * "Event is not bound" for every field, a body field included. That turned a declared budget into
+   * a 500 on the very route it was meant to protect. The router's own `findParam` does the
+   * find-bind-read dance safely, and it is asked through the container so this module keeps knowing
+   * nothing about the router.
+   *
+   * @param event - The incoming event.
+   * @param name - The field to read.
+   * @returns The value, or nothing.
+   */
+  private async fieldOf (event: ThrottledEvent, name: string): Promise<string | undefined> {
+    const router = this.container?.has?.('router') === true
+      ? this.container.make<{ findParam?: (event: unknown, name: string) => Promise<unknown> }>('router')
+      : undefined
+
+    const fromRoute = router?.findParam === undefined
+      ? undefined
+      : await this.attempt(async () => await router.findParam?.(event, name))
+
+    return this.text(fromRoute) ??
+      this.text(event.getFromBody?.<unknown>(name)) ??
+      this.text(event.getFromQueryParams?.<unknown>(name))
+  }
+
+  /**
+   * A value as a subject string, or nothing when it says nothing.
+   *
+   * @param value - Whatever a source answered.
+   * @returns The value as text, or nothing.
+   */
+  private text (value: unknown): string | undefined {
+    if (value === undefined || value === null) { return undefined }
+
+    const text = String(value)
+
+    return text === '' ? undefined : text
+  }
+
+  /**
+   * Run a read that is allowed to fail, and answer nothing when it does.
+   *
+   * A limiter must degrade, never break the route it protects: a resolver an application wrote, a
+   * router that cannot match, a body that never parsed. Whatever the reason, the request falls back
+   * to the address bucket and the refusal path stays intact.
+   *
+   * @param read - The read to attempt.
+   * @returns What it answered, or nothing.
+   */
+  private async attempt<T> (read: () => Promise<T>): Promise<T | undefined> {
+    try {
+      return await read()
+    } catch (error: any) {
+      this.logger()?.debug?.('Rate limit subject could not be read, falling back to the address', {
+        reason: error?.message
+      })
+      return undefined
+    }
   }
 
   /**

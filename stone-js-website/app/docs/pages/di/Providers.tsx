@@ -1,8 +1,8 @@
 import { JSX } from 'react'
-import { CodeTabs } from '../../components/Code'
+import { Code, CodeTabs } from '../../components/Code'
 import { siblings } from '../../nav'
 import { HeadContext, IPage, Page, ReactIncomingEvent } from '@stone-js/use-react'
-import { ArticleTop, Lead, H2, H3, Callout, PropsTable, SeeAlso, Pager } from '../../components/content'
+import { ArticleTop, Lead, H2, H3, Callout, Principle, PropsTable, SeeAlso, Pager } from '../../components/content'
 
 const PATH = '/docs/di/providers'
 
@@ -96,6 +96,63 @@ export class Providers implements IPage<ReactIncomingEvent> {
           factory, never a plain function. This is the one place the three forms are restricted, and
           the restriction is just the definition of what a provider is.
         </p>
+
+        <H2>State that must outlive the event</H2>
+        <p>
+          The container is an execution context: it is created for one event and thrown away with it,
+          and every provider registers again with the next one. That is deliberate, it is what makes
+          an event's work isolated from the next event's, and on a function-as-a-service platform it
+          is simply the truth: a cold start restarts everything.
+        </p>
+        <Callout kind='important' title='A provider runs again for every event'>
+          <p>
+            Anything a provider builds is rebuilt with it. Two shipped modules learnt this the hard
+            way: a rate limiter that refused nothing and a cache that never returned a hit, both
+            silent, both with a green test suite, because a test builds the thing once.
+          </p>
+        </Callout>
+        <p>
+          The answer is not to hold state somewhere the framework owns. There is no such place, on
+          purpose, and one would be wrong anyway: on serverless it would be per warm container, so a
+          count would be wrong, unshared and reset unpredictably, while looking correct in
+          development.
+        </p>
+        <Principle
+          principle={
+            <p>
+              The framework keeps nothing between events. What must outlive one belongs to a
+              <strong> store</strong>, because a store is the persistence boundary, and choosing it is
+              choosing where the state is kept.
+            </p>
+          }
+          incarnation={
+            <p>
+              A driver holds its own backing: a database, Redis, or the in-memory store, which is the
+              reference implementation of that boundary and honest about being one process wide.
+              Providers, managers and everything else are rebuilt per event.
+            </p>
+          }
+        />
+        <Code file='app/AppConfig.ts'>{`// The store is chosen, and the application knows what it chose.
+blueprint.set('stone.cache', {
+  default: 'shared',
+  stores: [{ name: 'shared', driver: 'redis', url: process.env.REDIS_URL }]
+})`}</Code>
+        <p>
+          Your own store plugs into the same seam, and it holds whatever it needs to hold, in the
+          place your deployment can actually share:
+        </p>
+        <Code file='app/AppConfig.ts'>{`blueprint.set('stone.rateLimit', {
+  default: 'table',
+  limiters: [{ name: 'table', factory: () => ({
+    hit: async (key, limit, windowMs) => await countInMyTable(key, limit, windowMs)
+  }) }]
+})`}</Code>
+        <Callout kind='note' title='The memory driver is one process wide'>
+          It is the right choice for a single server and for tests, and it is not a shared limit or a
+          shared cache anywhere else. On serverless each instance keeps its own, so it resets on every
+          cold start and every new instance starts again from nothing.
+        </Callout>
 
         <Callout kind='future' title='This is how the ecosystem attaches'>
           When you stack <code>@NodeHttp()</code> or add <code>@stone-js/auth</code>, you are adding

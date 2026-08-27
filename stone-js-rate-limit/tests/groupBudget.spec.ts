@@ -5,6 +5,16 @@ import { rateLimitBlueprint } from '../src/options/RateLimitBlueprint'
 import { ThrottleRouteMiddleware } from '../src/middleware/ThrottleRouteMiddleware'
 
 /**
+ * A store nobody else counts in.
+ *
+ * The memory limiter keeps its counters under its configured name, because a store is where
+ * inter-request state belongs. Two tests sharing a name would share the counting, so each test asks
+ * for its own, which is also how two limiters are separated in an application.
+ */
+let stores = 0
+const ownStore = (): any => MemoryRateLimiter.create({ name: `test-${++stores}` })
+
+/**
  * The mapper as the blueprint configures it, so the composition under test is the real one.
  *
  * Routes are looked up by path rather than by position: a declared `GET` is mapped to a `GET` and a
@@ -32,7 +42,7 @@ const mapRoutes = async (definitions: any[]): Promise<(path: string) => any> => 
 
 const enforcerFor = (): ThrottleRouteMiddleware => {
   const manager = RateLimitManager.create()
-  manager.register('memory', MemoryRateLimiter.create())
+  manager.register('memory', ownStore())
 
   return new ThrottleRouteMiddleware({
     blueprint: { get: (_key: string, fallback?: unknown) => fallback } as any,
@@ -43,7 +53,9 @@ const enforcerFor = (): ThrottleRouteMiddleware => {
 const eventFor = (route: any, body: Record<string, unknown> = {}, address = '1.2.3.4'): any => ({
   ip: address,
   pathname: route.getOption('path'),
-  get: <T>(key: string, fallback?: T) => (body[key] as T) ?? fallback,
+  // Throws like the real thing before binding: see ThrottleRouteMiddleware.spec.ts.
+  get: () => { throw new Error('Event is not bound') },
+  getFromBody: <T>(key: string, fallback?: T) => (body[key] as T) ?? fallback,
   getRoute: () => ({ getOption: <T>(key: string): T | undefined => route.getOption(key) })
 })
 
@@ -53,14 +65,14 @@ describe('a budget declared on a group', () => {
   it('composes with the route own budget, group first, through the real mapper', async () => {
     const routeFor = await mapRoutes([{
       path: '/api',
-      rateLimit: { max: 100, window: 60 },
-      children: [{ path: '/notes', method: 'GET', rateLimit: { max: 5, window: 60 }, handler: () => ({}) }]
+      rateLimit: { max: 100, window: 60, by: 'address' },
+      children: [{ path: '/notes', method: 'GET', rateLimit: { max: 5, window: 60, by: 'address' }, handler: () => ({}) }]
     }])
     const route = routeFor('/api/notes')
 
     // Both promises survive: the router flattens them parent-first because the module declared
     // `rateLimit` composable.
-    expect(route.getOption('rateLimit')).toEqual([{ max: 100, window: 60 }, { max: 5, window: 60 }])
+    expect(route.getOption('rateLimit')).toEqual([{ max: 100, window: 60, by: 'address' }, { max: 5, window: 60, by: 'address' }])
   })
 
   it('holds each child to the group budget and to its own', async () => {
@@ -68,9 +80,9 @@ describe('a budget declared on a group', () => {
     // under me allows more than three", and the child says "and this one allows two".
     const routeFor = await mapRoutes([{
       path: '/api',
-      rateLimit: { max: 3, window: 60 },
+      rateLimit: { max: 3, window: 60, by: 'address' },
       children: [
-        { path: '/notes', method: 'GET', rateLimit: { max: 2, window: 60 }, handler: () => ({}) },
+        { path: '/notes', method: 'GET', rateLimit: { max: 2, window: 60, by: 'address' }, handler: () => ({}) },
         { path: '/tags', method: 'GET', handler: () => ({}) }
       ]
     }])
@@ -99,7 +111,7 @@ describe('a budget declared on a group', () => {
     // inferred: `scope` is the bucket the rule counts in, and every rule naming it counts there.
     const routeFor = await mapRoutes([{
       path: '/api',
-      rateLimit: { max: 3, window: 60, scope: 'api' },
+      rateLimit: { max: 3, window: 60, scope: 'api', by: 'address' },
       children: [
         { path: '/notes', method: 'GET', handler: () => ({}) },
         { path: '/tags', method: 'GET', handler: () => ({}) }
@@ -123,8 +135,8 @@ describe('a budget declared on a group', () => {
     // it entirely on refusals and keep going.
     const routeFor = await mapRoutes([{
       path: '/api',
-      rateLimit: { max: 2, window: 60, scope: 'api' },
-      children: [{ path: '/notes', method: 'GET', rateLimit: { max: 1, window: 60 }, handler: () => ({}) }]
+      rateLimit: { max: 2, window: 60, scope: 'api', by: 'address' },
+      children: [{ path: '/notes', method: 'GET', rateLimit: { max: 1, window: 60, by: 'address' }, handler: () => ({}) }]
     }])
     const route = routeFor('/api/notes')
 
@@ -145,8 +157,8 @@ describe('a budget declared on a group', () => {
     // and the limit that fired would be neither of the two that were declared.
     const routeFor = await mapRoutes([{
       path: '/api',
-      rateLimit: { max: 100, window: 60 },
-      children: [{ path: '/notes', method: 'GET', rateLimit: { max: 3, window: 60 }, handler: () => ({}) }]
+      rateLimit: { max: 100, window: 60, by: 'address' },
+      children: [{ path: '/notes', method: 'GET', rateLimit: { max: 3, window: 60, by: 'address' }, handler: () => ({}) }]
     }])
     const route = routeFor('/api/notes')
 
@@ -166,7 +178,7 @@ describe('a budget declared on a group', () => {
     // per mailbox on the route that sends mail.
     const routeFor = await mapRoutes([{
       path: '/api',
-      rateLimit: { max: 50, window: 60 },
+      rateLimit: { max: 50, window: 60, by: 'address' },
       children: [{
         path: '/auth/code',
         method: 'POST',

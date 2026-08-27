@@ -9,6 +9,16 @@ import { rateLimitBlueprint } from '../src/options/RateLimitBlueprint'
 import { RateLimitServiceProvider } from '../src/RateLimitServiceProvider'
 import { ThrottleRouteMiddleware } from '../src/middleware/ThrottleRouteMiddleware'
 
+/**
+ * A store nobody else counts in.
+ *
+ * The memory limiter keeps its counters under its configured name, because a store is where
+ * inter-request state belongs. Two tests sharing a name would share the counting, so each test asks
+ * for its own, which is also how two limiters are separated in an application.
+ */
+let stores = 0
+const ownStore = (): any => MemoryRateLimiter.create({ name: `test-${++stores}` })
+
 describe('activating the module', () => {
   it('contributes the provider and the enforcement, declaratively', () => {
     @RateLimit()
@@ -71,7 +81,7 @@ describe('declaring what a handler is throttled by', () => {
       @Throttle({ max: 3, window: 900, by: 'email' })
       sendCode (): string { return 'sent' }
 
-      @Throttle({ max: 10, window: 60 })
+      @Throttle({ max: 10, window: 60, by: 'address' })
       verify (): string { return 'ok' }
     }
 
@@ -83,15 +93,15 @@ describe('declaring what a handler is throttled by', () => {
 
   it('is enforced for the action the event is dispatched to', async () => {
     class AuthController {
-      @Throttle({ max: 1, window: 60 })
+      @Throttle({ max: 1, window: 60, by: 'address' })
       sendCode (): string { return 'sent' }
 
-      @Throttle({ max: 5, window: 60 })
+      @Throttle({ max: 5, window: 60, by: 'address' })
       verify (): string { return 'ok' }
     }
 
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: { get: (_key: string, fallback?: unknown) => fallback } as any,
@@ -101,7 +111,8 @@ describe('declaring what a handler is throttled by', () => {
     const event = (action: string): any => ({
       ip: '1.2.3.4',
       pathname: '/auth',
-      get: <T>(_k: string, fallback?: T) => fallback,
+      get: () => { throw new Error('Event is not bound') },
+      getFromBody: <T>(_k: string, fallback?: T) => fallback,
       getRoute: () => ({
         getOption: <T>(key: string): T | undefined => ({
           name: `auth.${action}`,
@@ -123,12 +134,12 @@ describe('declaring what a handler is throttled by', () => {
 
   it('lets a route override what the handler declared', async () => {
     class AuthController {
-      @Throttle({ max: 1, window: 60 })
+      @Throttle({ max: 1, window: 60, by: 'address' })
       sendCode (): string { return 'sent' }
     }
 
     const manager = RateLimitManager.create()
-    manager.register('memory', MemoryRateLimiter.create())
+    manager.register('memory', ownStore())
 
     const middleware = new ThrottleRouteMiddleware({
       blueprint: { get: (_key: string, fallback?: unknown) => fallback } as any,
@@ -138,13 +149,14 @@ describe('declaring what a handler is throttled by', () => {
     const event = (): any => ({
       ip: '1.2.3.4',
       pathname: '/auth/sendCode',
-      get: <T>(_k: string, fallback?: T) => fallback,
+      get: () => { throw new Error('Event is not bound') },
+      getFromBody: <T>(_k: string, fallback?: T) => fallback,
       getRoute: () => ({
         getOption: <T>(key: string): T | undefined => ({
           name: 'auth.sendCode',
           method: 'POST',
           path: '/auth/sendCode',
-          rateLimit: { max: 3, window: 60 },
+          rateLimit: { max: 3, window: 60, by: 'address' },
           handler: { module: AuthController, action: 'sendCode' }
         } as any)[key]
       })

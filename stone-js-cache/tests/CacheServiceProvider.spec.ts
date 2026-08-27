@@ -53,3 +53,58 @@ describe('CacheServiceProvider', () => {
     expect(() => new CacheServiceProvider(container).register()).toThrow(CacheError)
   })
 })
+
+describe('a cached value has to outlive the event that computed it', () => {
+  afterEach(() => { CacheManager.setInstance(undefined) })
+
+  it('keeps what it stored across container rebuilds, because the values belong to the store', async () => {
+    // The bug this pins was total and silent: everything, the manager and the store with it, was
+    // rebuilt for every event, so the memory store was empty on arrival every single time. Measured
+    // on a real Node HTTP server, `get` after `set` returned nothing on the next request and
+    // `remember` recomputed forever while reporting nothing wrong.
+    //
+    // What changed is *where* the values live, not how long the container lives. The container is
+    // still an execution context rebuilt per event, and so is the manager. Cached values belong to
+    // the store the application chose, which is the persistence boundary.
+    const config = {}
+
+    const first = makeContainer(config)
+    new CacheServiceProvider(first).register()
+    await managerArg(first).store().set('k', 'v', { ttl: 300 })
+
+    const second = makeContainer(config)
+    new CacheServiceProvider(second).register()
+
+    await expect(managerArg(second).store().get('k')).resolves.toBe('v')
+  })
+
+  it('builds a new manager for every container, like everything else in it', () => {
+    // The framework keeps nothing between events, and this module adds no exception to that. A
+    // manager is a registry of factories: rebuilding it costs nothing and keeps the execution
+    // context ephemeral, which is what makes a cold start a clean start.
+    const config = {}
+
+    const first = makeContainer(config)
+    new CacheServiceProvider(first).register()
+
+    const second = makeContainer(config)
+    new CacheServiceProvider(second).register()
+
+    expect(managerArg(second)).not.toBe(managerArg(first))
+  })
+
+  it('keeps two named memory stores apart', async () => {
+    // Naming the store is what separates them, exactly as a prefix separates two Redis stores.
+    const container = makeContainer({ stores: [{ name: 'one', driver: 'memory' }, { name: 'two', driver: 'memory' }] })
+
+    new CacheServiceProvider(container).register()
+    const manager = managerArg(container)
+
+    await manager.store('one').set('k', 'from one', { ttl: 300 })
+
+    await expect(manager.store('one').get('k')).resolves.toBe('from one')
+    await expect(manager.store('two').get('k')).resolves.toBeUndefined()
+
+    await manager.store('one').clear()
+  })
+})
