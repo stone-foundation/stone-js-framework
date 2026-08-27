@@ -348,7 +348,7 @@ export class McpToolRegistry {
     const properties: Record<string, unknown> = {}
     const required: string[] = []
 
-    for (const [, name, optional] of this.pathOf(route).matchAll(/:([A-Za-z0-9_]+)(\?)?/g)) {
+    for (const [, name, optional] of this.pathOf(route).matchAll(/:(\w+)(\?)?/g)) {
       properties[name] = { type: 'string', description: `The ${name} in the path.` }
       if (optional === undefined) { required.push(name) }
     }

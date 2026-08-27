@@ -42,7 +42,10 @@ export const stableStringify = (value: unknown): string => {
       // Compared by code unit, deliberately, and not through `localeCompare`: a locale-aware order
       // is not the same order on two machines, and the two halves of a hydrated render can run on
       // two machines. A key has to be stable before it is pretty.
-      const byCodeUnit = (a: string, b: string): number => a < b ? -1 : (a > b ? 1 : 0)
+      const byCodeUnit = (a: string, b: string): number => {
+        if (a < b) { return -1 }
+        return a > b ? 1 : 0
+      }
 
       return Object.keys(item).sort(byCodeUnit).reduce<Record<string, unknown>>((sorted, key) => {
         sorted[key] = (item as Record<string, unknown>)[key]

@@ -30,8 +30,13 @@ jobs:
           node-version-file: '.nvmrc'
           cache: pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Security audit (high · critical)
-        run: pnpm audit --audit-level=high
+      # Every lockfile, not only the root one: a starter with its own lockfile resolves independently,
+      # so the root's `pnpm.overrides` never reached it and neither did the audit. That is how a
+      # vulnerable transitive dependency sat in a template developers scaffold from, seen by Dependabot
+      # and by nothing here. The same script runs locally through `pnpm run audit:ci`, so the two
+      # cannot drift.
+      - name: Security audit (every lockfile · moderate and above)
+        run: pnpm run audit:ci
       - name: Build (packages)
         run: pnpm run build:ci
       # Types are only useful if a consumer can resolve them: an extensionless relative import in a

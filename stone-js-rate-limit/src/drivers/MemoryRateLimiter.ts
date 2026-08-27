@@ -1,6 +1,9 @@
 import { windowOf } from '../utils'
 import { LimiterConfig, RateLimiter, RateLimitHit } from '../declarations'
 
+/** What an unconfigured memory limiter is, as one value rather than a literal rebuilt per call. */
+const DEFAULT_CONFIG: LimiterConfig = { name: 'memory' }
+
 /**
  * The counters, held by the store rather than by anything the framework owns.
  *
@@ -44,7 +47,7 @@ export class MemoryRateLimiter implements RateLimiter {
    * @param config - Names the limiter, which is what its counters are filed under.
    * @returns A limiter.
    */
-  static create (config: LimiterConfig = { name: 'memory' }): MemoryRateLimiter {
+  static create (config: LimiterConfig = DEFAULT_CONFIG): MemoryRateLimiter {
     return new this(config.name ?? 'memory')
   }
 

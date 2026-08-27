@@ -1,0 +1,9 @@
+# The security audit, before the push rather than after it.
+#
+# It is the one gate nobody runs by hand, and it is cheap: a few seconds against the registry, over
+# every lockfile in the repository. A vulnerable transitive dependency reached a published starter
+# because nothing local looked, and the root's overrides do not reach a nested lockfile.
+#
+# Everything else worth running before a push is `pnpm run verify`, which is slower and stays a
+# choice. This hook blocks only on an advisory, and `--no-verify` is there when you need it.
+pnpm run audit:ci

@@ -34,10 +34,10 @@ export class DeliverNotification {
     const retryable = outcomes.filter((outcome) => outcome.status === 'failed' && outcome.retryable === true)
 
     if (retryable.length > 0) {
-      throw new Error(
-        `Notification '${payload.template}' failed on ${retryable.map((o) => `'${String(o.channel)}'`).join(', ')}: ` +
-        retryable.map((o) => o.reason ?? 'no reason given').join('; ')
-      )
+      const channels = retryable.map((outcome) => `'${String(outcome.channel)}'`).join(', ')
+      const reasons = retryable.map((outcome) => outcome.reason ?? 'no reason given').join('; ')
+
+      throw new Error(`Notification '${payload.template}' failed on ${channels}: ${reasons}`)
     }
 
     return outcomes
