@@ -1,5 +1,13 @@
 # @stone-js/use-view
 
+## 0.8.17
+
+### Patch Changes
+
+- Updated dependencies [07b3cc9]
+  - @stone-js/core@0.8.17
+  - @stone-js/router@0.8.17
+
 ## 0.8.16
 
 ### Patch Changes

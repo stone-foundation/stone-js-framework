@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/rate-limit",
-  "version": "0.8.16",
+  "version": "0.8.17",
   "description": "Rate limiting for Stone.js: throttle the subject rather than the address, in any context, with a driver you choose.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

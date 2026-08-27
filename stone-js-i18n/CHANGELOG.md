@@ -1,5 +1,14 @@
 # @stone-js/i18n
 
+## 0.8.17
+
+### Patch Changes
+
+- Updated dependencies [07b3cc9]
+  - @stone-js/core@0.8.17
+  - @stone-js/cli@0.8.17
+  - @stone-js/config@0.8.17
+
 ## 0.8.16
 
 ### Patch Changes
