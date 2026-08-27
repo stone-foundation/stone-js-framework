@@ -1,5 +1,5 @@
 ---
-"@stone-js/http-core": minor
+"@stone-js/http-core": patch
 "@stone-js/fetch-adapter": patch
 "@stone-js/azure-functions-http-adapter": patch
 "@stone-js/alibaba-fc-http-adapter": patch
