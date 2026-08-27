@@ -33,6 +33,45 @@ export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.notifi
 }))
 `
 
+const NOTICE_DECL = `
+import { Notice } from '@stone-js/notifications'
+
+@Notice({
+  name: 'guardianship.consent_needed',
+  on: 'identity.guardian.invited.v1',
+  channels: ['smtp', 'in-app']
+})
+export class ConsentNeeded {
+  constructor ({ i18n }) { this.i18n = i18n }
+
+  // Who learns about it. Required when the notice reacts to an event.
+  recipients (event) { return event.guardianId }
+
+  // What it says, per channel. Asked once per recipient.
+  notify (event, { locale }) {
+    return {
+      smtp: {
+        subject: this.i18n.t('consent.subject', { lng: locale }),
+        body: this.i18n.t('consent.body', { lng: locale, child: event.childHandle })
+      },
+      'in-app': { body: this.i18n.t('consent.short', { lng: locale }) }
+    }
+  }
+}
+`
+
+const NOTICE_IMP = `
+import { defineNotice } from '@stone-js/notifications'
+
+blueprint.set('stone.notifications.notices', [
+  defineNotice(ConsentNeeded, {
+    name: 'guardianship.consent_needed',
+    on: 'identity.guardian.invited.v1',
+    channels: ['smtp', 'in-app']
+  })
+])
+`
+
 const CHANNEL_DECL = `
 import { NotificationChannel } from '@stone-js/notifications'
 
@@ -112,6 +151,36 @@ npm i nodemailer           # the SMTP channel`}</Code>
             Notifications go to the log and say so on first use. A default that quietly sent real mail
             would send it from the first test run, to real people. Reaching them is a decision, so it
             is written down.
+          </p>
+        </Callout>
+
+        <H2>A notice: what someone receives</H2>
+        <Aphorism>
+          The decorator carries the metadata. The class carries the content.
+        </Aphorism>
+        <p>
+          There is no <code>content</code> option, and that is deliberate: text in a decorator is text
+          that cannot be translated, formatted, or read off the event. The class is built through the
+          container, so it asks for whatever it needs.
+        </p>
+        <CodeTabs file='app/ConsentNeeded.ts' decl={NOTICE_DECL} imp={NOTICE_IMP} />
+
+        <H3>Nobody calls the notifier</H3>
+        <Code file='the path'>{`identity emits  ->  identity.guardian.invited.v1  ->  the notice that named it
+                                                     renders, chooses its channels, delivers`}</Code>
+        <p>
+          The notice subscribes through the light key router, the same one <code>@stone-js/event-bus</code>
+          routes domain events through, so the emitting module imports nothing and is never reopened
+          when a channel is added. That is the whole reason this is a declaration rather than a service
+          call: a coupling that does not exist cannot become a cycle.
+        </p>
+        <Callout kind='important' title='A body per channel'>
+          <p>
+            A text message is not an email: one has a subject and room to explain, the other a hundred
+            and sixty characters. A channel the notice says nothing about falls back to the declared
+            template rather than sending an empty body. And the <em>nature</em> of the message decides
+            its channels, not the caller: a service inviting a guardian has no reason to know whether
+            that goes by mail or by text.
           </p>
         </Callout>
 
@@ -206,6 +275,52 @@ await notifier.notify(user, 'welcome', {}, { channels: ['in-app'], inline: true 
           that operation because a provider was down would undo work that was correct.
         </p>
 
+        <H2>The same message twice</H2>
+        <p>
+          The most common production failure of any notification system: a queue is at-least-once, a
+          retry half succeeded, or two events describe one fact. Name the occurrence and the repeat is
+          dropped.
+        </p>
+        <Code file='app/anywhere.ts'>{`await notifier.notify(user, 'welcome', {}, { dedupe: \`welcome:\${user.id}\` })`}</Code>
+        <p>
+          A notice states its own through <code>dedupe(event)</code>. Keys are claimed atomically in
+          the cache store the application already chose, so this module stores nothing of its own.
+          Without the cache module, deduplication does not happen and says so once: sending twice in
+          silence is the failure it exists to prevent.
+        </p>
+
+        <H2>Who received what</H2>
+        <p>
+          This module keeps no delivery ledger, because the answer to "why did they never receive it"
+          belongs in whatever the application already queries. It announces instead, and you write the
+          row you need.
+        </p>
+        <Code file='app/NotificationLedger.ts'>{`@BusHandler()
+export class NotificationLedger {
+  @OnBusEvent('notification.failed')
+  onFailed (event) { /* ... write your own row */ }
+}`}</Code>
+        <Callout kind='note' title='The event carries an id, never an address'>
+          It leaves the process, and an address in an event is an address in every log that event
+          passes through.
+        </Callout>
+
+        <H2>Seeing it before sending it</H2>
+        <Code file='app/anywhere.ts'>{`const previewed = await notifier.preview(guardian, 'guardianship.consent_needed', { child: 'Lea' })
+// [{ recipient, channel: 'smtp', message: { subject, body, locale } }, ...]`}</Code>
+        <p>
+          Exactly what delivery would render, per channel, with nothing sent. For the screen that shows
+          a member of staff what a guardian is about to receive, and for a test that checks a notice
+          without a channel.
+        </p>
+
+        <H2>Later rather than now</H2>
+        <Code file='app/anywhere.ts'>{`await notifier.notify(user, 'trial.ending', {}, { delay: 86_400 })`}</Code>
+        <p>
+          Deferred by the queue, because a timer held in a process a cold start can end is not a
+          reminder.
+        </p>
+
         <H2>Configuration</H2>
         <PropsTable rows={[
           { name: 'channels', type: 'ChannelConfig[]', desc: 'The channels this application configures.' },
@@ -214,7 +329,10 @@ await notifier.notify(user, 'welcome', {}, { channels: ['in-app'], inline: true 
           { name: 'templates', type: 'object', desc: 'Templates, for an application with no translation catalogue. Also the override when there is one.' },
           { name: 'dispatch', type: "'queue' | 'inline'", desc: 'Defaults to queue when a queue is enabled, and to inline otherwise, saying so once.' },
           { name: 'queue', type: 'string', desc: 'Which queue to dispatch on.' },
-          { name: 'attempts', type: 'number', desc: 'How many times a queued delivery is retried.' }
+          { name: 'attempts', type: 'number', desc: 'How many times a queued delivery is retried.' },
+          { name: 'notices', type: 'NoticeDeclaration[]', desc: 'Notices declared in configuration rather than with @Notice. Both are read.' },
+          { name: 'dedupe', type: '{ ttl, store }', desc: 'Where a repeated occurrence is recognised. Keys live in @stone-js/cache.' },
+          { name: 'announce', type: 'boolean', desc: 'Emit notification.delivered and notification.failed on the bus. On when a bus is enabled.' }
         ]} />
 
         <SeeAlso links={[

@@ -2,6 +2,7 @@ import { Notifier } from './Notifier'
 import { LogChannel } from './channels/LogChannel'
 import { SmtpChannel } from './channels/SmtpChannel'
 import { InAppChannel, BroadcasterLike } from './channels/InAppChannel'
+import { NoticeRegistry } from './NoticeRegistry'
 import { NotificationManager } from './NotificationManager'
 import { NotificationConfigurationError } from './errors/NotificationError'
 import { IBlueprint, IContainer, ILogger, IServiceProvider, Promiseable } from '@stone-js/core'
@@ -35,6 +36,8 @@ export class NotificationServiceProvider implements IServiceProvider {
     this.container
       .instanceIf(NotificationManager, manager)
       .alias(NotificationManager, ['notificationManager', 'channels'])
+      .singletonIf(NoticeRegistry, () => new NoticeRegistry({ blueprint, container: this.container }))
+      .alias(NoticeRegistry, ['notices'])
       .singletonIf(Notifier, () => new Notifier({ blueprint, container: this.container }))
       .alias(Notifier, ['notifier'])
   }

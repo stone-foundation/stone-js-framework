@@ -5,3 +5,11 @@
  * can read it without importing this one.
  */
 export const CHANNEL_KEY: string = '@stone-js/notifications/channel'
+
+/**
+ * Where a class declares itself a notice.
+ *
+ * A string rather than a symbol, by the convention every first-party module follows: another package
+ * can read what an application declared without importing this one.
+ */
+export const NOTICE_KEY: string = '@stone-js/notifications/notice'

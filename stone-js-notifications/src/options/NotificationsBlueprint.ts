@@ -3,6 +3,7 @@ import { NotificationsConfig } from '../declarations'
 import { AppConfig, StoneBlueprint } from '@stone-js/core'
 import { DeliverNotification } from '../jobs/DeliverNotification'
 import { NotificationServiceProvider } from '../NotificationServiceProvider'
+import { MetaNoticeSubscriptionsMiddleware } from '../middleware/NoticeSubscriptionsMiddleware'
 
 /** Application config augmented with the notifications bucket. */
 export interface NotificationsAppConfig extends Partial<AppConfig> {
@@ -46,6 +47,11 @@ export const notificationsBlueprint: NotificationsBlueprint = {
     providers: [
       NotificationServiceProvider
     ],
+    blueprint: {
+      middleware: [
+        MetaNoticeSubscriptionsMiddleware
+      ]
+    },
     queue: {
       handlers: [
         { name: DELIVERY_JOB, module: DeliverNotification, isClass: true, action: 'handle' }

@@ -153,12 +153,116 @@ export type TemplateInput =
   | { subject?: string, body: string }
   | ((params: Record<string, unknown>, locale: string) => { subject?: string, body: string })
 
+/** One channel's worth of content: a body, and a subject for the channels that have one. */
+export interface NoticeContent {
+  /** A one-line subject. Ignored by a channel that has none. */
+  subject?: string
+  /** The message itself. */
+  body: string
+}
+
+/**
+ * What a notice says, per channel.
+ *
+ * A body keyed by channel name, because a text message is not an email: one has a subject and room
+ * to explain, the other has 160 characters. A single content, or a bare string, applies to every
+ * channel the notice uses.
+ */
+export type NoticeContentInput = Record<string, NoticeContent | string> | NoticeContent | string
+
+/** What a notice is told about the person it is writing to. */
+export interface NoticeContext {
+  /** The language **this person** reads. */
+  locale: string
+  /** Who it is for, so the content can use their name. */
+  recipient: Recipient
+}
+
+/**
+ * A notice: a class that knows what to say, and to whom.
+ *
+ * The decorator declares what a notice **is**; the class holds what it **says**. That separation is
+ * the point: metadata belongs on the declaration, content belongs in code, where it can read the
+ * event, translate, format a date, or ask a service for a link.
+ *
+ * ```ts
+ * @Notice({ name: 'guardianship.consent_needed', on: 'identity.guardian.invited.v1' })
+ * export class ConsentNeeded {
+ *   constructor ({ i18n }) { this.i18n = i18n }
+ *
+ *   recipients (event) { return event.guardianId }
+ *
+ *   notify (event, { locale }) {
+ *     return {
+ *       smtp: { subject: this.i18n.t('consent.subject', { lng: locale }), body: … },
+ *       'in-app': { body: … }
+ *     }
+ *   }
+ * }
+ * ```
+ */
+export interface NoticeInstance<EventType = any> {
+  /**
+   * What this notice says, for this person.
+   *
+   * Called once per recipient, never once per channel, so a name in the body is rendered once and a
+   * channel-specific body is chosen from what it returns.
+   */
+  notify: (event: EventType, context: NoticeContext) => Promiseable<NoticeContentInput>
+  /**
+   * Who learns about it.
+   *
+   * **Required when the notice reacts to an event**, because nobody else can say: the event carries
+   * the account, and only the notice knows which field that is. Unused when a caller names the
+   * recipient itself.
+   */
+  recipients?: (event: EventType) => Promiseable<RecipientInput | RecipientInput[]>
+  /**
+   * A key that makes this occurrence unique.
+   *
+   * The answer to the most common production failure of any notification system: the same message
+   * twice, because a queue is at-least-once, because a retry half succeeded, or because two events
+   * describe one fact. Return a key and the second attempt is dropped.
+   */
+  dedupe?: (event: EventType) => Promiseable<string | undefined>
+}
+
+/**
+ * What a notice declares about itself.
+ *
+ * Metadata only. Content lives in the class, which is why there is no `content` here: a decorator
+ * that carried message bodies would put text in the one place it cannot be translated, formatted or
+ * computed.
+ */
+export interface NoticeDeclaration {
+  /** The name a caller refers to it by, and the key its deduplication is filed under. */
+  name: string
+  /**
+   * The domain event it reacts to.
+   *
+   * With it, **nobody calls the notifier**: a module emits what happened, and the notice that named
+   * that event says who learns about it. The module that emitted imports nothing and is never
+   * reopened when a channel is added.
+   *
+   * Needs the event bus listener to be enabled, since that is what delivers a domain event.
+   */
+  on?: string
+  /** The channels it uses. Defaults to `stone.notifications.default`. */
+  channels?: string[]
+  /** The class. Built through the container, so it can ask for i18n, a repository, anything. */
+  module?: unknown
+  /** Whether `module` is a class. */
+  isClass?: boolean
+}
+
 /** What one call to the notifier reports back. */
 export interface NotificationReceipt {
   /** True when delivery was handed to a queue rather than performed here. */
   queued: boolean
   /** What each channel answered, empty when the work was queued. */
   deliveries: DeliveryOutcome[]
+  /** True when this occurrence had already been sent, and was dropped rather than sent again. */
+  duplicate?: boolean
 }
 
 /** What a notification says about itself, beyond the template and its params. */
@@ -169,6 +273,14 @@ export interface NotifyOptions {
   locale?: string
   /** Send here and now instead of queueing, whatever the configuration says. */
   inline?: boolean
+  /** Wait this many seconds before delivering. Needs a queue; ignored without one, out loud. */
+  delay?: number
+  /**
+   * A key that makes this occurrence unique, so it is not sent twice.
+   *
+   * Stated here for a direct call; a notice states its own through `dedupe(event)`.
+   */
+  dedupe?: string
 }
 
 /**
@@ -182,6 +294,33 @@ export interface NotifyOptions {
 export interface NotificationsConfig {
   /** The channels this application configures. */
   channels?: ChannelConfig[]
+  /**
+   * The notices this application declares, when it declares them in configuration rather than with
+   * `@Notice`. Both are read, and both say the same thing.
+   */
+  notices?: NoticeDeclaration[]
+  /**
+   * How a repeated occurrence is recognised.
+   *
+   * Keys are held in `@stone-js/cache`, so the store is the one the application already chose, and
+   * this module stores nothing of its own. Without the cache module, deduplication does not happen
+   * and says so once: silently sending twice is the failure it exists to prevent.
+   */
+  dedupe?: {
+    /** How long a key is remembered, in seconds. Defaults to a day. */
+    ttl?: number
+    /** Which cache store holds them. Defaults to the application's default store. */
+    store?: string
+  }
+  /**
+   * Whether each delivery is announced on the event bus.
+   *
+   * `notification.delivered` and `notification.failed`, carrying the notice, the channel and the
+   * outcome. On by default when a bus is enabled, and it is how an application keeps the delivery
+   * ledger it wants: this module records nothing, because a ledger belongs to whoever answers
+   * "why did they never receive it".
+   */
+  announce?: boolean
   /**
    * The channels a notification uses when it names none.
    *

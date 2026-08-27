@@ -16,6 +16,10 @@
 **Notifications for Stone.js.** One declaration reaches a person wherever they are: the mailbox, the
 phone, and the tab they already have open. Delivered out of band, in their own language.
 
+**Nobody has to call it.** A module emits what happened; the notice that named that event decides
+who learns about it, through which channels, and in what words. The emitting module imports nothing
+and is never reopened when a channel is added.
+
 **Decide now, deliver later.** A request resolves who the person is and hands the delivery to a
 queue. Reaching a mail provider takes as long as it takes, and a request that waits for one is a
 request that times out on the endpoint the user is watching.
@@ -71,6 +75,66 @@ export const AppConfig = defineConfig((blueprint) => blueprint.set('stone.notifi
 With nothing configured, notifications go to the log and say so on first use. Reaching real people
 is a decision, so it is written down: a default that quietly sent real mail would send it from the
 first test run.
+
+## A notice: what someone receives
+
+```ts
+@Notice({
+  name: 'guardianship.consent_needed',
+  on: 'identity.guardian.invited.v1',
+  channels: ['smtp', 'in-app']
+})
+export class ConsentNeeded {
+  constructor ({ i18n }) { this.i18n = i18n }
+
+  // Who learns about it. Required when the notice reacts to an event: the event carries the
+  // account, and only the notice knows which field that is.
+  recipients (event) { return event.guardianId }
+
+  // What it says, per channel. Asked once per recipient, so a name in the body is rendered once.
+  notify (event, { locale, recipient }) {
+    return {
+      smtp: {
+        subject: this.i18n.t('consent.subject', { lng: locale }),
+        body: this.i18n.t('consent.body', { lng: locale, child: event.childHandle })
+      },
+      'in-app': { body: this.i18n.t('consent.short', { lng: locale }) }
+    }
+  }
+
+  // Optional: the same fact, told once, however many times it arrives.
+  dedupe (event) { return event.eventId }
+}
+```
+
+**The decorator carries metadata; the class carries content.** There is no `content` option, and
+that is deliberate: text in a decorator is text that cannot be translated, formatted, or read off
+the event. The class is built through the container, so it asks for whatever it needs.
+
+The imperative form says the same thing:
+
+```ts
+blueprint.set('stone.notifications.notices', [
+  defineNotice(ConsentNeeded, { name: 'guardianship.consent_needed', on: 'identity.guardian.invited.v1' })
+])
+```
+
+### Nobody calls the notifier
+
+```
+identity emits  ->  identity.guardian.invited.v1  ->  the notice that named it
+                                                       renders, chooses its channels, delivers
+```
+
+The notice subscribes through the light key router, the same one `@stone-js/event-bus` routes domain
+events through, so `identity` imports nothing. Add a channel later and only the notice changes.
+
+**A body per channel matters.** A text message is not an email: one has a subject and room to
+explain, the other has a hundred and sixty characters. A channel the notice says nothing about falls
+back to the declared template rather than sending an empty body.
+
+**The nature of the message decides its channels**, not the caller. A service inviting a guardian has
+no reason to know whether that goes by mail or by text.
 
 ## Tell someone something
 
@@ -191,6 +255,58 @@ that was correct.
 | `templates` | Templates, for an application with no translation catalogue. |
 | `dispatch` | `queue` or `inline`. Defaults to `queue` when a queue is enabled. |
 | `queue` / `attempts` | Which queue, and how many retries. |
+| `notices` | Notices declared in configuration rather than with `@Notice`. Both are read. |
+| `dedupe` | `{ ttl, store }`. Keys live in `@stone-js/cache`, so this module stores nothing of its own. |
+| `announce` | Emit `notification.delivered` and `notification.failed` on the bus. On when a bus is enabled. |
+
+## The same message twice
+
+The most common production failure of any notification system: a queue is at-least-once, a retry
+half succeeded, or two events describe one fact. Name the occurrence and the repeat is dropped:
+
+```ts
+await notifier.notify(user, 'welcome', {}, { dedupe: `welcome:${user.id}` })
+```
+
+A notice states its own through `dedupe(event)`. Keys are claimed atomically in the cache store the
+application already chose. Without the cache module, deduplication does not happen and says so once:
+sending twice in silence is the failure it exists to prevent.
+
+## Who received what
+
+This module keeps no delivery ledger, because the answer to "why did they never receive it" belongs
+in whatever the application already queries. It announces instead:
+
+```ts
+@BusHandler()
+export class NotificationLedger {
+  @OnBusEvent('notification.failed')
+  onFailed (event) { /* ... write your own row */ }
+}
+```
+
+The event carries the notice, the channel, the outcome, whether it is worth retrying, and the
+recipient's **id**, never their address: an address in an event is an address in every log that
+event passes through.
+
+## Seeing it before sending it
+
+```ts
+const previewed = await notifier.preview(guardian, 'guardianship.consent_needed', { child: 'Lea' })
+// [{ recipient, channel: 'smtp', message: { subject, body, locale } }, ...]
+```
+
+Exactly what delivery would render, per channel, with nothing sent. For the screen that shows a
+member of staff what a guardian is about to receive, and for a test that checks a notice without a
+channel.
+
+## Later rather than now
+
+```ts
+await notifier.notify(user, 'trial.ending', {}, { delay: 86_400 })
+```
+
+Deferred by the queue, because a timer held in a process a cold start can end is not a reminder.
 
 ## Documentation
 
