@@ -2,8 +2,8 @@
 /**
  * Writes, and in CI verifies, the list of names each package exports from its entry point.
  *
- * Forty-eight of the forty-nine published packages re-export a `utils`, `declarations` or
- * `constants` module wholesale (678 `export *` lines against one explicit `export {}`). The public
+ * Fifty of the fifty-one published packages re-export a `utils`, `declarations` or `constants`
+ * module wholesale, across 702 `export *` lines. The public
  * API is therefore not a decision: a helper added to `utils.ts` on a Tuesday is public API on
  * Friday's release, and after the freeze it is frozen public API for the life of the major, without
  * anyone having chosen it. Reviewing the surface once, while the mechanism keeps adding to it

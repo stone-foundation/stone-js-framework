@@ -4,7 +4,7 @@ One file per published package, holding every name that package exports from its
 
 ## Why it is committed
 
-Forty-eight of the fifty-one published packages re-export a `utils`, `declarations` or `constants` module wholesale: 678 `export *` lines against one explicit `export {}`. So the public API is not a decision. A helper added to `utils.ts` on a Tuesday is public API on Friday's release, and after the API freeze it is frozen public API for the life of the major, without anyone having chosen it or reviewed it.
+Fifty of the fifty-one published packages re-export a `utils`, `declarations` or `constants` module wholesale, across 702 `export *` lines. So the public API is not a decision. A helper added to `utils.ts` on a Tuesday is public API on Friday's release, and after the API freeze it is frozen public API for the life of the major, without anyone having chosen it or reviewed it.
 
 Checking the surface in changes that. Adding a public export becomes a visible line in a pull request, reviewed like any other change, and removing one becomes impossible to do by accident.
 
