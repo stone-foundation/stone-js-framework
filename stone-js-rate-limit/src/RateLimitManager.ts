@@ -1,6 +1,6 @@
 import { MemoryRateLimiter } from './drivers/MemoryRateLimiter'
 import { RateLimitConfigurationError } from './errors/RateLimitConfigurationError'
-import { RateLimiter, RateLimiterFactory, RateLimitHit, LimiterConfig } from './declarations'
+import { RateLimiter, RateLimitHit } from './declarations'
 
 /**
  * Holds the configured limiters and hands one out by name.
@@ -105,5 +105,5 @@ export class RateLimitManager {
   }
 }
 
-/** What a driver receives when the manager builds it. */
-export type { LimiterConfig, RateLimiterFactory }
+/** What a driver receives when the manager builds it, re-exported for whoever writes one. */
+export type { LimiterConfig, RateLimiterFactory } from './declarations'

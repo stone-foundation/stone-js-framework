@@ -125,9 +125,23 @@ function fromCatalogue (
  * @returns The filled text.
  */
 function interpolate (text: string, params: Record<string, unknown>): string {
-  return text.replace(/\{\{\s*([A-Za-z0-9_.]+)\s*\}\}/g, (match, name: string) => {
-    const value = params[name]
-
-    return value === undefined || value === null ? match : String(value)
+  return text.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (match, name: string) => {
+    return primitive(params[name]) ?? match
   })
+}
+
+/**
+ * A parameter as text, or nothing when it is not something a message can carry.
+ *
+ * An object or an array would stringify to `[object Object]` in the middle of a sentence somebody
+ * reads. Leaving the placeholder is better: it is visibly unfinished, and it gets reported.
+ *
+ * @param value - The parameter.
+ * @returns Its text, or nothing.
+ */
+function primitive (value: unknown): string | undefined {
+  if (value === undefined || value === null) { return undefined }
+  if (typeof value === 'object') { return undefined }
+
+  return String(value as string | number | boolean | bigint | symbol)
 }

@@ -1,6 +1,9 @@
 import { ILogger } from '@stone-js/core'
 import { ChannelConfig, DeliveryOutcome, NotificationChannel, Recipient, RenderedNotification } from '../declarations'
 
+/** What an unconfigured log channel is, as one value rather than a literal rebuilt per call. */
+const DEFAULT_CONFIG: ChannelConfig = { name: 'log' }
+
 /**
  * The channel that delivers nothing, and is honest about it.
  *
@@ -23,7 +26,7 @@ export class LogChannel implements NotificationChannel {
    * @param logger - Where the message goes, when one is bound.
    * @returns A channel.
    */
-  static create (config: ChannelConfig = { name: 'log' }, logger?: ILogger): LogChannel {
+  static create (config: ChannelConfig = DEFAULT_CONFIG, logger?: ILogger): LogChannel {
     return new this(config.name ?? 'log', logger)
   }
 

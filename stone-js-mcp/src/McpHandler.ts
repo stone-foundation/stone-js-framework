@@ -5,6 +5,23 @@ import { JSONRPC_ERROR_CODES, McpError } from './errors/McpError'
 import { JSONRPC_VERSION, LATEST_PROTOCOL_VERSION, SUPPORTED_PROTOCOL_VERSIONS } from './constants'
 import { JsonSchema, McpConfig, McpToolRoute, RouteLike, RouterLike } from './declarations'
 
+/**
+ * An argument as text, or nothing when it is not something a path can carry.
+ *
+ * An object or an array would land in a URL as `[object Object]`, which matches no route and reads
+ * like a bug in the agent rather than in the call. Answering nothing leaves the placeholder, and the
+ * route then fails to match honestly.
+ *
+ * @param value - The argument.
+ * @returns Its text, or nothing.
+ */
+function asText (value: unknown): string | undefined {
+  if (value === undefined || value === null) { return undefined }
+  if (typeof value === 'object') { return undefined }
+
+  return String(value as string | number | boolean | bigint | symbol)
+}
+
 /** One JSON-RPC message, as it arrives. */
 interface JsonRpcMessage {
   jsonrpc?: string
@@ -274,15 +291,17 @@ export class McpHandler {
   private fillPath (route: RouteLike, args: Record<string, unknown>): { path: string, rest: Record<string, unknown> } {
     const rest = { ...args }
 
-    const path = (route.getOption<string>('path') ?? '/').replace(/:([A-Za-z0-9_]+)\??(\([^)]*\))?/g, (match, name: string) => {
-      const value = rest[name]
+    const path = (route.getOption<string>('path') ?? '/').replace(/:(\w+)\??(\([^)]*\))?/g, (match, name: string) => {
+      const value = asText(rest[name])
 
+      // An argument the agent did not send leaves its placeholder: the route then fails to match and
+      // the agent is told, where substituting an empty string would call a different endpoint.
       if (value === undefined) { return match }
 
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete rest[name]
 
-      return encodeURIComponent(String(value))
+      return encodeURIComponent(value)
     })
 
     return { path, rest }

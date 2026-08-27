@@ -6,6 +6,9 @@ export interface BroadcasterLike {
   to: (channel: string) => { emit: <T>(event: string, payload?: T) => Promise<void> }
 }
 
+/** What an unconfigured in-app channel is, as one value rather than a literal rebuilt per call. */
+const DEFAULT_CONFIG: InAppChannelConfig = { name: 'in-app' }
+
 /**
  * The channel that reaches the tab someone already has open.
  *
@@ -33,11 +36,11 @@ export class InAppChannel implements NotificationChannel {
    * @param broadcaster - The realtime broadcaster, when one is bound.
    * @returns A channel.
    */
-  static create (config: InAppChannelConfig = { name: 'in-app' }, broadcaster?: BroadcasterLike): InAppChannel {
+  static create (config: InAppChannelConfig = DEFAULT_CONFIG, broadcaster?: BroadcasterLike): InAppChannel {
     return new this(config, broadcaster)
   }
 
-  constructor (config: InAppChannelConfig = { name: 'in-app' }, broadcaster?: BroadcasterLike) {
+  constructor (config: InAppChannelConfig = DEFAULT_CONFIG, broadcaster?: BroadcasterLike) {
     this.name = config.name ?? 'in-app'
     this.event = config.event ?? IN_APP_EVENT
     this.broadcaster = broadcaster
