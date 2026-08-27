@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/react-native-adapter",
-  "version": "0.8.16",
+  "version": "0.8.17",
   "description": "React Native adapter for Stone.js. Turns deep links, in-app navigation and app-state changes into Stone.js events, so the same domain runs as a native mobile application, part of the Continuum Architecture.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",

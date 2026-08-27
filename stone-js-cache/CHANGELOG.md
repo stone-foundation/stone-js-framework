@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.8.17
+
+### Patch Changes
+
+- d7ddd44: fix: a limiter that never limited, and a cache that never cached
+
+  Both modules built their manager in a service provider, and a provider registers with the container. The container is an execution context: it is rebuilt for every event. So the manager was rebuilt for every event too, taking its state along.
+
+  Measured on a real Node HTTP server before the fix. A route declaring `{ max: 2, window: 60 }`: five requests, five `200`s, with `RateLimit-Remaining: 1` on every one of them, because the memory limiter arrived empty each time. A route setting then reading a cache key: the read never saw the write, so `remember` recomputed on every request. Both silent, both with a green test suite, because a test builds the manager once.
+
+  Counters and cached values have to outlive the event that produced them, by definition, so both managers are now process-scoped: the provider reuses the published instance instead of replacing it, and the container merely gets a handle on it. After the fix, on the same server: `200, 200, 429`, and a cache read that sees the previous request's write.
+
+  The same shape exists in `@stone-js/queue` (a memory connection holds the queued jobs) and `@stone-js/realtime` (a memory broadcaster holds the subscriptions). Both are tracked separately, to be fixed with their own measurement rather than by analogy.
+
+- d7ddd44: fix: state that outlives an event belongs to the store, not to the framework
+
+  Both modules built their manager in a service provider, and a provider registers with the container. The container is an execution context: it is rebuilt for every event. So the manager was rebuilt too, taking its state along, and neither module did what it existed to do.
+
+  Measured on a real Node HTTP server. A route declaring `{ max: 2, window: 60 }`: five requests, five `200`s, with `RateLimit-Remaining: 1` on every one, because the memory limiter arrived empty each time. A route setting then reading a cache key: the read never saw the write, so `remember` recomputed on every request. Both silent, both with a green suite, because a test builds the thing once.
+
+  **The fix is not to hold state where the framework can see it.** The container being ephemeral is the design, and on a function-as-a-service platform it is also the truth: a cold start restarts everything. Anything the framework kept between events would be per warm container there, so a count would be wrong, unshared and reset unpredictably, while looking correct in development. That is the same class of failure as the bug itself.
+
+  So the state moved to where it belongs: **the store**. A driver owns its own backing, because a store is the persistence boundary and choosing one is choosing where the state is kept. The memory limiter and the memory cache store now hold theirs, filed under the name they were configured with, so two named stores stay apart exactly as two Redis prefixes would. Managers, providers and everything else are rebuilt per event, unchanged.
+
+  Both memory drivers now say plainly what they are: one process wide, right for a single server and for tests, and **not** a shared limit or a shared cache anywhere else. An application that needs one across instances configures Redis, or registers its own driver with `limiters: [{ name, factory }]`, which is the seam for counting in the store a deployment already runs on.
+
+  After the fix, on the same server: `200, 200, 429`, and a cache read that sees the previous request's write.
+
+  One more consequence of a container rebuilt per event, and it predates this change: the Redis driver rebuilt its **client** with it, so a busy server opened a TCP connection per request and kept opening them. A connection is a resource, not state, since the counters are in Redis and rebuilding a client loses nothing at all. `@stone-js/rate-limit` now opens one connection per **connection target**, shared by every limiter pointing at it, with `disconnect()` to close them for a graceful shutdown or a test. A client the application supplies is left entirely alone: whoever opened it closes it.
+
+  `@stone-js/cache`, `@stone-js/queue` and `@stone-js/realtime` have the same connection behaviour, unchanged here and tracked with their state issue, so each is fixed with its own measurement rather than by analogy.
+
+- Updated dependencies [07b3cc9]
+  - @stone-js/core@0.8.17
+  - @stone-js/config@0.8.17
+
 ## 0.8.16
 
 ### Patch Changes

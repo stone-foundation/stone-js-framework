@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/notifications",
-  "version": "0.8.16",
+  "version": "0.8.17",
   "description": "Notifications for Stone.js: one declaration reaches a person wherever they are, delivered out of band.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
