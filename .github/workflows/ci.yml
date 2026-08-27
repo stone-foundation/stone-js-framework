@@ -43,6 +43,12 @@ jobs:
       # published declaration makes everything it re-exports invisible under `nodenext`.
       - name: Check published declarations
         run: pnpm run check:dts
+      # 48 of the 49 published packages re-export a `utils` or `declarations` module wholesale, so a
+      # helper added on a Tuesday is public API on Friday's release. The surface is checked in under
+      # `api/`, and this fails when the build no longer matches it: adding or removing a public export
+      # becomes a reviewed line in a pull request instead of a side effect.
+      - name: Check the public API surface
+        run: pnpm run api:check
       - name: Upload dist
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
