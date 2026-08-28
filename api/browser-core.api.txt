@@ -1,0 +1,13 @@
+class     BrowserError
+class     Cookie
+class     CookieCollection
+class     IncomingBrowserEvent
+class     OutgoingBrowserResponse
+class     RedirectBrowserResponse
+enum      CookieSameSite
+interface CookieOptions
+interface IncomingBrowserEventOptions
+interface IRoute
+interface OutgoingBrowserResponseOptions
+interface RedirectBrowserResponseOptions
+type      HttpMethod

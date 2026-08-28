@@ -21,13 +21,15 @@
     "test:ci": "pnpm -r --filter='!@stone-js/website' --filter='!@stone-js/lab-*' --filter='!@stone-js/starters' --filter='!@stone-js/blog-starters' run test:cvg",
     "test:lab": "pnpm -r --filter='@stone-js/lab-*' run test",
     "lint:ci": "pnpm -r --filter='!@stone-js/website' --filter='!@stone-js/lab-*' --filter='!@stone-js/starters' --filter='!@stone-js/blog-starters' run lint",
-    "verify": "pnpm run lint:ci && pnpm run build:ci && pnpm run test:ci && pnpm run audit:ci && pnpm run check:dts",
+    "verify": "pnpm run lint:ci && pnpm run build:ci && pnpm run api:check && pnpm run test:ci && pnpm run audit:ci && pnpm run check:dts",
     "audit:ci": "node scripts/audit-lockfiles.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version && node scripts/sync-external-versions.mjs",
     "release": "pnpm run clean && pnpm run build:ci && changeset publish",
     "prepare": "husky",
     "sync:versions": "node scripts/sync-external-versions.mjs",
+    "api:report": "node scripts/api-report.mjs",
+    "api:check": "node scripts/api-report.mjs --check",
     "check:dts": "node scripts/check-dts-extensions.mjs"
   },
   "devDependencies": {
@@ -37,7 +39,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "ts-standard": "^12.0.2",
-    "turbo": "^2.1.0"
+    "turbo": "^2.1.0",
+    "typescript": "^5.9.3"
   },
   "pnpm": {
     "overrides": {

@@ -39,18 +39,43 @@ function walkFiles (dir) {
  * packages have no `src/index.ts`). Runs after the typescript plugin emits the
  * per-file `.d.ts`.
  *
- * @param {{ dir?: string, out?: string, exclude?: string[] }} [options]
+ * The barrel lists the directory, and the build does not empty it, so a declaration left behind by a
+ * deleted source used to keep its place on the public entry point. The JS bundle is rebuilt from
+ * `src` and had already dropped it, so the types promised exports the runtime no longer had: on a
+ * developer's machine `@stone-js/core` still published `perProcess` months after it was deleted, and
+ * an API surface generated from that build would have frozen it. A declaration with no source behind
+ * it is therefore skipped, and named, rather than trusted because it happens to be on disk.
+ *
+ * @param {{ dir?: string, out?: string, exclude?: string[], src?: string }} [options]
  */
-export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [] } = {}) {
+export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [], src = 'src' } = {}) {
   return {
     name: 'stone-dts-barrel',
     writeBundle () {
       if (!existsSync(dir)) return
+
+      const orphaned = []
+      const hasSource = (rel) => {
+        // No `src` to compare against (a bespoke build, or declarations emitted from elsewhere)
+        // means nothing can be judged stale, so everything stands.
+        if (!existsSync(src)) return true
+        const base = join(src, rel.replace(/\.d\.ts$/, ''))
+        return existsSync(`${base}.ts`) || existsSync(`${base}.tsx`) || existsSync(join(base, 'index.ts'))
+      }
+
       const rels = walkFiles(dir)
         .filter((p) => p.endsWith('.d.ts'))
         .map((p) => relative(dir, p).replaceAll('\\', '/'))
         .filter((r) => r !== out && !exclude.some((e) => r.startsWith(e)))
+        .filter((r) => { if (hasSource(r)) return true; orphaned.push(r); return false })
         .sort((left, right) => left.localeCompare(right))
+
+      if (orphaned.length > 0) {
+        console.warn(
+          `stone-dts-barrel: ${orphaned.length} stale declaration(s) left by a deleted source were ` +
+          `kept off the public entry point: ${orphaned.join(', ')}. Remove \`${dir}\` to clear them.`
+        )
+      }
       // `.js`, not extensionless: this package is ESM with an `exports` map, and a consumer on
       // `moduleResolution: nodenext` cannot resolve a relative import without its extension. It
       // silently sees no exports at all, and TypeScript reports the misleading "has no exported
