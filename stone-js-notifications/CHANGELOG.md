@@ -1,5 +1,15 @@
 # @stone-js/notifications
 
+## 0.8.18
+
+### Patch Changes
+
+- @stone-js/queue@0.8.18
+- @stone-js/core@0.8.18
+- @stone-js/config@0.8.18
+- @stone-js/realtime@0.8.18
+- @stone-js/i18n@0.8.18
+
 ## 0.8.17
 
 ### Patch Changes
