@@ -7,7 +7,7 @@ import { QueueError } from './errors/QueueError'
 import { ON_JOB_KEY } from './decorators/OnJob'
 import { collectKeyHandlers } from '@stone-js/router'
 import { ClassType, IBlueprint, IContainer, IServiceProvider, Promiseable } from '@stone-js/core'
-import { QueueConfig, ConnectionConfig, JobHandlerMeta, JobHandler, QueueConnectionFactory } from './declarations'
+import { QueueConfig, ConnectionConfig, JobHandlerMeta, JobHandlerType, QueueConnectionFactory } from './declarations'
 
 /**
  * Built-in connection factories, keyed by driver name. `memory` needs nothing; `redis` imports
@@ -85,7 +85,7 @@ export class QueueServiceProvider implements IServiceProvider {
    */
   private registerHandler (registry: JobRegistry, meta: JobHandlerMeta): void {
     const isResolvable = meta.isClass === true || meta.isFactory === true
-    const handler = isResolvable ? this.container.make<JobHandler>(meta.module as any) : (meta.module as JobHandler)
+    const handler = isResolvable ? this.container.make<JobHandlerType>(meta.module as any) : (meta.module as JobHandlerType)
 
     // Whole-class (or function/instance) handler: routes the named job to the action method.
     if (meta.name !== undefined) {

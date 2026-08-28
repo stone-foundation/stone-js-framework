@@ -6,7 +6,7 @@ import { NoticeRegistry } from './NoticeRegistry'
 import { NotificationManager } from './NotificationManager'
 import { NotificationConfigurationError } from './errors/NotificationError'
 import { IBlueprint, IContainer, ILogger, IServiceProvider, Promiseable } from '@stone-js/core'
-import { ChannelConfig, NotificationChannel, NotificationChannelFactory, NotificationsConfig } from './declarations'
+import { ChannelConfig, Channel, NotificationChannelFactory, NotificationsConfig } from './declarations'
 
 /**
  * Binds the channels and the notifier.
@@ -53,11 +53,11 @@ export class NotificationServiceProvider implements IServiceProvider {
     // A channel the application builds itself, declared where the others are. Registering it on the
     // manager from a provider reads well and does not survive: the container is rebuilt per event.
     if (typeof config.factory === 'function') {
-      manager.registerFactory(config.name, () => config.factory?.(config) as NotificationChannel)
+      manager.registerFactory(config.name, () => config.factory?.(config) as Channel)
       return
     }
 
-    // A class the application declared with `@NotificationChannel`. Built through the container, so
+    // A class the application declared with `@Channel`. Built through the container, so
     // its constructor is auto-wired: a channel needing a provider client asks for it.
     if (typeof config.module === 'function') {
       manager.registerFactory(config.name, () => this.build(config))
@@ -86,8 +86,8 @@ export class NotificationServiceProvider implements IServiceProvider {
    * @returns The channel.
    * @throws {NotificationConfigurationError} When the class cannot be built.
    */
-  private build (config: ChannelConfig): NotificationChannel {
-    const built = this.container.resolve?.<NotificationChannel>(config.module as any, true)
+  private build (config: ChannelConfig): Channel {
+    const built = this.container.resolve?.<Channel>(config.module as any, true)
 
     if (built === undefined || typeof built.send !== 'function') {
       throw new NotificationConfigurationError(

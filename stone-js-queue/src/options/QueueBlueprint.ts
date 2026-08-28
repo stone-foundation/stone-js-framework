@@ -26,7 +26,7 @@ export interface QueueBlueprint extends StoneBlueprint {
  *
  * It contributes the {@link QueueServiceProvider}, which binds `queueManager`, the default
  * connection as `queue`, the `jobRegistry` and a `worker`. Configure connections/handlers under
- * `stone.queue` (or use `@Queue()` / `@JobHandler()`). `stone.providers` is an array, so this merges.
+ * `stone.queue` (or use `@Queue()` / `@JobHandlerType()`). `stone.providers` is an array, so this merges.
  */
 export const queueBlueprint: QueueBlueprint = {
   stone: {

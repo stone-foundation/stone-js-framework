@@ -1,20 +1,62 @@
 import { makeJob } from '../utils'
 import { Job, JobOptions, QueueConnection, ConnectionConfig, DEFAULT_QUEUE } from '../declarations'
 
+/** What one named connection holds: the queued jobs, what is in flight, and what died. */
+interface Backing {
+  queues: Map<string, Job[]>
+  reserved: Set<string>
+  dead: Job[]
+}
+
+/**
+ * The jobs, held by the connection rather than by anything the framework owns.
+ *
+ * This is the one place inter-request state may live, and it lives here because **a connection is
+ * the persistence boundary**: choosing this driver is choosing where the work is kept. Everything
+ * else in Stone.js is rebuilt for every event, deliberately, and nothing in the framework offers a
+ * place to keep things across them.
+ *
+ * Held per instance, the jobs did not survive the event that dispatched them. Measured on the
+ * published 0.8.18: dispatch, then `size()` answers `1` from the instance that dispatched and `0`
+ * from the next one, and the worker reserves nothing. Every job was dropped, silently, and
+ * `@stone-js/notifications` hands its deliveries to a queue as soon as one is registered, so a
+ * notification reported as queued was never delivered.
+ *
+ * Keyed by the connection's configured name, so two connections both backed by memory keep their own
+ * work, exactly as two Redis connections with different prefixes would.
+ */
+const backings = new Map<string, Backing>()
+
+/** The backing a named connection works in, created the first time that name is used. */
+function backingFor (name: string): Backing {
+  const existing = backings.get(name)
+
+  if (existing !== undefined) { return existing }
+
+  const created: Backing = { queues: new Map(), reserved: new Set(), dead: [] }
+  backings.set(name, created)
+
+  return created
+}
+
 /**
  * In-process memory queue.
  *
- * The zero-config default: jobs live in arrays keyed by queue name, with delay, reservation,
- * retry and a dead-letter list. Scoped to a single process (use the Redis connection to share work
- * across instances), ideal for development, tests and single-node apps.
+ * The zero-config default: jobs live in arrays keyed by queue name, with delay, reservation, retry
+ * and a dead-letter list, and the whole lot lives in this module rather than in the instance.
+ *
+ * **It is one process wide, and that is worth saying plainly.** It is right for a single server and
+ * for tests. It is not a shared queue: two instances behind a load balancer each hold their own
+ * work, and on a function-as-a-service platform a cold start loses whatever had not run. Configure
+ * the Redis connection there, or register your own with `connections: [{ name, factory }]`.
  */
 export class MemoryQueue implements QueueConnection {
   readonly name: string
 
   private readonly defaultQueue: string
-  private readonly queues = new Map<string, Job[]>()
-  private readonly reserved = new Set<string>()
-  private readonly dead: Job[] = []
+  private readonly queues: Map<string, Job[]>
+  private readonly reserved: Set<string>
+  private readonly dead: Job[]
 
   /**
    * Create a memory queue.
@@ -30,8 +72,13 @@ export class MemoryQueue implements QueueConnection {
    * @param config - The connection options.
    */
   constructor (config: Partial<ConnectionConfig> = {}) {
+    const backing = backingFor(config.name ?? 'memory')
+
     this.name = config.name ?? 'memory'
     this.defaultQueue = config.defaultQueue ?? DEFAULT_QUEUE
+    this.queues = backing.queues
+    this.reserved = backing.reserved
+    this.dead = backing.dead
   }
 
   /** @inheritdoc */
@@ -91,6 +138,9 @@ export class MemoryQueue implements QueueConnection {
     if (queue !== undefined) { this.queues.delete(queue); return }
     this.queues.clear()
     this.reserved.clear()
+    // The dead letters too: they outlive an instance now, so a caller asking for an empty
+    // connection would otherwise inherit the previous one's failures.
+    this.dead.length = 0
   }
 
   /**
