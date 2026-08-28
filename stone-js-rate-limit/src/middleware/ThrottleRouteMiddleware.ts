@@ -8,6 +8,44 @@ import {
   getMetadata, hasMetadata, type MetaMiddleware
 } from '@stone-js/core'
 
+/**
+ * Whether a value says who it is when read as text.
+ *
+ * `String(value)` answers `'[object Object]'` for anything that never defined its own `toString`,
+ * and that string makes a perfectly good bucket key: every caller carrying such a value would land
+ * in the same bucket and spend each other's budget, which is the opposite of what a subject is for.
+ * A value with its own `toString` (a `Date`, an object id from a database driver, an array) says
+ * something distinct and is kept, and a function is never an identity whatever it stringifies to.
+ *
+ * Answering false sends the request to the address bucket, which is this module's designed
+ * degradation and is warned about, rather than to a bucket shared with strangers, which is silent.
+ *
+ * @param value - Whatever a source answered.
+ * @returns True when reading it as text identifies something.
+ */
+function identifies (value: unknown): boolean {
+  if (typeof value === 'function') { return false }
+  if (typeof value !== 'object' || value === null) { return true }
+
+  const own = (value as { toString?: unknown }).toString
+
+  return typeof own === 'function' && own !== Object.prototype.toString
+}
+
+/**
+ * What a rule bills, as one word for a log line or a bucket key.
+ *
+ * A resolver is a function, and a function has no name worth reading in a key: every rule using one
+ * would otherwise write its source into the bucket. `'resolver'` says which rule it was without
+ * saying anything about the caller.
+ *
+ * @param by - What the rule declared.
+ * @returns The label.
+ */
+function labelOf (by: RateLimitRule['by']): string {
+  return typeof by === 'function' ? 'resolver' : String(by)
+}
+
 /** Where a caller stands against one budget, as the headers report it. */
 interface Budget {
   limit: number
@@ -83,6 +121,7 @@ export class ThrottleRouteMiddleware {
 
     for (const declared of rules) {
       const rule = this.applied(declared, scope)
+      const by = labelOf(rule.by)
       const windowMs = Math.max(1, rule.window) * 1000
       const subject = await this.subjectOf(event, rule)
 
@@ -93,7 +132,7 @@ export class ThrottleRouteMiddleware {
         // unrelated callers paying for one, which is the failure this module exists to prevent.
         this.logger()?.warn(
           'Rate limit rule names a subject the request does not carry, falling back to the address bucket',
-          { scope, by: typeof rule.by === 'function' ? 'resolver' : rule.by, limit: rule.max }
+          { scope, by, limit: rule.max }
         )
       }
 
@@ -103,12 +142,12 @@ export class ThrottleRouteMiddleware {
       //
       // A rule that names a scope is counted there instead of per route, which is how a ceiling shared
       // by several routes is expressed. See `RateLimitRule.scope`.
-      const bucket = `${rule.scope ?? scope}|${rule.max}|${windowMs}|${typeof rule.by === 'function' ? 'resolver' : rule.by}`
+      const bucket = `${rule.scope ?? scope}|${rule.max}|${windowMs}|${by}`
 
       // The subject's own budget, which is the real guarantee.
       if (subject !== undefined) {
         const hit = await manager.hit(`${bucket}:${subject}`, rule.max, windowMs, rule.limiter)
-        this.refuseIfSpent(hit, rule.max, { scope, by: typeof rule.by === 'function' ? 'resolver' : rule.by })
+        this.refuseIfSpent(hit, rule.max, { scope, by })
         tightest = this.tighter(tightest, { limit: rule.max, remaining: hit.remaining, resetAt: hit.resetAt })
       }
 
@@ -281,12 +320,9 @@ export class ThrottleRouteMiddleware {
 
     const user = event.getUser?.<Record<string, unknown>>()
 
-    if (typeof user === 'string' || typeof user === 'number') { return String(user) }
-    if (typeof user !== 'object' || user === null) { return undefined }
+    if (typeof user !== 'object' || user === null) { return this.text(user) }
 
-    const identity = user.id ?? user.sub ?? user.userId
-
-    return identity === undefined || identity === null ? undefined : String(identity)
+    return this.text(user.id ?? user.sub ?? user.userId)
   }
 
   /**
@@ -324,7 +360,7 @@ export class ThrottleRouteMiddleware {
    * @returns The value as text, or nothing.
    */
   private text (value: unknown): string | undefined {
-    if (value === undefined || value === null) { return undefined }
+    if (value === undefined || value === null || !identifies(value)) { return undefined }
 
     const text = String(value)
 
