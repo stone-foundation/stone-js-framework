@@ -1,0 +1,9 @@
+function  buildFetchHandler
+function  serveBun
+function  serveCloudflare
+function  serveDeno
+function  serveFetch
+function  serveNetlify
+function  serveVercel
+interface EdgeAppOptions
+type      FetchHandler
