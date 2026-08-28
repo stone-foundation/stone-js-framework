@@ -1,5 +1,17 @@
 # @stone-js/use-react-core
 
+## 0.8.18
+
+### Patch Changes
+
+- Updated dependencies [9ba6f7b]
+  - @stone-js/http-core@0.8.18
+  - @stone-js/core@0.8.18
+  - @stone-js/config@0.8.18
+  - @stone-js/router@0.8.18
+  - @stone-js/browser-core@0.8.18
+  - @stone-js/use-view@0.8.18
+
 ## 0.8.17
 
 ### Patch Changes
