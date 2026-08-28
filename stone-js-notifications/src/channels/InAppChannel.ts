@@ -1,5 +1,5 @@
 import { IN_APP_EVENT } from '../constants'
-import { DeliveryOutcome, InAppChannelConfig, NotificationChannel, Recipient, RenderedNotification } from '../declarations'
+import { DeliveryOutcome, InAppChannelConfig, Channel, Recipient, RenderedNotification } from '../declarations'
 
 /** The shape this channel needs from a broadcaster, duck-typed so no realtime import is required. */
 export interface BroadcasterLike {
@@ -24,7 +24,7 @@ const DEFAULT_CONFIG: InAppChannelConfig = { name: 'in-app' }
  * It reports `unreachable` rather than `failed` when nobody is listening, because that is not an
  * error: a person who is not looking at the screen is exactly why the other channels exist.
  */
-export class InAppChannel implements NotificationChannel {
+export class InAppChannel implements Channel {
   readonly name: string
 
   private readonly event: string

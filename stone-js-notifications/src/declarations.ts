@@ -83,7 +83,7 @@ export interface DeliveryOutcome {
  * it before calling here. A channel that started deciding would be a second policy to keep in step
  * with the first.
  */
-export interface NotificationChannel {
+export interface Channel {
   /** The name a notification refers to it by. */
   readonly name: string
   /**
@@ -97,7 +97,7 @@ export interface NotificationChannel {
 }
 
 /** How a channel is built from what the application configured. */
-export type NotificationChannelFactory = (config: ChannelConfig) => NotificationChannel
+export type NotificationChannelFactory = (config: ChannelConfig) => Channel
 
 /** The channels this package ships. Any other name is one an application registered. */
 export type NotificationDriver = 'log' | 'in-app' | 'smtp' | (string & {})
