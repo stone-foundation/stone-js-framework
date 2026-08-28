@@ -23,3 +23,7 @@ When a pull request legitimately changes the surface, run `pnpm run api:report` 
 ## What it does not track
 
 Signatures. The accident this guards against is a name becoming public without a decision, and the kind is enough to catch a value quietly becoming a type. Tracking signature drift needs a full API extractor and a configuration per package; it can be added later without changing what is written here.
+
+Members, either: a class gaining or losing a method is not a line here, only the class itself is.
+
+And a name that is legitimately **both** a value and a type (declaration merging in one file) is reported under a single kind, because the checker resolves it to one symbol. That was how `@NotificationChannel` and `@JobHandler` hid: each looked like a plain `interface` in this report while the decorator of the same name had silently left the public types. The build now refuses that shape outright, in `dtsBarrel`, so the report no longer has to catch it.
