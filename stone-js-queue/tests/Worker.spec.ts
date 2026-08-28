@@ -3,9 +3,19 @@ import { JobRegistry } from '../src/JobRegistry'
 import { QueueManager } from '../src/QueueManager'
 import { MemoryQueue } from '../src/drivers/MemoryQueue'
 
+/**
+ * A connection nobody else works in.
+ *
+ * The memory connection keeps its jobs under its configured name, because a connection is where
+ * inter-request work belongs. Two tests sharing a name would share the queue, and its dead letters,
+ * so each asks for its own, which is also how two connections are separated in an application.
+ */
+let connections = 0
+
 const setup = (): { conn: MemoryQueue, manager: QueueManager, registry: JobRegistry, worker: Worker } => {
-  const conn = MemoryQueue.create({ name: 'memory' })
-  const manager = QueueManager.create('memory').register('memory', conn)
+  const name = `test-${++connections}`
+  const conn = MemoryQueue.create({ name })
+  const manager = QueueManager.create(name).register(name, conn)
   const registry = JobRegistry.create()
   const worker = Worker.create(manager, registry)
   return { conn, manager, registry, worker }
