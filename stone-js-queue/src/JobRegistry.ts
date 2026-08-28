@@ -1,4 +1,4 @@
-import { Job, JobHandler } from './declarations'
+import { Job, JobHandlerType } from './declarations'
 import { QueueError } from './errors/QueueError'
 import { KeyRouter, KeyRouteHandler } from '@stone-js/router'
 
@@ -53,7 +53,7 @@ export class JobRegistry {
    * @returns This registry for chaining.
    * @throws {QueueError} When the handler is malformed.
    */
-  register (name: string, handler: JobHandler, action: string = 'handle'): this {
+  register (name: string, handler: JobHandlerType, action: string = 'handle'): this {
     try {
       this.router.register(name, handler as KeyRouteHandler, action)
     } catch (error: any) {

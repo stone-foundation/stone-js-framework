@@ -76,7 +76,7 @@ export interface QueueConnection {
 /**
  * A job handler: a function, or an object/instance exposing `handle`.
  */
-export type JobHandler<T = any> =
+export type JobHandlerType<T = any> =
   | ((payload: T, job: Job<T>) => unknown)
   | { handle: (payload: T, job: Job<T>) => unknown }
 
