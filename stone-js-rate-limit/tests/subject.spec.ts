@@ -300,3 +300,56 @@ describe('a rule that names no subject at all', () => {
     expect(warnings.filter(([m]) => String(m).includes('declares no `by`'))).toHaveLength(0)
   })
 })
+
+describe('a subject that does not say who it is', () => {
+  const eventWithUser = (user: unknown, rateLimit: unknown): any => ({
+    ip: '1.2.3.4',
+    pathname: '/notes',
+    get: () => { throw new Error('Event is not bound') },
+    getUser: () => user,
+    getRoute: () => ({
+      getOption: <T>(k: string): T | undefined => ({ name: 'notes', method: 'GET', path: '/notes', rateLimit } as any)[k]
+    })
+  })
+
+  it('does not put two principals in one bucket because their ids stringify alike', async () => {
+    // `String({})` is `'[object Object]'`, and that is a perfectly good bucket key. So every caller
+    // whose id happened to be a plain object shared one counter and spent each other's budget: two
+    // strangers, one limit, silently. The subject is refused instead, which sends the request to the
+    // address bucket, and that path warns.
+    const { middleware, warnings } = enforcerFor()
+    const rule = { max: 1, window: 60, by: 'user', backstop: false as const }
+
+    await middleware.handle(eventWithUser({ id: { oid: 'a' } }, rule), next)
+
+    // The second caller is a different principal. Under the shared '[object Object]' key it was
+    // refused on its first request, having spent nothing.
+    await expect(middleware.handle(eventWithUser({ id: { oid: 'b' } }, rule), next)).resolves.toBeDefined()
+    expect(downgrades(warnings)).toHaveLength(2)
+  })
+
+  it('keeps an id that defines its own toString, which is what a database driver hands over', async () => {
+    // An ObjectId, a branded identifier, a `Date`: these say something distinct, and refusing them
+    // would downgrade a perfectly identified caller to the address bucket.
+    const { middleware, warnings } = enforcerFor()
+    const rule = { max: 1, window: 60, by: 'user', backstop: false as const }
+    const id = (value: string): unknown => ({ toString: () => value })
+
+    await middleware.handle(eventWithUser({ id: id('u1') }, rule), next)
+
+    await expect(middleware.handle(eventWithUser({ id: id('u2') }, rule), next)).resolves.toBeDefined()
+    await expect(middleware.handle(eventWithUser({ id: id('u1') }, rule), next)).rejects.toThrow(RateLimitError)
+    expect(downgrades(warnings)).toHaveLength(0)
+  })
+
+  it('refuses a field of the request that stringifies to nothing useful', async () => {
+    // Same failure through the other door: a body field declared as the subject, arriving as an
+    // object because a client sent one. Every such request would have shared a bucket.
+    const { middleware, warnings } = enforcerFor()
+    const rule = { max: 1, window: 900, by: 'email', backstop: false as const }
+    const event = await realEventOn(rule, '/notes/abc', { email: { address: 'a@x.test' } })
+
+    await expect(middleware.handle(event, next)).resolves.toBeDefined()
+    expect(downgrades(warnings)).toHaveLength(1)
+  })
+})
