@@ -47,12 +47,13 @@
     "doc": "typedoc",
     "clean": "rimraf dist",
     "build": "rollup -c",
-    "test": "vitest run",
-    "test:cvg": "npm run test -- --coverage",
+    "test": "vitest run && npm run test:types",
+    "test:cvg": "vitest run --coverage && npm run test:types",
     "test:text": "npm run test:cvg -- --coverage.reporter=text",
     "test:html": "npm run test:cvg -- --coverage.reporter=html",
     "test:clover": "npm run test:cvg -- --coverage.reporter=clover",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:types": "tsc -p tsconfig.types.json"
   },
   "peerDependencies": {
     "@stone-js/core": "workspace:*",

@@ -6,6 +6,7 @@ class     QueueServiceProvider
 class     RedisQueue
 class     Worker
 const     DEFAULT_QUEUE
+const     JobHandler
 const     ON_JOB_KEY
 const     OnJob
 const     Queue
@@ -27,8 +28,8 @@ interface QueueModuleConfig
 interface QueueOptions
 interface RedisConnectionOptions
 interface WorkerRunOptions
-type      JobHandler
 type      JobHandlerFn
+type      JobHandlerType
 type      QueueConnectionFactory
 type      QueueConnectionThunk
 type      QueueDriver
