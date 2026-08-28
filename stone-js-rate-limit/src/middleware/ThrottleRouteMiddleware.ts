@@ -8,6 +8,9 @@ import {
   getMetadata, hasMetadata, type MetaMiddleware
 } from '@stone-js/core'
 
+/** A value that reads as text saying which one it is: a primitive, or an object defining its own. */
+type Identifiable = string | number | bigint | boolean | symbol | { toString: () => string }
+
 /**
  * Whether a value says who it is when read as text.
  *
@@ -20,10 +23,14 @@ import {
  * Answering false sends the request to the address bucket, which is this module's designed
  * degradation and is warned about, rather than to a bucket shared with strangers, which is silent.
  *
+ * Written as a type guard rather than a predicate so the safety is proven to the compiler instead of
+ * being explained in this comment: past the guard, `String(value)` is reading something that defines
+ * its own text, which is exactly what the rule about default stringification asks for.
+ *
  * @param value - Whatever a source answered.
  * @returns True when reading it as text identifies something.
  */
-function identifies (value: unknown): boolean {
+function identifies (value: unknown): value is Identifiable {
   if (typeof value === 'function') { return false }
   if (typeof value !== 'object' || value === null) { return true }
 

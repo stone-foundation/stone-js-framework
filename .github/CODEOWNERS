@@ -1,0 +1,13 @@
+# Who is asked to review what.
+#
+# One owner today, and that is the honest state of the project rather than a placeholder: it makes
+# every pull request request a review instead of relying on someone noticing. Add teams as they
+# form, from the most specific path to the least, since the last matching rule wins.
+
+*                       @evens-stone
+
+# The build and the release path decide what reaches npm, so they are never a drive-by change.
+/rollup.config.base.mjs @evens-stone
+/scripts/               @evens-stone
+/.github/workflows/     @evens-stone
+/api/                   @evens-stone

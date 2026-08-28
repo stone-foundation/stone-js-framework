@@ -13,6 +13,11 @@ on:
       - '.github/workflows/deploy-website.yml'
   workflow_dispatch:
 
+# Least privilege at the workflow level, so a job that forgets to declare its own inherits nothing.
+# The deploy job widens it to what Pages needs, and only there.
+permissions:
+  contents: read
+
 # One deploy at a time; let a newer run supersede an in-flight one.
 concurrency:
   group: pages
