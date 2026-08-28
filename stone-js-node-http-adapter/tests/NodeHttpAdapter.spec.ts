@@ -207,15 +207,15 @@ describe('NodeHttpAdapter', () => {
   it('getNetworkUrl should return expected local IP', () => {
     const adapter = NodeHttpAdapter.create(blueprint)
     // @ts-expect-error - private access
-    const result = adapter.getNetworkUrl(new URL('http://localhost:3000'))
-    expect(result).toBe('http://192.168.0.1:3000/')
+    const result = adapter.getNetworkUrl()
+    expect(result).toBe('http://192.168.0.1:8080/')
   })
 
   it('getNetworkUrl should not return expected local IP when there is no interfaces', () => {
     vi.mocked(networkInterfaces).mockReturnValue({ eth0: undefined })
     const adapter = NodeHttpAdapter.create(blueprint)
     // @ts-expect-error - private access
-    const result = adapter.getNetworkUrl(new URL('http://localhost:3000'))
+    const result = adapter.getNetworkUrl()
     expect(result).toBeUndefined()
   })
 

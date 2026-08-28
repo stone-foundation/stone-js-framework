@@ -48,6 +48,53 @@ import { createServer, IncomingMessage, ServerResponse } from 'node:http'
  *
  * @extends Adapter
  */
+/** Where the server listens when nothing says otherwise. */
+const DEFAULT_URL = 'http://localhost:8080'
+
+/** Hostnames that mean every interface. */
+const WILDCARD = new Set(['0.0.0.0', '::'])
+
+/**
+ * The URL to listen on, with the platform's own instruction honoured.
+ *
+ * An adapter exists to translate a platform's conventions, and `PORT` is one: Cloud Run, Heroku,
+ * Render, Fly, App Runner and Railway all assign a port through the environment and route traffic to
+ * it. Nothing in this framework read it, so the default `http://localhost:8080` was used verbatim: an
+ * application listened on a port nothing forwarded to, **on an interface nothing outside the
+ * container can reach**, and answered no request at all while looking perfectly healthy in
+ * development.
+ *
+ * A declaration wins over the environment, because an application that wrote `stone.adapter.url`
+ * said what it meant. The environment is consulted only when the URL is still the default, which is
+ * exactly the case where nobody has said anything.
+ *
+ * And when the port comes from the environment, the host becomes every interface unless `HOST` names
+ * one: a platform that assigns the port is going to reach the process from outside, and loopback
+ * answers nobody there. Locally, where no platform assigns anything, the default stays loopback, so
+ * `stone dev` does not put a development server on the network without being asked.
+ *
+ * @param declared - What the blueprint says.
+ * @param env - The environment to read, defaulting to this process's.
+ * @returns The URL to listen on.
+ */
+export function resolveListenUrl (declared: string, env: Record<string, string | undefined> = process.env): URL {
+  const url = new URL(declared)
+
+  if (declared !== DEFAULT_URL) { return url }
+
+  const host = env.HOST ?? ''
+  const port = env.PORT ?? ''
+
+  if (port !== '') {
+    url.port = port
+    url.hostname = host !== '' ? host : '0.0.0.0'
+  } else if (host !== '') {
+    url.hostname = host
+  }
+
+  return url
+}
+
 export class NodeHttpAdapter extends Adapter<
 IncomingMessage,
 ServerResponse,
@@ -89,7 +136,7 @@ NodeHttpAdapterContext
     super(blueprint)
 
     this.server = this.createServer()
-    this.url = new URL(blueprint.get('stone.adapter.url', 'http://localhost:8080'))
+    this.url = resolveListenUrl(blueprint.get('stone.adapter.url', DEFAULT_URL))
     this.logger = blueprint.get<LoggerResolver>('stone.logger.resolver', defaultLoggerResolver)(blueprint)
   }
 
@@ -317,31 +364,41 @@ NodeHttpAdapterContext
    * Prints the server URLs to the console.
    */
   private printUrls (): void {
-    if (this.blueprint.get('stone.adapter.printUrls') === true) {
-      const localUrl = this.url.href
-      const networkUrl = this.getNetworkUrl(this.url)
+    if (this.blueprint.get('stone.adapter.printUrls') !== true) { return }
 
-      this.logger.info(`
-  ${chalk.green('➜')}  ${chalk.white('Local:')}    ${chalk.blue(localUrl)}
-  ${chalk.green('➜')}  ${chalk.gray('Network:')}  ${chalk.blue(networkUrl ?? 'Unavailable')}
+    // Only what actually answers. Bound to loopback, the banner used to advertise the machine's LAN
+    // address, which returns nothing: it sent whoever tried it looking for a firewall that was not
+    // there. The line appears when the server is bound to every interface, and then it is true.
+    const onEveryInterface = WILDCARD.has(this.url.hostname)
+    const localUrl = onEveryInterface ? `http://localhost:${this.resolvePort()}/` : this.url.href
+    const networkUrl = onEveryInterface ? this.getNetworkUrl() : undefined
+
+    this.logger.info(`
+  ${chalk.green('➜')}  ${chalk.white('Local:')}    ${chalk.blue(localUrl)}${
+    networkUrl === undefined
+      ? ''
+      : `\n  ${chalk.green('➜')}  ${chalk.gray('Network:')}  ${chalk.blue(networkUrl)}`
+  }
   ${chalk.green('➜')}  ${chalk.gray('Press CTRL+C to stop')}
       `)
-    }
   }
 
   /**
-   * Gets the network URL for the server.
+   * The address this machine can be reached at from the network, when there is one.
    *
-   * @param url - The server URL.
-   * @returns The network URL or `undefined` if not found.
+   * Built from the interface rather than by substituting into the configured URL: bound to every
+   * interface the hostname is `0.0.0.0`, and a textual replacement of `localhost` found nothing to
+   * replace, so the line printed the wildcard address as if it were reachable.
+   *
+   * @returns The network URL, or nothing when no external interface exists.
    */
-  private getNetworkUrl (url: URL): string | undefined {
+  private getNetworkUrl (): string | undefined {
     const interfaces = networkInterfaces()
 
     for (const key of Object.keys(interfaces)) {
       for (const net of interfaces[key] ?? []) {
         if (net.family === 'IPv4' && !net.internal) {
-          return url.href.replace('localhost', net.address)
+          return `${this.url.protocol}//${net.address}:${this.resolvePort()}/`
         }
       }
     }
