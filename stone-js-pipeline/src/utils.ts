@@ -64,7 +64,33 @@ export const isAliasPipe = <T = unknown, R = T, Args extends any[] = any[]>(
 }
 
 /**
+ * Checks whether a value is a class rather than a plain function.
+ *
+ * A class declaration's `prototype` property is non-writable, and a function's is writable. That is
+ * the only reliable distinction at runtime, and it is exact for the ES2022 output these packages
+ * publish. An arrow function has no `prototype` at all.
+ *
+ * @param value - The value to be checked.
+ * @returns True when the value is a class.
+ */
+export const isClassLike = (value: unknown): boolean => {
+  if (!isFunction(value)) { return false }
+
+  return Object.getOwnPropertyDescriptor(value, 'prototype')?.writable === false
+}
+
+/**
  * Check if the meta pipe is a class pipe.
+ *
+ * A class is recognised **with or without** the `isClass` marker, because `PipeType` names
+ * `PipeClass` as one of the four shapes a pipe may take, and `defineMiddleware(SomeClass)` does not
+ * add the marker either. Without this, a class arriving unmarked was treated as a function and
+ * called: `TypeError: Class constructor cannot be invoked without 'new'`, at the first request, on
+ * something the type accepted and the module's own helper produced.
+ *
+ * The marker still wins where detection cannot see: a class transpiled down to a function is a
+ * function at runtime, and `isClass: true` says what it is. And a class deliberately declared as a
+ * factory or an alias is left to those, since an explicit intent outranks an inferred one.
  *
  * @param metaPipe - The meta pipe to check.
  * @returns `true` if the meta pipe is a class pipe, otherwise `false`.
@@ -72,7 +98,10 @@ export const isAliasPipe = <T = unknown, R = T, Args extends any[] = any[]>(
 export const isClassPipe = <T = unknown, R = T, Args extends any[] = any[]>(
   metaPipe: MetaPipe<T, R, Args>
 ): metaPipe is { module: PipeClass<T, R, Args> } => {
-  return metaPipe.isClass === true && isFunction(metaPipe.module) && isConstructor(metaPipe.module)
+  const declared = metaPipe.isClass === true
+  const inferred = metaPipe.isFactory !== true && metaPipe.isAlias !== true && isClassLike(metaPipe.module)
+
+  return (declared || inferred) && isFunction(metaPipe.module) && isConstructor(metaPipe.module)
 }
 
 /**

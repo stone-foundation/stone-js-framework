@@ -1,5 +1,5 @@
 import { MetaPipe, FunctionalPipe } from '../src/declarations'
-import { defineMiddleware, isConstructor, isFunction, isFunctionPipe, isString } from '../src/utils'
+import { defineMiddleware, isClassLike, isClassPipe, isConstructor, isFactoryPipe, isFunction, isFunctionPipe, isString } from '../src/utils'
 
 describe('defineMiddleware', () => {
   it('should define middleware with provided pipe and options', () => {
@@ -82,5 +82,44 @@ describe('isFunctionPipe', () => {
     expect(isFunctionPipe({ module: 'alias', isAlias: true })).toBe(false)
     expect(isFunctionPipe({ module: () => {}, isFactory: true })).toBe(false)
     expect(isFunctionPipe({ module: class { handle (): string { return 'Testing' } }, isClass: true })).toBe(false)
+  })
+})
+
+describe('a class handed over without a marker', () => {
+  it('is recognised as a class, because the type says a pipe may be one', () => {
+    // The failure this pins, reproduced on the published 0.8.18: `PipeType` names `PipeClass` as one
+    // of the four shapes a pipe may take, and `defineMiddleware(SomeClass)` adds no marker, yet an
+    // unmarked class was treated as a function and called. It threw
+    // `TypeError: Class constructor cannot be invoked without 'new'` at the first request, on
+    // something the type accepted and this module's own helper produced.
+    class BareMiddleware { handle (): void {} }
+
+    expect(isClassPipe({ module: BareMiddleware })).toBe(true)
+    expect(isClassPipe(defineMiddleware(BareMiddleware as any))).toBe(true)
+    expect(isFunctionPipe({ module: BareMiddleware })).toBe(false)
+  })
+
+  it('leaves a plain function alone', () => {
+    const middleware = (passable: unknown, next: (value: unknown) => unknown): unknown => next(passable)
+
+    expect(isClassPipe({ module: middleware })).toBe(false)
+    expect(isFunctionPipe({ module: middleware })).toBe(true)
+  })
+
+  it('lets an explicit intent outrank the inferred one', () => {
+    // A class deliberately declared as a factory or an alias is left to those: what someone wrote
+    // beats what the runtime can guess.
+    class Factoryish { }
+
+    expect(isClassPipe({ module: Factoryish, isFactory: true })).toBe(false)
+    expect(isFactoryPipe({ module: Factoryish, isFactory: true })).toBe(true)
+  })
+
+  it('still trusts the marker where detection cannot see', () => {
+    // A class transpiled down to a function is a function at runtime; `isClass` says what it is.
+    function TranspiledClass (this: unknown): void {}
+
+    expect(isClassLike(TranspiledClass)).toBe(false)
+    expect(isClassPipe({ module: TranspiledClass as any, isClass: true })).toBe(true)
   })
 })
