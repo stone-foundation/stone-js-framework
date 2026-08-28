@@ -13,7 +13,6 @@ const     MetaIncomingEventMiddleware
 const     MetaServerResponseMiddleware
 const     SetAlibabaFcHttpResponseResolverMiddleware
 function  headersToRecord
-function  isTextualContentType
 function  normalizeRequest
 function  readRawBody
 function  resolveIp
@@ -26,7 +25,7 @@ interface AlibabaFcHttpOptions
 interface AlibabaFcHttpRawResponseOptions
 interface AlibabaFcHttpRequest
 interface AlibabaFcHttpResponse
-interface NormalizedRequest
 type      AlibabaFcHttpAdapterResponseBuilder
 type      AlibabaFcHttpEventHandlerFunction
 type      AlibabaFcHttpExecutionContext
+type      NormalizedRequest

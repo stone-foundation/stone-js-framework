@@ -25,6 +25,7 @@ const     CONNECT
 const     Cors
 const     corsBlueprint
 const     createHttpResponse
+const     DEFAULT_IP_HEADERS
 const     DELETE
 const     emptyHttpResponse
 const     EnsureCorsHeadersHook
@@ -142,9 +143,14 @@ function  getFilesUploads
 function  getHostname
 function  getProtocol
 function  getType
+function  headersToRecord
 function  isIpTrusted
 function  isMultipart
+function  isTextualContentType
 function  isValidHostname
+function  normalizeWebRequest
+function  readRawBody
+function  resolveIp
 function  streamFile
 interface BinaryFileResponseOptions
 interface CookieOptions
@@ -161,8 +167,10 @@ interface HttpJsonConfig
 interface IncomingHttpEventOptions
 interface IOutgoingHttpResponse
 interface IRoute
+interface NormalizedWebRequest
 interface OutgoingHttpResponseOptions
 interface RedirectResponseOptions
+interface WebRequestLike
 type      AdapterContextType
 type      DeclaredResponseType
 type      HeadersType
