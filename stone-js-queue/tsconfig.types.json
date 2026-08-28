@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": true,
+    /* Checked against the BUILT declarations, the way a consumer sees them: the defect this exists to
+       catch lives in the generated barrel, not in `src`. A decorator and a type sharing a name made
+       `@JobHandler(...)` fail to compile for every TypeScript consumer while working in JavaScript,
+       and no runtime test can see that. */
+    "strict": true,
+    "strictFunctionTypes": true,
+    "exactOptionalPropertyTypes": true,
+    "paths": { "@stone-js/queue": ["./dist/index.d.ts"] }
+  },
+  "include": ["types-tests/**/*.ts"]
+}

@@ -1,5 +1,5 @@
 import { NotificationConfigurationError } from '../errors/NotificationError'
-import { DeliveryOutcome, NotificationChannel, Recipient, RenderedNotification, SmtpChannelConfig } from '../declarations'
+import { DeliveryOutcome, Channel, Recipient, RenderedNotification, SmtpChannelConfig } from '../declarations'
 
 /**
  * Email, over SMTP.
@@ -13,7 +13,7 @@ import { DeliveryOutcome, NotificationChannel, Recipient, RenderedNotification, 
  * the container: a transport is a **resource**, not state, and nodemailer pools its own connections,
  * so an application under load should pass a transport it owns.
  */
-export class SmtpChannel implements NotificationChannel {
+export class SmtpChannel implements Channel {
   readonly name: string
 
   private readonly config: SmtpChannelConfig

@@ -1,11 +1,20 @@
 import { MemoryQueue } from '../../src/drivers/MemoryQueue'
 
-const queue = (over: any = {}): MemoryQueue => MemoryQueue.create(over)
+/**
+ * A connection nobody else works in.
+ *
+ * The jobs live in the connection, filed under its name, so a test that reused a name would inherit
+ * the previous one's queue. A test naming one on purpose still gets exactly that name.
+ */
+let connections = 0
+const queue = (over: any = {}): MemoryQueue => MemoryQueue.create({ name: `test-${++connections}`, ...over })
 
 describe('MemoryQueue', () => {
   it('defaults its name and honours a custom one', () => {
-    expect(queue().name).toBe('memory')
-    expect(queue({ name: 'jobs' }).name).toBe('jobs')
+    // Built directly rather than through the helper above: this test is about the default name, and
+    // the helper's whole job is to supply one.
+    expect(MemoryQueue.create().name).toBe('memory')
+    expect(MemoryQueue.create({ name: 'jobs' }).name).toBe('jobs')
   })
 
   it('dispatches, reserves (incrementing attempts), and acks', async () => {
@@ -103,5 +112,40 @@ describe('MemoryQueue', () => {
       vi.advanceTimersByTime(2000)
       expect(await q.reserve()).toBeDefined()
     })
+  })
+})
+
+describe('work that outlives the event that dispatched it', () => {
+  it('is still there for the next connection under the same name', async () => {
+    // The failure this pins, measured on the published 0.8.18 before the fix: the jobs lived in the
+    // instance, and the container is rebuilt for every event, so `size()` answered 1 from the
+    // instance that dispatched and 0 from the next one. The worker reserved nothing, every job was
+    // dropped, and nothing said so. `@stone-js/notifications` hands its deliveries to a queue as
+    // soon as one is registered, so a notification reported as queued was never delivered.
+    const dispatching = MemoryQueue.create({ name: 'orders' })
+
+    await dispatching.dispatch('send-receipt', { orderId: 'A-1' })
+
+    const working = MemoryQueue.create({ name: 'orders' })
+
+    expect(await working.size()).toBe(1)
+    expect((await working.reserve())?.name).toBe('send-receipt')
+
+    await working.clear()
+  })
+
+  it('stays apart from work filed under another name', async () => {
+    // Two connections both backed by memory are two queues, exactly as two Redis connections with
+    // different prefixes are. Sharing one backing would let an application's queues drain each other.
+    const orders = MemoryQueue.create({ name: 'orders-b' })
+    const mail = MemoryQueue.create({ name: 'mail-b' })
+
+    await orders.dispatch('send-receipt', {})
+
+    expect(await orders.size()).toBe(1)
+    expect(await mail.size()).toBe(0)
+
+    await orders.clear()
+    await mail.clear()
   })
 })

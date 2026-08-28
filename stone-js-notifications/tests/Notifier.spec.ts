@@ -1,10 +1,10 @@
 import { Notifier } from '../src/Notifier'
 import { DELIVERY_JOB } from '../src/constants'
 import { NotificationManager } from '../src/NotificationManager'
-import { DeliveryOutcome, NotificationChannel, Recipient, RenderedNotification } from '../src/declarations'
+import { DeliveryOutcome, Channel, Recipient, RenderedNotification } from '../src/declarations'
 
 /** A channel that records what it was handed and answers what the test wants. */
-const recordingChannel = (name: string, outcome: DeliveryOutcome = { status: 'sent' }): NotificationChannel & {
+const recordingChannel = (name: string, outcome: DeliveryOutcome = { status: 'sent' }): Channel & {
   sent: Array<{ message: RenderedNotification, recipient: Recipient }>
 } => {
   const sent: Array<{ message: RenderedNotification, recipient: Recipient }> = []
@@ -21,7 +21,7 @@ const recordingChannel = (name: string, outcome: DeliveryOutcome = { status: 'se
 
 const notifierWith = (options: {
   config?: Record<string, unknown>
-  channels?: NotificationChannel[]
+  channels?: Channel[]
   queue?: { dispatch: (name: string, payload: unknown, opts?: unknown) => Promise<string> }
   i18n?: { t: (key: string, options?: Record<string, unknown>) => string }
 } = {}): { notifier: Notifier, warnings: any[], errors: any[], manager: NotificationManager } => {

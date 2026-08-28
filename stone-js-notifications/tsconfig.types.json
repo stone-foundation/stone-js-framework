@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": true,
+    /* Checked against the BUILT declarations, the way a consumer sees them, because the defect this
+       exists to catch lives in the generated barrel and not in `src`: a decorator and a type sharing
+       a name made `@NotificationChannel(...)` fail to compile for every TypeScript consumer while
+       working perfectly in JavaScript, and no runtime test can see that. */
+    "strict": true,
+    "strictFunctionTypes": true,
+    "exactOptionalPropertyTypes": true,
+    "paths": { "@stone-js/notifications": ["./dist/index.d.ts"] }
+  },
+  "include": ["types-tests/**/*.ts"]
+}

@@ -1,9 +1,9 @@
 import { Notifier } from '../src/Notifier'
 import { DELIVERY_JOB } from '../src/constants'
 import { NotificationManager } from '../src/NotificationManager'
-import { DeliveryOutcome, NotificationChannel, Recipient, RenderedNotification } from '../src/declarations'
+import { DeliveryOutcome, Channel, Recipient, RenderedNotification } from '../src/declarations'
 
-const recordingChannel = (name: string, outcome: DeliveryOutcome = { status: 'sent' }): NotificationChannel & {
+const recordingChannel = (name: string, outcome: DeliveryOutcome = { status: 'sent' }): Channel & {
   sent: Array<{ message: RenderedNotification, recipient: Recipient }>
 } => {
   const sent: Array<{ message: RenderedNotification, recipient: Recipient }> = []
@@ -27,7 +27,7 @@ const claimingCache = (): { add: (key: string, value: unknown, options?: any) =>
 
 const notifierWith = (options: {
   config?: Record<string, unknown>
-  channels?: NotificationChannel[]
+  channels?: Channel[]
   bound?: Record<string, unknown>
 } = {}): { notifier: Notifier, warnings: any[], errors: any[], infos: any[] } => {
   const warnings: any[] = []

@@ -1,8 +1,18 @@
 import { MemoryConnectionStore } from '../../src/drivers/MemoryConnectionStore'
 
+/**
+ * A store nobody else connects to.
+ *
+ * Connections live in the store, filed under its name, because a store is where inter-request state
+ * belongs. Two tests sharing a name would share the connections, so each asks for its own, which is
+ * also how two stores are separated in an application.
+ */
+let stores = 0
+const ownStore = (): MemoryConnectionStore => MemoryConnectionStore.create(`test-${++stores}`)
+
 describe('MemoryConnectionStore', () => {
   it('adds connections, subscribes them and reports channel members', async () => {
-    const store = MemoryConnectionStore.create()
+    const store = ownStore()
     await store.add({ id: 'a', info: { user: 'Ana' } })
     await store.add({ id: 'b', info: { user: 'Bo' } })
 
@@ -18,7 +28,7 @@ describe('MemoryConnectionStore', () => {
   })
 
   it('unsubscribe removes a single membership', async () => {
-    const store = MemoryConnectionStore.create()
+    const store = ownStore()
     await store.add({ id: 'a' })
     await store.subscribe('a', 'room')
     await store.unsubscribe('a', 'room')
@@ -26,7 +36,7 @@ describe('MemoryConnectionStore', () => {
   })
 
   it('remove clears the connection and all its memberships', async () => {
-    const store = MemoryConnectionStore.create()
+    const store = ownStore()
     await store.add({ id: 'a' })
     await store.subscribe('a', 'room')
     await store.remove('a')
@@ -37,7 +47,7 @@ describe('MemoryConnectionStore', () => {
   })
 
   it('ignores membership ids that no longer resolve to a connection', async () => {
-    const store = MemoryConnectionStore.create()
+    const store = ownStore()
     await store.subscribe('ghost', 'room') // subscribed without add()
     expect(await store.connectionsFor('room')).toEqual([])
   })

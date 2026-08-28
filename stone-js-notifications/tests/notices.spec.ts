@@ -7,9 +7,9 @@ import { NoticeRegistry } from '../src/NoticeRegistry'
 import { NotificationManager } from '../src/NotificationManager'
 import { NotificationConfigurationError } from '../src/errors/NotificationError'
 import { NoticeSubscriptionsMiddleware } from '../src/middleware/NoticeSubscriptionsMiddleware'
-import { DeliveryOutcome, NotificationChannel, Recipient, RenderedNotification } from '../src/declarations'
+import { DeliveryOutcome, Channel, Recipient, RenderedNotification } from '../src/declarations'
 
-const recordingChannel = (name: string, outcome: DeliveryOutcome = { status: 'sent' }): NotificationChannel & {
+const recordingChannel = (name: string, outcome: DeliveryOutcome = { status: 'sent' }): Channel & {
   sent: Array<{ message: RenderedNotification, recipient: Recipient }>
 } => {
   const sent: Array<{ message: RenderedNotification, recipient: Recipient }> = []
@@ -19,7 +19,7 @@ const recordingChannel = (name: string, outcome: DeliveryOutcome = { status: 'se
 
 const notifierWith = (options: {
   config?: Record<string, unknown>
-  channels?: NotificationChannel[]
+  channels?: Channel[]
   bound?: Record<string, unknown>
   resolve?: (target: any) => unknown
 } = {}): { notifier: Notifier, warnings: any[], errors: any[], infos: any[] } => {

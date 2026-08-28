@@ -1,5 +1,5 @@
 import { NotificationConfigurationError } from './errors/NotificationError'
-import { NotificationChannel } from './declarations'
+import { Channel } from './declarations'
 
 /**
  * Holds the configured channels and hands one out by name.
@@ -12,8 +12,8 @@ import { NotificationChannel } from './declarations'
 export class NotificationManager {
   private static current?: NotificationManager
 
-  private readonly channels = new Map<string, NotificationChannel>()
-  private readonly factories = new Map<string, () => NotificationChannel>()
+  private readonly channels = new Map<string, Channel>()
+  private readonly factories = new Map<string, () => Channel>()
 
   /**
    * @returns A manager.
@@ -38,7 +38,7 @@ export class NotificationManager {
    * @param channel - The channel.
    * @returns This manager.
    */
-  register (channel: NotificationChannel): this {
+  register (channel: Channel): this {
     this.channels.set(channel.name, channel)
     return this
   }
@@ -50,7 +50,7 @@ export class NotificationManager {
    * @param factory - How to build it.
    * @returns This manager.
    */
-  registerFactory (name: string, factory: () => NotificationChannel): this {
+  registerFactory (name: string, factory: () => Channel): this {
     this.factories.set(name, factory)
     return this
   }
@@ -72,7 +72,7 @@ export class NotificationManager {
    * @returns The channel.
    * @throws {NotificationConfigurationError} When nothing is registered under that name.
    */
-  channel (name: string): NotificationChannel {
+  channel (name: string): Channel {
     const built = this.channels.get(name)
     if (built !== undefined) { return built }
 

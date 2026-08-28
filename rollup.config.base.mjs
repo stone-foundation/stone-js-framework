@@ -34,6 +34,61 @@ function walkFiles (dir) {
 }
 
 /**
+ * Every name a declaration file declares and exports itself.
+ *
+ * Only declarations, never re-exports: `export * from` and `export { x } from` pass a name through
+ * without owning it, and counting those would report a collision for every barrel.
+ *
+ * @param {string} source
+ * @returns {string[]}
+ */
+function declaredNames (source) {
+  const withoutComments = source.replace(/\/\*[\s\S]*?\*\//g, '')
+  const declaration = /^export\s+(?:declare\s+)?(?:abstract\s+)?(?:const|let|var|function|class|enum|namespace|interface|type)\s+([A-Za-z_$][\w$]*)/gm
+  return [...withoutComments.matchAll(declaration)].map((match) => match[1])
+}
+
+/**
+ * Fail when two declarations reaching the public entry point share a name.
+ *
+ * A barrel of `export *` lines cannot carry the same name twice: TypeScript calls the export
+ * ambiguous (TS2308) and keeps NEITHER, so the name silently leaves the public types while the JS
+ * bundle still exports it. Two shipped modules did exactly this, `@stone-js/notifications` and
+ * `@stone-js/queue`, where a decorator and a type shared a name: `@NotificationChannel(...)` and
+ * `@JobHandler(...)` failed to compile for every TypeScript consumer, with the documentation
+ * teaching both, while working perfectly in JavaScript.
+ *
+ * There is no way to repair it from here. Explicitly re-exporting both halves resolves the value and
+ * loses the type, and merging them needs both declarations in one file, which a barrel of re-exports
+ * is not. So the collision has to be fixed at the source, by naming one of the two something else,
+ * and this fails the build rather than shipping a name nobody can use.
+ *
+ * @param {string} dir
+ * @param {string[]} rels
+ */
+function assertNoDuplicateNames (dir, rels) {
+  const owners = new Map()
+
+  for (const rel of rels) {
+    for (const name of new Set(declaredNames(readFileSync(join(dir, rel), 'utf-8')))) {
+      owners.set(name, [...(owners.get(name) ?? []), rel])
+    }
+  }
+
+  const clashes = [...owners].filter(([, files]) => files.length > 1)
+
+  if (clashes.length === 0) return
+
+  throw new Error(
+    `stone-dts-barrel: ${clashes.length} name(s) are declared twice among the files reaching ` +
+    `${join(dir, 'index.d.ts')}, so TypeScript would drop them from the public types:\n` +
+    clashes.map(([name, files]) => `  ${name}  <-  ${files.join(', ')}`).join('\n') +
+    '\n\nRename one of the two at the source. A dual browser/server build is not this case: those ' +
+    'trees are kept off the barrel through `barrel: { exclude }`.'
+  )
+}
+
+/**
  * Write `dist/index.d.ts` as `export * from './<file>'` for every emitted
  * declaration (mirroring what multi-entry does for the JS bundle, since these
  * packages have no `src/index.ts`). Runs after the typescript plugin emits the
@@ -67,7 +122,11 @@ export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [], src
         .filter((p) => p.endsWith('.d.ts'))
         .map((p) => relative(dir, p).replaceAll('\\', '/'))
         .filter((r) => r !== out && !exclude.some((e) => r.startsWith(e)))
-        .filter((r) => { if (hasSource(r)) return true; orphaned.push(r); return false })
+        .filter((r) => {
+          if (hasSource(r)) { return true }
+          orphaned.push(r)
+          return false
+        })
         .sort((left, right) => left.localeCompare(right))
 
       if (orphaned.length > 0) {
@@ -76,6 +135,8 @@ export function dtsBarrel ({ dir = 'dist', out = 'index.d.ts', exclude = [], src
           `kept off the public entry point: ${orphaned.join(', ')}. Remove \`${dir}\` to clear them.`
         )
       }
+      assertNoDuplicateNames(dir, rels)
+
       // `.js`, not extensionless: this package is ESM with an `exports` map, and a consumer on
       // `moduleResolution: nodenext` cannot resolve a relative import without its extension. It
       // silently sees no exports at all, and TypeScript reports the misleading "has no exported
