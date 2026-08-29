@@ -1,4 +1,5 @@
 import {
+  classDecoratorLegacyWrapper,
   setMetadata,
   hasMetadata,
   getMetadata,
@@ -161,5 +162,20 @@ describe('Metadata Utilities', () => {
     const result2 = getBlueprint(class {}, { name: 'Stone.js' } as any)
     expect(result).toEqual(mockBlueprint)
     expect(result2).toEqual({ name: 'Stone.js' })
+  })
+})
+
+describe('the message a legacy decorator gets', () => {
+  it('names both ways out, on the branch a test runner actually hits', () => {
+    // Measured on a real application: running `vitest` directly on a Stone.js project fails with
+    // this exact error, because the project's tsconfig says `experimentalDecorators: true` for
+    // TypeScript's checker and esbuild honours it by emitting the legacy form. The branch that fires
+    // is the one with no decorator context, and it used to say only "this usage is not supported",
+    // which names neither the cause nor either fix.
+    const decorator = classDecoratorLegacyWrapper(() => undefined)
+
+    expect(() => (decorator as any)(class {})).toThrow(/stone test/)
+    expect(() => (decorator as any)(class {})).toThrow(/experimentalDecorators/)
+    expect(() => (decorator as any)(class {})).toThrow(/troubleshooting/)
   })
 })
