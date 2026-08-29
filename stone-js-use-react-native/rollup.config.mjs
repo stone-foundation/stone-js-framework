@@ -24,7 +24,10 @@ export default createRollupConfig({
         '!src/navigation/**/*'
       ],
       file: 'dist/index.js',
-      barrel: { exclude: ['cli/', 'metro/', 'build/', 'navigation/'] }
+      // `currentStack` is a seam between the blueprint middleware and the hook, not API: publishing
+      // `setCurrentScreenStack` would invite an application to move the stack behind the framework's
+      // back. A root component reaches the same object through `useScreens()`.
+      barrel: { exclude: ['cli/', 'metro/', 'build/', 'navigation/', 'currentStack'] }
     },
     // The native navigator (`./navigation`). Kept out of the main bundle so that
     // `@react-navigation/native` and its native dependencies stay optional: an application happy
