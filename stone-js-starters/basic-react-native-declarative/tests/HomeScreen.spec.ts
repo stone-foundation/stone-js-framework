@@ -18,7 +18,7 @@ describe('HomeScreen', () => {
   it('resolves the home screen, data included', async () => {
     const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM })
 
-    const response = await app.send(makeIncomingBrowserEvent({ url: 'stone://app/?name=Ada' }))
+    const response = await app.send(makeIncomingBrowserEvent({ url: 'stone://?name=Ada' }))
 
     expect(response.statusCode).toBe(200)
     // The head is what a navigator shows in its header, and it proves the loader ran with the deep
@@ -29,7 +29,7 @@ describe('HomeScreen', () => {
   it('resolves without a name', async () => {
     const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM })
 
-    const response = await app.send(makeIncomingBrowserEvent({ url: 'stone://app/' }))
+    const response = await app.send(makeIncomingBrowserEvent({ url: 'stone://' }))
 
     expect(response.statusCode).toBe(200)
   })

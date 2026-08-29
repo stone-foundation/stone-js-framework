@@ -98,7 +98,7 @@ Navigation goes through the router, so a screen never renders another screen its
 returns `{ goBack, canGoBack }`: wire `goBack` to your header button and to Android's hardware back
 button, and let the platform leave the application when `canGoBack` is false.
 
-Deep links arrive the same way. This starter's scheme is `stone`, so `stone://app/?name=Ada` reaches
+Deep links arrive the same way. This starter's scheme is `stone`, so `stone://?name=Ada` reaches
 the page that owns `/`, with `name` readable through `event.get('name')`. Change `scheme` in
 `app.json` to your own.
 

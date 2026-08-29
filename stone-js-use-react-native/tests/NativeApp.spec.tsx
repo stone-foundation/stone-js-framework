@@ -159,7 +159,7 @@ describe('A native Stone.js application', () => {
   it('resolves the deep link it was launched with, through the same pipeline', async () => {
     const source = NavigationSource.create({
       linkingResolver: () => ({
-        getInitialURL: async () => 'myapp://open/tasks/7',
+        getInitialURL: async () => 'myapp://tasks/7',
         addEventListener: () => ({ remove: () => {} })
       })
     })
@@ -181,6 +181,41 @@ describe('A native Stone.js application', () => {
     await adapter.run()
 
     expect(stack.top()?.path).toBe('/tasks/7')
+
+    await adapter.stop()
+  })
+
+  it.each([
+    ['myapp://tasks', '/tasks'],
+    ['myapp://tasks/7', '/tasks/7']
+  ])('sends %s to %s, and not to its first segment', async (link, expected) => {
+    // The case a pilot found on a device, and the reason it was hard to see: the single-segment
+    // form answered 200 with the wrong screen. A custom scheme has no authority, so WHATWG read
+    // `tasks` as a host, the path came out empty, and the router served `/`. Nothing looked broken.
+    const source = NavigationSource.create({
+      linkingResolver: () => ({
+        getInitialURL: async () => link,
+        addEventListener: () => ({ remove: () => {} })
+      })
+    })
+    const blueprint = Config.create() as unknown as IBlueprint
+
+    blueprint.set(stoneBlueprint as any)
+    blueprint.set(routerBlueprint as any)
+    blueprint.set(reactNativeAdapterBlueprint as any)
+    blueprint.set(useReactNativeBlueprint as any)
+    blueprint.set('stone.reactNative.navigationSource', source)
+
+    Logger.init(blueprint as any)
+    await BlueprintBuilder.create(blueprint as any).build([HomePage, TasksPage, TaskPage, BrokenPage, AppErrorScreen])
+    Logger.init(blueprint as any)
+
+    const stack = blueprint.get<ScreenStack>(`stone.useReactNative.${STONE_SCREEN_STACK}`)
+    const adapter = ReactNativeAdapter.create(blueprint)
+
+    await adapter.run()
+
+    expect(stack.top()?.path).toBe(expected)
 
     await adapter.stop()
   })

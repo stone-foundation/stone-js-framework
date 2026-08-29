@@ -129,7 +129,7 @@ export class Mobile implements IPage<ReactIncomingEvent> {
         <H2>Configuration</H2>
         <PropsTable rows={[
           { name: 'stone.reactNative.navigationSource', type: 'NavigationSource', desc: 'The source of navigation events. Supply your own to drive the application from a test, or to change the base URL its links are resolved against.' },
-          { name: 'baseUrl', type: 'string', default: 'stone://app', desc: 'The origin a scheme-less path is resolved against when building the event. Set it to your own scheme so a generated link matches what the platform delivers.' }
+          { name: 'baseUrl', type: 'string', default: 'stone://', desc: 'The origin a scheme-less path is resolved against when building the event. Set it to your own scheme so a generated link matches what the platform delivers.' }
         ]} />
 
         <H2>Running and shipping</H2>

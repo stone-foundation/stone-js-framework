@@ -18,7 +18,7 @@ describe('TaskListScreen', () => {
   it('resolves the task list from the shared domain', async () => {
     const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM })
 
-    const response = await app.send(makeIncomingBrowserEvent({ url: 'acme://app/' }))
+    const response = await app.send(makeIncomingBrowserEvent({ url: 'acme://' }))
 
     expect(response.statusCode).toBe(200)
     // The head is what a navigator shows in its header, and it carries the count the domain computed.
@@ -28,7 +28,7 @@ describe('TaskListScreen', () => {
   it('toggles a task through the same domain the web app uses', async () => {
     const app = await createTestApp({ platform: REACT_NATIVE_PLATFORM })
 
-    const response = await app.send(makeIncomingBrowserEvent({ url: 'acme://app/?toggle=3' }))
+    const response = await app.send(makeIncomingBrowserEvent({ url: 'acme://?toggle=3' }))
 
     expect(response.statusCode).toBe(200)
     expect((response.content as any).head.title).toBe('0 left · Acme tasks')
