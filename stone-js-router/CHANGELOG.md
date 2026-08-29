@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.19
+
+### Patch Changes
+
+- Updated dependencies [6b76c36]
+- Updated dependencies [cb52a51]
+- Updated dependencies [859d6ed]
+  - @stone-js/core@0.8.19
+  - @stone-js/pipeline@0.8.19
+
 ## 0.8.18
 
 ### Patch Changes

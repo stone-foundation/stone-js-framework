@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.8.19
+
+### Patch Changes
+
+- 6b76c36: chore: the API report refuses to run on a stale build
+
+  `scripts/api-report.mjs` reads `dist`, so regenerating the baseline from a build that no longer matches its sources writes a **false** surface: after a branch switch, a rebase or a merge, it silently removes names the committed baseline correctly had, or carries another branch's additions into this one.
+
+  That happened three times in a single day, each caught only because `api:check` failed afterwards. The write path now compares the newest modification time under each `src` with its `dist` and stops, naming the packages and saying what to do. The check path is untouched: a stale `dist` there produces a diff, which is already the right answer, and CI builds before checking anyway.
+
+  No published package changes; the patch is on `@stone-js/core` only so the repository has a release note for it.
+
+- cb52a51: fix(core): the legacy-decorator error names the way out
+
+  Running `vitest` directly on a Stone.js application fails on the first decorated class:
+
+  ```
+  SetupError: Class decorators must be used with the 2023-11 decorators proposal.
+  This usage is not supported.
+  ```
+
+  That message names neither the cause nor either fix, and it is the one a developer actually meets. The framework already had a good message explaining exactly this, on the neighbouring branch, for a case that fires far less often.
+
+  The three terse messages now carry the same guidance, written once so the four cannot drift: the cause is a transformer emitting legacy decorators, `experimentalDecorators: true` makes esbuild (so Vite and Vitest) emit that form, and there are two ways out. `stone test` sets the right semantics for you, and a project keeping its own runner config sets them itself with `esbuild.tsconfigRaw.compilerOptions`.
+
+  Measured on a scaffolded application: the same decorated class fails under a bare `vitest run` and passes under `stone test`, and passes under a plain runner config carrying those two options.
+
+  The legacy shape of the published decorator signatures is deliberate, and stays. Measured on TypeScript 5.9: a factory typed legacy compiles only with `experimentalDecorators: true`, one typed 2023-11 only with it off, and a union of the two under neither. It is strictly either/or, so the checker is satisfied with the legacy shape while the runtime is 2023-11 throughout. What was missing was an error message that says which knob to turn.
+
+- Updated dependencies [859d6ed]
+  - @stone-js/pipeline@0.8.19
+  - @stone-js/config@0.8.19
+  - @stone-js/service-container@0.8.19
+
 ## 0.8.18
 
 ### Patch Changes

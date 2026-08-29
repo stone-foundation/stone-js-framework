@@ -1,5 +1,16 @@
 # @stone-js/authz
 
+## 0.8.19
+
+### Patch Changes
+
+- Updated dependencies [6b76c36]
+- Updated dependencies [cb52a51]
+- Updated dependencies [865579c]
+  - @stone-js/core@0.8.19
+  - @stone-js/http-core@0.8.19
+  - @stone-js/config@0.8.19
+
 ## 0.8.18
 
 ### Patch Changes

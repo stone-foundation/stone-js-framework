@@ -1,5 +1,7 @@
 # @stone-js/blog-starters
 
+## 0.8.19
+
 ## 0.8.18
 
 ## 0.8.17

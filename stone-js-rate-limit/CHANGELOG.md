@@ -1,5 +1,22 @@
 # @stone-js/rate-limit
 
+## 0.8.19
+
+### Patch Changes
+
+- 865579c: fix(http-core): the published types resolve for a strict consumer
+
+  `@stone-js/http-core` referenced `send`, `accepts` and `range-parser` from its **published** declarations while their `@types/*` sat in `devDependencies`. So a consumer compiling with `skipLibCheck: false`, which is what a careful team turns on, got three `TS7016` errors from inside our own package and had to install type packages it never asked for.
+
+  The three are `dependencies` now, which is what a package referencing them from its public API owes its consumers. Measured on a real install from the registry: those were the only three errors of that kind across every published entry point.
+
+  Also in `@stone-js/rate-limit`, the guard that decides whether a value identifies a subject is now a **type guard**. It already made `String(value)` safe, and the comment said so; saying it in the type says it to the compiler instead, which is what the analyser was asking for.
+
+- Updated dependencies [6b76c36]
+- Updated dependencies [cb52a51]
+  - @stone-js/core@0.8.19
+  - @stone-js/config@0.8.19
+
 ## 0.8.18
 
 ### Patch Changes
