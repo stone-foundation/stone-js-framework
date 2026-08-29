@@ -319,3 +319,23 @@ describe('Pipeline — string alias with inline params', () => {
     expect(p.sortedMetaPipes[0].params).toEqual([null, -3, 1.5, 'hello'])
   })
 })
+
+describe('a class handed to `through` without a marker', () => {
+  it('is instantiated and run, instead of being called as a function', async () => {
+    // Measured on the published 0.8.18 before the fix: `TypeError: Class constructor BareMiddleware
+    // cannot be invoked without 'new'`, thrown from the pipeline, for a shape `PipeType` declares.
+    class BareMiddleware {
+      async handle (value: { seen: boolean }, next: (v: { seen: boolean }) => unknown): Promise<unknown> {
+        return await next({ ...value, seen: true })
+      }
+    }
+
+    const result = await Pipeline
+      .create<{ seen: boolean }, { seen: boolean }>()
+      .send({ seen: false })
+      .through(BareMiddleware as any)
+      .then((value) => value)
+
+    expect(result).toEqual({ seen: true })
+  })
+})
