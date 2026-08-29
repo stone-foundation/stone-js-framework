@@ -192,6 +192,11 @@ export class TestCommand {
    * Only the decorator options are stated. Everything else esbuild reads from the project's own
    * tsconfig, so JSX, target and paths keep working as they do everywhere else.
    *
+   * The same value is published as `decoratorSemantics` in `@stone-js/testing/vitest`, for a project
+   * that keeps its own runner config. It is written out here rather than imported, because the CLI
+   * generating a config must not require a package the project may not have installed; the two are
+   * held together by a test on each side.
+   *
    * @returns The transformer options.
    */
   private decoratorSemantics (): Record<string, unknown> {

@@ -1,7 +1,7 @@
 {
   "name": "@stone-js/testing",
   "version": "0.8.18",
-  "description": "Testing utilities for Stone.js. Boot a real app in-memory and dispatch synthetic events through the full kernel — no server, no adapter — plus event/response factories. Works with any test runner.",
+  "description": "Testing utilities for Stone.js. Boot a real app in-memory and dispatch synthetic events through the full kernel \u2014 no server, no adapter \u2014 plus event/response factories. Works with any test runner.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -40,6 +40,10 @@
     "./http": {
       "types": "./dist/http.d.ts",
       "default": "./dist/http.js"
+    },
+    "./vitest": {
+      "types": "./dist/vitest.d.ts",
+      "default": "./dist/vitest.js"
     }
   },
   "engines": {
