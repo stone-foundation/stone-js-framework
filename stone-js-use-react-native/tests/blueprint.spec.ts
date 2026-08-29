@@ -1,6 +1,8 @@
 import { getBlueprint, hasBlueprint } from '@stone-js/core'
 import { UseReactNative } from '../src/decorators/UseReactNative'
 import { ScreenStack } from '../src/ScreenStack'
+import { getCurrentScreenStack } from '../src/currentStack'
+import { SetScreenStackMiddleware } from '../src/middleware/BlueprintMiddleware'
 import { defineStoneReactNativeApp } from '../src/blueprint/BlueprintUtils'
 import { useReactNativeBlueprint } from '../src/options/UseReactNativeBlueprint'
 
@@ -75,5 +77,19 @@ describe('Enabling the renderer', () => {
 
     expect(blueprint.stone.marker).toBe(true)
     expect(blueprint.stone.useReact.componentEventHandler.module).toBe(Screen)
+  })
+})
+
+describe('SetScreenStackMiddleware, and what the root can reach', () => {
+  it('publishes the stack it decided on, so a component outside every event finds it', async () => {
+    // The root component has no container. Publishing here, where the one stack is chosen, is what
+    // makes `registerRootComponent(App)` work at all.
+    const blueprint: any = { get: vi.fn(() => undefined), set: vi.fn() }
+
+    await SetScreenStackMiddleware({ blueprint } as any, async () => blueprint)
+
+    expect(blueprint.set).toHaveBeenCalledWith('stone.useReactNative.screenStack', expect.any(ScreenStack))
+    // And the same object is reachable without a container, which is the whole point.
+    expect(getCurrentScreenStack()).toBe(blueprint.set.mock.calls[0][1])
   })
 })

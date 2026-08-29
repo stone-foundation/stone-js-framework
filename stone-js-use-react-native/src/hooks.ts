@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ScreenStack } from './ScreenStack'
 import { HeadContext } from '@stone-js/use-view'
 import { NativeRuntime } from './NativeRuntime'
 import { NativeScreen, ScreenTransition } from './declarations'
 import { STONE_REACT_RUNTIME, STONE_SCREEN_STACK } from './constants'
-import { IRouter, useContainer } from '@stone-js/use-react-core'
+import { getCurrentScreenStack } from './currentStack'
+import { UseReactNativeError } from './errors/UseReactNativeError'
+import { IRouter, StoneContext, useContainer } from '@stone-js/use-react-core'
 
 /**
  * The hooks a native screen needs on top of the shared ones.
@@ -44,7 +46,20 @@ export function useHead (head: HeadContext): void {
  * @returns The screen stack.
  */
 export function useScreenStack (): ScreenStack {
-  return useContainer().make<ScreenStack>(STONE_SCREEN_STACK)
+  // `useContext` rather than `useContainer`, deliberately: the latter throws when there is no
+  // context, and having no context is the normal case here. A screen has one, because it is
+  // rendered inside an event; the root component does not, because `registerRootComponent` mounts
+  // it outside every event. Both must reach the same stack.
+  const context = useContext(StoneContext)
+  const stack = context?.container?.make<ScreenStack>(STONE_SCREEN_STACK) ?? getCurrentScreenStack()
+
+  if (stack === undefined) {
+    throw new UseReactNativeError(
+      'No screen stack yet. The renderer publishes it during the build phase, so this component rendered before `stoneApp(...).run()` was called, or the renderer was never enabled with `@UseReactNative()` or its blueprint.'
+    )
+  }
+
+  return stack
 }
 
 /**

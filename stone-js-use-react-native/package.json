@@ -35,15 +35,15 @@
       "default": "./dist/index.js"
     },
     "./cli": {
-      "types": "./dist/cli.d.ts",
+      "types": "./dist/cli/index.d.ts",
       "default": "./dist/cli.js"
     },
     "./metro": {
-      "types": "./dist/metro.d.ts",
+      "types": "./dist/metro/index.d.ts",
       "default": "./dist/metro.js"
     },
     "./navigation": {
-      "types": "./dist/navigation.d.ts",
+      "types": "./dist/navigation/index.d.ts",
       "default": "./dist/navigation.js"
     }
   },
