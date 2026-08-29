@@ -27,6 +27,25 @@ interface ToolDeclarationEntry {
  * container, which is rebuilt for every event: a registry that cached would be caching something
  * whose lifetime it does not own.
  */
+/**
+ * The route option `@stone-js/openapi` publishes a contract under.
+ *
+ * Read as a string, never imported, the same convention the declaration keys follow: this module
+ * derives tools from what an application declares and must not depend on the modules that declare
+ * it. Kept private, because a second package exporting this name would put one word with two owners
+ * in the public surface.
+ *
+ * It is `contract` rather than `openapi`, because naming an option after a specification would put
+ * that specification's name in the router's vocabulary.
+ */
+/** What this module reads from `@stone-js/openapi`, which is an optional peer. */
+interface OpenApiDerivations {
+  readResource?: (declared: unknown, registries: Record<string, unknown>, route: string) => { schema?: unknown } | undefined
+  toJsonSchema?: (schema: unknown, direction: string) => unknown
+}
+
+const CONTRACT_OPTION = 'contract'
+
 export class McpToolRegistry {
   private readonly blueprint: IBlueprint
   private readonly container?: IContainer
@@ -156,7 +175,7 @@ export class McpToolRegistry {
     if (description === undefined) {
       const message =
         `[@stone-js/mcp] the tool '${name}' has no description. An agent reading a bare name will ` +
-        'guess what it does. Write `mcp: { name, description }`, or an `openapi` summary on the route.'
+        'guess what it does. Write `mcp: { name, description }`, or a `contract` summary on the route.'
 
       if (this.options().requireDescription === true) {
         this.logger()?.warn(`${message} It is left out, because \`stone.mcp.requireDescription\` is on.`)
@@ -170,7 +189,7 @@ export class McpToolRegistry {
       name,
       ...(description !== undefined ? { description } : {}),
       inputSchema: declaration.inputSchema ?? await this.inputSchemaFor(route),
-      ...(declaration.outputSchema !== undefined ? { outputSchema: declaration.outputSchema } : {}),
+      ...(await this.outputSchemaEntry(route, declaration)),
       ...(declaration.annotations !== undefined ? { annotations: declaration.annotations } : {})
     }
   }
@@ -178,16 +197,21 @@ export class McpToolRegistry {
   /**
    * What the route says about itself elsewhere, when the tool declaration says nothing.
    *
-   * `openapi` is read as a plain route option rather than through the package: a route carrying a
+   * `contract` is read as a plain route option rather than through the package: a route carrying a
    * summary has documented itself for a reader, and a model is a reader.
+   *
+   * The name is `contract`, not `openapi`. `@stone-js/openapi` renamed it so a specification's name
+   * would not sit in the router's vocabulary, and this module read the old one for a release: an
+   * application declaring `contract:` on two hundred routes had every one of its tools exposed
+   * without a description, silently, because nothing here was looking at the right key.
    *
    * @param route - The route.
    * @returns A description, or nothing.
    */
   private describedBy (route: RouteLike): string | undefined {
-    const openapi = route.getOption<{ summary?: string, description?: string }>('openapi')
+    const contract = route.getOption<{ summary?: string, description?: string }>(CONTRACT_OPTION)
 
-    return openapi?.description ?? openapi?.summary
+    return contract?.description ?? contract?.summary
   }
 
   /**
@@ -326,6 +350,108 @@ export class McpToolRegistry {
   }
 
   /** `@stone-js/openapi`'s converter, when the package is installed. */
+  /**
+   * The `outputSchema` entry, when there is a shape somebody promised.
+   *
+   * Spread rather than assigned, because the field is absent from the tool when nothing describes the
+   * answer: an agent told a tool returns an object it may not return is worse off than one told
+   * nothing, since it will parse against a promise the application never made.
+   *
+   * @param route - The route.
+   * @param declaration - What the tool declared.
+   * @returns The entry, or an empty object.
+   */
+  private async outputSchemaEntry (
+    route: RouteLike,
+    declaration: McpToolDeclaration
+  ): Promise<{ outputSchema?: JsonSchema }> {
+    const outputSchema = declaration.outputSchema ?? await this.fromResource(route)
+
+    return outputSchema === undefined ? {} : { outputSchema }
+  }
+
+  /**
+   * The resource the route publishes, as JSON Schema, when there is one and something can read it.
+   *
+   * The symmetry of the input side: an application that already says what a route answers with, in
+   * `@Returns` or in the route's own `resource`, should not say it a second time for an agent. The
+   * reading and the conversion are both `@stone-js/openapi`'s, imported lazily and optional, because
+   * they are the same ones that build the document a human reads: a tool and a contract describing
+   * the same answer differently would be two answers.
+   *
+   * Only an object schema is published. A resource answering a bare array is a real thing, and MCP
+   * carries structured output as an object, so wrapping it here would invent a shape the application
+   * never declared. That case gets no `outputSchema`, which is the honest answer.
+   *
+   * @param route - The route.
+   * @returns The schema, or nothing.
+   */
+  private async fromResource (route: RouteLike): Promise<JsonSchema | undefined> {
+    const declared = this.declaredOn(route, 'resource')
+
+    if (declared === undefined) { return undefined }
+
+    const openapi = await this.openapi()
+
+    if (openapi === undefined) {
+      this.logger()?.debug(
+        '[@stone-js/mcp] a route declares a resource, but `@stone-js/openapi` is not installed to ' +
+        'read it. The tool publishes no output schema.',
+        { method: route.getOption('method'), path: this.pathOf(route) }
+      )
+      return undefined
+    }
+
+    try {
+      const read = openapi.readResource?.(declared, this.derivationRegistries(), this.pathOf(route))
+
+      if (read?.schema === undefined) { return undefined }
+
+      const converted = openapi.toJsonSchema?.(read.schema, 'output') as JsonSchema | undefined
+
+      return converted?.type === 'object' ? converted : undefined
+    } catch (error: any) {
+      // Same rule as the input side: a schema that cannot be described leaves the tool poorer, which
+      // is recoverable. Letting the throw out would take down `tools/list` entirely, which is not.
+      this.logger()?.warn(
+        `[@stone-js/mcp] a resource schema could not be described: ${String(error?.message)}`,
+        { method: route.getOption('method'), path: this.pathOf(route) }
+      )
+      return undefined
+    }
+  }
+
+  /**
+   * What reading a declared resource needs to resolve one declared by name.
+   *
+   * A route may name its resource instead of pointing at it, and the registry that resolves the name
+   * is the one the runtime projects through, so a tool describes the shape a caller actually gets.
+   *
+   * @returns The registries.
+   */
+  private derivationRegistries (): Record<string, unknown> {
+    return {
+      resources: this.blueprint.get<Record<string, unknown>>('stone.resources.registry', {}),
+      resolve: (Class: ClassType) => this.container?.has?.(Class) === true ? this.container.make(Class) : undefined
+    }
+  }
+
+  /**
+   * `@stone-js/openapi`, when the application installed it.
+   *
+   * Typed by what is read from it rather than as the whole module: an optional peer is a duck, and
+   * naming the two functions used says which parts this module actually depends on.
+   *
+   * @returns The module, or nothing.
+   */
+  private async openapi (): Promise<OpenApiDerivations | undefined> {
+    try {
+      return await import('@stone-js/openapi') as unknown as OpenApiDerivations
+    } catch {
+      return undefined
+    }
+  }
+
   private async converter (): Promise<((schema: unknown, direction: string) => unknown) | undefined> {
     try {
       const mod: any = await import('@stone-js/openapi')

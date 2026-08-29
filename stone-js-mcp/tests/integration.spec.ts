@@ -36,7 +36,11 @@ const handlerOn = (router: any, config: Record<string, unknown> = {}): McpHandle
   return new McpHandler({
     blueprint: {
       get: (key: string, fallback?: unknown) => (
-        key === 'stone.mcp' ? config : (key === 'stone.validation.schemas' ? (config.schemas ?? {}) : fallback)
+        key === 'stone.mcp'
+          ? config
+          : key === 'stone.validation.schemas'
+            ? (config.schemas ?? {})
+            : key === 'stone.resources.registry' ? (config.resources ?? {}) : fallback
       )
     } as any,
     container: {
@@ -189,7 +193,7 @@ describe('what the rest of the application already declared', () => {
       method: 'POST',
       name: 'notes.create',
       validation: 'createNote',
-      openapi: { summary: 'Derived summary.' },
+      contract: { summary: 'Derived summary.' },
       mcp: {
         name: 'create-note',
         description: 'Stated description.',
@@ -256,5 +260,126 @@ describe('declaring a tool on the handler instead of the route', () => {
     const result = await ask(handlerOn(router), { jsonrpc: '2.0', id: 1, method: 'tools/list' })
 
     expect(result.result.tools[0].name).toBe('from-the-route')
+  })
+})
+
+describe('what a route promises to answer', () => {
+  it('takes the output schema from the resource the route publishes', async () => {
+    // The symmetry of the input side: an application that already says what a route answers with
+    // should not say it a second time for an agent. Read and converted by `@stone-js/openapi`, the
+    // same package that builds the document a human reads, so a tool and a contract describing the
+    // same answer cannot describe it differently.
+    class NoteResource {
+      schema (): unknown {
+        return z.object({ id: z.number(), title: z.string() })
+      }
+    }
+
+    const router = await realRouter([{
+      path: '/notes/:id',
+      method: 'GET',
+      name: 'notes.show',
+      mcp: { name: 'get-note', description: 'Read one note.' },
+      resource: 'note',
+      handler: () => ({})
+    }])
+
+    const result = await ask(
+      handlerOn(router, { resources: { note: NoteResource } }),
+      { jsonrpc: '2.0', id: 1, method: 'tools/list' }
+    )
+    const schema = result.result.tools[0].outputSchema
+
+    expect(schema.type).toBe('object')
+    expect(Object.keys(schema.properties)).toEqual(['id', 'title'])
+  })
+
+  it('says nothing when the route promised nothing', async () => {
+    // A shape nobody promised is not sent: an agent told a tool returns an object it may not return
+    // is worse off than one told nothing, because it will parse against a promise never made.
+    const router = await realRouter([{
+      path: '/notes',
+      method: 'GET',
+      name: 'notes.index',
+      mcp: { name: 'list-notes', description: 'List.' },
+      handler: () => ({})
+    }])
+
+    const result = await ask(handlerOn(router), { jsonrpc: '2.0', id: 1, method: 'tools/list' })
+
+    expect(result.result.tools[0]).not.toHaveProperty('outputSchema')
+  })
+
+  it('lets the declaration win over the resource', async () => {
+    class NoteResource { schema (): unknown { return z.object({ id: z.number() }) } }
+
+    const router = await realRouter([{
+      path: '/notes/:id',
+      method: 'GET',
+      name: 'notes.show',
+      resource: 'note',
+      mcp: {
+        name: 'get-note',
+        description: 'Read.',
+        outputSchema: { type: 'object', properties: { stated: { type: 'string' } } }
+      },
+      handler: () => ({})
+    }])
+
+    const result = await ask(
+      handlerOn(router, { resources: { note: NoteResource } }),
+      { jsonrpc: '2.0', id: 1, method: 'tools/list' }
+    )
+
+    expect(Object.keys(result.result.tools[0].outputSchema.properties)).toEqual(['stated'])
+  })
+
+  it('leaves it out when the resource answers something that is not an object', async () => {
+    // A resource answering a bare array is a real thing, and MCP carries structured output as an
+    // object. Wrapping it here would invent a shape the application never declared.
+    class ListResource { schema (): unknown { return z.array(z.string()) } }
+
+    const router = await realRouter([{
+      path: '/tags',
+      method: 'GET',
+      name: 'tags.index',
+      mcp: { name: 'list-tags', description: 'List tags.' },
+      resource: 'tags',
+      handler: () => ({})
+    }])
+
+    const result = await ask(
+      handlerOn(router, { resources: { tags: ListResource } }),
+      { jsonrpc: '2.0', id: 1, method: 'tools/list' }
+    )
+
+    expect(result.result.tools[0]).not.toHaveProperty('outputSchema')
+  })
+})
+
+describe('a resource that cannot be read', () => {
+  it('leaves the tool without an output schema, and says so, instead of taking the listing down', async () => {
+    // A schema that throws leaves the tool poorer, which is recoverable. Letting the throw out would
+    // take down `tools/list` entirely, which is not: one bad resource would hide every other tool.
+    class BrokenResource {
+      schema (): unknown { throw new Error('needs a real context') }
+    }
+
+    const router = await realRouter([{
+      path: '/notes/:id',
+      method: 'GET',
+      name: 'notes.show',
+      mcp: { name: 'get-note', description: 'Read.' },
+      resource: 'broken',
+      handler: () => ({})
+    }])
+
+    const result = await ask(
+      handlerOn(router, { resources: { broken: BrokenResource } }),
+      { jsonrpc: '2.0', id: 1, method: 'tools/list' }
+    )
+
+    expect(result.result.tools).toHaveLength(1)
+    expect(result.result.tools[0]).not.toHaveProperty('outputSchema')
   })
 })
