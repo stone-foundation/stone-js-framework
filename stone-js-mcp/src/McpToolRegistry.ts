@@ -38,6 +38,12 @@ interface ToolDeclarationEntry {
  * It is `contract` rather than `openapi`, because naming an option after a specification would put
  * that specification's name in the router's vocabulary.
  */
+/** What this module reads from `@stone-js/openapi`, which is an optional peer. */
+interface OpenApiDerivations {
+  readResource?: (declared: unknown, registries: Record<string, unknown>, route: string) => { schema?: unknown } | undefined
+  toJsonSchema?: (schema: unknown, direction: string) => unknown
+}
+
 const CONTRACT_OPTION = 'contract'
 
 export class McpToolRegistry {
@@ -433,11 +439,14 @@ export class McpToolRegistry {
   /**
    * `@stone-js/openapi`, when the application installed it.
    *
+   * Typed by what is read from it rather than as the whole module: an optional peer is a duck, and
+   * naming the two functions used says which parts this module actually depends on.
+   *
    * @returns The module, or nothing.
    */
-  private async openapi (): Promise<any | undefined> {
+  private async openapi (): Promise<OpenApiDerivations | undefined> {
     try {
-      return await import('@stone-js/openapi')
+      return await import('@stone-js/openapi') as unknown as OpenApiDerivations
     } catch {
       return undefined
     }

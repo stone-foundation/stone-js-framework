@@ -55,6 +55,91 @@ describe('when the contract package is not installed', () => {
     vi.doUnmock('@stone-js/openapi')
     vi.resetModules()
   })
+
+  it('publishes no output schema for a route that declares a resource', async () => {
+    // Same degradation on the answer's side: the resource is read and converted by that package, so
+    // without it there is nothing to convert. A tool with no `outputSchema` is a working tool; one
+    // carrying a shape guessed here would be a promise the application never made.
+    vi.resetModules()
+    vi.doMock('@stone-js/openapi', () => { throw new Error('not installed') })
+
+    const { McpHandler } = await import('../src/McpHandler')
+    const debugs: unknown[] = []
+
+    const bound: Record<string, unknown> = {
+      router: {
+        getRoutes: () => ({
+          getRoutes: () => [route({
+            path: '/notes/:id',
+            method: 'GET',
+            name: 'n',
+            mcp: { name: 'get-note', description: 'Read.' },
+            resource: 'note'
+          })]
+        }),
+        dispatch: async () => 'ok'
+      },
+      logger: { warn: () => {}, debug: (message: unknown) => debugs.push(message), error: () => {} }
+    }
+
+    const handler = new McpHandler({
+      blueprint: { get: (k: string, f?: unknown) => (k === 'stone.mcp' ? {} : f) } as any,
+      container: { has: (k: unknown) => typeof k === 'string' && k in bound, make: (k: unknown) => bound[k as string] } as any
+    })
+
+    const result = await ask(handler, { jsonrpc: '2.0', id: 1, method: 'tools/list' })
+
+    expect(result.result.tools[0]).not.toHaveProperty('outputSchema')
+    expect(debugs.some((line) => String(line).includes('declares a resource'))).toBe(true)
+
+    vi.doUnmock('@stone-js/openapi')
+    vi.resetModules()
+  })
+})
+
+describe('when reading a resource throws from inside the contract package', () => {
+  it('lists the tool without an output schema, and warns', async () => {
+    // The resource module catches what a schema throws; this covers the other side, where the
+    // reading itself fails. One unreadable resource must not hide every other tool from an agent.
+    vi.resetModules()
+    vi.doMock('@stone-js/openapi', () => ({
+      readResource: () => { throw new Error('registry exploded') },
+      toJsonSchema: (schema: unknown) => schema
+    }))
+
+    const { McpHandler } = await import('../src/McpHandler')
+    const warnings: unknown[] = []
+
+    const bound: Record<string, unknown> = {
+      router: {
+        getRoutes: () => ({
+          getRoutes: () => [route({
+            path: '/notes/:id',
+            method: 'GET',
+            name: 'n',
+            mcp: { name: 'get-note', description: 'Read.' },
+            resource: 'note'
+          })]
+        }),
+        dispatch: async () => 'ok'
+      },
+      logger: { warn: (message: unknown) => warnings.push(message), debug: () => {}, error: () => {} }
+    }
+
+    const handler = new McpHandler({
+      blueprint: { get: (k: string, f?: unknown) => (k === 'stone.mcp' ? {} : f) } as any,
+      container: { has: (k: unknown) => typeof k === 'string' && k in bound, make: (k: unknown) => bound[k as string] } as any
+    })
+
+    const result = await ask(handler, { jsonrpc: '2.0', id: 1, method: 'tools/list' })
+
+    expect(result.result.tools).toHaveLength(1)
+    expect(result.result.tools[0]).not.toHaveProperty('outputSchema')
+    expect(warnings.some((line) => String(line).includes('could not be described'))).toBe(true)
+
+    vi.doUnmock('@stone-js/openapi')
+    vi.resetModules()
+  })
 })
 
 describe('an event that carries less than an HTTP request usually does', () => {

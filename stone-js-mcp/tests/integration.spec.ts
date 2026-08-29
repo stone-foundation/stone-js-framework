@@ -356,3 +356,30 @@ describe('what a route promises to answer', () => {
     expect(result.result.tools[0]).not.toHaveProperty('outputSchema')
   })
 })
+
+describe('a resource that cannot be read', () => {
+  it('leaves the tool without an output schema, and says so, instead of taking the listing down', async () => {
+    // A schema that throws leaves the tool poorer, which is recoverable. Letting the throw out would
+    // take down `tools/list` entirely, which is not: one bad resource would hide every other tool.
+    class BrokenResource {
+      schema (): unknown { throw new Error('needs a real context') }
+    }
+
+    const router = await realRouter([{
+      path: '/notes/:id',
+      method: 'GET',
+      name: 'notes.show',
+      mcp: { name: 'get-note', description: 'Read.' },
+      resource: 'broken',
+      handler: () => ({})
+    }])
+
+    const result = await ask(
+      handlerOn(router, { resources: { broken: BrokenResource } }),
+      { jsonrpc: '2.0', id: 1, method: 'tools/list' }
+    )
+
+    expect(result.result.tools).toHaveLength(1)
+    expect(result.result.tools[0]).not.toHaveProperty('outputSchema')
+  })
+})
