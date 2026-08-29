@@ -66,12 +66,21 @@ export const isAliasPipe = <T = unknown, R = T, Args extends any[] = any[]>(
 /**
  * Checks whether a value is a class rather than a plain function.
  *
- * A class declaration's `prototype` property is non-writable, and a function's is writable. That is
- * the only reliable distinction at runtime, and it is exact for the ES2022 output these packages
- * publish. An arrow function has no `prototype` at all.
+ * A class's `prototype` property is non-writable, and a function's is writable. An arrow function has
+ * no `prototype` at all.
+ *
+ * **This survives being transpiled down to ES5, which is the case that matters here.** A browser
+ * build compiles an application with `@babel/preset-env` against that application's own
+ * `browserslist`, so a class in user code can reach the runtime as a function. Babel lowers it
+ * through its `_createClass` helper, which ends with
+ * `Object.defineProperty(e, 'prototype', { writable: false })` precisely to preserve class
+ * semantics. Measured against a real ES5 build targeting `ie 11`: both a class with its method on
+ * the prototype and one with its method as an instance field are recognised, and a plain function
+ * and an arrow function are not. The lowered class throws `TypeError: Cannot call a class as a
+ * function` when called, which is the same defect wearing a different message.
  *
  * @param value - The value to be checked.
- * @returns True when the value is a class.
+ * @returns True when the value is a class, including a class lowered to ES5.
  */
 export const isClassLike = (value: unknown): boolean => {
   if (!isFunction(value)) { return false }

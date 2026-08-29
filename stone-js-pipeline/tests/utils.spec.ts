@@ -123,3 +123,24 @@ describe('a class handed over without a marker', () => {
     expect(isClassPipe({ module: TranspiledClass as any, isClass: true })).toBe(true)
   })
 })
+
+describe('a class that reached the runtime as ES5', () => {
+  it('is still recognised, because Babel keeps the prototype non-writable', () => {
+    // A browser build compiles an application against its own `browserslist`, so a class in user
+    // code can arrive lowered to a function. This is exactly what `@babel/preset-env` emits for
+    // `ie 11`: a function whose `prototype` its `_createClass` helper has made non-writable, on
+    // purpose, to preserve class semantics. Verified against a real ES5 build of both shapes, one
+    // with its method on the prototype and one with its method as an instance field.
+    function LoweredClass (this: unknown): void {}
+    LoweredClass.prototype.handle = function (value: unknown, next: (v: unknown) => unknown): unknown { return next(value) }
+    Object.defineProperty(LoweredClass, 'prototype', { writable: false })
+
+    expect(isClassLike(LoweredClass)).toBe(true)
+    expect(isClassPipe({ module: LoweredClass as any })).toBe(true)
+
+    // And the shape it must not swallow: a plain function keeps a writable prototype.
+    function plain (value: unknown, next: (v: unknown) => unknown): unknown { return next(value) }
+    expect(Object.getOwnPropertyDescriptor(plain, 'prototype')?.writable).toBe(true)
+    expect(isClassLike(plain)).toBe(false)
+  })
+})
