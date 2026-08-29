@@ -29,7 +29,7 @@
  * Run after a build: the reports come from `dist`.
  */
 import { createRequire } from 'node:module'
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 // `typescript` is CommonJS, and its default export under Node's ESM interop is not the namespace,
@@ -95,6 +95,49 @@ function exportsOf (entry) {
     .sort((a, b) => a.localeCompare(b, 'en'))
 }
 
+/** The newest modification time under a directory, or 0 when it does not exist. */
+function newestMtime (dir) {
+  if (!existsSync(dir)) return 0
+
+  let newest = 0
+
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name)
+    newest = Math.max(newest, entry.isDirectory() ? newestMtime(path) : statSync(path).mtimeMs)
+  }
+
+  return newest
+}
+
+/**
+ * Refuse to write a baseline from a build that no longer matches its sources.
+ *
+ * The report reads `dist`, so a stale one writes a false surface: after a branch switch, a rebase or
+ * a merge, `dist` is whatever the last build left, and regenerating then **removes names the
+ * baseline correctly had** or carries another branch's additions into this one. Measured three times
+ * in one day, each caught only because `api:check` failed afterwards.
+ *
+ * Only the write path checks this. On `--check` a stale `dist` produces a diff, which is already the
+ * right answer, and CI builds before checking anyway.
+ *
+ * @param packages - The package directories to verify.
+ */
+function assertFreshBuild (packages) {
+  const stale = packages.filter((pkg) => newestMtime(join(pkg, 'src')) > newestMtime(join(pkg, 'dist')))
+
+  if (stale.length === 0) return
+
+  console.error(
+    `✖ ${stale.length} package(s) have sources newer than their build, so the report would describe\n` +
+    'a surface that no longer exists:\n' +
+    stale.map((pkg) => `  ${pkg}`).join('\n') +
+    '\n\nBuild them first (`pnpm run build:ci`, or `npx rollup -c` in each), then run this again.\n' +
+    'If `api:check` reported a name as REMOVED on code you did not touch, the committed baseline is\n' +
+    'right and your build is old: rebuild rather than regenerate.'
+  )
+  process.exit(1)
+}
+
 const packages = readdirSync('.')
   .filter((name) => name.startsWith('stone-js-'))
   .filter((name) => existsSync(join(name, 'dist', 'index.d.ts')))
@@ -104,7 +147,10 @@ const packages = readdirSync('.')
   })
   .sort()
 
-if (!check) { mkdirSync(outDir, { recursive: true }) }
+if (!check) {
+  assertFreshBuild(packages)
+  mkdirSync(outDir, { recursive: true })
+}
 
 const drifted = []
 const missing = []

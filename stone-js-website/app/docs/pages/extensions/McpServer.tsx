@@ -123,10 +123,17 @@ class NotesController {
         <H2>What is derived, and from where</H2>
         <PropsTable nameHeader='field' rows={[
           { name: 'name', type: 'string', desc: <>Stated as <code>mcp: 'create-note'</code> or <code>mcp.name</code>. Otherwise the route's own <code>name</code>.</> },
-          { name: 'description', type: 'string', desc: <>Stated as <code>mcp.description</code>. Otherwise the route's <code>openapi</code> summary or description.</> },
+          { name: 'description', type: 'string', desc: <>Stated as <code>mcp.description</code>. Otherwise the route's <code>contract</code> summary or description.</> },
           { name: 'inputSchema', type: 'JSON Schema', desc: <>Stated as <code>mcp.inputSchema</code>. Otherwise the route's validation schema, converted; failing that, its path parameters.</> },
-          { name: 'outputSchema', type: 'JSON Schema', desc: <>Stated as <code>mcp.outputSchema</code>, or nothing. A shape nobody promised is not sent.</> }
+          { name: 'outputSchema', type: 'JSON Schema', desc: <>Stated as <code>mcp.outputSchema</code>. Otherwise the resource the route publishes, converted. A shape nobody promised is still not sent.</> }
         ]} />
+        <Callout kind='note' title='Only an object schema is published'>
+          MCP carries structured output as an object, and a resource answering a bare array is a real
+          thing. Wrapping it would invent a shape the application never declared, so that route gets
+          no <code>outputSchema</code> at all: an agent told a tool returns an object it may not
+          return is worse off than one told nothing, because it will parse against a promise nobody
+          made.
+        </Callout>
         <Callout kind='note' title='Every source is optional'>
           <p>
             An application with <code>openapi</code> and <code>validation</code> writes almost

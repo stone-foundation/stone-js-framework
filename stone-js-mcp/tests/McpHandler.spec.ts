@@ -128,7 +128,7 @@ describe('listing what an agent may call', () => {
 
   it('takes the short form as the tool name', async () => {
     const { handler } = handlerFor([
-      route({ path: '/notes', method: 'POST', name: 'notes.create', mcp: 'create-note', openapi: { summary: 'Create a note.' } })
+      route({ path: '/notes', method: 'POST', name: 'notes.create', mcp: 'create-note', contract: { summary: 'Create a note.' } })
     ])
 
     const result = await answer(handler, { jsonrpc: '2.0', id: 1, method: 'tools/list' })
@@ -139,7 +139,7 @@ describe('listing what an agent may call', () => {
   it('describes a tool from what the route already documented', async () => {
     // The route wrote a summary for a human reader. A model is a reader, so it is not written twice.
     const { handler } = handlerFor([
-      route({ path: '/notes/:id', method: 'GET', name: 'notes.show', mcp: 'get-note', openapi: { description: 'Read one note.' } })
+      route({ path: '/notes/:id', method: 'GET', name: 'notes.show', mcp: 'get-note', contract: { description: 'Read one note.' } })
     ])
 
     const result = await answer(handler, { jsonrpc: '2.0', id: 1, method: 'tools/list' })

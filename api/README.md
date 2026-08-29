@@ -16,6 +16,12 @@ pnpm run api:report    # regenerate
 pnpm run api:check     # fail when the build no longer matches what is committed
 ```
 
+`api:report` refuses to run when a package's sources are newer than its build, because a report read
+from a stale `dist` describes a surface that no longer exists: after a branch switch, a rebase or a
+merge it silently **removes names the baseline correctly had**. When `api:check` reports a name as
+removed on code you did not touch, the committed baseline is right and your build is old: rebuild
+rather than regenerate.
+
 `api:check` runs in CI after the build, and inside `pnpm run verify`.
 
 When a pull request legitimately changes the surface, run `pnpm run api:report` and commit the result alongside the change. A removal is breaking: it needs a changeset that says so.
