@@ -16,3 +16,5 @@ That message names neither the cause nor either fix, and it is the one a develop
 The three terse messages now carry the same guidance, written once so the four cannot drift: the cause is a transformer emitting legacy decorators, `experimentalDecorators: true` makes esbuild (so Vite and Vitest) emit that form, and there are two ways out. `stone test` sets the right semantics for you, and a project keeping its own runner config sets them itself with `esbuild.tsconfigRaw.compilerOptions`.
 
 Measured on a scaffolded application: the same decorated class fails under a bare `vitest run` and passes under `stone test`, and passes under a plain runner config carrying those two options.
+
+The legacy shape of the published decorator signatures is deliberate, and stays. Measured on TypeScript 5.9: a factory typed legacy compiles only with `experimentalDecorators: true`, one typed 2023-11 only with it off, and a union of the two under neither. It is strictly either/or, so the checker is satisfied with the legacy shape while the runtime is 2023-11 throughout. What was missing was an error message that says which knob to turn.
