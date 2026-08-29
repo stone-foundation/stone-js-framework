@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.8.19
+
+### Patch Changes
+
+- Updated dependencies [de9865b]
+  - @stone-js/cli@0.8.19
+
 ## 0.8.18
 
 ### Patch Changes

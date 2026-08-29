@@ -1,5 +1,15 @@
 # @stone-js/mcp-dev
 
+## 0.8.19
+
+### Patch Changes
+
+- Updated dependencies [6b76c36]
+- Updated dependencies [cb52a51]
+- Updated dependencies [de9865b]
+  - @stone-js/core@0.8.19
+  - @stone-js/cli@0.8.19
+
 ## 0.8.18
 
 ### Patch Changes

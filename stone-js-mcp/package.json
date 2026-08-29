@@ -1,6 +1,6 @@
 {
   "name": "@stone-js/mcp",
-  "version": "0.8.18",
+  "version": "0.8.19",
   "description": "MCP for Stone.js: your existing routes become tools an AI agent can call, through the chain that already protects them.",
   "author": "Mr. Stone <evensstone@gmail.com>",
   "license": "MIT",
