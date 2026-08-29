@@ -31,7 +31,7 @@ Une application n'est pas un objet mais un **acte** : `Application = Domaine × 
 - **Adaptateurs (Integration)** : `stone-js-node-http-adapter`, `stone-js-aws-lambda-adapter` (générique), `stone-js-aws-lambda-http-adapter`, `stone-js-browser-adapter` (SPA), `stone-js-node-cli-adapter`.
 - **Frontend** : `stone-js-use-react` (React, SSR/CSR) et `stone-js-use-view` (couche « view engine » agnostique, réutilisable par d'autres frameworks de vue).
 - **Outillage** : `stone-js-cli` (builds de tous les projets : Rollup+Babel backend, Vite+Babel frontend, codegen `.stone/`), `stone-js` (`@stone-js/create`, scaffolder), `stone-js-starters` (templates).
-- **Docs** : `stone-js-docs` (site VuePress).
+- **Docs** : `stone-js-website` (le site est lui-même une app Stone.js SSG ; il porte la documentation, le blog et les starters). Le projet VuePress `stone-js-docs` n'existe plus.
 
 ## Conventions communes à tous les modules
 

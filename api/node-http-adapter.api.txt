@@ -17,6 +17,7 @@ const     nodeHttpAdapterBlueprint
 const     nodeHttpAdapterResolver
 const     SetNodeHttpDefaultAdapterMiddleware
 const     SetNodeHttpResponseResolverMiddleware
+function  resolveListenUrl
 function  resolveMethodOverride
 interface NodeHttpAdapterAdapterConfig
 interface NodeHttpAdapterBlueprint

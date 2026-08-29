@@ -65,7 +65,7 @@ curl localhost:8080/tasks   # your routes, served`}</Code>
         <H2>Configuration</H2>
         <PropsTable rows={[
           { name: 'default', type: 'boolean', default: 'false', desc: 'Run this adapter by default when several are stacked.' },
-          { name: 'url / host / port', type: 'string / number', desc: 'Where the server listens (also settable via the environment).' },
+          { name: 'url', type: 'string', default: 'http://localhost:8080', desc: 'Where the server listens. Left at the default, HOST and PORT from the environment are honoured.' },
           { name: 'server', type: 'object', desc: 'Underlying server options (timeouts, body limits).' },
           { name: 'shutdownGracePeriod', type: 'number', default: '10000', desc: 'How long requests in flight have to finish on SIGINT/SIGTERM before the process exits anyway.' }
         ]} />
@@ -81,6 +81,23 @@ curl localhost:8080/tasks   # your routes, served`}</Code>
           It builds on <code>@stone-js/http-core</code>, so the request and response model, cookies,
           headers and file uploads are the runtime-agnostic ones documented in Essentials.
         </p>
+
+        <H2>Where it listens</H2>
+        <p>
+          Three rules, in this order. A <code>url</code> you declared always wins, because an
+          application that pinned one said what it meant. Left at the default, <code>HOST</code> and{' '}
+          <code>PORT</code> from the environment are honoured, which is how Cloud Run, Heroku, Render,
+          Fly, App Runner and Railway tell a process where to listen. And when the port comes from the
+          environment without a <code>HOST</code>, the server binds <strong>every interface</strong>{' '}
+          rather than loopback.
+        </p>
+        <Callout kind='note' title='Why the port implies the interface'>
+          A platform that assigns the port is going to reach the process from outside its container,
+          and loopback answers nobody there. Locally, where nothing assigns a port, the default stays
+          loopback: <code>stone dev</code> does not put a development server on your network without
+          being asked, and the startup banner prints the network address only when that address can
+          actually answer.
+        </Callout>
 
         <H2>Deploy</H2>
         <p>
@@ -105,6 +122,10 @@ RUN npm run build                       # -> dist/server.mjs
 FROM node:20-slim
 WORKDIR /app
 ENV NODE_ENV=production
+# Tells the server which port to listen on, and with it to bind every interface rather than
+# loopback, which nothing outside the container can reach. A platform that injects its own PORT
+# overrides this one.
+ENV PORT=8080
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
