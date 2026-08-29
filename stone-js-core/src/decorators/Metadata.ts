@@ -226,6 +226,24 @@ export function getBlueprint<TClass extends ClassType, UReturn = StoneBlueprint>
 }
 
 /**
+ * What to do about a decorator that arrived in the legacy form.
+ *
+ * The cause is always the same and is worth stating once: a transformer emitting LEGACY decorators.
+ * `experimentalDecorators: true` makes esbuild, and therefore Vite and Vitest, emit that form, while
+ * Babel's `plugin-proposal-decorators` with `version: '2023-11'` emits the one Stone.js runs on.
+ *
+ * The message names both ways out, because a developer meeting this is usually running a test runner
+ * directly and has no reason to know that `stone test` already solves it.
+ */
+const LEGACY_DECORATOR_HINT =
+  'Stone.js decorators require the TC39 2023-11 proposal, and the usual cause is a transformer ' +
+  'emitting LEGACY decorators: the `experimentalDecorators` compiler flag makes esbuild (so Vite ' +
+  'and Vitest) emit the legacy form. Run the suite with `stone test`, which sets the right ' +
+  'semantics for you, or set them in your own runner config: esbuild.tsconfigRaw.compilerOptions ' +
+  'with `experimentalDecorators: false` and `useDefineForClassFields: true`. ' +
+  'See https://stonejs.dev/docs/start/troubleshooting'
+
+/**
  * Wraps a class decorator to ensure compatibility with both legacy and 2023-11 proposal contexts.
  *
  * This wrapper enforces that the decorator is only applied in a valid 2023-11 proposal context
@@ -246,12 +264,11 @@ export function classDecoratorLegacyWrapper<T extends ClassType = ClassType> (
         return decorator(target as unknown as T, potentialContext) as (TFunction | undefined)
       } else {
         throw new SetupError(
-          'This decorator can only be applied to classes. ' +
-          'Stone.js decorators require the TC39 2023-11 proposal, and the usual cause is a transformer emitting LEGACY decorators: the `experimentalDecorators` compiler flag makes esbuild (so Vite and Vitest) emit the legacy form, while Babel plugin-proposal-decorators with `version: 2023-11` emits the right one. Every transformer in the project must emit 2023-11. See https://stonejs.dev/docs/start/troubleshooting'
+          'This decorator can only be applied to classes. ' + LEGACY_DECORATOR_HINT
         )
       }
     } else {
-      throw new SetupError('Class decorators must be used with the 2023-11 decorators proposal. This usage is not supported.')
+      throw new SetupError('Class decorators must be used with the 2023-11 decorators proposal. ' + LEGACY_DECORATOR_HINT)
     }
   }
 }
@@ -286,7 +303,7 @@ export function methodDecoratorLegacyWrapper<T extends Function = Function> (
         )
       }
     } else {
-      throw new SetupError('Class method decorators must be used with the 2023-11 decorators proposal. This usage is not supported.')
+      throw new SetupError('Class method decorators must be used with the 2023-11 decorators proposal. ' + LEGACY_DECORATOR_HINT)
     }
   }
 }
@@ -319,7 +336,7 @@ export function propertyDecoratorLegacyWrapper (
         )
       }
     } else {
-      throw new SetupError('Class field decorators must be used with the 2023-11 decorators proposal. This usage is not supported.')
+      throw new SetupError('Class field decorators must be used with the 2023-11 decorators proposal. ' + LEGACY_DECORATOR_HINT)
     }
   }
 }

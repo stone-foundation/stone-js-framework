@@ -65,9 +65,30 @@ export class Troubleshooting implements IPage<ReactIncomingEvent> {
 }`}</Code>
         <H3>Testing a real application with Vitest</H3>
         <p>
-          Vitest transforms with esbuild, so a decorated class imported in a test hits the rule above.
-          Add Babel to the test transform and the whole application boots in-memory, handlers,
-          services, error handlers and routes included:
+          <strong>Run the suite with <code>stone test</code> and there is nothing to do.</strong> It
+          generates the runner config for you and pins the decorator semantics the framework runs on.
+          Verified on a scaffolded application: a decorated class fails under a bare{' '}
+          <code>vitest run</code> and passes under <code>stone test</code>, same file, same project.
+        </p>
+        <p>
+          Keeping your own <code>vitest.config.ts</code> is a decision, not a mistake, and it needs
+          exactly one thing: your project sets <code>experimentalDecorators: true</code> for
+          TypeScript&apos;s checker, esbuild honours it and emits the legacy form. Turn it off for the
+          runner alone, which is what <code>stone test</code> writes:
+        </p>
+        <Code file='vitest.config.ts (your own runner config)'>{`import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  esbuild: {
+    tsconfigRaw: {
+      compilerOptions: { experimentalDecorators: false, useDefineForClassFields: true }
+    }
+  },
+  test: { globals: true, include: ['tests/**/*.spec.ts'] }
+})`}</Code>
+        <p>
+          Babel is the fallback, and it is worth having when a toolchain does not read{' '}
+          <code>tsconfigRaw</code> or when you already run Babel for other reasons:
         </p>
         <Code file='vitest.config.ts'>{`import babel from 'vite-plugin-babel'
 import { defineConfig } from 'vitest/config'
