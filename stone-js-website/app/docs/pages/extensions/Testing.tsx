@@ -116,6 +116,35 @@ expect(response.html()).toContain('<h1>Tasks</h1>')`}</Code>
     vitest: { environment: 'happy-dom' }   // raw Vitest config, merged over the defaults
   }
 })`}</Code>
+        <H3>Keeping your own runner config</H3>
+        <p>
+          A monorepo with one shared Vitest config, or a project that runs unit tests straight from
+          Vitest, does not go through <code>stone test</code> and needs one thing from it. Stone.js
+          decorators are TC39 2023-11 while your <code>tsconfig.json</code> says{' '}
+          <code>experimentalDecorators: true</code> for TypeScript&apos;s checker; esbuild reads the
+          same file, honours the flag, and emits the <em>legacy</em> form, so the first decorated
+          class a test imports fails to boot.
+        </p>
+        <Code file='vitest.config.ts'>{`import { defineConfig } from 'vitest/config'
+import { decoratorSemantics } from '@stone-js/testing/vitest'
+
+export default defineConfig({
+  esbuild: decoratorSemantics,
+  test: { globals: true, include: ['tests/**/*.spec.ts'] }
+})`}</Code>
+        <Callout kind='note' title='The same value stone test writes'>
+          <code>decoratorSemantics</code> is exactly what the generated config carries, published so a
+          project imports it instead of copying two flags that must stay right. Its entry point pulls
+          nothing else in, which matters for a file loaded before everything else. Everything besides
+          those two options keeps coming from your own <code>tsconfig.json</code>, so JSX, target and
+          paths behave as they do everywhere.
+        </Callout>
+        <p>
+          It buys the decorators, and nothing more: <code>.env.test</code> loaded before the runner
+          starts and the build&apos;s own file set are what <code>stone test</code> adds on top, so an
+          integration suite is still better off going through it.
+        </p>
+
         <Aphorism>Boot the real app. Send a real intention. Assert on the real response.</Aphorism>
 
         <H3>The harness API</H3>

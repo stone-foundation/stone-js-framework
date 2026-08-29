@@ -211,3 +211,32 @@ describe('what the generated runner config must carry', () => {
     expect(JSON.parse(JSON.stringify({ inline: [/^@stone-js\//] }))).toEqual({ inline: [{}] })
   })
 })
+
+describe('the decorator semantics the generated config pins', () => {
+  beforeEach(() => {
+    // Outside the suite above, so this block arms its own runner rather than inheriting whichever
+    // mock the previous test left behind.
+    vi.clearAllMocks()
+    pathExistsSync.mockReturnValue(true)
+    spawnMock.mockImplementation(runnerExiting(0))
+  })
+
+  it('turns the flag off for the runner, and says so in the file', async () => {
+    // Stone.js decorators are TC39 2023-11 while a project's tsconfig says
+    // `experimentalDecorators: true` for TypeScript's checker. esbuild reads the same file and would
+    // emit the legacy form, so the first decorated class a test imports fails to boot. This is the
+    // one thing the generated config exists to state.
+    //
+    // The same value is published as `decoratorSemantics` in `@stone-js/testing/vitest`, for a
+    // project keeping its own runner config. It is asserted on both sides rather than imported
+    // across, because the CLI must not require a package the project may not have.
+    await new TestCommand(makeContext()).handle(makeEvent())
+
+    const source: string = outputFileSync.mock.calls[0][1]
+    const esbuild = JSON.parse(source.slice(source.indexOf('  esbuild: ') + 11, source.indexOf(',\n  test: ')))
+
+    expect(esbuild).toEqual({
+      tsconfigRaw: { compilerOptions: { experimentalDecorators: false, useDefineForClassFields: true } }
+    })
+  })
+})

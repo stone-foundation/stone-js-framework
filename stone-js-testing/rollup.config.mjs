@@ -15,11 +15,13 @@ export default createRollupConfig({
     // The agnostic half: `createTestApp`, the client, the bindings, the generic event. It imports no
     // platform package, which is what lets both of the others be optional.
     {
-      input: ['src/**/*.ts', '!src/http.ts', '!src/browser.ts'],
+      input: ['src/**/*.ts', '!src/http.ts', '!src/browser.ts', '!src/vitest.ts'],
       file: 'dist/index.js',
-      barrel: { exclude: ['http', 'browser'] }
+      barrel: { exclude: ['http', 'browser', 'vitest'] }
     },
     { input: ['src/http.ts'], file: 'dist/http.js', multiEntry: false },
-    { input: ['src/browser.ts'], file: 'dist/browser.js', multiEntry: false }
+    { input: ['src/browser.ts'], file: 'dist/browser.js', multiEntry: false },
+    // Loaded by a runner config, before anything else: its own entry so it pulls nothing with it.
+    { input: ['src/vitest.ts'], file: 'dist/vitest.js', multiEntry: false }
   ]
 })
