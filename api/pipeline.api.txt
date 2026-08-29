@@ -2,6 +2,7 @@ class     Pipeline
 class     PipelineError
 const     defineMiddleware
 const     isAliasPipe
+const     isClassLike
 const     isClassPipe
 const     isConstructor
 const     isFactoryPipe
