@@ -26,13 +26,16 @@ describe('NavigationSource', () => {
     expect(source.resolveUrl('/tasks').href).toBe('stone://app/tasks')
   })
 
-  it('should keep a deep link\'s own scheme and host', () => {
+  it('should keep a deep link\'s own scheme, and read everything after it as the path', () => {
+    // This used to expect `/tasks/42`, dropping `open` as though it were a host. It is not: a
+    // custom scheme has no authority, and every platform delivers a deep link verbatim. Treating
+    // the first segment as a host is what sent `myapp://discover` to `/`.
     const source = NavigationSource.create()
 
     const url = source.resolveUrl('myapp://open/tasks/42?from=push')
 
     expect(url.protocol).toBe('myapp:')
-    expect(url.pathname).toBe('/tasks/42')
+    expect(url.pathname).toBe('/open/tasks/42')
     expect(url.searchParams.get('from')).toBe('push')
   })
 
@@ -140,5 +143,48 @@ describe('NavigationSource', () => {
   it('should resolve to nothing when react-native is absent', async () => {
     // The package is not installed here, which is the Node case the resolver must survive.
     expect(await defaultLinkingResolver()).toBeUndefined()
+  })
+})
+
+describe('resolveUrl, against what a phone actually delivers', () => {
+  const source = (baseUrl?: string): any => NavigationSource.create(baseUrl === undefined ? {} : { baseUrl })
+
+  it('routes a deep link to the path the user wrote, not to its first segment', () => {
+    // The defect this exists for. A custom scheme is not a special scheme, so WHATWG reads the
+    // first segment as an authority: `myapp://tasks/42` parsed as host `tasks`, path `/42`, and the
+    // router served `/42`. Worse, `myapp://discover` parsed as host `discover`, path '', and the
+    // router answered `/` with 200: the wrong screen, and nothing looking wrong.
+    expect(source().resolveUrl('myapp://tasks/42').pathname).toBe('/tasks/42')
+    expect(source().resolveUrl('myapp://discover').pathname).toBe('/discover')
+    expect(source().resolveUrl('myapp://orgs/klere').pathname).toBe('/orgs/klere')
+  })
+
+  it('keeps the query and the fragment a deep link carries', () => {
+    const url = source().resolveUrl('myapp://tasks?page=2#top')
+
+    expect(url.pathname).toBe('/tasks')
+    expect(url.search).toBe('?page=2')
+    expect(url.hash).toBe('#top')
+  })
+
+  it('handles a deep link with no path at all', () => {
+    expect(source().resolveUrl('myapp://').pathname).toBe('/')
+    expect(source().resolveUrl('myapp://?name=Ada').search).toBe('?name=Ada')
+  })
+
+  it('handles the triple-slash form, where there is no authority to mistake', () => {
+    expect(source().resolveUrl('myapp:///tasks/42').pathname).toBe('/tasks/42')
+  })
+
+  it('leaves an http URL alone, because there the authority is an authority', () => {
+    const url = source().resolveUrl('https://example.test/tasks/42')
+
+    expect(url.host).toBe('example.test')
+    expect(url.pathname).toBe('/tasks/42')
+  })
+
+  it('still resolves an in-app path against the base', () => {
+    expect(source().resolveUrl('/tasks/42').pathname).toBe('/tasks/42')
+    expect(source('myapp://x').resolveUrl('/tasks').pathname).toBe('/tasks')
   })
 })

@@ -75,7 +75,7 @@ describe('ReactNativeAdapter', () => {
   it('should resolve the deep link the application was opened with', async () => {
     const seen: IncomingBrowserEvent[] = []
     const { adapter } = await bootAdapter({
-      linking: makeLinking('myapp://open/tasks/42?from=push'),
+      linking: makeLinking('myapp://tasks/42?from=push'),
       handler: (event) => { seen.push(event); return { content: 'ok' } }
     })
 
@@ -97,7 +97,7 @@ describe('ReactNativeAdapter', () => {
     })
 
     await adapter.run()
-    linking.fire('myapp://open/from-link')
+    linking.fire('myapp://from-link')
     source.navigate('/from-app')
     await settle()
 

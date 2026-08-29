@@ -30,7 +30,8 @@
     "sync:versions": "node scripts/sync-external-versions.mjs",
     "api:report": "node scripts/api-report.mjs",
     "api:check": "node scripts/api-report.mjs --check",
-    "check:dts": "node scripts/check-dts-extensions.mjs"
+    "check:dts": "node scripts/check-dts-extensions.mjs",
+    "check:exports": "node scripts/check-export-targets.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",

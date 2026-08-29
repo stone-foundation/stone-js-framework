@@ -21,7 +21,7 @@ import { NavigationSource } from '@stone-js/react-native-adapter'
  */
 describe('Navigation', () => {
   const screens = ScreenStack.create()
-  const navigation = NavigationSource.create({ baseUrl: 'stone://app' })
+  const navigation = NavigationSource.create({ baseUrl: 'stone://' })
 
   // Booted once for the whole suite, as on a device: the default blueprints are shared module
   // objects, so booting the same modules twice in one process would accumulate route definitions.
@@ -44,7 +44,7 @@ describe('Navigation', () => {
   })
 
   it('routes a deep link to the screen that owns it, parameters included', async () => {
-    navigation.navigate('stone://app/?name=Ada')
+    navigation.navigate('stone://?name=Ada')
     await settle()
 
     expect(screens.top()?.title).toBe('Ada · Welcome to Stone.js')
@@ -57,7 +57,7 @@ describe('Navigation', () => {
   })
 
   it('surfaces an unknown route instead of crashing', async () => {
-    navigation.navigate('stone://app/nowhere')
+    navigation.navigate('stone://nowhere')
     await settle()
 
     // An error page is still a screen: the application stays up and shows something.

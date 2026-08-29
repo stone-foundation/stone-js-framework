@@ -1,4 +1,5 @@
 import { ScreenStack } from '../ScreenStack'
+import { setCurrentScreenStack } from '../currentStack'
 import { STONE_SCREEN_STACK } from '../constants'
 import { onPreparingResponse } from '../PageHooks'
 import { REACT_NATIVE_PLATFORM } from '@stone-js/react-native-adapter'
@@ -29,10 +30,16 @@ export const SetScreenStackMiddleware = async (
   next: NextMiddleware<BlueprintContext<IBlueprint, ClassType>, IBlueprint>
 ): Promise<IBlueprint> => {
   const key = `stone.useReactNative.${STONE_SCREEN_STACK}`
+  const supplied = context.blueprint.get<ScreenStack>(key)
+  const stack = isEmpty(supplied) ? ScreenStack.create() : supplied
 
-  if (isEmpty(context.blueprint.get(key))) {
-    context.blueprint.set(key, ScreenStack.create())
+  if (isEmpty(supplied)) {
+    context.blueprint.set(key, stack)
   }
+
+  // Published outside the container as well, because the root component is outside every event and
+  // has no container to ask. The object in hand, not a read-back: see `currentStack.ts`.
+  setCurrentScreenStack(stack)
 
   return await next(context)
 }

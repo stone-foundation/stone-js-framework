@@ -41,7 +41,7 @@
       }
     },
     "./cli": {
-      "types": "./dist/cli.d.ts",
+      "types": "./dist/cli/index.d.ts",
       "default": "./dist/cli.js"
     }
   },

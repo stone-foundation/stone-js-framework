@@ -1,6 +1,9 @@
 import { DEFAULT_BASE_URL } from './constants'
 import { LinkingLike, LinkingResolver, NavigationIntent, NavigationListener, NavigationOrigin } from './declarations'
 
+/** A URL carrying its own scheme, as the platform delivers a deep link. */
+const ABSOLUTE = /^[a-z][a-z0-9+.-]*:/i
+
 /**
  * The default linking resolver: React Native's own `Linking` module, or nothing.
  *
@@ -11,9 +14,23 @@ import { LinkingLike, LinkingResolver, NavigationIntent, NavigationListener, Nav
  * @returns The linking module, or `undefined` when the platform has none.
  */
 export const defaultLinkingResolver: LinkingResolver = async (): Promise<LinkingLike | undefined> => {
+  // `require` first, and only its `Linking` key. Building the ESM namespace of `react-native`
+  // evaluates **every** getter on its index, including deprecated modules such as
+  // `PushNotificationIOS` whose native half is not linked on a fresh Expo prebuild: constructing
+  // one crashed the application at boot with `new NativeEventEmitter() requires a non-null
+  // argument`, before the first screen. A CommonJS `require` returns the exports object and runs
+  // only the getter that is read, which is what every React Native application does.
   try {
-    const reactNative = await import('react-native')
-    return (reactNative as unknown as { Linking?: LinkingLike }).Linking
+    // `require` is what Metro provides in module scope; referencing it under Node throws, which is
+    // exactly the case the catch handles.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return (require('react-native') as { Linking?: LinkingLike }).Linking
+  } catch {
+    // No `require` in scope, or no module: fall through.
+  }
+
+  try {
+    return (await import('react-native') as unknown as { Linking?: LinkingLike }).Linking
   } catch {
     return undefined
   }
@@ -140,7 +157,32 @@ export class NavigationSource {
    * @returns The absolute URL.
    */
   resolveUrl (url: string): URL {
-    return new URL(url, `${this.baseUrl}/`)
+    // A path from inside the application: the base makes it a URL, and its own host is a
+    // placeholder that never reaches the router.
+    if (!ABSOLUTE.test(url)) {
+      return new URL(url, `${this.baseUrl}/`)
+    }
+
+    const parsed = new URL(url)
+
+    // `http` and `https` are special schemes, so what was parsed as a host really is one.
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed
+    }
+
+    // Every other scheme has no authority, and this is the case a phone actually delivers.
+    // `myapp://tasks/42` parses as host `tasks` and path `/42`, because a custom scheme is not
+    // special and WHATWG reads the first segment as an authority. Routing that verbatim sends
+    // `myapp://tasks/42` to `/42`, and `myapp://discover` to `/`, which answers 200 with the wrong
+    // screen and looks like nothing is wrong. What the user wrote after the scheme is the path.
+    const segments = [parsed.host, parsed.pathname.replace(/^\//, '')].filter((part) => part !== '')
+
+    // Rewritten in place rather than rebuilt against the base, so the event keeps the scheme it
+    // arrived with: a handler that wants to know a deep link brought it here still can.
+    parsed.host = ''
+    parsed.pathname = `/${segments.join('/')}`
+
+    return parsed
   }
 
   /**

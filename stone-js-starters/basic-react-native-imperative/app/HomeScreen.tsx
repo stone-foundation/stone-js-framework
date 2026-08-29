@@ -21,7 +21,7 @@ export const HomeScreen = ({ logger }: AppOptions): IPage<ReactIncomingEvent> =>
     /**
      * Handle incoming events.
      *
-     * A deep link carries its parameters here: `stone://app/?name=Ada` arrives as an event, and
+     * A deep link carries its parameters here: `stone://?name=Ada` arrives as an event, and
      * `event.get` reads from it the same way an HTTP request would be read.
      *
      * @param event - Incoming event.
