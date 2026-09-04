@@ -111,6 +111,7 @@ function  useData
 function  useEvent
 function  useEventEmitter
 function  useHead
+function  useLink
 function  useRawEvent
 function  useRoute
 function  useRouter
@@ -128,6 +129,8 @@ interface IAdapterErrorPage
 interface IErrorPage
 interface IPage
 interface IPageLayout
+interface Link
+interface LinkTarget
 interface LoadOutcome
 interface MetaAdapterErrorPage
 interface MetaErrorPage

@@ -61,15 +61,37 @@ describe('React stubs', () => {
     expect(html).toContain('<style>custom</style>')
   })
 
-  it('viteDevServerTemplate should return server entry with default serverName', () => {
+  it('imports the runner from the package that actually exports it', () => {
+    // The template named `@stone-js/cli` after both runners had moved here, so every `stone dev` of
+    // a React application died on `does not provide an export named 'runDevServer'` before a line of
+    // the application ran. These two assertions were what said it was fine.
     const code = viteDevServerTemplate()
-    expect(code).toContain('import { runDevServer } from \'@stone-js/cli\'')
+
+    expect(code).toContain('import { runDevServer } from \'@stone-js/use-react/cli\'')
     expect(code).toContain('const server = await runDevServer()')
   })
 
-  it('viteDevServerTemplate should accept a custom serverName', () => {
-    const code = viteDevServerTemplate('start')
-    expect(code).toContain('import { start } from \'@stone-js/cli\'')
-    expect(code).toContain('const server = await start()')
+  it('accepts a custom runner name, from the same package', () => {
+    const code = viteDevServerTemplate('runPreviewServer')
+
+    expect(code).toContain('import { runPreviewServer } from \'@stone-js/use-react/cli\'')
+    expect(code).toContain('const server = await runPreviewServer()')
+  })
+
+  it('names a runner this package really exports', async () => {
+    // The assertion the two above could not make: the import specifier and the name are checked
+    // against the module itself, so renaming or moving a runner fails here instead of at the first
+    // `stone dev` somebody runs.
+    //
+    // The module that declares them, not the `./cli` barrel: importing the barrel drags every
+    // build-time module it re-exports into this suite's coverage, and a test should not decide what
+    // the gauge measures. The barrel re-exports this file wholesale, and the API report guards what
+    // reaches the entry point.
+    const cli = await import('../../src/cli/react-utils')
+
+    for (const name of ['runDevServer', 'runPreviewServer']) {
+      expect(viteDevServerTemplate(name)).toContain(`import { ${name} } from '@stone-js/use-react/cli'`)
+      expect(typeof (cli as unknown as Record<string, unknown>)[name]).toBe('function')
+    }
   })
 })

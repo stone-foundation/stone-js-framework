@@ -132,9 +132,16 @@ export const reactHtmlEntryPointTemplate = (
 /**
  * The Vite server template.
  * This template is used to create the server entry point for a Vite application.
+ *
+ * The import is `@stone-js/use-react/cli`, not `@stone-js/cli`. Both runners moved here when this
+ * package took over the React build, and the template kept naming the package it had left: every
+ * `stone dev` of a React application died on
+ * `SyntaxError: The requested module '@stone-js/cli' does not provide an export named 'runDevServer'`
+ * before a single line of the application ran. Nothing caught it, because no test starts a dev
+ * server and the generated file is only ever executed by one.
  */
 export const viteDevServerTemplate = (serverName: string = 'runDevServer'): string => `
-import { ${serverName} } from '@stone-js/cli'
+import { ${serverName} } from '@stone-js/use-react/cli'
 
 const server = await ${serverName}()
 
