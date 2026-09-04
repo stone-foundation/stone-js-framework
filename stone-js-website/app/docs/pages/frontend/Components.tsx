@@ -30,15 +30,33 @@ export class Components implements IPage<ReactIncomingEvent> {
 
         <H2>Framework components</H2>
         <PropsTable nameHeader='Component' rows={[
-          { name: '<StoneLink to={} />', type: 'link', desc: 'Client-side navigation in SPA/SSR, a normal link where that is right.' },
+          { name: '<StoneLink name={} params={} />', type: 'link', desc: 'Client-side navigation in SPA/SSR, addressed by route name, a normal link where that is right.' },
           { name: '<StoneOutlet>', type: 'outlet', desc: 'Where a layout renders its page.' },
           { name: '<StonePage />', type: 'page mount', desc: 'Mounts a resolved page (advanced; used internally and for custom shells).' }
         ]} />
         <Code file='app/pages/TaskRow.tsx' lang='tsx'>{`import { StoneLink } from '@stone-js/use-react'
 
 export function TaskRow ({ task }: { task: Task }) {
-  return <StoneLink to={\`/tasks/\${task.id}\`}>{task.title}</StoneLink>
+  return <StoneLink name='tasks.show' params={{ id: task.id }}>{task.title}</StoneLink>
 }`}</Code>
+        <p>
+          <strong>Name the route, do not write the path.</strong> The router owns the shape of every
+          path, so a link that names a route and hands over its parameters cannot go stale the day
+          that path changes, and a name nobody declared says so in the console instead of rendering a
+          broken address that looks fine. Everything <code>router.generate()</code> accepts is a
+          prop: <code>params</code>, <code>query</code>, <code>hash</code>, <code>protocol</code> and{' '}
+          <code>withDomain</code>.
+        </p>
+        <Code file='more of the same component' lang='tsx'>{`<StoneLink name='tasks.index' query={{ page: 2 }} hash='top'>Page 2</StoneLink>
+<StoneLink href='https://stonejs.dev' external>The site</StoneLink>   // no route describes it
+<StoneLink to={\`/tasks/\${task.id}\`}>Still works</StoneLink>          // the older way`}</Code>
+        <Callout kind='note' title='The same link on mobile'>
+          An anchor is a browser element and a route name is not, so the resolution lives in{' '}
+          <code>@stone-js/use-react-core</code> as <code>useLink</code> and only the rendering lives
+          here. A React Native component calls the same hook and gets the address, whether the link
+          is current, and a <code>navigate()</code> that goes through the router:
+          <code> const {'{'} href, isCurrent, navigate {'}'} = useLink({'{'} name: 'tasks.show', params: {'{'} id {'}'} {'}'})</code>.
+        </Callout>
 
         <H2>Hooks</H2>
         <p>
