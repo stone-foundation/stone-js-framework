@@ -42,17 +42,27 @@ export interface StonePluginContext {
   reporter: StoneReporter
 
   /**
-   * Resolve a path inside the `.stone/tmp` build directory (where generated entries live).
+   * Resolve a path inside `.stone`, the build directory.
    *
-   * @param paths - Path segments joined under `.stone/tmp`.
+   * Not `.stone/tmp`: that one is scratch space for a build, and it is **deleted when the build
+   * ends**. A file a plugin generates is imported by the application, so a development server keeps
+   * loading it for the whole session, long after some build swept its scratch away. Writing there
+   * gave `ENOENT: no such file or directory, open '.stone/tmp/plugins/i18n.mjs'` in the middle of a
+   * dev session, from Vite's own transform step.
+   *
+   * Write under `plugins/`: that directory is emptied at the start of every run, so a module is
+   * always fresh and never missing, and one left behind by a plugin that is no longer installed
+   * cannot be served by mistake.
+   *
+   * @param paths - Path segments joined under `.stone`.
    * @returns The absolute path.
    */
   buildPath: (...paths: string[]) => string
 
   /**
-   * Write a file into the `.stone/tmp` build directory, creating parent directories as needed.
+   * Write a file into `.stone`, creating parent directories as needed. Use `plugins/<name>`.
    *
-   * @param relativePath - The path, relative to `.stone/tmp`.
+   * @param relativePath - The path, relative to `.stone`. By convention, `plugins/<name>`.
    * @param content - The file content.
    * @returns The absolute path written.
    */
@@ -64,9 +74,11 @@ export interface StonePluginContext {
    * The specifier is imported by the generated entry point and its exports are collected into
    * the app's `modules` (exactly like the user's own `app/**` modules), so a plugin can inject
    * decorated classes, blueprints or `defineBuilderConfig(...)` meta-modules. Use a specifier that
-   * resolves from `.stone/tmp` (a relative path like `./plugins/x.mjs`, or a bare package name).
+   * resolves from `.stone` (a relative path like `./plugins/x.mjs`, or a bare package name); it is
+   * rewritten for whichever entry imports it, since a production entry lives in `.stone/tmp` and a
+   * development one in `.stone`.
    *
-   * @param specifier - An import specifier resolvable from `.stone/tmp`.
+   * @param specifier - An import specifier resolvable from `.stone`.
    */
   addModule: (specifier: string) => void
 

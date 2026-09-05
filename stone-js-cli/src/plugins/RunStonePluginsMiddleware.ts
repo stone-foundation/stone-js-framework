@@ -1,9 +1,21 @@
+import fsExtra from 'fs-extra'
 import { IBlueprint } from '@stone-js/core'
 import { NextPipe } from '@stone-js/pipeline'
+import { buildPath } from '@stone-js/filesystem'
 import { LoadedStonePlugin } from './loadPlugins'
 import { StoneReporter } from '../StoneReporter'
 import { ConsoleContext } from '../declarations'
 import { PluginContributions, createStonePluginContext } from './StonePluginContext'
+
+const { emptyDirSync } = fsExtra
+
+/**
+ * Where a plugin writes what it generates, by convention.
+ *
+ * Kept private: a plugin author writes the path themselves, `plugins/x.mjs`, and a second public
+ * name for one word would be one more thing frozen at the API freeze for nothing.
+ */
+const PLUGINS_DIR = 'plugins'
 
 /**
  * The build-phase hooks a plugin can expose, run at distinct moments of the lifecycle.
@@ -71,7 +83,18 @@ export const RunStonePluginsPrepareMiddleware = async (
   context: ConsoleContext,
   next: NextPipe<ConsoleContext, IBlueprint>
 ): Promise<IBlueprint> => {
+  // Emptied at the START of the run, and never at the end. A generated module is imported by the
+  // application, so a development server keeps loading it for the whole session: deleting it when
+  // some build finished is what gave `ENOENT` from Vite's transform step, in the middle of a session
+  // that was working a second earlier. Emptying here gives the other half of the guarantee, that a
+  // module left by a plugin no longer installed is never served in place of nothing.
+  //
+  // Unconditional, before the plugins run and even when none are loaded, because a stale file
+  // outliving the plugin that wrote it is exactly the case the emptying exists for.
+  emptyDirSync(buildPath(PLUGINS_DIR))
+
   await runPluginHook(context, 'onPrepare', true)
+
   return await next(context)
 }
 

@@ -35,18 +35,21 @@ describe('StonePluginContext', () => {
     expect(ctx.reporter).toBe(reporter)
   })
 
-  it('resolves paths inside the .stone/tmp directory', () => {
+  it('resolves paths inside .stone, not the build scratch', () => {
     const ctx = createStonePluginContext(context, 'build', reporter, createPluginContributions())
-    expect(ctx.buildPath('a', 'b.mjs')).toBe('/project/.stone/tmp/a/b.mjs')
+    expect(ctx.buildPath('a', 'b.mjs')).toBe('/project/.stone/a/b.mjs')
   })
 
-  it('writes files into .stone/tmp and returns the absolute path', () => {
+  it('writes files into .stone, which a build does not sweep away', () => {
     const ctx = createStonePluginContext(context, 'build', reporter, createPluginContributions())
     const path = ctx.writeFile('plugins/x.mjs', 'export const a = 1')
 
-    expect(buildPath).toHaveBeenCalledWith('tmp', 'plugins/x.mjs')
-    expect(fsExtra.outputFileSync).toHaveBeenCalledWith('/project/.stone/tmp/plugins/x.mjs', 'export const a = 1', 'utf-8')
-    expect(path).toBe('/project/.stone/tmp/plugins/x.mjs')
+    // `.stone/tmp` is scratch for a build and is deleted when the build ends. What a plugin
+    // generates is imported by the application, so a dev server keeps loading it long after: writing
+    // it there gave `ENOENT` from Vite's transform step, mid-session.
+    expect(buildPath).toHaveBeenCalledWith('plugins/x.mjs')
+    expect(fsExtra.outputFileSync).toHaveBeenCalledWith('/project/.stone/plugins/x.mjs', 'export const a = 1', 'utf-8')
+    expect(path).toBe('/project/.stone/plugins/x.mjs')
   })
 
   it('accumulates modules and de-duplicates them', () => {
