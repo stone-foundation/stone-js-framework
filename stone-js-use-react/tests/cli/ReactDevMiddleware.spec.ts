@@ -22,7 +22,10 @@ vi.mock('@stone-js/filesystem', async () => ({
   buildPath: vi.fn((p?: string) => `/build/${p ?? ''}`)
 }))
 
-vi.mock('../../src/cli/stubs', async () => ({
+vi.mock('../../src/cli/stubs', async (importOriginal) => ({
+  // The real glob constants: a mock that omitted them let the entry generator fall back to whatever
+  // the mock returned, which is how a pattern could change without a single test noticing.
+  ...(await importOriginal<Record<string, unknown>>()),
   reactClientEntryPointTemplate: vi.fn().mockReturnValue('// client'),
   reactHtmlEntryPointTemplate: vi.fn().mockReturnValue('<html><!--main-js--><!--main-css--></html>'),
   reactConsoleEntryPointTemplate: vi.fn().mockReturnValue('// console'),

@@ -12,7 +12,11 @@ import { NODE_CONSOLE_PLATFORM } from '@stone-js/node-cli-adapter'
 describe('React stubs', () => {
   it('reactClientEntryPointTemplate should return valid client entry code with default path', () => {
     const code = reactClientEntryPointTemplate()
-    expect(code).toContain("const rawModules = import.meta.glob('./app/**/*.{ts,js,mjs,json}'")
+    // Modules, not data. A JSON catalogue swept in here is dead weight in the entry chunk and junk
+    // in the module list, and it is what cancelled lazy i18n loading for every application keeping
+    // its catalogues at the conventional `app/i18n`.
+    expect(code).toContain("const rawModules = import.meta.glob('./app/**/*.{ts,tsx,js,jsx,mjs}'")
+    expect(code).not.toContain('json')
     expect(code).toContain('export const stone = stoneApp({ modules }).run()')
   })
 

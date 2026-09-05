@@ -1,12 +1,30 @@
 import { NODE_CONSOLE_PLATFORM } from '@stone-js/node-cli-adapter'
 
 /**
+ * What the generated entry points glob for: modules, not everything under `app/`.
+ *
+ * An entry eagerly imports what it globs and spreads each module's exports into
+ * `stoneApp({ modules })`, so a data file swept in here is both dead weight in the entry chunk and
+ * junk in the module list. The previous catch-all pattern took images, stylesheets and JSON with it, and
+ * i18n catalogues above all: they live at the conventional `app/i18n`, they are meant to load one
+ * locale at a time, and a static import always wins over a dynamic one. A French reader downloaded
+ * every English catalogue, and the only sign was a wall of Rollup warnings inside a build log.
+ *
+ * `EAGER` is used when pages are bundled with everything else; `LAZY` is the narrower set for when
+ * pages come through their own module and must not be pulled in twice.
+ */
+export const APP_MODULES_GLOB_EAGER: string = 'app/**/*.{ts,tsx,js,jsx,mjs}'
+
+/** The same, for a build whose pages are loaded separately. */
+export const APP_MODULES_GLOB_LAZY: string = 'app/**/*.{ts,js,mjs}'
+
+/**
  * The React client template.
  * This template is used to create the client entry point for a React application.
  * Note: This file is embedded in the index.html file.
  */
 export const reactClientEntryPointTemplate = (
-  path = './app/**/*.{ts,js,mjs,json}'
+  path = `./${APP_MODULES_GLOB_EAGER}`
 ): string => `
 import { stoneApp } from '@stone-js/core'
 

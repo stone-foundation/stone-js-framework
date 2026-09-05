@@ -2,6 +2,7 @@ import {
   viteDevServerTemplate,
   reactHtmlEntryPointTemplate,
   reactConsoleEntryPointTemplate,
+  APP_MODULES_GLOB_EAGER,
   reactClientEntryPointTemplate
 } from './stubs'
 import { applyPluginInjections, ConsoleContext, generatePublicEnvironmentsFile, isTypescriptApp, setCache } from '@stone-js/cli'
@@ -30,7 +31,7 @@ export const GenerateEntryPointFileMiddleware = async (
 ): Promise<IBlueprint> => {
   const pattern = relative(
     buildPath(),
-    basePath(context.blueprint.get('stone.builder.input.all', 'app/**/*.**'))
+    basePath(context.blueprint.get('stone.builder.input.all', APP_MODULES_GLOB_EAGER))
   )
 
   const isTypescript = isTypescriptApp(context.blueprint, context.event)
@@ -140,7 +141,7 @@ export const GenerateReactConsoleFileMiddleware = async (
 ): Promise<IBlueprint> => {
   const pattern = relative(
     buildPath(),
-    basePath(context.blueprint.get('stone.builder.input.all', 'app/**/*.**'))
+    basePath(context.blueprint.get('stone.builder.input.all', APP_MODULES_GLOB_EAGER))
   )
 
   const isTypescript = isTypescriptApp(context.blueprint, context.event)
@@ -176,7 +177,7 @@ export const BuildConsoleAppMiddleware = async (
   next: NextPipe<ConsoleContext, IBlueprint>
 ): Promise<IBlueprint> => {
   const userConfig = await getViteConfig('build', 'production')
-  const pattern = context.blueprint.get('stone.builder.input.all', 'app/**/*.**')
+  const pattern = context.blueprint.get('stone.builder.input.all', APP_MODULES_GLOB_EAGER)
   const filename = isTypescriptApp(context.blueprint, context.event) ? 'index.console.ts' : 'index.console.mjs'
   const customInput = {
     build: {

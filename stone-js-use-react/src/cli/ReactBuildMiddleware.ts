@@ -12,7 +12,7 @@ import { removeImportsVitePlugin } from './RemoveImportsVitePlugin'
 import { basePath, buildPath, distPath } from '@stone-js/filesystem'
 import { isNotEmpty, IBlueprint, ClassType, isStoneBlueprint } from '@stone-js/core'
 import { generateDeclarativeLazyPages, generateImperativeLazyPages, getViteConfig } from './react-utils'
-import { reactHtmlEntryPointTemplate, reactClientEntryPointTemplate, reactServerEntryPointTemplate } from './stubs'
+import { APP_MODULES_GLOB_EAGER, APP_MODULES_GLOB_LAZY, reactHtmlEntryPointTemplate, reactClientEntryPointTemplate, reactServerEntryPointTemplate } from './stubs'
 import { MetaAdapterErrorPage, MetaErrorPage, MetaPageLayout, ReactIncomingEvent, UseReactBlueprint } from '@stone-js/use-react-core'
 
 const { outputFileSync, moveSync, removeSync, readFileSync } = fsExtra
@@ -214,8 +214,8 @@ export const GenerateClientFileMiddleware = async (
   }
 
   const basePattern = basePath(!isLazy
-    ? context.blueprint.get('stone.builder.input.all', 'app/**/*.**')
-    : context.blueprint.get('stone.builder.input.app', 'app/**/*.{ts,js,mjs,json}'))
+    ? context.blueprint.get('stone.builder.input.all', APP_MODULES_GLOB_EAGER)
+    : context.blueprint.get('stone.builder.input.app', APP_MODULES_GLOB_LAZY))
   const pattern = relative(buildPath('tmp'), basePattern)
 
   const isTypescript = isTypescriptApp(context.blueprint, context.event)
@@ -256,7 +256,7 @@ export const GenerateReactServerFileMiddleware = async (
 ): Promise<IBlueprint> => {
   const pattern = relative(
     buildPath('tmp'),
-    basePath(context.blueprint.get('stone.builder.input.all', 'app/**/*.**'))
+    basePath(context.blueprint.get('stone.builder.input.all', APP_MODULES_GLOB_EAGER))
   )
   const printUrls = context.blueprint.get('stone.builder.server.printUrls', true)
 
