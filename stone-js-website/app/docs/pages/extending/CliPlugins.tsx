@@ -89,10 +89,22 @@ export class CliPlugins implements IPage<ReactIncomingEvent> {
           { name: 'command', type: 'string', desc: 'Which command is driving the lifecycle: build, dev, preview, ...' },
           { name: 'event', type: 'IncomingEvent', desc: 'The console event, carrying the CLI flags and arguments.' },
           { name: 'reporter', type: 'StoneReporter', desc: 'Branded output that matches the CLI look.' },
-          { name: 'writeFile', type: '(path, content) => string', desc: 'Write a file into the .stone/tmp build directory.' },
+          { name: 'writeFile', type: '(path, content) => string', desc: 'Write a file into .stone, under plugins/ by convention. Emptied at the start of every run.' },
           { name: 'addModule', type: '(specifier) => void', desc: 'Add a module to the built app: its exports join the app modules, exactly like app/** files.' },
           { name: 'addBlueprint', type: '(statement) => void', desc: 'Inject a statement into the entry configure step, where a local blueprint is in scope (server and console entries).' }
         ]} />
+
+        <Callout kind='note' title='Write under plugins/, never into .stone/tmp'>
+          <code>.stone/tmp</code> is scratch for a build and is <strong>deleted when the build
+          ends</strong>. What a plugin generates is imported by the application, so a development
+          server keeps loading it for the whole session: a file written there disappeared under a
+          running dev server the moment some build finished, as{' '}
+          <code>ENOENT: no such file or directory</code> from Vite&apos;s own transform step.{' '}
+          <code>writeFile</code> puts your file under <code>.stone</code>, and{' '}
+          <code>.stone/plugins</code> is emptied at the <em>start</em> of every run, so a module is
+          always fresh, never missing mid-session, and one left behind by a plugin that is no longer
+          installed is never served in its place.
+        </Callout>
 
         <H2>A minimal plugin</H2>
         <p>

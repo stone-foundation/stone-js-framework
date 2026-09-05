@@ -57,9 +57,9 @@ export function createStonePluginContext (
     reporter,
     event: context.event,
     blueprint: context.blueprint,
-    buildPath: (...paths: string[]) => buildPath('tmp', ...paths),
+    buildPath: (...paths: string[]) => buildPath(...paths),
     writeFile: (relativePath: string, content: string) => {
-      const absolute = buildPath('tmp', relativePath)
+      const absolute = buildPath(relativePath)
       outputFileSync(absolute, content, 'utf-8')
       return absolute
     },

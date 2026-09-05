@@ -14,9 +14,9 @@ import { injectPluginBlueprints, injectPluginModules } from './inject'
  * @param content - The entry template source.
  * @param blueprint - The build blueprint carrying the contributions.
  * @param entryDir - Where the generated entry will be written. Contributed relative specifiers are
- *                   rewritten against it, because a plugin writes its files into `.stone/tmp` while
- *                   an entry lives there only for a production build; a development entry sits in
- *                   `.stone`, where `./plugins/x.mjs` resolves to a file that is not there.
+ *                   rewritten against it, because a plugin writes its files into `.stone` while an
+ *                   entry lives in `.stone/tmp` for a production build and in `.stone` for a
+ *                   development one: the same specifier has to reach the same file from both.
  * @returns The transformed source.
  */
 export function applyPluginInjections (
@@ -35,7 +35,7 @@ export function applyPluginInjections (
  * Rewrite a contributed specifier so the generated entry can actually import it.
  *
  * A bare package name is left alone: it resolves through `node_modules` from anywhere. A relative
- * one is resolved against `.stone/tmp`, where `context.writeFile` puts every plugin file, and then
+ * one is resolved against `.stone`, where `context.writeFile` puts every plugin file, and then
  * expressed relative to the entry that will import it.
  *
  * @param specifier - What the plugin contributed.
@@ -45,7 +45,7 @@ export function applyPluginInjections (
 function resolveSpecifier (specifier: string, entryDir: string): string {
   if (!specifier.startsWith('.')) { return specifier }
 
-  const target = buildPath('tmp', specifier.replace(/^\.\/?/, ''))
+  const target = buildPath(specifier.replace(/^\.\/?/, ''))
   const relativePath = relative(entryDir, target).replaceAll('\\', '/')
 
   return relativePath.startsWith('.') ? relativePath : `./${relativePath}`

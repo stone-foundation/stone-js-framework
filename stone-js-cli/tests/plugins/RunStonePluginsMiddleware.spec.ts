@@ -8,7 +8,8 @@ vi.mock('@stone-js/filesystem', () => ({
   buildPath: vi.fn((...paths: string[]) => `/proj/.stone/${paths.join('/')}`)
 }))
 
-vi.mock('fs-extra', () => ({ default: { outputFileSync: vi.fn() } }))
+const emptyDirSync = vi.fn()
+vi.mock('fs-extra', () => ({ default: { outputFileSync: vi.fn(), emptyDirSync: (...args: any[]) => emptyDirSync(...args) } }))
 
 const step = vi.fn()
 vi.mock('../../src/StoneReporter', () => ({
