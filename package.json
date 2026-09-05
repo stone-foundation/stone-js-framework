@@ -21,7 +21,7 @@
     "test:ci": "pnpm -r --filter='!@stone-js/website' --filter='!@stone-js/lab-*' --filter='!@stone-js/starters' --filter='!@stone-js/blog-starters' run test:cvg",
     "test:lab": "pnpm -r --filter='@stone-js/lab-*' run test",
     "lint:ci": "pnpm -r --filter='!@stone-js/website' --filter='!@stone-js/lab-*' --filter='!@stone-js/starters' --filter='!@stone-js/blog-starters' run lint",
-    "verify": "pnpm run lint:ci && pnpm run build:ci && pnpm run api:check && pnpm run test:ci && pnpm run audit:ci && pnpm run check:dts",
+    "verify": "pnpm run lint:ci && pnpm run build:ci && pnpm run api:check && pnpm run test:ci && pnpm run audit:ci && pnpm run check:dts && pnpm run smoke:ci",
     "audit:ci": "node scripts/audit-lockfiles.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version && node scripts/sync-external-versions.mjs",
@@ -30,7 +30,8 @@
     "sync:versions": "node scripts/sync-external-versions.mjs",
     "api:report": "node scripts/api-report.mjs",
     "api:check": "node scripts/api-report.mjs --check",
-    "check:dts": "node scripts/check-dts-extensions.mjs"
+    "check:dts": "node scripts/check-dts-extensions.mjs",
+    "smoke:ci": "node scripts/smoke-lab.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
