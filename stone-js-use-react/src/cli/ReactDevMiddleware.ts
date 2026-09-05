@@ -5,6 +5,7 @@ import {
   reactClientEntryPointTemplate
 } from './stubs'
 import { applyPluginInjections, ConsoleContext, generatePublicEnvironmentsFile, isTypescriptApp, setCache } from '@stone-js/cli'
+import { injectEnvScript } from './ReactBuildMiddleware'
 import fsExtra from 'fs-extra'
 import { relative } from 'node:path'
 import { build, mergeConfig } from 'vite'
@@ -117,10 +118,9 @@ export const GeneratePublicEnvFileDevMiddleware = async (
 
   outputFileSync(
     buildPath('index.html'),
-    content.replace(
-      '<!--env-js-->',
-      hasEnvFile ? '<script src="environments.js"></script>' : ''
-    ),
+    // The same injection the build does, through the same function: three places wrote this by hand
+    // and one of them was wrong for the life of a release.
+    injectEnvScript(content, hasEnvFile ? 'environments.js' : undefined),
     'utf-8'
   )
 

@@ -244,6 +244,22 @@ export const GenerateClientFileMiddleware = async (
 }
 
 /**
+ * Put the public environment script where the marker says, or take the marker out.
+ *
+ * Written once because it is now needed in three places, and because the one place that did not do
+ * it is the whole defect: an SSR document served `<!--env-js-->` verbatim to every visitor while the
+ * built `index.html` next to it carried the script. `window.process.env` was therefore empty in a
+ * server-rendered page, and nothing said so.
+ *
+ * @param html - The document to inject into.
+ * @param src - Where the generated script lives, or nothing when there is no public environment.
+ * @returns The document.
+ */
+export function injectEnvScript (html: string, src?: string): string {
+  return html.replace('<!--env-js-->', src === undefined ? '' : `<script src="${src}"></script>`)
+}
+
+/**
  * Generates a server file for all modules in the application.
  *
  * @param context The console context.
@@ -276,9 +292,18 @@ export const GenerateReactServerFileMiddleware = async (
     .replace('%pattern%', pattern)
     .replace("'%printUrls%'", String(printUrls))
 
+  // The template is frozen into the server bundle here, so the environment script has to be in it
+  // BEFORE that happens. `GeneratePublicEnvFileMiddleware` runs three steps later and rewrites
+  // `dist/index.html`, which the client loads and the server never reads again: the server carried
+  // the raw marker for the life of the build.
+  const hasEnvFile = generatePublicEnvironmentsFile(context.blueprint, distPath('env'))
+
   outputFileSync(
     buildPath('tmp/template.mjs'),
-    `export const indexHtmlTemplate = \`${readFileSync(distPath('.stone/tmp/index.html'), 'utf-8')}\`;`,
+    `export const indexHtmlTemplate = \`${injectEnvScript(
+      readFileSync(distPath('.stone/tmp/index.html'), 'utf-8'),
+      hasEnvFile ? '/env/environments.js' : undefined
+    )}\`;`,
     'utf-8'
   )
 
@@ -431,10 +456,7 @@ export const GeneratePublicEnvFileMiddleware = async (
 
   outputFileSync(
     distPath('index.html'),
-    content.replace(
-      '<!--env-js-->',
-      hasEnvFile ? '<script src="/env/environments.js"></script>' : ''
-    ),
+    injectEnvScript(content, hasEnvFile ? '/env/environments.js' : undefined),
     'utf-8'
   )
 
