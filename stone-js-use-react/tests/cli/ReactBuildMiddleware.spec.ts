@@ -85,7 +85,10 @@ vi.mock('../../src/cli/react-utils', async () => ({
   generateImperativeLazyPages: vi.fn(() => ({ definitions: [], layouts: {}, errorPages: {}, adapterErrorPages: {} }))
 }))
 
-vi.mock('../../src/cli/stubs', async () => ({
+vi.mock('../../src/cli/stubs', async (importOriginal) => ({
+  // The real glob constants: a mock that omitted them let the entry generator fall back to whatever
+  // the mock returned, which is how a pattern could change without a single test noticing.
+  ...(await importOriginal<Record<string, unknown>>()),
   reactHtmlEntryPointTemplate: vi.fn(() => '<html><!--main-js--><!--main-css--></html>'),
   reactClientEntryPointTemplate: vi.fn(() => '// client %pattern%\n// %concat%'),
   reactServerEntryPointTemplate: vi.fn(() => '// server %pattern%\n// %blueprint%')
