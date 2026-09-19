@@ -2415,11 +2415,11 @@ importers:
         specifier: workspace:*
         version: link:../../../stone-js-use-react
       react:
-        specifier: ^19.2.8
-        version: 19.2.8
+        specifier: ^19.3.0
+        version: 19.3.0
       react-dom:
         specifier: ^19.2.8
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.25.9
@@ -2440,11 +2440,11 @@ importers:
         specifier: ^24.0.7
         version: 24.13.3
       '@types/react':
-        specifier: ^19.0.7
-        version: 19.2.17
+        specifier: ^19.3.0
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.17)
+        version: 19.2.3(@types/react@19.3.0)
       vitest:
         specifier: ^3.0.9
         version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
@@ -2467,11 +2467,11 @@ importers:
         specifier: workspace:*
         version: link:../../../stone-js-use-react
       react:
-        specifier: ^19.2.8
-        version: 19.2.8
+        specifier: ^19.3.0
+        version: 19.3.0
       react-dom:
         specifier: ^19.2.8
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.25.9
@@ -2489,11 +2489,11 @@ importers:
         specifier: ^24.0.7
         version: 24.13.3
       '@types/react':
-        specifier: ^19.0.7
-        version: 19.2.17
+        specifier: ^19.3.0
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.17)
+        version: 19.2.3(@types/react@19.3.0)
 
   stone-js-lab/apps/ssg:
     dependencies:
@@ -2516,11 +2516,11 @@ importers:
         specifier: workspace:*
         version: link:../../../stone-js-use-react
       react:
-        specifier: ^19.2.8
-        version: 19.2.8
+        specifier: ^19.3.0
+        version: 19.3.0
       react-dom:
         specifier: ^19.2.8
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.25.9
@@ -2544,11 +2544,11 @@ importers:
         specifier: ^24.0.7
         version: 24.13.3
       '@types/react':
-        specifier: ^19.0.7
-        version: 19.2.17
+        specifier: ^19.3.0
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.17)
+        version: 19.2.3(@types/react@19.3.0)
       vitest:
         specifier: ^3.0.9
         version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
@@ -2574,11 +2574,11 @@ importers:
         specifier: workspace:*
         version: link:../../../stone-js-use-react
       react:
-        specifier: ^19.2.8
-        version: 19.2.8
+        specifier: ^19.3.0
+        version: 19.3.0
       react-dom:
         specifier: ^19.2.8
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.25.9
@@ -2596,11 +2596,11 @@ importers:
         specifier: ^24.0.7
         version: 24.13.3
       '@types/react':
-        specifier: ^19.0.7
-        version: 19.2.17
+        specifier: ^19.3.0
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.17)
+        version: 19.2.3(@types/react@19.3.0)
 
   stone-js-lab/apps/ssr:
     dependencies:
@@ -2623,11 +2623,11 @@ importers:
         specifier: workspace:*
         version: link:../../../stone-js-use-react
       react:
-        specifier: ^19.2.8
-        version: 19.2.8
+        specifier: ^19.3.0
+        version: 19.3.0
       react-dom:
         specifier: ^19.2.8
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.25.9
@@ -2651,11 +2651,11 @@ importers:
         specifier: ^24.0.7
         version: 24.13.3
       '@types/react':
-        specifier: ^19.0.7
-        version: 19.2.17
+        specifier: ^19.3.0
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.17)
+        version: 19.2.3(@types/react@19.3.0)
       vitest:
         specifier: ^3.0.9
         version: 3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0)
@@ -2681,11 +2681,11 @@ importers:
         specifier: workspace:*
         version: link:../../../stone-js-use-react
       react:
-        specifier: ^19.2.8
-        version: 19.2.8
+        specifier: ^19.3.0
+        version: 19.3.0
       react-dom:
         specifier: ^19.2.8
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.25.9
@@ -2703,11 +2703,11 @@ importers:
         specifier: ^24.0.7
         version: 24.13.3
       '@types/react':
-        specifier: ^19.0.7
-        version: 19.2.17
+        specifier: ^19.3.0
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.17)
+        version: 19.2.3(@types/react@19.3.0)
 
   stone-js-mcp:
     dependencies:
@@ -4324,10 +4324,10 @@ importers:
         version: 13.0.6
       react:
         specifier: ^19.0.0
-        version: 19.2.8
+        version: 19.3.0
       react-dom:
         specifier: ^19.0.0
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
       vite:
         specifier: ^6.0.5
         version: 6.4.3(@types/node@24.13.3)(jiti@2.6.1)(terser@5.50.0)(yaml@2.9.0)
@@ -4361,7 +4361,7 @@ importers:
         version: link:../stone-js-node-cli-adapter
       '@testing-library/react':
         specifier: ^16.3.0
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
@@ -4370,10 +4370,10 @@ importers:
         version: 24.13.3
       '@types/react':
         specifier: ^19.0.7
-        version: 19.2.17
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.17)
+        version: 19.2.3(@types/react@19.3.0)
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
@@ -4433,7 +4433,7 @@ importers:
         version: link:../stone-js-use-view
       react:
         specifier: ^19.0.0
-        version: 19.2.8
+        version: 19.3.0
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
@@ -4455,13 +4455,13 @@ importers:
         version: 12.3.0(rollup@4.62.2)(tslib@2.8.1)(typescript@5.9.3)
       '@testing-library/react':
         specifier: ^16.3.0
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)
       '@types/node':
         specifier: ^24.0.7
         version: 24.13.3
       '@types/react':
         specifier: ^19.0.7
-        version: 19.2.17
+        version: 19.3.0
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
@@ -4527,7 +4527,7 @@ importers:
         version: 7.0.6
       react:
         specifier: ^19.0.0
-        version: 19.2.8
+        version: 19.3.0
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.8.1
@@ -4552,7 +4552,7 @@ importers:
         version: link:../stone-js-cli
       '@testing-library/react':
         specifier: ^16.3.0
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)
       '@types/cross-spawn':
         specifier: ^6.0.6
         version: 6.0.6
@@ -4561,7 +4561,7 @@ importers:
         version: 24.13.3
       '@types/react':
         specifier: ^19.0.7
-        version: 19.2.17
+        version: 19.3.0
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.7(vitest@3.2.7(@types/node@24.13.3)(jiti@2.6.1)(jsdom@26.1.0)(terser@5.50.0)(yaml@2.9.0))
@@ -4731,7 +4731,7 @@ importers:
     dependencies:
       '@docsearch/js':
         specifier: ^3.9.0
-        version: 3.9.0(@algolia/client-search@5.56.0)(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(search-insights@2.17.3)
+        version: 3.9.0(@algolia/client-search@5.56.0)(@types/react@19.3.0)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)(search-insights@2.17.3)
       '@stone-js/browser-adapter':
         specifier: workspace:*
         version: link:../stone-js-browser-adapter
@@ -4752,10 +4752,10 @@ importers:
         version: 1.30.0
       react:
         specifier: ^19.2.8
-        version: 19.2.8
+        version: 19.3.0
       react-dom:
         specifier: ^19.2.8
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.25.9
@@ -4777,10 +4777,10 @@ importers:
         version: 1.26.6
       '@types/react':
         specifier: ^19.0.7
-        version: 19.2.17
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.17)
+        version: 19.2.3(@types/react@19.3.0)
       typedoc:
         specifier: ^0.28.20
         version: 0.28.20(typescript@7.0.2)
@@ -6530,8 +6530,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.2.0
 
-  '@types/react@19.2.17':
-    resolution: {integrity: sha512-MXfmqaVPEVgkBT/aY0aGCkRWWtByiYQXo3xdQ8r5RzuFrPiRn8Gar2tQdXSUQ2GKV3bkXckek89V8wQBY2Q/Aw==}
+  '@types/react@19.3.0':
+    resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
 
   '@types/request@2.48.13':
     resolution: {integrity: sha512-FGJ6udDNUCjd19pp0Q3iTiDkwhYup7J8hpMW9c4k53NrccQFFWKRho6hvtPPEhnXWKvukfwAlB6DbDz4yhH5Gg==}
@@ -6833,6 +6833,11 @@ packages:
 
   acorn@8.17.0:
     resolution: {integrity: sha512-xRQbDb9BnwDafYNn6Vwl839DYVjqXYb1XVGtWAZ1kcDc6iwAL4hg3B1dZlRiuENFeO2H53gFG3in621AdERVAg==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
+  acorn@8.18.0:
+    resolution: {integrity: sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -9032,8 +9037,8 @@ packages:
     resolution: {integrity: sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==}
     engines: {node: '>=0.10.0'}
 
-  react@19.2.8:
-    resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
+  react@19.3.0:
+    resolution: {integrity: sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==}
     engines: {node: '>=0.10.0'}
 
   read-yaml-file@1.1.0:
@@ -11445,9 +11450,9 @@ snapshots:
 
   '@docsearch/css@3.9.0': {}
 
-  '@docsearch/js@3.9.0(@algolia/client-search@5.56.0)(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(search-insights@2.17.3)':
+  '@docsearch/js@3.9.0(@algolia/client-search@5.56.0)(@types/react@19.3.0)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)(search-insights@2.17.3)':
     dependencies:
-      '@docsearch/react': 3.9.0(@algolia/client-search@5.56.0)(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(search-insights@2.17.3)
+      '@docsearch/react': 3.9.0(@algolia/client-search@5.56.0)(@types/react@19.3.0)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)(search-insights@2.17.3)
       preact: 10.29.7
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -11457,16 +11462,16 @@ snapshots:
       - react-dom
       - search-insights
 
-  '@docsearch/react@3.9.0(@algolia/client-search@5.56.0)(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(search-insights@2.17.3)':
+  '@docsearch/react@3.9.0(@algolia/client-search@5.56.0)(@types/react@19.3.0)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)(search-insights@2.17.3)':
     dependencies:
       '@algolia/autocomplete-core': 1.17.9(@algolia/client-search@5.56.0)(algoliasearch@5.56.0)(search-insights@2.17.3)
       '@algolia/autocomplete-preset-algolia': 1.17.9(@algolia/client-search@5.56.0)(algoliasearch@5.56.0)
       '@docsearch/css': 3.9.0
       algoliasearch: 5.56.0
     optionalDependencies:
-      '@types/react': 19.2.17
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
+      '@types/react': 19.3.0
+      react: 19.3.0
+      react-dom: 19.2.8(react@19.3.0)
       search-insights: 2.17.3
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -11988,15 +11993,15 @@ snapshots:
       picocolors: 1.1.1
       pretty-format: 27.5.1
 
-  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@testing-library/dom': 10.4.1
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
+      react: 19.3.0
+      react-dom: 19.2.8(react@19.3.0)
     optionalDependencies:
-      '@types/react': 19.2.17
-      '@types/react-dom': 19.2.3(@types/react@19.2.17)
+      '@types/react': 19.3.0
+      '@types/react-dom': 19.2.3(@types/react@19.3.0)
 
   '@tootallnate/once@2.0.1': {}
 
@@ -12143,11 +12148,11 @@ snapshots:
 
   '@types/range-parser@1.2.7': {}
 
-  '@types/react-dom@19.2.3(@types/react@19.2.17)':
+  '@types/react-dom@19.2.3(@types/react@19.3.0)':
     dependencies:
-      '@types/react': 19.2.17
+      '@types/react': 19.3.0
 
-  '@types/react@19.2.17':
+  '@types/react@19.3.0':
     dependencies:
       csstype: 3.2.3
 
@@ -12458,6 +12463,9 @@ snapshots:
       acorn: 8.17.0
 
   acorn@8.17.0: {}
+
+  acorn@8.18.0:
+    optional: true
 
   agent-base@6.0.2:
     dependencies:
@@ -14874,9 +14882,9 @@ snapshots:
       iconv-lite: 0.7.3
       unpipe: 1.0.0
 
-  react-dom@19.2.8(react@19.2.8):
+  react-dom@19.2.8(react@19.3.0):
     dependencies:
-      react: 19.2.8
+      react: 19.3.0
       scheduler: 0.27.0
 
   react-is@16.13.1: {}
@@ -14885,7 +14893,7 @@ snapshots:
 
   react-refresh@0.17.0: {}
 
-  react@19.2.8: {}
+  react@19.3.0: {}
 
   read-yaml-file@1.1.0:
     dependencies:
@@ -15392,7 +15400,7 @@ snapshots:
   terser@5.50.0:
     dependencies:
       '@jridgewell/source-map': 0.3.11
-      acorn: 8.17.0
+      acorn: 8.18.0
       commander: 2.20.3
       source-map-support: 0.5.21
     optional: true

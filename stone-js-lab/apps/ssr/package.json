@@ -21,7 +21,7 @@
     "@stone-js/node-http-adapter": "workspace:*",
     "@stone-js/router": "workspace:*",
     "@stone-js/use-react": "workspace:*",
-    "react": "^19.2.8",
+    "react": "^19.3.0",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "@stone-js/http-core": "workspace:*",
     "@stone-js/testing": "workspace:*",
     "@types/node": "^24.0.7",
-    "@types/react": "^19.0.7",
+    "@types/react": "^19.3.0",
     "@types/react-dom": "^19.0.3",
     "vitest": "^3.0.9"
   }
