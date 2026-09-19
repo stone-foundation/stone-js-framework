@@ -21,7 +21,7 @@
     "@stone-js/router": "workspace:*",
     "@stone-js/use-react": "workspace:*",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.25.9",
@@ -31,7 +31,7 @@
     "@stone-js/testing": "workspace:*",
     "@types/node": "^24.0.7",
     "@types/react": "^19.0.7",
-    "@types/react-dom": "^19.0.3",
+    "@types/react-dom": "^19.3.0",
     "vitest": "^3.0.9"
   }
 }
